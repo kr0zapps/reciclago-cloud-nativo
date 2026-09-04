@@ -2,9 +2,9 @@
 
 ## 🧑‍💻 Desarrollador 1: Frontend, BFF y Seguridad
 
-- [ ] Task 1.1: Configurar el Tenant de Azure AD y registrar la aplicación (Obtener clientId y tenantId).
-- [ ] Task 1.2: Scaffold del proyecto Frontend en Angular.
-- [ ] Task 1.3: Integración de MSAL en Angular para el Login público y protección de rutas.
+- [x] Task 1.1: Configurar el Tenant de Azure AD y registrar la aplicación (Obtener clientId y tenantId).
+- [x] Task 1.2: Scaffold del proyecto Frontend en Angular.
+- [x] Task 1.3: Integración de MSAL en Angular para el Login público y protección de rutas.
 - [ ] Task 1.4: Implementar `ms-reciclago-bff` con Spring Boot y Spring Security (Validador de JWT).
 - [ ] Task 1.5: Creación de Pantallas (Dashboard, Retiros, Catálogo, Reportes, Auditoría) conectadas al BFF.
 
