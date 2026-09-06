@@ -1,0 +1,13 @@
+# Docker volumes and local data
+*.log
+.env
+
+# IDE and OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Maven / Build output
+target/
+*.class

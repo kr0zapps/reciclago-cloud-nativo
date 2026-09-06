@@ -10,9 +10,9 @@
 
 ## 🧑‍💻 Desarrollador 2: Backend Core, Infraestructura y Eventos
 
-- [ ] Task 2.1: Configurar el `docker-compose.yml` base para la infraestructura (RabbitMQ, Kafka, Zookeeper, DB).
-- [ ] Task 2.2: Implementar `ms-reciclago-catalog` (REST + DB) para tipos de residuos y camiones.
-- [ ] Task 2.3: Implementar `ms-reciclago-pickups` (REST + DB + RabbitMQ publisher + Kafka producer) para gestión de retiros.
+- [x] Task 2.1: Configurar el `docker-compose.yml` base para la infraestructura (RabbitMQ, Kafka, Zookeeper, DB).
+- [x] Task 2.2: Implementar `ms-reciclago-catalog` (REST + DB) para tipos de residuos y camiones.
+- [x] Task 2.3: Implementar `ms-reciclago-pickups` (REST + DB + RabbitMQ publisher + Kafka producer) para gestión de retiros.
 - [ ] Task 2.4: Implementar `ms-reciclago-notify` (consumidor RabbitMQ para emails/tickets).
 - [ ] Task 2.5: Implementar `ms-reciclago-audit` (consumidor Kafka para el timeline).
 - [ ] Task 2.6: Implementar `ms-reciclago-report` (consumidor Kafka para KPIs).
