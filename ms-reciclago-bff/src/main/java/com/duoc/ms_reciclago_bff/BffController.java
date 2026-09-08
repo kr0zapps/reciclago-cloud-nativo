@@ -1,18 +1,32 @@
 package com.duoc.ms_reciclago_bff;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClient;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping
 public class BffController {
+
+    private final RestClient restClient;
+
+    @Value("${reciclago.services.catalog-url:http://localhost:8081}")
+    private String catalogUrl;
+
+    @Value("${reciclago.services.pickups-url:http://localhost:8083}")
+    private String pickupsUrl;
+
+    public BffController(RestClient.Builder restClientBuilder) {
+        this.restClient = restClientBuilder.build();
+    }
 
     @GetMapping("/public/status")
     public ResponseEntity<Map<String, Object>> getPublicStatus() {
@@ -45,12 +59,117 @@ public class BffController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/api/catalog/residuos")
+    public ResponseEntity<?> getResiduos() {
+        try {
+            List<?> residuos = restClient.get()
+                    .uri(catalogUrl + "/api/catalog/residuos")
+                    .retrieve()
+                    .body(List.class);
+            return ResponseEntity.ok(residuos);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Error comunicando con ms-reciclago-catalog");
+            error.put("details", e.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+        }
+    }
+
+    @GetMapping("/api/catalog/tarifas")
+    public ResponseEntity<?> getTarifas() {
+        try {
+            List<?> tarifas = restClient.get()
+                    .uri(catalogUrl + "/api/catalog/tarifas")
+                    .retrieve()
+                    .body(List.class);
+            return ResponseEntity.ok(tarifas);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Error comunicando con ms-reciclago-catalog");
+            error.put("details", e.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+        }
+    }
+
+    @GetMapping("/api/pickups")
+    public ResponseEntity<?> getPickups(@RequestParam(required = false) String vecinoEmail) {
+        try {
+            String uri = pickupsUrl + "/api/pickups";
+            if (vecinoEmail != null && !vecinoEmail.isBlank()) {
+                uri += "?vecinoEmail=" + vecinoEmail;
+            }
+            List<?> pickups = restClient.get()
+                    .uri(uri)
+                    .retrieve()
+                    .body(List.class);
+            return ResponseEntity.ok(pickups);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Error comunicando con ms-reciclago-pickups");
+            error.put("details", e.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+        }
+    }
+
+    @PostMapping("/api/pickups")
+    public ResponseEntity<?> createPickup(@AuthenticationPrincipal Jwt jwt, @RequestBody Map<String, Object> payload) {
+        try {
+            if (!payload.containsKey("vecinoEmail") || payload.get("vecinoEmail") == null) {
+                String email = jwt.getClaimAsString("preferred_username");
+                if (email == null) email = jwt.getClaimAsString("upn");
+                payload.put("vecinoEmail", email);
+            }
+            if (!payload.containsKey("vecinoNombre") || payload.get("vecinoNombre") == null) {
+                String name = jwt.getClaimAsString("name");
+                if (name == null) name = jwt.getClaimAsString("preferred_username");
+                payload.put("vecinoNombre", name);
+            }
+
+            Object response = restClient.post()
+                    .uri(pickupsUrl + "/api/pickups")
+                    .body(payload)
+                    .retrieve()
+                    .body(Object.class);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Error al crear solicitud en ms-reciclago-pickups");
+            error.put("details", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+    }
+
     @GetMapping("/api/pickups/summary")
     public ResponseEntity<Map<String, Object>> getPickupsSummary(@AuthenticationPrincipal Jwt jwt) {
+        String email = jwt.getClaimAsString("preferred_username");
+        if (email == null) email = jwt.getClaimAsString("upn");
+
         Map<String, Object> response = new HashMap<>();
-        response.put("message", "Resumen de retiros disponible para usuarios autorizados");
-        response.put("user", jwt.getClaimAsString("preferred_username"));
+        response.put("user", email);
+        response.put("name", jwt.getClaimAsString("name"));
         response.put("roles", jwt.getClaimAsStringList("roles"));
+
+        try {
+            List<?> allPickups = restClient.get()
+                    .uri(pickupsUrl + "/api/pickups")
+                    .retrieve()
+                    .body(List.class);
+
+            List<?> myPickups = restClient.get()
+                    .uri(pickupsUrl + "/api/pickups?vecinoEmail=" + email)
+                    .retrieve()
+                    .body(List.class);
+
+            response.put("totalSystemPickups", allPickups != null ? allPickups.size() : 0);
+            response.put("userPickupsCount", myPickups != null ? myPickups.size() : 0);
+            response.put("userPickups", myPickups);
+            response.put("status", "SUCCESS");
+        } catch (Exception e) {
+            response.put("status", "PARTIAL");
+            response.put("message", "Microservicio de retiros no disponible actualmente");
+        }
+
         return ResponseEntity.ok(response);
     }
 }

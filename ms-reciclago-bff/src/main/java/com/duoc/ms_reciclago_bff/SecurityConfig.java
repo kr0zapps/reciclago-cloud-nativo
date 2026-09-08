@@ -3,10 +3,8 @@ package com.duoc.ms_reciclago_bff;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,8 +15,7 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jwt.*;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -50,15 +47,15 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("Admin")
                 .requestMatchers("/api/coordinador/**").hasAnyRole("Admin", "Coordinador")
-                .requestMatchers("/api/pickups/**").hasAnyRole("Admin", "Coordinador", "Vecino")
-                .requestMatchers("/api/catalog/**").hasAnyRole("Admin", "Coordinador", "Vecino")
+                .requestMatchers("/api/pickups/**").authenticated()
+                .requestMatchers("/api/catalog/**").authenticated()
                 .requestMatchers("/api/me").authenticated()
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(jwt -> jwt
                     .decoder(jwtDecoder())
-                    .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                    .jwtAuthenticationConverter(customJwtAuthenticationConverter())
                 )
                 .authenticationEntryPoint(authenticationEntryPoint())
                 .accessDeniedHandler(accessDeniedHandler())
@@ -71,38 +68,53 @@ public class SecurityConfig {
     public JwtDecoder jwtDecoder() {
         NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuerUri);
 
-        OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuerUri);
-        OAuth2TokenValidator<Jwt> withAudience = new OAuth2TokenValidator<Jwt>() {
-            @Override
-            public OAuth2TokenValidatorResult validate(Jwt token) {
-                List<String> audiences = token.getAudience();
-                if (audiences != null && (audiences.contains(audience) || audiences.stream().anyMatch(a -> a.contains("20ae8f6f-ef82-48a6-a4ae-897d36212b4b")))) {
-                    return OAuth2TokenValidatorResult.success();
-                }
-                OAuth2Error error = new OAuth2Error("invalid_token", "El token no contiene la audiencia requerida: " + audience, null);
-                return OAuth2TokenValidatorResult.failure(error);
+        OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
+        OAuth2TokenValidator<Jwt> withIssuer = (Jwt token) -> {
+            String iss = token.getIssuer() != null ? token.getIssuer().toString() : "";
+            if (iss.contains("5625266d-cae0-4070-a7ea-b5e88273580f")) {
+                return OAuth2TokenValidatorResult.success();
             }
+            return OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token", "Emisor no corresponde al tenant de RecicLaGo: " + iss, null));
         };
 
-        jwtDecoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(withIssuer, withAudience));
+        OAuth2TokenValidator<Jwt> withAudience = (Jwt token) -> {
+            List<String> audiences = token.getAudience();
+            if (audiences != null && audiences.stream().anyMatch(a -> a.contains("20ae8f6f-ef82-48a6-a4ae-897d36212b4b") || a.contains(audience))) {
+                return OAuth2TokenValidatorResult.success();
+            }
+            return OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token", "Audiencia no corresponde a la aplicacion: " + audiences, null));
+        };
+
+        jwtDecoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer, withAudience));
         return jwtDecoder;
     }
 
-    private Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter defaultGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-
-        return (Jwt jwt) -> {
-            Collection<GrantedAuthority> authorities = new ArrayList<>(defaultGrantedAuthoritiesConverter.convert(jwt));
+    private JwtAuthenticationConverter customJwtAuthenticationConverter() {
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setPrincipalClaimName("preferred_username");
+        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            Collection<GrantedAuthority> authorities = new ArrayList<>();
 
             Object rolesClaim = jwt.getClaims().get("roles");
-            if (rolesClaim instanceof List<?> rolesList) {
+            if (rolesClaim instanceof List<?> rolesList && !rolesList.isEmpty()) {
                 for (Object role : rolesList) {
                     authorities.add(new SimpleGrantedAuthority("ROLE_" + role.toString()));
                 }
+            } else {
+                authorities.add(new SimpleGrantedAuthority("ROLE_Vecino"));
             }
 
-            return new JwtAuthenticationToken(jwt, authorities, jwt.getClaimAsString("preferred_username"));
-        };
+            Object scpClaim = jwt.getClaims().get("scp");
+            if (scpClaim instanceof String scpString) {
+                for (String scope : scpString.split(" ")) {
+                    authorities.add(new SimpleGrantedAuthority("SCOPE_" + scope));
+                }
+            }
+
+            return authorities;
+        });
+
+        return converter;
     }
 
     @Bean
@@ -110,7 +122,10 @@ public class SecurityConfig {
         return (request, response, authException) -> {
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Token JWT no valido o ausente\"}");
+            String detail = authException != null && authException.getMessage() != null
+                ? authException.getMessage().replace("\"", "'")
+                : "Token JWT no valido o ausente";
+            response.getWriter().write("{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"" + detail + "\"}");
         };
     }
 
@@ -119,7 +134,10 @@ public class SecurityConfig {
         return (request, response, accessDeniedException) -> {
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write("{\"status\":403,\"error\":\"Forbidden\",\"message\":\"Acceso denegado: no cuentas con el rol requerido\"}");
+            String detail = accessDeniedException != null && accessDeniedException.getMessage() != null
+                ? accessDeniedException.getMessage().replace("\"", "'")
+                : "Acceso denegado: no cuentas con el rol requerido";
+            response.getWriter().write("{\"status\":403,\"error\":\"Forbidden\",\"message\":\"" + detail + "\"}");
         };
     }
 

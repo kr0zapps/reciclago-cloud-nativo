@@ -15,14 +15,14 @@ main                      (Rama productiva / Entrega final al docente)
 develop                   (Rama de desarrollo común e integración continua)
   ▲                     ▲
   │                     │
-feature/dev1-frontend-bff  feature/dev2-backend-core
+dev1-frontend-bff       dev2-backend-core
 (Desarrollador 1)       (Desarrollador 2)
 ```
 
 - **`main`**: Código estable y funcional listo para evaluación.
 - **`develop`**: Rama base donde convergen los cambios de ambos desarrolladores.
-- **`feature/dev1-frontend-bff`**: Rama exclusiva de trabajo para el Desarrollador 1.
-- **`feature/dev2-backend-core`**: Rama exclusiva de trabajo para el Desarrollador 2.
+- **`dev1-frontend-bff`**: Rama exclusiva de trabajo para el Desarrollador 1.
+- **`dev2-backend-core`**: Rama exclusiva de trabajo para el Desarrollador 2.
 
 ---
 
@@ -30,7 +30,7 @@ feature/dev1-frontend-bff  feature/dev2-backend-core
 
 ### 🧑‍💻 Desarrollador 1: Frontend, BFF y Seguridad
 - **Módulos a cargo:** `frontend-reciclago/` y `ms-reciclago-bff/`
-- **Rama:** `feature/dev1-frontend-bff`
+- **Rama:** `dev1-frontend-bff`
 
 #### Tareas y Entregables (Pauta EP1 - 100% de la nota):
 1. **Frontend en Angular (`frontend-reciclago`)**:
@@ -56,7 +56,7 @@ feature/dev1-frontend-bff  feature/dev2-backend-core
 
 #### Tareas y Entregables:
 1. **Infraestructura Base (`docker-compose.yml`)**:
-   - Contenedor de base de datos relacional (PostgreSQL en puerto 5432, con esquema compatible para Oracle).
+   - Contenedor de base de datos relacional (PostgreSQL en puerto 5433, con esquema compatible para Oracle).
    - Clúster de RabbitMQ (puerto AMQP 5672 y Management UI en puerto 15672).
    - Entorno Apache Kafka (Zookeeper en 2181 y Broker Kafka en 9092 / 29092).
 
@@ -66,7 +66,7 @@ feature/dev1-frontend-bff  feature/dev2-backend-core
    - Endpoints REST para CRUD de tipos de residuo, capacidad de flota y tarifas asociadas.
    - Pruebas unitarias/integración básicas para validar que `mvn test` ejecute con éxito.
 
-3. **Microservicio Retiros (`ms-reciclago-pickups`) - Puerto 8082**:
+3. **Microservicio Retiros (`ms-reciclago-pickups`) - Puerto 8083**:
    - Entidad JPA `Pickup` con control de ciclo de vida de estados (`SOLICITADO` → `PROGRAMADO` → `EN_RUTA` → `RETIRADO` → `PESADO` / `CANCELADO`).
    - Endpoints REST para solicitar retiros, consultar historial y actualizar estados.
    - Publicación asíncrona de mensajes en RabbitMQ (`q.cmd.email`, `q.cmd.route`) al programar o iniciar rutas.
@@ -97,7 +97,7 @@ Abrir una terminal por cada servicio:
   .\mvnw.cmd spring-boot:run
   ```
 
-- **Retiros (Puerto 8082):**
+- **Retiros (Puerto 8083):**
   ```powershell
   cd ms-reciclago-pickups
   .\mvnw.cmd spring-boot:run
