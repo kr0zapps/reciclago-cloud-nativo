@@ -11,3 +11,9 @@ Thumbs.db
 # Maven / Build output
 target/
 *.class
+
+# Node / Angular Frontend
+node_modules/
+.angular/
+dist/
+.env*
