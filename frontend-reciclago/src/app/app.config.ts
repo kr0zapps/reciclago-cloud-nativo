@@ -41,7 +41,10 @@ export const appConfig: ApplicationConfig = {
       useValue: {
         interactionType: InteractionType.Redirect,
         authRequest: {
-          scopes: ['user.read']
+          scopes: [
+            'user.read',
+            'api://' + environment.msalConfig.auth.clientId + '/access_as_user'
+          ]
         }
       }
     },
