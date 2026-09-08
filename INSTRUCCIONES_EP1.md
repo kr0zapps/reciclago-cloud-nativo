@@ -99,7 +99,7 @@ Tu foco es garantizar que **los microservicios compilen**, la **base de datos fu
 
 ### 📌 Tareas de Compatibilidad y Compilación (¡Crítico!)
 
-- [ ] **2.1. Ajuste de Java 17 en `pom.xml` de Catálogo y Pickups**
+- [x] **2.1. Ajuste de Java 17 en `pom.xml` de Catálogo y Pickups**
   - **Archivos:** 
     - `ms-reciclago-catalog/pom.xml`
     - `ms-reciclago-pickups/pom.xml`
