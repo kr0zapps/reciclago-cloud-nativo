@@ -50,7 +50,6 @@ export const appConfig: ApplicationConfig = {
       useValue: {
         interactionType: InteractionType.Redirect,
         protectedResourceMap: new Map([
-          // Todas las llamadas a nuestro backend local irán protegidas con Token
           ['http://localhost:8080/api/*', ['api://' + environment.msalConfig.auth.clientId + '/access_as_user']]
         ])
       }

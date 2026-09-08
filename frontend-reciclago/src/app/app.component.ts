@@ -1,33 +1,34 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
+import { RouterOutlet, RouterModule } from '@angular/router';
 import { MsalService, MSAL_GUARD_CONFIG, MsalGuardConfiguration, MsalBroadcastService } from '@azure/msal-angular';
 import { InteractionType, PopupRequest, RedirectRequest } from '@azure/msal-browser';
 import { Subject } from 'rxjs';
-import { filter, takeUntil } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule],
+  imports: [RouterOutlet, RouterModule, CommonModule],
   template: `
-    <div style="text-align:center; margin-top: 50px;">
-      <h1>Bienvenido a RecicLaGo</h1>
-      
-      <div *ngIf="!isIframe">
-        <button *ngIf="!loginDisplay" (click)="login()">Iniciar sesión con Microsoft</button>
-        <button *ngIf="loginDisplay" (click)="logout()">Cerrar sesión</button>
+    <nav style="display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background-color: #1b5e20; color: white;">
+      <div style="font-size: 20px; font-weight: bold;">RecicLaGo Cloud</div>
+      <div style="display: flex; gap: 20px; align-items: center;">
+        <a routerLink="/" style="color: white; text-decoration: none;">Inicio</a>
+        <a routerLink="/dashboard" style="color: white; text-decoration: none;">Panel</a>
+        <button *ngIf="!loginDisplay" (click)="login()" style="padding: 8px 16px; background-color: white; color: #1b5e20; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+          Iniciar sesión
+        </button>
+        <button *ngIf="loginDisplay" (click)="logout()" style="padding: 8px 16px; background-color: #c62828; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+          Cerrar sesión
+        </button>
       </div>
-      
-      <div *ngIf="loginDisplay" style="margin-top: 20px; padding: 20px; background: #e0f7fa; border-radius: 8px;">
-        <h3>¡Autenticación Exitosa!</h3>
-        <p>Ya puedes acceder a los retiros de la comunidad.</p>
-      </div>
-    </div>
-    <router-outlet></router-outlet>
+    </nav>
+    <main>
+      <router-outlet></router-outlet>
+    </main>
   `
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   isIframe = false;
   loginDisplay = false;
   private readonly _destroying$ = new Subject<void>();
@@ -36,7 +37,7 @@ export class AppComponent implements OnInit {
     @Inject(MSAL_GUARD_CONFIG) private msalGuardConfig: MsalGuardConfiguration,
     private authService: MsalService,
     private msalBroadcastService: MsalBroadcastService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.isIframe = window !== window.parent && !window.opener;
@@ -47,11 +48,15 @@ export class AppComponent implements OnInit {
     });
   }
 
-  setLoginDisplay() {
-    this.loginDisplay = this.authService.instance.getAllAccounts().length > 0;
+  setLoginDisplay(): void {
+    const accounts = this.authService.instance.getAllAccounts();
+    this.loginDisplay = accounts.length > 0;
+    if (this.loginDisplay && !this.authService.instance.getActiveAccount()) {
+      this.authService.instance.setActiveAccount(accounts[0]);
+    }
   }
 
-  login() {
+  login(): void {
     if (this.msalGuardConfig.interactionType === InteractionType.Popup) {
       if (this.msalGuardConfig.authRequest) {
         this.authService.loginPopup({ ...this.msalGuardConfig.authRequest } as PopupRequest)
@@ -75,7 +80,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  logout() {
+  logout(): void {
     this.authService.logoutRedirect();
   }
 
