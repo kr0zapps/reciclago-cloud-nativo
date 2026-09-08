@@ -15,14 +15,14 @@ main                      (Rama productiva / Entrega final al docente)
 develop                   (Rama de desarrollo común e integración continua)
   ▲                     ▲
   │                     │
-feature/dev1-frontend-bff  feature/dev2-backend-core
+dev1-frontend-bff       dev2-backend-core
 (Desarrollador 1)       (Desarrollador 2)
 ```
 
 - **`main`**: Código estable y funcional listo para evaluación.
 - **`develop`**: Rama base donde convergen los cambios de ambos desarrolladores.
-- **`feature/dev1-frontend-bff`**: Rama exclusiva de trabajo para el Desarrollador 1.
-- **`feature/dev2-backend-core`**: Rama exclusiva de trabajo para el Desarrollador 2.
+- **`dev1-frontend-bff`**: Rama exclusiva de trabajo para el Desarrollador 1.
+- **`dev2-backend-core`**: Rama exclusiva de trabajo para el Desarrollador 2.
 
 ---
 
@@ -30,7 +30,7 @@ feature/dev1-frontend-bff  feature/dev2-backend-core
 
 ### 🧑‍💻 Desarrollador 1: Frontend, BFF y Seguridad
 - **Módulos a cargo:** `frontend-reciclago/` y `ms-reciclago-bff/`
-- **Rama:** `feature/dev1-frontend-bff`
+- **Rama:** `dev1-frontend-bff`
 
 #### Tareas y Entregables (Pauta EP1 - 100% de la nota):
 1. **Frontend en Angular (`frontend-reciclago`)**:
