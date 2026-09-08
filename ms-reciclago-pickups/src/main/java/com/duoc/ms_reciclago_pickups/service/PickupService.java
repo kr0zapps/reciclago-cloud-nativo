@@ -30,8 +30,8 @@ public class PickupService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public PickupService(PickupRepository pickupRepository,
-                         RabbitTemplate rabbitTemplate,
-                         KafkaTemplate<String, Object> kafkaTemplate) {
+            RabbitTemplate rabbitTemplate,
+            KafkaTemplate<String, Object> kafkaTemplate) {
         this.pickupRepository = pickupRepository;
         this.rabbitTemplate = rabbitTemplate;
         this.kafkaTemplate = kafkaTemplate;
@@ -69,8 +69,9 @@ public class PickupService {
 
         // Notificar eventos iniciales
         notificarCambioEstadoKafka(guardado, "NINGUNO", "SOLICITADO");
-        notificarEmailRabbitMQ(guardado, "Solicitud de Retiro Recibida", 
-            "Hemos recibido tu solicitud de retiro #" + guardado.getCodigoRetiro() + ". Pronto asignaremos una fecha.");
+        notificarEmailRabbitMQ(guardado, "Solicitud de Retiro Recibida",
+                "Hemos recibido tu solicitud de retiro #" + guardado.getCodigoRetiro()
+                        + ". Pronto asignaremos una fecha.");
 
         return guardado;
     }
@@ -90,7 +91,7 @@ public class PickupService {
 
         // Publicar eventos (Kafka + RabbitMQ)
         notificarCambioEstadoKafka(actualizado, estadoAnterior, "PROGRAMADO");
-        
+
         // Integración RabbitMQ (q.cmd.email y q.cmd.route)
         notificarEmailRabbitMQ(actualizado, "Retiro Programado #" + actualizado.getCodigoRetiro(),
                 "Tu retiro ha sido programado para la fecha: " + fechaProgramada);
@@ -104,9 +105,12 @@ public class PickupService {
         Pickup pickup = obtenerPorId(id)
                 .orElseThrow(() -> new RuntimeException("Solicitud de retiro no encontrada con id: " + id));
 
-        // Regla del Negocio: No se puede pasar a EN_RUTA sin estar previamente en PROGRAMADO
+        // Regla del Negocio: No se puede pasar a EN_RUTA sin estar previamente en
+        // PROGRAMADO
         if (!"PROGRAMADO".equalsIgnoreCase(pickup.getEstado())) {
-            throw new IllegalStateException("Regla violada: No se puede pasar a EN_RUTA si el retiro no está en estado PROGRAMADO. Estado actual: " + pickup.getEstado());
+            throw new IllegalStateException(
+                    "Regla violada: No se puede pasar a EN_RUTA si el retiro no está en estado PROGRAMADO. Estado actual: "
+                            + pickup.getEstado());
         }
 
         String estadoAnterior = pickup.getEstado();
@@ -116,7 +120,7 @@ public class PickupService {
 
         // Publicar eventos (Kafka + RabbitMQ)
         notificarCambioEstadoKafka(actualizado, estadoAnterior, "EN_RUTA");
-        
+
         // Integración RabbitMQ (q.cmd.email y q.cmd.route)
         notificarEmailRabbitMQ(actualizado, "Camión en Camino #" + actualizado.getCodigoRetiro(),
                 "El camión con patente " + actualizado.getCamionPatente() + " va en camino a tu domicilio.");
@@ -155,7 +159,7 @@ public class PickupService {
         Pickup actualizado = pickupRepository.save(pickup);
 
         notificarCambioEstadoKafka(actualizado, estadoAnterior, "PESADO");
-        
+
         // Emitir a q.cmd.certificate en RabbitMQ para generación de certificado PDF
         notificarCertificadoRabbitMQ(actualizado);
 
@@ -197,11 +201,11 @@ public class PickupService {
                     pickup.getComuna(),
                     pickup.getResiduoNombre(),
                     pickup.getPesoEstimadoKg(),
-                    pickup.getPesoRealKg()
-            );
+                    pickup.getPesoRealKg());
             kafkaTemplate.send(KafkaConfig.TOPIC_PICKUPS_EVENTS, pickup.getCodigoRetiro(), event);
             kafkaTemplate.send(KafkaConfig.TOPIC_AUDIT_TIMELINE, pickup.getCodigoRetiro(), event);
-            log.info("Evento de cambio de estado emitido a Kafka para {}: {} -> {}", pickup.getCodigoRetiro(), estadoAnterior, estadoNuevo);
+            log.info("Evento de cambio de estado emitido a Kafka para {}: {} -> {}", pickup.getCodigoRetiro(),
+                    estadoAnterior, estadoNuevo);
         } catch (Exception e) {
             log.error("Error al emitir evento Kafka: {}", e.getMessage());
         }
@@ -216,10 +220,10 @@ public class PickupService {
                     asunto,
                     mensaje,
                     pickup.getEstado(),
-                    LocalDateTime.now()
-            );
+                    LocalDateTime.now());
             rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_EMAIL, emailDto);
-            log.info("Mensaje de Email publicado en RabbitMQ (cola {}): {}", RabbitMQConfig.QUEUE_EMAIL, pickup.getCodigoRetiro());
+            log.info("Mensaje de Email publicado en RabbitMQ (cola {}): {}", RabbitMQConfig.QUEUE_EMAIL,
+                    pickup.getCodigoRetiro());
         } catch (Exception e) {
             log.error("Error al publicar en RabbitMQ email: {}", e.getMessage());
         }
@@ -235,10 +239,10 @@ public class PickupService {
                     pickup.getDireccion(),
                     pickup.getPesoEstimadoKg(),
                     pickup.getEstado(),
-                    pickup.getFechaProgramada()
-            );
+                    pickup.getFechaProgramada());
             rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_ROUTE, routeDto);
-            log.info("Mensaje de Ruta publicado en RabbitMQ (cola {}): {}", RabbitMQConfig.QUEUE_ROUTE, pickup.getCodigoRetiro());
+            log.info("Mensaje de Ruta publicado en RabbitMQ (cola {}): {}", RabbitMQConfig.QUEUE_ROUTE,
+                    pickup.getCodigoRetiro());
         } catch (Exception e) {
             log.error("Error al publicar en RabbitMQ route: {}", e.getMessage());
         }
@@ -247,7 +251,8 @@ public class PickupService {
     private void notificarCertificadoRabbitMQ(Pickup pickup) {
         try {
             rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_CERTIFICATE, pickup);
-            log.info("Mensaje de Certificado publicado en RabbitMQ (cola {}): {}", RabbitMQConfig.QUEUE_CERTIFICATE, pickup.getCodigoRetiro());
+            log.info("Mensaje de Certificado publicado en RabbitMQ (cola {}): {}", RabbitMQConfig.QUEUE_CERTIFICATE,
+                    pickup.getCodigoRetiro());
         } catch (Exception e) {
             log.error("Error al publicar en RabbitMQ certificate: {}", e.getMessage());
         }
