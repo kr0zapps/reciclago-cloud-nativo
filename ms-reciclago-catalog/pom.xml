@@ -15,7 +15,7 @@
 	<description>Microservicio de Catálogo para RecicLaGo (Residuos, Flota y Tarifas)</description>
 
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 	</properties>
 
 	<dependencies>
