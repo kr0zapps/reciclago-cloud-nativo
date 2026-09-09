@@ -6,7 +6,9 @@ export const environment = {
 
             authority: 'https://login.microsoftonline.com/5625266d-cae0-4070-a7ea-b5e88273580f',
 
-            redirectUri: 'http://localhost:4200'
+            redirectUri: typeof window !== 'undefined' && window.location?.origin
+                ? window.location.origin
+                : 'http://localhost:4200'
         }
     }
 };

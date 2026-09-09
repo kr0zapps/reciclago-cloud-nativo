@@ -5,6 +5,7 @@ import { InteractionType, PopupRequest, RedirectRequest, EventMessage, EventType
 import { Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -756,14 +757,23 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   login(): void {
+    const origin = typeof window !== 'undefined' && window.location?.origin
+      ? window.location.origin
+      : environment.msalConfig.auth.redirectUri;
+
     if (this.msalGuardConfig.interactionType === InteractionType.Popup) {
-      this.authService.loginPopup(this.msalGuardConfig.authRequest as PopupRequest)
-        .subscribe((response) => {
-          this.authService.instance?.setActiveAccount?.(response.account);
-          this.setLoginDisplay();
-        });
+      this.authService.loginPopup({
+        ...(this.msalGuardConfig.authRequest as PopupRequest),
+        redirectUri: origin
+      }).subscribe((response) => {
+        this.authService.instance?.setActiveAccount?.(response.account);
+        this.setLoginDisplay();
+      });
     } else {
-      this.authService.loginRedirect(this.msalGuardConfig.authRequest as RedirectRequest);
+      this.authService.loginRedirect({
+        ...(this.msalGuardConfig.authRequest as RedirectRequest),
+        redirectUri: origin
+      });
     }
   }
 

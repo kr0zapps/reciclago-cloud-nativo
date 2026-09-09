@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MsalService, MSAL_GUARD_CONFIG, MsalGuardConfiguration } from '@azure/msal-angular';
 import { InteractionType, RedirectRequest } from '@azure/msal-browser';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -143,6 +144,12 @@ export class LoginComponent implements OnInit {
   loginWithMicrosoft(): void {
     const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
     sessionStorage.setItem('reciclago_return_url', returnUrl);
-    this.authService.loginRedirect(this.msalGuardConfig.authRequest as RedirectRequest);
+    const origin = typeof window !== 'undefined' && window.location?.origin
+      ? window.location.origin
+      : environment.msalConfig.auth.redirectUri;
+    this.authService.loginRedirect({
+      ...(this.msalGuardConfig.authRequest as RedirectRequest),
+      redirectUri: origin
+    });
   }
 }

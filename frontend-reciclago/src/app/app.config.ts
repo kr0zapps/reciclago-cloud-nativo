@@ -9,11 +9,15 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 
 export function MSALInstanceFactory(): IPublicClientApplication {
   try {
+    const origin = (typeof window !== 'undefined' && window.location?.origin)
+      ? window.location.origin
+      : environment.msalConfig.auth.redirectUri;
+
     return new PublicClientApplication({
       auth: {
         clientId: environment.msalConfig.auth.clientId,
         authority: environment.msalConfig.auth.authority,
-        redirectUri: environment.msalConfig.auth.redirectUri,
+        redirectUri: origin,
       },
       cache: {
         cacheLocation: BrowserCacheLocation.LocalStorage
@@ -74,14 +78,20 @@ export const appConfig: ApplicationConfig = {
     MsalBroadcastService,
     {
       provide: MSAL_GUARD_CONFIG,
-      useValue: {
-        interactionType: InteractionType.Redirect,
-        authRequest: {
-          scopes: [
-            'user.read',
-            'api://' + environment.msalConfig.auth.clientId + '/access_as_user'
-          ]
-        }
+      useFactory: () => {
+        const origin = (typeof window !== 'undefined' && window.location?.origin)
+          ? window.location.origin
+          : environment.msalConfig.auth.redirectUri;
+        return {
+          interactionType: InteractionType.Redirect,
+          authRequest: {
+            scopes: [
+              'user.read',
+              'api://' + environment.msalConfig.auth.clientId + '/access_as_user'
+            ],
+            redirectUri: origin
+          }
+        };
       }
     },
     {
