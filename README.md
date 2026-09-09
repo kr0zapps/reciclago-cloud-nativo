@@ -12,8 +12,8 @@
 [![AWS S3](https://img.shields.io/badge/AWS-S3_Website-569A31?style=flat-square&logo=amazons3&logoColor=white)](https://aws.amazon.com/s3/)
 [![Microsoft Entra ID](https://img.shields.io/badge/Microsoft_Entra_ID-OAuth2_SSO-0078D4?style=flat-square&logo=microsoftazure&logoColor=white)](https://learn.microsoft.com/entra/)
 
-**Frontend Desplegado en Produccion (AWS S3):**  
-[http://reciclago-frontend-puertovaras.s3-website-us-east-1.amazonaws.com](http://reciclago-frontend-puertovaras.s3-website-us-east-1.amazonaws.com)
+**Frontend Desplegado en Produccion (AWS S3 HTTPS):**  
+[https://reciclago-frontend-puertovaras.s3.us-east-1.amazonaws.com/index.html](https://reciclago-frontend-puertovaras.s3.us-east-1.amazonaws.com/index.html)
 
 ---
 

@@ -323,7 +323,7 @@ Para la entrega y defensa de **Cloud Native (Duoc UC)**, la infraestructura se d
 ```mermaid
 graph LR
     subgraph "DEV 1 (Frontend en S3)"
-        Angular["🌐 Angular 18 (SPA)<br>dist/frontend-reciclago/browser"] -->|"Static Website Hosting"| S3["🪣 AWS S3 Bucket<br>http://reciclago-frontend-puertovaras.s3-website-us-east-1.amazonaws.com"]
+        Angular["🌐 Angular 18 (SPA)<br>dist/frontend-reciclago/browser"] -->|"Static Website / HTTPS"| S3["🪣 AWS S3 Bucket<br>https://reciclago-frontend-puertovaras.s3.us-east-1.amazonaws.com/index.html"]
     end
 
     subgraph "DEV 2 (Backend en ECR + EC2)"
