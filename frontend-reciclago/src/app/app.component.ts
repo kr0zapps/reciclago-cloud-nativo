@@ -135,17 +135,11 @@ import { environment } from '../environments/environment';
 
       </div>
 
-      <!-- Backdrop Oscuro y Difuminado para Móviles -->
+      <!-- Menú Móvil Desplegable Luminoso en Blanco Puro -->
       <div *ngIf="mobileMenuOpen"
-           (click)="mobileMenuOpen = false"
-           class="fixed inset-0 top-[73px] bg-[#041D2D]/40 backdrop-blur-xs z-40 md:hidden animate-backdrop-fade">
-      </div>
-
-      <!-- Menú Móvil Desplegable Fluido -->
-      <div *ngIf="mobileMenuOpen"
-           class="md:hidden border-t border-[#E2E9E4] bg-white/98 backdrop-blur-xl px-4 pt-3 pb-5 space-y-3.5 shadow-2xl rounded-b-3xl relative z-50 animate-drawer-slide border-b-2 border-[#D5E5D9]">
+           class="md:hidden border-t border-[#E2E9E4] bg-white px-4 pt-3 pb-5 space-y-3.5 shadow-xl border-b border-[#E2E9E4] relative z-50 animate-drawer-slide">
         <!-- Sello Municipal Oficial en Móvil -->
-        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-gradient-to-r from-[#F8FAF7] to-[#F1F6F2] border border-[#E2E9E4]/80">
+        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-[#F8FAF7] border border-[#E2E9E4]">
           <img src="assets/escudo-puerto-varas.svg" alt="Escudo Ilustre Municipalidad de Puerto Varas" class="h-8 w-auto object-contain flex-shrink-0">
           <div class="text-xs text-[#546571] leading-tight">
             Ilustre Municipalidad de <strong class="text-[#123F5B] block font-bold">Puerto Varas</strong>
@@ -206,18 +200,18 @@ import { environment } from '../environments/environment';
           <div *ngIf="!loginDisplay">
             <a routerLink="/login"
                (click)="mobileMenuOpen = false"
-               class="flex items-center justify-center gap-2.5 w-full bg-gradient-to-r from-[#123F5B] to-[#1E6088] hover:from-[#0E354D] hover:to-[#174D6E] text-white text-sm font-semibold px-4 py-3 rounded-xl transition-all shadow-sm cursor-pointer">
+               class="flex items-center justify-center gap-2.5 w-full bg-[#123F5B] hover:bg-[#0E354D] text-white text-sm font-semibold px-4 py-3 rounded-xl transition-all shadow-sm cursor-pointer">
               <i class="fa-regular fa-circle-user text-base"></i>
               <span>Mi cuenta (Iniciar sesión)</span>
             </a>
           </div>
 
-          <!-- MINI PERFIL REDISEÑADO PRO (Inspirado en mejores apps móviles cívicas) -->
-          <div *ngIf="loginDisplay" class="relative overflow-hidden rounded-2xl p-3.5 bg-gradient-to-br from-[#F5F9F5] via-white to-[#EDF5EC] border border-[#D5E6D8] shadow-xs">
+          <!-- MINI PERFIL PRO EN BLANCO Y VERDE MUNICIPAL -->
+          <div *ngIf="loginDisplay" class="rounded-2xl p-3.5 bg-[#F8FAF7] border border-[#DFE8E1] shadow-xs">
             <div class="flex items-center gap-3 mb-3">
-              <!-- Avatar con anillo gradiente y estado en línea activo -->
+              <!-- Avatar con anillo limpio y estado verde -->
               <div class="relative flex-shrink-0">
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#123F5B] to-[#1F5C82] text-white text-sm font-extrabold flex items-center justify-center shadow-xs ring-2 ring-[#4F8A3D]/40 ring-offset-2 ring-offset-white">
+                <div class="w-11 h-11 rounded-full bg-[#123F5B] text-white text-sm font-extrabold flex items-center justify-center shadow-xs ring-2 ring-[#4F8A3D]/40 ring-offset-2 ring-offset-[#F8FAF7]">
                   {{ currentUser ? currentUser.charAt(0).toUpperCase() : 'V' }}
                 </div>
                 <span class="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
@@ -228,27 +222,27 @@ import { environment } from '../environments/environment';
 
               <!-- Información de Identidad Ciudadana -->
               <div class="min-w-0 flex-1">
-                <h4 class="text-[13px] font-extrabold text-[#123F5B] truncate tracking-tight">
+                <h4 class="text-[13px] font-bold text-[#123F5B] truncate">
                   {{ currentUser }}
                 </h4>
                 <div class="flex items-center gap-1.5 mt-0.5">
-                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E2F2DE] text-[#2F6D20] border border-[#C5E4BE]">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E8F4E5] text-[#2F6D20] border border-[#C5E4BE]">
                     <i class="fa-solid fa-circle-check text-[9px] text-[#4F8A3D]"></i>
                     <span>Vecino Verificado</span>
                   </span>
                 </div>
-                <p class="text-[10.5px] text-[#546571] mt-0.5 flex items-center gap-1 truncate">
+                <p class="text-[10.5px] text-[#546571] mt-0.5 flex items-center gap-1 truncate font-medium">
                   <i class="fa-solid fa-location-dot text-[#4F8A3D] text-[10px]"></i>
-                  <span>Cuadrante Costanera Sur • P. Varas</span>
+                  <span>Cuadrante Costanera Sur • Puerto Varas</span>
                 </p>
               </div>
             </div>
 
-            <!-- Botones de Acción Divididos: Panel + Cerrar Sesión -->
+            <!-- Botones de Acción Divididos: Mi Panel + Salir -->
             <div class="grid grid-cols-4 gap-2 pt-2.5 border-t border-[#DFEAE1]">
               <a routerLink="/dashboard"
                  (click)="mobileMenuOpen = false"
-                 class="col-span-3 flex items-center justify-between px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#4F8A3D] to-[#3D6E2E] hover:from-[#437633] hover:to-[#315725] text-white text-xs font-bold transition-all shadow-xs hover:shadow active:scale-[0.98] cursor-pointer group">
+                 class="col-span-3 flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white text-xs font-bold transition-all shadow-xs hover:shadow active:scale-[0.98] cursor-pointer group">
                 <div class="flex items-center gap-2">
                   <i class="fa-solid fa-gauge-high text-xs opacity-90 group-hover:rotate-12 transition-transform"></i>
                   <span>Mi Panel Vecinal</span>
@@ -259,7 +253,7 @@ import { environment } from '../environments/environment';
               <button (click)="logout(); mobileMenuOpen = false"
                       type="button"
                       title="Cerrar sesión"
-                      class="col-span-1 flex items-center justify-center gap-1 px-2 py-2.5 rounded-xl bg-rose-50/80 hover:bg-rose-100 text-rose-600 hover:text-rose-700 text-xs font-bold border border-rose-200/70 transition-all active:scale-[0.98] cursor-pointer">
+                      class="col-span-1 flex items-center justify-center gap-1 px-2 py-2.5 rounded-xl bg-white hover:bg-rose-50 text-rose-600 hover:text-rose-700 text-xs font-bold border border-rose-200 transition-all active:scale-[0.98] cursor-pointer shadow-2xs">
                 <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
                 <span class="text-[11px]">Salir</span>
               </button>
