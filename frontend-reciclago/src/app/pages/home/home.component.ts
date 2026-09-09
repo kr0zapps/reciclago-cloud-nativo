@@ -129,52 +129,20 @@ export interface SectorInfo {
                   </div>
                 </div>
 
-                <!-- Barra de Sectores: 100% alineada en una sola línea horizontal con scroll táctil suave (sin saltos ni quiebres) -->
-                <div class="mt-3 flex items-center gap-2 overflow-x-auto no-scrollbar py-1 w-full">
-                  <span class="text-[11px] font-bold text-white/90 drop-shadow-sm flex items-center gap-1.5 flex-shrink-0">
+                <!-- Barra de Sectores: Limpia, sin cortes y visible al 100% en desktop y mobile -->
+                <div class="mt-3 flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                  <span class="text-[11px] font-bold text-white/90 drop-shadow-sm flex items-center gap-1.5 flex-shrink-0 mr-1">
                     <i class="fa-solid fa-compass text-emerald-300 text-xs"></i>
                     <span>Sectores:</span>
                   </span>
-                  <div class="flex items-center gap-1.5 flex-nowrap">
-                    <button
-                      *ngFor="let s of allSectors"
-                      (click)="selectSector(s)"
-                      type="button"
-                      class="text-[11px] font-bold px-3 py-1.5 rounded-full backdrop-blur-md transition-all cursor-pointer shadow-xs active:scale-95 flex-shrink-0 whitespace-nowrap"
-                      [ngClass]="selectedSector.id === s.id ? 'bg-[#437d32] text-white ring-2 ring-white/70 shadow-md' : 'bg-white/20 hover:bg-white/35 text-white border border-white/25'">
-                      {{ s.shortName }} <span class="opacity-80 font-normal">({{ s.day }})</span>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Tarjeta de Confirmación de Día de Retiro en el Hero (Visible en pantalla sin moverse) -->
-                <div class="mt-3.5 bg-white/95 sm:bg-white/95 backdrop-blur-md rounded-2xl p-3 sm:p-3.5 border border-white/90 shadow-xl flex items-center justify-between gap-3 text-slate-800 transition-all duration-300 anim-fade-in"
-                     [class.ring-2]="justUpdated"
-                     [class.ring-[#437d32]]="justUpdated">
-                  <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#edf8ed] border border-[#d2ead0] flex items-center justify-center text-[#437d32] flex-shrink-0 shadow-2xs">
-                      <i class="fa-regular fa-calendar-check text-base sm:text-lg"></i>
-                    </div>
-                    <div class="min-w-0">
-                      <div class="flex items-center gap-2">
-                        <span class="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#437d32] block">
-                          Día de retiro confirmado
-                        </span>
-                        <span *ngIf="justUpdated" class="text-[9px] font-black uppercase text-[#437d32] bg-[#edf8ed] border border-[#d2ead0] px-1.5 py-0.5 rounded-full animate-pulse">
-                          Actualizado
-                        </span>
-                      </div>
-                      <p class="text-xs sm:text-sm font-bold text-[#093554] truncate">
-                        {{ selectedSector.name }}: <span class="text-[#437d32] font-black">{{ selectedSector.day }}</span>
-                        <span class="text-slate-500 font-normal text-xs ml-1">({{ selectedSector.hours }})</span>
-                      </p>
-                    </div>
-                  </div>
-                  <div class="text-right flex-shrink-0">
-                    <span class="inline-block bg-[#093554] text-white text-xs font-black px-3 py-1.5 rounded-full shadow-xs">
-                      {{ selectedSector.day }}
-                    </span>
-                  </div>
+                  <button
+                    *ngFor="let s of popularSectors"
+                    (click)="selectSector(s)"
+                    type="button"
+                    class="text-xs font-semibold px-3.5 py-1.5 rounded-full backdrop-blur-md transition-all cursor-pointer shadow-xs active:scale-95 whitespace-nowrap"
+                    [ngClass]="selectedSector.id === s.id ? 'bg-[#437d32] text-white ring-2 ring-white/80 shadow-md font-bold' : 'bg-white/20 hover:bg-white/35 text-white border border-white/25'">
+                    {{ s.shortName }}
+                  </button>
                 </div>
               </div>
             </div>
@@ -577,7 +545,7 @@ export class HomeComponent {
   allSectors: SectorInfo[] = [
     { id: 'braunau', name: 'Población Nueva Braunau', shortName: 'Nueva Braunau', day: 'Martes', hours: '08:00 y 17:00 hrs.' },
     { id: 'chico', name: 'Puerto Chico / Los Colonos', shortName: 'Puerto Chico', day: 'Miércoles', hours: '08:00 y 17:00 hrs.' },
-    { id: 'centro', name: 'Centro / Costanera', shortName: 'Costanera / Centro', day: 'Lunes', hours: '08:00 y 17:00 hrs.' },
+    { id: 'centro', name: 'Centro / Costanera', shortName: 'Costanera', day: 'Lunes', hours: '08:00 y 17:00 hrs.' },
     { id: 'ensenada', name: 'Ensenada / Ruta 225', shortName: 'Ensenada', day: 'Jueves', hours: '08:00 y 17:00 hrs.' },
     { id: 'mirador', name: 'El Mirador / Alta Esperanza', shortName: 'El Mirador', day: 'Viernes', hours: '08:00 y 17:00 hrs.' }
   ];
@@ -617,6 +585,10 @@ export class HomeComponent {
       this.selectSector(matches[0]);
     } else {
       this.isSearchFocused = false;
+    }
+    const el = document.getElementById('tu-dia-de-retiro');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 
