@@ -98,9 +98,13 @@ import { environment } from '../environments/environment';
 
         <!-- ACCIONES DERECHA -->
         <div class="flex items-center gap-3 sm:gap-4">
-          <!-- Sello Municipal Iglesia Puerto Varas (Desktop) -->
-          <div class="hidden lg:flex items-center gap-2 pr-3 border-r border-[#E2E9E4]">
-            <img src="assets/header_muni.png" alt="Municipalidad de Puerto Varas" class="h-8 w-auto object-contain">
+          <!-- Sello Municipal Oficial Puerto Varas (Desktop) -->
+          <div class="hidden lg:flex items-center gap-2.5 pr-3 border-r border-[#E2E9E4]">
+            <img src="assets/escudo-puerto-varas.svg" alt="Ilustre Municipalidad de Puerto Varas" class="h-9 w-auto object-contain">
+            <div class="text-left leading-tight">
+              <div class="text-[9.5px] font-bold text-[#546571] uppercase tracking-wider">Ilustre Municipalidad</div>
+              <div class="text-[12.5px] font-extrabold text-[#123F5B] tracking-tight">Puerto Varas</div>
+            </div>
           </div>
 
           <!-- Botón Mi cuenta / Pill Vecinal (Desktop & Tablet) -->
@@ -354,8 +358,12 @@ import { environment } from '../environments/environment';
               </a>
             </div>
 
-            <div class="flex items-center gap-2 border-l border-white/20 pl-3">
-              <img src="assets/footer_muni.png" alt="Municipalidad de Puerto Varas" class="h-8 w-auto object-contain">
+            <div class="flex items-center gap-2.5 border-l border-white/20 pl-3">
+              <img src="assets/escudo-puerto-varas.svg" alt="Ilustre Municipalidad de Puerto Varas" class="h-9 w-auto object-contain drop-shadow">
+              <div class="text-left leading-tight hidden sm:block">
+                <div class="text-[9.5px] font-medium text-slate-300 uppercase tracking-wider">Ilustre Municipalidad</div>
+                <div class="text-[12.5px] font-bold text-white tracking-tight">Puerto Varas</div>
+              </div>
             </div>
           </div>
 
