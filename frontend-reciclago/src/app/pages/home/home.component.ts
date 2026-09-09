@@ -114,19 +114,21 @@ import { RouterModule } from '@angular/router';
           </div>
 
           <div class="space-y-4 pt-3">
-            <div class="bg-[#dcf0d6] rounded-2xl p-4 flex items-center gap-3.5 border border-[#cbe4c3]">
-              <div class="w-7 h-7 rounded-full bg-[#4F8A3D] text-white flex items-center justify-center text-xs flex-shrink-0">
+            <div class="bg-[#dcf0d6] rounded-2xl p-4 flex items-center justify-center gap-3.5 border border-[#cbe4c3] shadow-xs">
+              <div class="w-7 h-7 rounded-full bg-[#4F8A3D] text-white flex items-center justify-center text-xs flex-shrink-0 shadow-xs">
                 <i class="fa-solid fa-check"></i>
               </div>
-              <p class="text-xs sm:text-[13px] text-[#1a4023] font-medium leading-tight">
+              <p class="text-xs sm:text-[13px] text-[#1a4023] font-medium leading-snug">
                 El camión pasará entre las <strong class="font-bold text-[#0f2e16]">08:00 y 17:00 hrs.</strong>
               </p>
             </div>
 
-            <a routerLink="/dashboard" class="inline-flex items-center gap-2 text-xs font-bold text-[#093554] hover:text-brand-green transition-colors pl-1">
-              <span>Ver cuadrantes y sectores en vivo</span>
-              <i class="fa-solid fa-arrow-right text-[10px]"></i>
-            </a>
+            <div class="flex items-center justify-center sm:justify-start">
+              <a routerLink="/dashboard" class="inline-flex items-center gap-2 text-xs font-bold text-[#093554] hover:text-[#4F8A3D] transition-colors pl-1">
+                <span>Ver cuadrantes y sectores en vivo</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </a>
+            </div>
           </div>
         </div>
 

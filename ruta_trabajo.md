@@ -442,10 +442,33 @@ sequenceDiagram
 
 ### 📦 Parte B: Guía para DEV 2 (Backend a ECR y Despliegue en EC2)
 
-DEV 2 empaqueta los microservicios en contenedores Docker y los sube a **AWS ECR** para ejecutarlos en una instancia **EC2**:
+> [!CAUTION]
+> **🚨 AVISO CRÍTICO PARA DEV 2 — USO DE CREDENCIALES AWS SEPARADAS**:
+> - **Frontend (S3)**: Está alojado en la cuenta AWS de **DEV 1** (`reciclago-frontend-puertovaras`).
+> - **Backend (ECR + EC2)**: Se desplegará en la cuenta AWS de **DEV 2**.
+> - **IMPORTANTE**: DEV 2 **NO DEBE USAR LAS CREDENCIALES DE DEV 1**. Debes copiar tus propias credenciales desde la consola de AWS Learner Lab / Academy (botón *AWS Details* ➔ *Show*) y ejecutarlas en tu terminal local o configurarlas en los secretos de GitHub para no mezclar recursos ni sobreescribir permisos.
 
-#### 1. Autenticación en AWS ECR
+#### 🔑 Matriz de Secretos en GitHub (`Settings` > `Secrets and variables` > `Actions`)
+
+| Secreto | Cuenta Perteneciente | Propósito |
+|---|---|---|
+| `AWS_ACCESS_KEY_ID` | **DEV 1 (Frontend)** | Despliegue automatizado al bucket S3 |
+| `AWS_SECRET_ACCESS_KEY` | **DEV 1 (Frontend)** | Despliegue automatizado al bucket S3 |
+| `AWS_SESSION_TOKEN` | **DEV 1 (Frontend)** | Sesión activa Learner Lab DEV 1 |
+| `S3_BUCKET_NAME` | **DEV 1 (Frontend)** | Nombre del bucket: `reciclago-frontend-puertovaras` |
+| `AWS_REGION` | Global | `us-east-1` |
+| `AWS_BACKEND_ACCESS_KEY_ID` | **DEV 2 (Backend)** | Login y subida a AWS ECR / EC2 |
+| `AWS_BACKEND_SECRET_ACCESS_KEY` | **DEV 2 (Backend)** | Login y subida a AWS ECR / EC2 |
+| `AWS_BACKEND_SESSION_TOKEN` | **DEV 2 (Backend)** | Sesión activa Learner Lab DEV 2 |
+| `AWS_BACKEND_ACCOUNT_ID` | **DEV 2 (Backend)** | Account ID numérico de DEV 2 |
+| `EC2_HOST` | **DEV 2 (Backend)** | IP pública de la instancia EC2 de DEV 2 |
+| `EC2_SSH_KEY` | **DEV 2 (Backend)** | Llave privada SSH (.pem) para EC2 |
+
+---
+
+#### 1. Autenticación en AWS ECR (En la máquina de DEV 2 con sus credenciales)
 ```powershell
+# Obtiene el ID de la cuenta propia de DEV 2 automáticamente
 $ACCOUNT_ID = (aws sts get-caller-identity --query Account --output text)
 $REGION = "us-east-1"
 
