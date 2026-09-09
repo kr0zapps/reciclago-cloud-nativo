@@ -85,26 +85,27 @@ import { environment } from '../environments/environment';
         </a>
 
         <!-- NAVEGACIÓN -->
-        <nav class="hidden md:flex items-center gap-7 lg:gap-9 text-[15px] font-semibold text-[#183247]">
-          <a routerLink="/" routerLinkActive="text-[#123F5B] font-bold relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-[#4F8A3D]" [routerLinkActiveOptions]="{exact: true}" class="hover:text-[#4F8A3D] transition-colors py-2">Inicio</a>
+        <nav class="hidden md:flex items-center gap-7 lg:gap-8 text-[15px] font-semibold text-[#183247]">
+          <a routerLink="/" routerLinkActive="text-[#093554] font-bold" [routerLinkActiveOptions]="{exact: true}" class="relative py-2 hover:text-[#4F8A3D] transition-colors flex flex-col items-center">
+            <span>Inicio</span>
+            <div class="w-6 h-0.5 sm:h-1 bg-[#4F8A3D] rounded-full mt-1"></div>
+          </a>
           <button (click)="showHowItWorks = true" type="button" class="hover:text-[#4F8A3D] transition-colors py-2 font-semibold text-[15px] text-[#183247] cursor-pointer">¿Cómo funciona?</button>
           <button (click)="showMaterials = true" type="button" class="hover:text-[#4F8A3D] transition-colors py-2 font-semibold text-[15px] text-[#183247] cursor-pointer">Materiales</button>
-          <a routerLink="/dashboard" routerLinkActive="text-[#123F5B] font-bold relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-[#4F8A3D]" class="hover:text-[#4F8A3D] transition-colors py-2">Retiro especial</a>
+          <a routerLink="/dashboard" class="hover:text-[#4F8A3D] transition-colors py-2">Retiro especial</a>
+          <button (click)="showContact = true" type="button" class="hover:text-[#4F8A3D] transition-colors py-2 font-semibold text-[15px] text-[#183247] cursor-pointer">Contacto</button>
         </nav>
 
         <!-- ACCIONES DERECHA -->
         <div class="flex items-center gap-3 sm:gap-4">
-          <!-- Sello Municipal Oficial de Puerto Varas (Desktop) -->
-          <div class="hidden lg:flex items-center gap-2.5 pl-2 pr-3 border-r border-[#E2E9E4] text-left">
-            <img src="assets/escudo-puerto-varas.svg" alt="Escudo Oficial Municipalidad de Puerto Varas" class="h-9 w-auto object-contain flex-shrink-0 drop-shadow-xs">
-            <span class="text-[12px] font-medium text-[#546571] leading-tight">
-              Municipalidad de<br><strong class="text-[#123F5B] font-bold">Puerto Varas</strong>
-            </span>
+          <!-- Sello Municipal Iglesia Puerto Varas (Desktop) -->
+          <div class="hidden lg:flex items-center gap-2 pr-3 border-r border-[#E2E9E4]">
+            <img src="assets/header_muni.png" alt="Municipalidad de Puerto Varas" class="h-8 w-auto object-contain">
           </div>
 
           <!-- Botón Mi cuenta / Pill Vecinal (Desktop & Tablet) -->
-          <a *ngIf="!loginDisplay" routerLink="/login" class="hidden sm:flex items-center gap-2.5 bg-[#123F5B] hover:bg-[#0D3549] text-white text-xs font-semibold px-4 py-2.5 rounded-full transition-all duration-200 shadow-sm cursor-pointer">
-            <i class="fa-regular fa-circle-user text-base"></i>
+          <a *ngIf="!loginDisplay" routerLink="/login" class="hidden sm:flex items-center gap-2 bg-[#0e5584] hover:bg-[#0b476f] text-white text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-200 shadow-xs cursor-pointer">
+            <i class="fa-solid fa-circle-user text-sm"></i>
             <span>Mi cuenta</span>
           </a>
 
@@ -327,37 +328,34 @@ import { environment } from '../environments/environment';
           </a>
 
           <!-- Enlaces de Navegación del Footer -->
-          <nav class="flex flex-wrap justify-center items-center gap-x-4 sm:gap-x-6 gap-y-2 text-sm text-slate-200 font-medium">
+          <nav class="flex flex-wrap justify-center items-center gap-x-3 sm:gap-x-4 gap-y-2 text-xs sm:text-sm text-slate-200 font-medium">
             <a class="hover:text-emerald-300 transition-colors" routerLink="/">Inicio</a>
-            <span class="text-white/30">•</span>
-            <a class="hover:text-emerald-300 transition-colors" routerLink="/dashboard">Mi calendario</a>
-            <span class="text-white/30">•</span>
+            <span class="text-white/40">|</span>
+            <button (click)="showHowItWorks = true" type="button" class="hover:text-emerald-300 transition-colors cursor-pointer">¿Cómo funciona?</button>
+            <span class="text-white/40">|</span>
             <button (click)="showMaterials = true" type="button" class="hover:text-emerald-300 transition-colors cursor-pointer">Materiales</button>
-            <span class="text-white/30">•</span>
+            <span class="text-white/40">|</span>
             <a class="hover:text-emerald-300 transition-colors" routerLink="/dashboard">Retiro especial</a>
-            <span class="text-white/30">•</span>
+            <span class="text-white/40">|</span>
             <button (click)="showContact = true" type="button" class="hover:text-emerald-300 transition-colors cursor-pointer">Contacto</button>
           </nav>
 
           <!-- Sello Municipal y Redes Sociales Oficiales -->
-          <div class="flex items-center gap-5">
-            <div class="flex items-center gap-3 text-white text-base">
-              <a aria-label="Facebook Municipalidad de Puerto Varas" class="w-9 h-9 rounded-full bg-white/10 hover:bg-[#72be36] hover:text-[#093554] flex items-center justify-center transition-all" href="https://www.facebook.com/munipuertovaras" target="_blank" rel="noopener noreferrer">
-                <i class="fa-brands fa-facebook-f text-sm"></i>
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2.5 text-white text-sm">
+              <a aria-label="Facebook Municipalidad de Puerto Varas" class="w-8 h-8 rounded-full bg-white/10 hover:bg-[#4F8A3D] flex items-center justify-center transition-all" href="https://www.facebook.com/munipuertovaras" target="_blank" rel="noopener noreferrer">
+                <i class="fa-brands fa-facebook-f text-xs"></i>
               </a>
-              <a aria-label="Instagram Municipalidad de Puerto Varas" class="w-9 h-9 rounded-full bg-white/10 hover:bg-[#72be36] hover:text-[#093554] flex items-center justify-center transition-all" href="https://www.instagram.com/munipuertovaras" target="_blank" rel="noopener noreferrer">
-                <i class="fa-brands fa-instagram text-sm"></i>
+              <a aria-label="Instagram Municipalidad de Puerto Varas" class="w-8 h-8 rounded-full bg-white/10 hover:bg-[#4F8A3D] flex items-center justify-center transition-all" href="https://www.instagram.com/munipuertovaras" target="_blank" rel="noopener noreferrer">
+                <i class="fa-brands fa-instagram text-xs"></i>
               </a>
-              <a aria-label="YouTube Municipalidad de Puerto Varas" class="w-9 h-9 rounded-full bg-white/10 hover:bg-[#72be36] hover:text-[#093554] flex items-center justify-center transition-all" href="https://www.youtube.com/@MunicipalidadPuertoVaras" target="_blank" rel="noopener noreferrer">
-                <i class="fa-brands fa-youtube text-sm"></i>
+              <a aria-label="YouTube Municipalidad de Puerto Varas" class="w-8 h-8 rounded-full bg-white/10 hover:bg-[#4F8A3D] flex items-center justify-center transition-all" href="https://www.youtube.com/@MunicipalidadPuertoVaras" target="_blank" rel="noopener noreferrer">
+                <i class="fa-brands fa-youtube text-xs"></i>
               </a>
             </div>
 
-            <div class="flex items-center gap-2.5 border-l border-white/20 pl-4">
-              <img src="assets/escudo-puerto-varas.svg" alt="Escudo Oficial Municipalidad de Puerto Varas" class="h-10 w-auto object-contain flex-shrink-0 drop-shadow">
-              <div class="text-[9px] uppercase tracking-tight font-bold text-slate-300 leading-tight">
-                Municipalidad de<br><span class="text-xs text-white font-extrabold">Puerto Varas</span>
-              </div>
+            <div class="flex items-center gap-2 border-l border-white/20 pl-3">
+              <img src="assets/footer_muni.png" alt="Municipalidad de Puerto Varas" class="h-8 w-auto object-contain">
             </div>
           </div>
 
@@ -366,7 +364,7 @@ import { environment } from '../environments/environment';
         <!-- Fila Inferior con Lema Manuscrito Destacado -->
         <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <p class="text-xs text-slate-400">
-            © 2026 Municipalidad de Puerto Varas. Todos los derechos reservados.
+            © 2025 Municipalidad de Puerto Varas. Todos los derechos reservados.
           </p>
 
           <!-- Lema natural con Caveat destacado -->
