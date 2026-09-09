@@ -11,6 +11,10 @@
   <script>
     (function() {
       if (typeof window === 'undefined') return;
+      // Preservar Web Cryptography API nativo en contextos seguros (HTTPS y localhost)
+      if (window.crypto && window.crypto.getRandomValues && window.crypto.subtle) {
+        return;
+      }
       if (!window.crypto) {
         window.crypto = {};
       }

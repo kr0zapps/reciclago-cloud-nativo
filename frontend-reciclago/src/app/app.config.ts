@@ -81,7 +81,6 @@ export const appConfig: ApplicationConfig = {
           interactionType: InteractionType.Redirect,
           authRequest: {
             scopes: [
-              'user.read',
               ...environment.apiConfig.scopes
             ],
             redirectUri: environment.msalConfig.auth.redirectUri,
@@ -95,8 +94,8 @@ export const appConfig: ApplicationConfig = {
       useValue: {
         interactionType: InteractionType.Redirect,
         protectedResourceMap: new Map([
-          ['http://localhost:8080/api/*', environment.apiConfig.scopes],
-          ['https://*/api/*', environment.apiConfig.scopes]
+          ['http://localhost:8080/api', environment.apiConfig.scopes],
+          ['/api', environment.apiConfig.scopes]
         ])
       }
     }

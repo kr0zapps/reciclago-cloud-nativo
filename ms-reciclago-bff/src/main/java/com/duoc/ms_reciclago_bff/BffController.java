@@ -117,11 +117,23 @@ public class BffController {
     }
 
     @GetMapping("/api/pickups")
-    public ResponseEntity<?> getPickups(@RequestParam(required = false) String vecinoEmail) {
+    public ResponseEntity<?> getPickups(@AuthenticationPrincipal Jwt jwt, @RequestParam(required = false) String vecinoEmail) {
         try {
+            // Protección contra fuga de datos (BOLA): Si no es Admin ni Coordinador, forzar su propio email
+            List<String> roles = jwt != null ? jwt.getClaimAsStringList("roles") : null;
+            boolean isStaff = roles != null && (roles.contains("Admin") || roles.contains("Coordinador"));
+
+            String effectiveEmail = vecinoEmail;
+            if (!isStaff && jwt != null) {
+                effectiveEmail = jwt.getClaimAsString("preferred_username");
+                if (effectiveEmail == null) {
+                    effectiveEmail = jwt.getClaimAsString("upn");
+                }
+            }
+
             String uri = pickupsUrl + "/api/pickups";
-            if (vecinoEmail != null && !vecinoEmail.isBlank()) {
-                uri += "?vecinoEmail=" + vecinoEmail;
+            if (effectiveEmail != null && !effectiveEmail.isBlank()) {
+                uri += "?vecinoEmail=" + effectiveEmail;
             }
             List<?> pickups = restClient.get()
                     .uri(uri)
@@ -131,7 +143,7 @@ public class BffController {
         } catch (Exception e) {
             Map<String, Object> error = new HashMap<>();
             error.put("error", "Error comunicando con ms-reciclago-pickups");
-            error.put("details", e.getMessage());
+            error.put("message", "Servicio no disponible actualmente");
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
         }
     }
@@ -139,18 +151,16 @@ public class BffController {
     @PostMapping("/api/pickups")
     public ResponseEntity<?> createPickup(@AuthenticationPrincipal Jwt jwt, @RequestBody Map<String, Object> payload) {
         try {
-            if (!payload.containsKey("vecinoEmail") || payload.get("vecinoEmail") == null) {
-                String email = jwt.getClaimAsString("preferred_username");
-                if (email == null)
-                    email = jwt.getClaimAsString("upn");
-                payload.put("vecinoEmail", email);
-            }
-            if (!payload.containsKey("vecinoNombre") || payload.get("vecinoNombre") == null) {
-                String name = jwt.getClaimAsString("name");
-                if (name == null)
-                    name = jwt.getClaimAsString("preferred_username");
-                payload.put("vecinoNombre", name);
-            }
+            // Prevención estricta de IDOR: Sobrescribir incondicionalmente vecinoEmail y vecinoNombre desde los claims del JWT
+            String email = jwt.getClaimAsString("preferred_username");
+            if (email == null)
+                email = jwt.getClaimAsString("upn");
+            payload.put("vecinoEmail", email);
+
+            String name = jwt.getClaimAsString("name");
+            if (name == null)
+                name = email;
+            payload.put("vecinoNombre", name);
 
             Object response = restClient.post()
                     .uri(pickupsUrl + "/api/pickups")
@@ -162,7 +172,7 @@ public class BffController {
         } catch (Exception e) {
             Map<String, Object> error = new HashMap<>();
             error.put("error", "Error al crear solicitud en ms-reciclago-pickups");
-            error.put("details", e.getMessage());
+            error.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
@@ -203,11 +213,22 @@ public class BffController {
 
     @PatchMapping("/api/pickups/{id}/programar")
     public ResponseEntity<?> programarPickup(@PathVariable Long id,
+            @RequestParam(required = false) Long camionId,
+            @RequestParam(required = false) String camionPatente,
+            @RequestParam(required = false) String fechaProgramada,
             @RequestBody(required = false) Map<String, Object> body) {
         try {
+            Long effectiveCamionId = camionId != null ? camionId : (body != null && body.get("camionId") != null ? Long.valueOf(body.get("camionId").toString()) : 1L);
+            String effectivePatente = camionPatente != null ? camionPatente : (body != null && body.get("camionPatente") != null ? body.get("camionPatente").toString() : "PV-RC-2026");
+            String effectiveFecha = fechaProgramada != null ? fechaProgramada : (body != null && body.get("fechaProgramada") != null ? body.get("fechaProgramada").toString() : java.time.LocalDateTime.now().plusDays(1).toString());
+
+            String targetUri = pickupsUrl + "/api/pickups/" + id + "/programar"
+                    + "?camionId=" + effectiveCamionId
+                    + "&camionPatente=" + java.net.URLEncoder.encode(effectivePatente, java.nio.charset.StandardCharsets.UTF_8)
+                    + "&fechaProgramada=" + java.net.URLEncoder.encode(effectiveFecha, java.nio.charset.StandardCharsets.UTF_8);
+
             Object response = restClient.patch()
-                    .uri(pickupsUrl + "/api/pickups/" + id + "/programar")
-                    .body(body != null ? body : Map.of())
+                    .uri(targetUri)
                     .retrieve()
                     .body(Object.class);
             return ResponseEntity.ok(response);

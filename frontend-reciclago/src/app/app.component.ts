@@ -122,27 +122,37 @@ import { environment } from '../environments/environment';
             </button>
           </div>
 
-          <!-- Botón Hamburger para Móviles (md:hidden) -->
+          <!-- Botón Hamburger para Móviles (md:hidden) con micro-animación -->
           <button (click)="mobileMenuOpen = !mobileMenuOpen"
                   type="button"
-                  class="md:hidden inline-flex items-center justify-center p-2 rounded-xl text-[#123F5B] hover:text-[#4F8A3D] hover:bg-[#EEF5EB] transition-colors focus:outline-none focus:ring-2 focus:ring-[#4F8A3D]/40 cursor-pointer"
+                  class="md:hidden relative w-10 h-10 inline-flex items-center justify-center rounded-xl bg-[#F0F5F2] hover:bg-[#E2EBE5] text-[#123F5B] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#4F8A3D]/40 cursor-pointer shadow-xs active:scale-95"
                   aria-label="Abrir menú de navegación"
                   [attr.aria-expanded]="mobileMenuOpen">
-            <i *ngIf="!mobileMenuOpen" class="fa-solid fa-bars text-xl"></i>
-            <i *ngIf="mobileMenuOpen" class="fa-solid fa-xmark text-xl"></i>
+            <i class="fa-solid fa-bars text-lg transition-transform duration-300" [class.rotate-90]="mobileMenuOpen" [class.hidden]="mobileMenuOpen"></i>
+            <i class="fa-solid fa-xmark text-lg transition-transform duration-300" [class.rotate-90]="!mobileMenuOpen" [class.hidden]="!mobileMenuOpen"></i>
           </button>
         </div>
 
       </div>
 
-      <!-- Menú Móvil Desplegable Completo -->
-      <div *ngIf="mobileMenuOpen" class="md:hidden border-t border-[#E2E9E4] bg-white/98 backdrop-blur-md px-4 pt-3 pb-5 space-y-3 shadow-lg animate-fadeIn">
+      <!-- Backdrop Oscuro y Difuminado para Móviles -->
+      <div *ngIf="mobileMenuOpen"
+           (click)="mobileMenuOpen = false"
+           class="fixed inset-0 top-[73px] bg-[#041D2D]/40 backdrop-blur-xs z-40 md:hidden animate-backdrop-fade">
+      </div>
+
+      <!-- Menú Móvil Desplegable Fluido -->
+      <div *ngIf="mobileMenuOpen"
+           class="md:hidden border-t border-[#E2E9E4] bg-white/98 backdrop-blur-xl px-4 pt-3 pb-5 space-y-3.5 shadow-2xl rounded-b-3xl relative z-50 animate-drawer-slide border-b-2 border-[#D5E5D9]">
         <!-- Sello Municipal Oficial en Móvil -->
-        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-[#F8FAF7] border border-[#E2E9E4]/80">
+        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-gradient-to-r from-[#F8FAF7] to-[#F1F6F2] border border-[#E2E9E4]/80">
           <img src="assets/escudo-puerto-varas.svg" alt="Escudo Ilustre Municipalidad de Puerto Varas" class="h-8 w-auto object-contain flex-shrink-0">
           <div class="text-xs text-[#546571] leading-tight">
             Ilustre Municipalidad de <strong class="text-[#123F5B] block font-bold">Puerto Varas</strong>
           </div>
+          <span class="ml-auto px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E8F3E6] text-[#3D742F] border border-[#CCE4C8]">
+            Portal 2026
+          </span>
         </div>
 
         <!-- Links de Navegación Móvil -->
@@ -152,7 +162,7 @@ import { environment } from '../environments/environment';
              (click)="mobileMenuOpen = false"
              routerLinkActive="bg-[#EEF5EB] text-[#4F8A3D] font-bold"
              [routerLinkActiveOptions]="{exact: true}"
-             class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-colors cursor-pointer">
+             class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all cursor-pointer">
             <i class="fa-solid fa-house w-5 text-center text-sm text-[#4F8A3D]"></i>
             <span>Inicio</span>
           </a>
@@ -160,7 +170,7 @@ import { environment } from '../environments/environment';
           <!-- ¿Cómo funciona? -->
           <button type="button"
                   (click)="showHowItWorks = true; mobileMenuOpen = false"
-                  class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-colors font-semibold text-[15px] text-[#183247] cursor-pointer">
+                  class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all font-semibold text-[15px] text-[#183247] cursor-pointer">
             <i class="fa-solid fa-circle-question w-5 text-center text-sm text-[#0ea5e9]"></i>
             <span>¿Cómo funciona?</span>
           </button>
@@ -168,7 +178,7 @@ import { environment } from '../environments/environment';
           <!-- Materiales -->
           <button type="button"
                   (click)="showMaterials = true; mobileMenuOpen = false"
-                  class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-colors font-semibold text-[15px] text-[#183247] cursor-pointer">
+                  class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all font-semibold text-[15px] text-[#183247] cursor-pointer">
             <i class="fa-solid fa-recycle w-5 text-center text-sm text-[#4F8A3D]"></i>
             <span>Materiales</span>
           </button>
@@ -177,7 +187,7 @@ import { environment } from '../environments/environment';
           <a routerLink="/dashboard"
              (click)="mobileMenuOpen = false"
              routerLinkActive="bg-[#EEF5EB] text-[#4F8A3D] font-bold"
-             class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-colors cursor-pointer">
+             class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all cursor-pointer">
             <i class="fa-solid fa-truck-pickup w-5 text-center text-sm text-[#123F5B]"></i>
             <span>Retiro especial</span>
           </a>
@@ -185,7 +195,7 @@ import { environment } from '../environments/environment';
           <!-- Contacto DIMAO -->
           <button type="button"
                   (click)="showContact = true; mobileMenuOpen = false"
-                  class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-colors font-semibold text-[15px] text-[#183247] cursor-pointer">
+                  class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all font-semibold text-[15px] text-[#183247] cursor-pointer">
             <i class="fa-solid fa-envelope w-5 text-center text-sm text-emerald-600"></i>
             <span>Contacto DIMAO</span>
           </button>
@@ -196,33 +206,64 @@ import { environment } from '../environments/environment';
           <div *ngIf="!loginDisplay">
             <a routerLink="/login"
                (click)="mobileMenuOpen = false"
-               class="flex items-center justify-center gap-2.5 w-full bg-[#123F5B] hover:bg-[#0D3549] text-white text-sm font-semibold px-4 py-3 rounded-xl transition-all shadow-sm cursor-pointer">
+               class="flex items-center justify-center gap-2.5 w-full bg-gradient-to-r from-[#123F5B] to-[#1E6088] hover:from-[#0E354D] hover:to-[#174D6E] text-white text-sm font-semibold px-4 py-3 rounded-xl transition-all shadow-sm cursor-pointer">
               <i class="fa-regular fa-circle-user text-base"></i>
               <span>Mi cuenta (Iniciar sesión)</span>
             </a>
           </div>
 
-          <div *ngIf="loginDisplay" class="bg-[#F8FAF7] rounded-xl p-3 border border-[#DFE8E1]">
-            <div class="flex items-center justify-between">
-              <a routerLink="/dashboard" (click)="mobileMenuOpen = false" class="flex items-center gap-2.5 min-w-0 cursor-pointer">
-                <div class="w-8 h-8 rounded-full bg-[#123F5B] text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
+          <!-- MINI PERFIL REDISEÑADO PRO (Inspirado en mejores apps móviles cívicas) -->
+          <div *ngIf="loginDisplay" class="relative overflow-hidden rounded-2xl p-3.5 bg-gradient-to-br from-[#F5F9F5] via-white to-[#EDF5EC] border border-[#D5E6D8] shadow-xs">
+            <div class="flex items-center gap-3 mb-3">
+              <!-- Avatar con anillo gradiente y estado en línea activo -->
+              <div class="relative flex-shrink-0">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#123F5B] to-[#1F5C82] text-white text-sm font-extrabold flex items-center justify-center shadow-xs ring-2 ring-[#4F8A3D]/40 ring-offset-2 ring-offset-white">
                   {{ currentUser ? currentUser.charAt(0).toUpperCase() : 'V' }}
                 </div>
-                <div class="min-w-0">
-                  <span class="text-xs font-bold text-[#123F5B] block truncate">{{ currentUser }}</span>
-                  <span class="text-[10px] text-emerald-700 font-semibold block">Vecino Registrado</span>
+                <span class="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-[#4F8A3D] border-2 border-white"></span>
+                </span>
+              </div>
+
+              <!-- Información de Identidad Ciudadana -->
+              <div class="min-w-0 flex-1">
+                <h4 class="text-[13px] font-extrabold text-[#123F5B] truncate tracking-tight">
+                  {{ currentUser }}
+                </h4>
+                <div class="flex items-center gap-1.5 mt-0.5">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E2F2DE] text-[#2F6D20] border border-[#C5E4BE]">
+                    <i class="fa-solid fa-circle-check text-[9px] text-[#4F8A3D]"></i>
+                    <span>Vecino Verificado</span>
+                  </span>
                 </div>
+                <p class="text-[10.5px] text-[#546571] mt-0.5 flex items-center gap-1 truncate">
+                  <i class="fa-solid fa-location-dot text-[#4F8A3D] text-[10px]"></i>
+                  <span>Cuadrante Costanera Sur • P. Varas</span>
+                </p>
+              </div>
+            </div>
+
+            <!-- Botones de Acción Divididos: Panel + Cerrar Sesión -->
+            <div class="grid grid-cols-4 gap-2 pt-2.5 border-t border-[#DFEAE1]">
+              <a routerLink="/dashboard"
+                 (click)="mobileMenuOpen = false"
+                 class="col-span-3 flex items-center justify-between px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#4F8A3D] to-[#3D6E2E] hover:from-[#437633] hover:to-[#315725] text-white text-xs font-bold transition-all shadow-xs hover:shadow active:scale-[0.98] cursor-pointer group">
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-gauge-high text-xs opacity-90 group-hover:rotate-12 transition-transform"></i>
+                  <span>Mi Panel Vecinal</span>
+                </div>
+                <i class="fa-solid fa-arrow-right text-[11px] opacity-80 group-hover:translate-x-0.5 transition-transform"></i>
               </a>
-              <button (click)="logout(); mobileMenuOpen = false" class="text-xs font-bold text-red-500 hover:text-red-700 hover:underline px-2 py-1 cursor-pointer">
-                Salir
+
+              <button (click)="logout(); mobileMenuOpen = false"
+                      type="button"
+                      title="Cerrar sesión"
+                      class="col-span-1 flex items-center justify-center gap-1 px-2 py-2.5 rounded-xl bg-rose-50/80 hover:bg-rose-100 text-rose-600 hover:text-rose-700 text-xs font-bold border border-rose-200/70 transition-all active:scale-[0.98] cursor-pointer">
+                <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
+                <span class="text-[11px]">Salir</span>
               </button>
             </div>
-            <a routerLink="/dashboard"
-               (click)="mobileMenuOpen = false"
-               class="mt-2.5 flex items-center justify-center gap-2 w-full bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white text-xs font-bold py-2 rounded-lg transition-colors cursor-pointer">
-              <i class="fa-solid fa-gauge"></i>
-              <span>Ir a mi panel</span>
-            </a>
           </div>
         </div>
       </div>

@@ -1,12 +1,12 @@
 export function getRedirectUri(): string {
     if (typeof window === 'undefined' || !window.location) {
-        return 'http://localhost:4200';
+        return 'https://reciclago-frontend-puertovaras.s3.us-east-1.amazonaws.com/index.html';
     }
-    // Entorno local
+    // Entorno local fallback
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         return window.location.origin;
     }
-    // Entorno S3 HTTPS: requiere /index.html para que S3 sirva el archivo y no intente ListBucket (AccessDenied)
+    // Entorno S3 HTTPS: requiere /index.html para evitar error AccessDenied en S3 REST endpoint
     if (window.location.hostname.includes('s3') && !window.location.hostname.includes('s3-website')) {
         return `${window.location.origin}/index.html`;
     }
@@ -14,7 +14,7 @@ export function getRedirectUri(): string {
 }
 
 export const environment = {
-    production: false,
+    production: true,
     msalConfig: {
         auth: {
             clientId: '20ae8f6f-ef82-48a6-a4ae-897d36212b4b',

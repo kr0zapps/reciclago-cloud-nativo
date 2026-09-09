@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -440,39 +440,157 @@ import { MsalService } from '@azure/msal-angular';
 <p class="text-[16px] text-brand-muted leading-relaxed">
           Consulta cuándo pasa el camión por tu calle y revisa el cuadrante comunal por días y tipos de materiales en toda la comuna.
         </p>
-<!-- REPRESENTACIÓN VECTORIAL ESTILIZADA DE CALLES Y LAGO (Con trazo interactivo y movimiento) -->
-<div class="rounded-2xl bg-[#F0F6F9] border-2 border-[#D4E6EF] p-4 relative overflow-hidden">
-<div class="flex items-center justify-between gap-2 mb-2">
-<div class="flex items-center gap-2">
-<i class="fa-solid fa-compass text-brand-lake text-lg"></i>
-<span class="font-bold text-sm text-brand-navy">Cuadrante 2: Costanera y Llanquihue Sur</span>
-</div>
-<span class="text-xs bg-white px-2.5 py-1 rounded-md text-brand-lake font-bold border border-[#CCE1EC] shadow-xs">
-              En circulación
-            </span>
-</div>
-<!-- Croquis visual amigable de lago y calles -->
-<div class="h-24 w-full bg-white rounded-xl relative p-2 overflow-hidden border border-[#E1EDF2]">
-<!-- Lago estilizado arriba a la derecha -->
-<div class="absolute -top-3 -right-3 w-32 h-16 bg-[#E1F1F8] rounded-full flex items-center justify-center text-[10px] font-bold text-brand-lake">
-              Lago Llanquihue
-            </div>
-<!-- Trazado de calles base -->
-<div class="absolute left-6 top-0 bottom-0 w-3 bg-slate-100"></div>
-<div class="absolute left-0 right-0 top-12 h-3 bg-slate-100"></div>
-<!-- Ruta vectorial trazada con stroke animado -->
-<svg class="absolute inset-0 w-full h-full pointer-events-none" fill="none">
-<path class="route-path-animated" d="M 30 0 L 30 54 L 320 54" stroke="#4F8A3D" stroke-linecap="round" stroke-width="4"></path>
-</svg>
-<!-- Camión en el mapa con animación de traslación suave -->
-<div class="absolute left-24 top-9 bg-brand-lake text-white w-8 h-8 rounded-full flex items-center justify-center text-xs shadow-md anim-truck-route z-10">
-<i class="fa-solid fa-truck-fast"></i>
-</div>
-<!-- Marcador de casa de Matías -->
-<div class="absolute left-44 top-7 flex items-center gap-1 bg-white px-2 py-0.5 rounded-full border border-brand-green shadow-xs text-[11px] font-bold text-brand-green z-10">
-<i class="fa-solid fa-house-chimney text-[10px]"></i> Tu casa
-            </div>
-</div>
+<!-- REPRESENTACIÓN VECTORIAL ESTILIZADA DE CALLES DE PUERTO VARAS Y LAGO CON DEMO INTERACTIVA -->
+<div class="rounded-2xl bg-[#F0F6F9] border-2 border-[#D4E6EF] p-4 sm:p-5 relative overflow-hidden shadow-xs">
+  <!-- Cabecera del Mapa con estado en vivo -->
+  <div class="flex items-center justify-between gap-2 mb-3">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid fa-compass text-brand-lake text-lg"></i>
+      <span class="font-bold text-sm text-brand-navy">Cuadrante 2: Costanera y Llanquihue Sur</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="inline-flex items-center gap-1.5 text-xs bg-white px-2.5 py-1 rounded-md text-brand-lake font-bold border border-[#CCE1EC] shadow-xs">
+        <span class="w-2 h-2 rounded-full bg-emerald-500" [class.animate-ping]="truckSimulationRunning"></span>
+        <span>{{ truckSimulationRunning ? 'En circulación' : 'Pausado' }}</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Lienzo Vectorial de Calles de Puerto Varas -->
+  <div class="h-44 sm:h-48 w-full bg-white rounded-xl relative p-2 overflow-hidden border border-[#E1EDF2] select-none">
+    <!-- Lago Llanquihue en el fondo superior derecho -->
+    <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-3xl flex flex-col items-center justify-center text-[10px] font-extrabold text-brand-lake border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
+      <div class="flex items-center gap-1.5 opacity-90">
+        <i class="fa-solid fa-water text-xs text-sky-500"></i>
+        <span>Lago Llanquihue</span>
+      </div>
+      <span class="text-[8.5px] font-semibold text-sky-700/80 mt-0.5">Bahía de Puerto Varas</span>
+    </div>
+
+    <!-- Red de Calles Reales de Puerto Varas (Trazado estético) -->
+    <!-- Av. Vicente Pérez Rosales (Costanera horizontal) -->
+    <div class="absolute left-0 right-0 top-[68%] h-4 bg-slate-100 border-y border-slate-200/80 flex items-center justify-between px-3">
+      <span class="text-[8px] font-bold text-slate-600 uppercase tracking-wider">Av. Vicente Pérez Rosales (Costanera)</span>
+      <span class="text-[8px] font-semibold text-slate-500 hidden sm:inline">Hacia Ensenada →</span>
+    </div>
+    <!-- Calle San Francisco (vertical) -->
+    <div class="absolute left-[27%] top-0 bottom-0 w-4 bg-slate-100 border-x border-slate-200/80 flex flex-col items-center justify-center">
+      <span class="text-[7.5px] font-bold text-slate-600 [writing-mode:vertical-lr] rotate-180 uppercase tracking-tight py-1">San Francisco</span>
+    </div>
+    <!-- Calle Del Salvador (horizontal norte) -->
+    <div class="absolute left-[27%] right-[45%] top-[26%] h-4 bg-slate-100 border-y border-slate-200/80 flex items-center justify-center">
+      <span class="text-[7.5px] font-bold text-slate-600 uppercase tracking-tight">Del Salvador</span>
+    </div>
+    <!-- Calle Santa Rosa (vertical este) -->
+    <div class="absolute left-[51%] top-0 bottom-0 w-4 bg-slate-100 border-x border-slate-200/80 flex flex-col items-center justify-center">
+      <span class="text-[7.5px] font-bold text-slate-600 [writing-mode:vertical-lr] rotate-180 uppercase tracking-tight py-1">Santa Rosa</span>
+    </div>
+
+    <!-- Puntos de Interés Comunales -->
+    <!-- Punto Limpio Costanera -->
+    <div class="absolute left-[8%] top-[35%] flex items-center gap-1 bg-white/95 px-1.5 py-0.5 rounded-md border border-emerald-300 text-[9px] font-bold text-emerald-800 shadow-xs">
+      <i class="fa-solid fa-recycle text-[8.5px] text-[#4F8A3D]"></i>
+      <span class="hidden sm:inline">Punto Limpio</span>
+    </div>
+
+    <!-- Tu Casa Marcador -->
+    <div class="absolute left-[78%] top-[50%] flex items-center gap-1 bg-white px-2 py-0.5 rounded-full border-2 border-[#4F8A3D] shadow-sm text-[10px] font-extrabold text-[#4F8A3D] z-20">
+      <i class="fa-solid fa-house-chimney text-[9px]"></i>
+      <span>Tu casa</span>
+    </div>
+
+    <!-- RUTA VECTORIAL TRAZADA CON RECORRIDO ILUMINADO -->
+    <svg class="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 100 100">
+      <!-- Ruta completa punteada de fondo -->
+      <path d="M 8 72 L 28 72 L 28 28 L 52 28 L 52 72 L 82 72"
+            fill="none"
+            stroke="#CBD5E1"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-dasharray="3 3">
+      </path>
+      <!-- Ruta recorrida iluminada verde -->
+      <path d="M 8 72 L 28 72 L 28 28 L 52 28 L 52 72 L 82 72"
+            fill="none"
+            stroke="#4F8A3D"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            opacity="0.85">
+      </path>
+    </svg>
+
+    <!-- ICONO DE CAMIONCITO MÓVIL CON NAVEGACIÓN SUAVE Y BEACON RADAR -->
+    <div class="absolute z-30 pointer-events-none -translate-x-1/2 -translate-y-1/2"
+         [style.left.%]="activeWaypoint.x"
+         [style.top.%]="activeWaypoint.y"
+         style="transition: left 1.2s cubic-bezier(0.4, 0, 0.2, 1), top 1.2s cubic-bezier(0.4, 0, 0.2, 1);">
+      
+      <!-- Halo de Radar Pulsante -->
+      <div class="relative flex items-center justify-center">
+        <span class="absolute inline-flex h-9 w-9 rounded-full bg-emerald-400 opacity-60 animate-ping" *ngIf="truckSimulationRunning"></span>
+        <span class="absolute inline-flex h-7 w-7 rounded-full bg-brand-lake/30"></span>
+        
+        <!-- Vehículo Municipal -->
+        <div class="relative w-8 h-8 rounded-full bg-gradient-to-tr from-[#123F5B] to-[#1E628C] text-white flex items-center justify-center text-xs shadow-lg ring-2 ring-white">
+          <i class="fa-solid fa-truck-fast text-[11px] text-emerald-300"></i>
+        </div>
+
+        <!-- Etiqueta Flotante de Patente / Camión -->
+        <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-[#041D2D] text-white text-[8px] font-bold px-1.5 py-0.2 rounded-md shadow whitespace-nowrap border border-white/20">
+          PV-2026
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL DE TELEMETRÍA EN VIVO Y CONTROLES DE LA DEMO -->
+  <div class="mt-3 bg-white/95 rounded-xl p-3 border border-[#D0E2EC] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <!-- Información de posición en tiempo real -->
+    <div class="min-w-0 flex-1">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#E6F4EA] text-[#2C6E25] border border-[#C6E6C0]">
+          <i class="fa-solid fa-satellite-dish text-[9px] text-[#4F8A3D]" [class.animate-pulse]="truckSimulationRunning"></i>
+          <span>GPS Demo Puerto Varas</span>
+        </span>
+        <span class="text-xs font-bold text-[#123F5B] truncate">
+          {{ activeWaypoint.name }}
+        </span>
+      </div>
+      <p class="text-[11px] text-[#546571] mt-0.5 flex items-center gap-2 flex-wrap">
+        <span>{{ activeWaypoint.detail }}</span>
+        <span class="text-slate-300">•</span>
+        <span class="font-bold text-[#4F8A3D]"><i class="fa-solid fa-clock text-[10px] mr-0.5"></i> ETA: {{ activeWaypoint.eta }}</span>
+        <span class="text-slate-300">•</span>
+        <span class="font-semibold text-slate-600"><i class="fa-solid fa-route text-[10px] mr-0.5"></i> {{ activeWaypoint.distancia }}</span>
+      </p>
+    </div>
+
+    <!-- Botonera de control de simulación -->
+    <div class="flex items-center gap-1.5 flex-shrink-0 self-end sm:self-center">
+      <button (click)="toggleTruckSimulation()"
+              type="button"
+              class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#EEF5EB] hover:bg-[#E0EDE0] text-[#3D742F] border border-[#C8DFCA] transition-colors flex items-center gap-1.5 cursor-pointer">
+        <i class="fa-solid" [class.fa-pause]="truckSimulationRunning" [class.fa-play]="!truckSimulationRunning"></i>
+        <span>{{ truckSimulationRunning ? 'Pausar' : 'Reanudar' }}</span>
+      </button>
+
+      <button (click)="toggleTruckSpeed()"
+              type="button"
+              class="px-2 py-1.5 rounded-lg text-xs font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 transition-colors cursor-pointer"
+              title="Alternar velocidad de simulación">
+        <span>{{ truckSpeed }}x</span>
+      </button>
+
+      <button (click)="resetTruckSimulation()"
+              type="button"
+              class="px-2 py-1.5 rounded-lg text-xs font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 transition-colors cursor-pointer"
+              title="Reiniciar recorrido">
+        <i class="fa-solid fa-rotate-left text-[11px]"></i>
+      </button>
+    </div>
+  </div>
 </div>
 </div>
 <div class="pt-6">
@@ -844,7 +962,7 @@ import { MsalService } from '@azure/msal-angular';
   </main>
 `
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   userName = '';
   userRoles: string[] = [];
 
@@ -858,6 +976,73 @@ export class DashboardComponent implements OnInit {
 
   showRutaModal = false;
   showHistorialModal = false;
+
+  // Simulación interactiva del camión recolector en Puerto Varas
+  truckSimulationRunning = true;
+  truckSpeed = 1;
+  currentTruckIndex = 0;
+  private truckTimer: any = null;
+
+  truckWaypoints = [
+    {
+      name: 'Av. Vicente Pérez Rosales (Costanera)',
+      detail: 'Bordeando Lago Llanquihue • Sector Costanera',
+      eta: '14 min',
+      distancia: '650 m',
+      x: 8,
+      y: 72,
+      estado: 'En tránsito costanero'
+    },
+    {
+      name: 'Av. Pérez Rosales esq. San Francisco',
+      detail: 'Giro hacia sector comercial y cuadrante céntrico',
+      eta: '11 min',
+      distancia: '480 m',
+      x: 28,
+      y: 72,
+      estado: 'Giro a la derecha'
+    },
+    {
+      name: 'Calle San Francisco (Sector Iglesia del Sagrado Corazón)',
+      detail: 'Recolectando campanas de vidrio y cartón',
+      eta: '8 min',
+      distancia: '350 m',
+      x: 28,
+      y: 28,
+      estado: 'Recolección activa'
+    },
+    {
+      name: 'Calle Del Salvador (Centro Histórico)',
+      detail: 'Avanzando hacia cuadrante residencial',
+      eta: '5 min',
+      distancia: '220 m',
+      x: 52,
+      y: 28,
+      estado: 'Tránsito fluido'
+    },
+    {
+      name: 'Calle Santa Rosa hacia Costanera',
+      detail: 'Próxima parada: Tu sector habitacional',
+      eta: '2 min',
+      distancia: '90 m',
+      x: 52,
+      y: 72,
+      estado: 'Aproximándose a tu domicilio'
+    },
+    {
+      name: 'Tu Domicilio (Sector Costanera Sur)',
+      detail: '¡Camión municipal en tu puerta! Retiro en curso',
+      eta: '¡Llegando ahora!',
+      distancia: '0 m',
+      x: 82,
+      y: 72,
+      estado: 'Retiro en tu domicilio'
+    }
+  ];
+
+  get activeWaypoint() {
+    return this.truckWaypoints[this.currentTruckIndex];
+  }
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
@@ -880,16 +1065,50 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const account = this.authService.instance.getActiveAccount();
+    const account = this.authService.instance.getActiveAccount() || this.authService.instance.getAllAccounts()[0];
     if (account) {
       this.userName = account.name || account.username || '';
-      if (account.idTokenClaims && account.idTokenClaims.roles) {
-        this.userRoles = account.idTokenClaims.roles;
+      const claims = account.idTokenClaims as Record<string, any> | undefined;
+      if (claims && claims['roles']) {
+        this.userRoles = claims['roles'];
       }
     }
 
     this.loadResiduos();
     this.loadPickups();
+    this.startTruckSimulation();
+  }
+
+  ngOnDestroy(): void {
+    if (this.truckTimer) {
+      clearInterval(this.truckTimer);
+      this.truckTimer = null;
+    }
+  }
+
+  startTruckSimulation(): void {
+    if (this.truckTimer) clearInterval(this.truckTimer);
+    const intervalMs = this.truckSpeed === 2 ? 1800 : 3500;
+    this.truckTimer = setInterval(() => {
+      if (this.truckSimulationRunning) {
+        this.currentTruckIndex = (this.currentTruckIndex + 1) % this.truckWaypoints.length;
+      }
+    }, intervalMs);
+  }
+
+  toggleTruckSimulation(): void {
+    this.truckSimulationRunning = !this.truckSimulationRunning;
+  }
+
+  toggleTruckSpeed(): void {
+    this.truckSpeed = this.truckSpeed === 1 ? 2 : 1;
+    this.startTruckSimulation();
+  }
+
+  resetTruckSimulation(): void {
+    this.currentTruckIndex = 0;
+    this.truckSimulationRunning = true;
+    this.startTruckSimulation();
   }
 
   checkLoadingStatus(): void {

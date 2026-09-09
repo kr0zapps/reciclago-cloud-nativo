@@ -194,17 +194,88 @@ El portal estara disponible localmente en `http://localhost:4200`.
 
 ---
 
-## 7. Estructura del Repositorio
+## 7. Verificación de Seguridad y Rutas con cURL (Rúbrica EP2 - Indicador 8)
+
+A continuación se presentan los comandos formales de prueba mediante cURL para demostrar el comportamiento del Resource Server BFF frente a diferentes escenarios de autenticación y autorización (códigos HTTP 200, 401 y 403):
+
+### 1. Acceso a Rutas Públicas (Sin Token) -> `200 OK`
+```bash
+# Verificación de estado del BFF
+curl -i http://localhost:8080/public/status
+
+# Healthcheck de Actuator
+curl -i http://localhost:8080/actuator/health
+```
+**Respuesta esperada:** `HTTP/1.1 200 OK` con JSON `{"status":"ONLINE","gateway":"ms-reciclago-bff"}`.
+
+### 2. Petición a Ruta Protegida sin Token -> `401 Unauthorized`
+```bash
+curl -i http://localhost:8080/api/me
+```
+**Respuesta esperada:** `HTTP/1.1 401 Unauthorized` con payload RFC 7807:
+```json
+{
+  "timestamp": 1725904800000,
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "Full authentication is required to access this resource",
+  "path": "/api/me"
+}
+```
+
+### 3. Petición con Token de Vecino a Endpoint Administrativo -> `403 Forbidden`
+```bash
+# Presentando Bearer token emitido para usuario con rol "ROLE_Vecino"
+curl -i -H "Authorization: Bearer <TOKEN_VECINO>" http://localhost:8080/api/admin/dashboard
+```
+**Respuesta esperada:** `HTTP/1.1 403 Forbidden`:
+```json
+{
+  "timestamp": 1725904800000,
+  "status": 403,
+  "error": "Forbidden",
+  "message": "Access Denied: Insufficient Role Permissions",
+  "path": "/api/admin/dashboard"
+}
+```
+
+### 4. Petición con Token de Vecino a Rutas Propias -> `200 OK`
+```bash
+# Perfil del usuario autenticado
+curl -i -H "Authorization: Bearer <TOKEN_VECINO>" http://localhost:8080/api/me
+
+# Catálogo comunal de residuos
+curl -i -H "Authorization: Bearer <TOKEN_VECINO>" http://localhost:8080/api/catalog/residuos
+
+# Historial de retiros (Filtrado automáticamente por el BFF a su propio email)
+curl -i -H "Authorization: Bearer <TOKEN_VECINO>" http://localhost:8080/api/pickups
+```
+**Respuesta esperada:** `HTTP/1.1 200 OK`.
+
+### 5. Control de Acceso RBAC en Ciclo de Vida Logístico
+```bash
+# Intento de programar camión por un usuario 'Vecino' -> 403 Forbidden
+curl -i -X PATCH -H "Authorization: Bearer <TOKEN_VECINO>" \
+  http://localhost:8080/api/pickups/1/programar
+
+# Ejecución por usuario con rol 'Admin' o 'Coordinador' -> 200 OK
+curl -i -X PATCH -H "Authorization: Bearer <TOKEN_ADMIN>" \
+  "http://localhost:8080/api/pickups/1/programar?camionId=1&camionPatente=PV-RC-2026&fechaProgramada=2026-09-12T09:00:00"
+```
+
+---
+
+## 8. Estructura del Repositorio
 
 ```text
 reciclago/
 ├── .github/
 │   └── workflows/
-│       └── deploy-frontend.yml       # Pipeline CI/CD automatico GitHub -> AWS S3
+│       └── deploy-frontend.yml       # Pipeline CI/CD automático GitHub -> AWS S3
 ├── docker-compose.yml                # Infraestructura local (Postgres, RabbitMQ, Kafka)
-├── ruta_trabajo.md                   # Bitacora tecnica y guia detallada DEV 1 / DEV 2
-├── ms-reciclago-bff/                 # Backend for Frontend (Spring Security OAuth2)
-├── ms-reciclago-catalog/             # Microservicio de Catalogo (Residuos, Camiones, Tarifas)
+├── ruta_trabajo.md                   # Bitácora técnica y guía detallada DEV 1 / DEV 2
+├── ms-reciclago-bff/                 # Backend for Frontend (Spring Security OAuth2 + Dockerfile)
+├── ms-reciclago-catalog/             # Microservicio de Catálogo (Residuos, Camiones, Tarifas)
 ├── ms-reciclago-pickups/             # Microservicio de Retiros (Eventos Kafka / RabbitMQ)
 └── frontend-reciclago/               # Portal Web Angular 18
     ├── src/
@@ -213,24 +284,24 @@ reciclago/
     │   │   ├── pages/
     │   │   │   ├── home/             # Landing page institucional comunal
     │   │   │   ├── login/            # Pantalla de acceso SSO Microsoft
-    │   │   │   └── dashboard/        # Panel vecinal, solicitud y cuadrantes
-    │   │   ├── services/             # BffService (Comunicacion REST reactiva)
-    │   │   ├── app.component.ts      # Header universal, modales y footer civico
-    │   │   ├── app.config.ts         # Configuracion MSAL y Providers Angular
-    │   │   └── app.routes.ts         # Enrutador cliente SPA
-    │   └── assets/                   # Fotografias 4K, favicon y escudos oficiales
-    └── tailwind.config.js            # Sistema de diseno comunal Puerto Varas
+    │   │   │   └── dashboard/        # Panel vecinal, simulación de camión y cuadrantes
+    │   │   ├── services/             # BffService (Comunicación REST reactiva)
+    │   │   ├── app.component.ts      # Header universal, menú móvil fluido y modales
+    │   │   ├── app.config.ts         # Configuración MSAL y Providers Angular
+    │   │   └── app.routes.ts         # Enrutador cliente SPA (HashLocationStrategy)
+    │   └── assets/                   # Fotografías 4K, favicon y escudos oficiales
+    └── tailwind.config.js            # Sistema de diseño comunal Puerto Varas
 ```
 
 ---
 
-## 8. Cumplimiento Academico (Caso 7 & Pautas DSY1107)
+## 9. Cumplimiento Académico (Caso 7 & Pautas DSY1107)
 
-El proyecto da cumplimiento integro a los requisitos solicitados en la asignatura **Cloud Nativo**:
+El proyecto da cumplimiento íntegro a los requisitos solicitados en la asignatura **Cloud Nativo**:
 
-- **Caso 7 (RecicLaGo Puerto Varas)**: Cobertura de trazabilidad de reciclaje puerta a puerta, sectores y cuadrantes comunales, categorizacion oficial de residuos (vidrio, carton, plastico, latas) y pesaje in situ.
-- **Encargo EP1 (60% Frontend + 40% BFF)**: Autenticacion federada MSAL en Angular, intercepcion de peticiones con Bearer JWT, validacion de claims y control RBAC en Spring Security.
-- **Encargo EP2 (Cloud Nativo y Presentacion)**: Despliegue en nube publica AWS, pipeline CI/CD, contenedorizacion Docker, comunicacion asincrona mediante Kafka y RabbitMQ, y alta disponibilidad con arquitectura SPA desacoplada.
+- **Caso 7 (RecicLaGo Puerto Varas)**: Cobertura de trazabilidad de reciclaje puerta a puerta, sectores y cuadrantes comunales, categorización oficial de residuos (vidrio, cartón, plástico, latas) y pesaje in situ.
+- **Encargo EP1 (60% Frontend + 40% BFF)**: Autenticación federada MSAL en Angular, intercepción de peticiones con Bearer JWT, validación de claims y control RBAC en Spring Security.
+- **Encargo EP2 (Cloud Nativo y Presentación)**: Despliegue en nube pública AWS, pipeline CI/CD, contenedorización Docker, comunicación asíncrona mediante Kafka y RabbitMQ, y alta disponibilidad con arquitectura SPA desacoplada.
 
 ---
 

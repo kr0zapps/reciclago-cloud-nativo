@@ -31,6 +31,12 @@ import java.util.*;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    @Value("${azure.activedirectory.tenant-id:5625266d-cae0-4070-a7ea-b5e88273580f}")
+    private String tenantId;
+
+    @Value("${azure.activedirectory.client-id:9a946a0b-5350-4fe1-a79e-ca332612f60d}")
+    private String clientId;
+
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String issuerUri;
 
@@ -43,10 +49,15 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/public/**", "/actuator/health").permitAll()
+                .requestMatchers("/public/**", "/actuator/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("Admin")
                 .requestMatchers("/api/coordinador/**").hasAnyRole("Admin", "Coordinador")
+                // RBAC estricto en operaciones logisticas de ciclo de vida (solo Admin o Coordinador)
+                .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/programar").hasAnyRole("Admin", "Coordinador")
+                .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/en-ruta").hasAnyRole("Admin", "Coordinador")
+                .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/retirado").hasAnyRole("Admin", "Coordinador")
+                .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/pesado").hasAnyRole("Admin", "Coordinador")
                 .requestMatchers("/api/pickups/**").authenticated()
                 .requestMatchers("/api/catalog/**").authenticated()
                 .requestMatchers("/api/me").authenticated()
@@ -71,7 +82,7 @@ public class SecurityConfig {
         OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
         OAuth2TokenValidator<Jwt> withIssuer = (Jwt token) -> {
             String iss = token.getIssuer() != null ? token.getIssuer().toString() : "";
-            if (iss.contains("5625266d-cae0-4070-a7ea-b5e88273580f")) {
+            if (iss.contains(tenantId) || iss.equals(issuerUri)) {
                 return OAuth2TokenValidatorResult.success();
             }
             return OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token", "Emisor no corresponde al tenant de RecicLaGo: " + iss, null));
@@ -80,12 +91,12 @@ public class SecurityConfig {
         OAuth2TokenValidator<Jwt> withAudience = (Jwt token) -> {
             List<String> audiences = token.getAudience();
             if (audiences != null && audiences.stream().anyMatch(a ->
-                a.contains("9a946a0b-5350-4fe1-a79e-ca332612f60d") ||
-                a.contains("20ae8f6f-ef82-48a6-a4ae-897d36212b4b") ||
-                a.contains(audience))) {
+                a.equals(clientId) ||
+                a.equals("api://" + clientId) ||
+                a.equals(audience))) {
                 return OAuth2TokenValidatorResult.success();
             }
-            return OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token", "Audiencia no corresponde a la aplicacion: " + audiences, null));
+            return OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token", "Audiencia no corresponde a la API de RecicLaGo: " + audiences, null));
         };
 
         jwtDecoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer, withAudience));
