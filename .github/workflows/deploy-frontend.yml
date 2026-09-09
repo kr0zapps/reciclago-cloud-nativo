@@ -44,5 +44,9 @@ jobs:
 
       - name: 🚀 Sincronizar archivos a AWS S3 Bucket
         run: |
-          aws s3 sync ./frontend-reciclago/dist/frontend-reciclago/browser s3://${{ secrets.S3_BUCKET_NAME || 'reciclago-frontend-puertovaras' }} --delete
+          BUCKET="${{ secrets.S3_BUCKET_NAME || 'reciclago-frontend-puertovaras' }}"
+          aws s3 sync ./frontend-reciclago/dist/frontend-reciclago/browser s3://$BUCKET --delete
+          for route in dashboard login pickups catalog reports audit auth; do
+            aws s3 cp ./frontend-reciclago/dist/frontend-reciclago/browser/index.html s3://$BUCKET/$route --content-type text/html
+          done
           echo "✅ Despliegue a S3 completado con éxito."

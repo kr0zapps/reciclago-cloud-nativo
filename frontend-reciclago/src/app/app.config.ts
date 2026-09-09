@@ -1,5 +1,5 @@
 import { ApplicationConfig, APP_INITIALIZER } from '@angular/core';
-import { provideRouter, withViewTransitions } from '@angular/router';
+import { provideRouter, withViewTransitions, withHashLocation } from '@angular/router';
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
 import { MsalService, MSAL_INSTANCE, MsalGuard, MsalInterceptor, MSAL_INTERCEPTOR_CONFIG, MSAL_GUARD_CONFIG, MsalBroadcastService } from '@azure/msal-angular';
@@ -53,7 +53,7 @@ export function MSALInitializerFactory(msalInstance: IPublicClientApplication) {
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes, withViewTransitions({ skipInitialTransition: false })),
+    provideRouter(routes, withViewTransitions({ skipInitialTransition: false }), withHashLocation()),
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimations(),
     {
@@ -84,7 +84,8 @@ export const appConfig: ApplicationConfig = {
               'user.read',
               ...environment.apiConfig.scopes
             ],
-            redirectUri: environment.msalConfig.auth.redirectUri
+            redirectUri: environment.msalConfig.auth.redirectUri,
+            redirectStartPage: environment.msalConfig.auth.redirectUri
           }
         };
       }
