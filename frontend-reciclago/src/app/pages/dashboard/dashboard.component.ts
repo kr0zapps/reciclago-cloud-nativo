@@ -10,300 +10,388 @@ import { BffService } from '../../services/bff.service';
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   template: `
-    <div style="padding: 24px; max-width: 1100px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #333;">
-      <div style="background: linear-gradient(135deg, #1b5e20, #2e7d32); color: white; border-radius: 12px; padding: 24px 30px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-          <div>
-            <h1 style="margin: 0 0 6px 0; font-size: 24px; font-weight: 700;">Panel de Control RecicLaGo</h1>
-            <p style="margin: 0; opacity: 0.9; font-size: 14px;">Autenticado con Microsoft Entra ID (Azure AD) y protegido por <code>MsalGuard</code></p>
+    <div style="background-color: #f3fcf4; min-height: 100vh; padding-bottom: 60px;">
+      
+      <!-- Protocol Ledger Top Bar -->
+      <div style="background: rgba(226, 234, 227, 0.7); backdrop-filter: blur(4px); border-bottom: 1px solid #c0c9c1; padding: 10px 24px;">
+        <div style="max-width: 1280px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; font-size: 12px; color: #414943;">
+          <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; text-transform: uppercase;">
+            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #013623;"></span>
+            <span>Ordenanza N° 1.402</span>
+            <span style="color: #717973;">•</span>
+            <span style="color: #161d19;">Sistema de Gestión Residual & Trazabilidad Predial</span>
           </div>
-          <div style="background: rgba(255,255,255,0.15); padding: 10px 18px; border-radius: 8px; backdrop-filter: blur(4px);">
-            <div style="font-size: 14px; font-weight: 600;">{{ userName }}</div>
-            <div style="font-size: 12px; opacity: 0.85;">{{ userEmail }}</div>
-          </div>
-        </div>
-      </div>
-
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 24px;">
-        <div style="background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
-          <h3 style="color: #e65100; margin-top: 0; font-size: 17px; display: flex; align-items: center; gap: 8px;">
-            <span>🛡️</span> Roles y Permisos (Token JWT)
-          </h3>
-          <div style="margin-bottom: 12px;">
-            <div style="font-size: 13px; color: #666; margin-bottom: 5px;">Roles asignados (claim 'roles'):</div>
-            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-              <span *ngFor="let role of userRoles" style="background-color: #ff9800; color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">
-                {{ role }}
-              </span>
-              <span *ngIf="userRoles.length === 0" style="background-color: #4caf50; color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">
-                Rol por Defecto: Vecino (Sin roles administrativos)
-              </span>
-            </div>
-          </div>
-          <div>
-            <div style="font-size: 13px; color: #666; margin-bottom: 5px;">Scopes delegados (claim 'scp'):</div>
-            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-              <span *ngFor="let scope of userScopes" style="background-color: #0288d1; color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">
-                {{ scope }}
-              </span>
-              <span *ngIf="userScopes.length === 0" style="color: #888; font-size: 13px; font-style: italic;">
-                Scope implícito por recurso
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div style="background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
-          <h3 style="color: #1565c0; margin-top: 0; font-size: 17px; display: flex; align-items: center; gap: 8px;">
-            <span>⚡</span> Pruebas Directas BFF (MsalInterceptor)
-          </h3>
-          <p style="color: #666; font-size: 13px; margin-bottom: 14px;">
-            <code>MsalInterceptor</code> inyecta automáticamente el token Bearer en el puerto 8080.
-          </p>
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <button (click)="callProfileApi()" style="padding: 8px 14px; background-color: #1976d2; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: left; font-size: 13px;">
-              👤 GET /api/me (Perfil & Claims)
-            </button>
-            <button (click)="callPickupsSummaryApi()" style="padding: 8px 14px; background-color: #388e3c; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: left; font-size: 13px;">
-              📊 GET /api/pickups/summary (Resumen Microservicio)
-            </button>
-            <button (click)="callAdminApi()" style="padding: 8px 14px; background-color: #d32f2f; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: left; font-size: 13px;">
-              🔒 GET /api/admin/dashboard (Prueba RBAC 403 Forbidden)
-              </button>
-            <button (click)="callCoordinadorApi()" style="padding: 8px 14px; background-color: #f57c00; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: left; font-size: 13px;">
-              📋 GET /api/coordinador/dashboard (Prueba RBAC Coordinador/Admin)
-            </button>
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <span style="background: #ffffff; color: #013623; padding: 3px 8px; border-radius: 4px; font-weight: 600; font-size: 11px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 4px;">
+              <span class="material-symbols-outlined" style="font-size: 14px;">verified_user</span>
+              MICROSOFT ENTRA ID • ACCESO SSO SEGURO
+            </span>
           </div>
         </div>
       </div>
 
-      <div *ngIf="apiResponse" style="background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
-        <strong style="color: #2e7d32;">Respuesta Exitosa del BFF (HTTP {{ apiStatus }}):</strong>
-        <pre style="background: white; padding: 12px; border-radius: 4px; overflow-x: auto; font-size: 12px; margin-top: 8px; border: 1px solid #c8e6c9;">{{ apiResponse | json }}</pre>
-      </div>
-
-      <div *ngIf="apiError" style="background: #ffebee; border: 1px solid #ef9a9a; border-radius: 8px; padding: 16px; margin-bottom: 24px; color: #c62828;">
-        <strong>Respuesta de Seguridad del BFF (HTTP {{ apiStatus }}):</strong>
-        <pre style="background: white; padding: 12px; border-radius: 4px; overflow-x: auto; font-size: 12px; margin-top: 8px; border: 1px solid #ffcdd2;">{{ apiError | json }}</pre>
-      </div>
-
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 24px; margin-bottom: 24px;">
-        <div style="background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 22px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="margin: 0; color: #2e7d32; font-size: 18px;">♻️ Catálogo de Residuos</h3>
-            <button (click)="loadResiduos()" style="background: #f1f8e9; border: 1px solid #c5e1a5; color: #33691e; padding: 5px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;">
-              Refrescar
-            </button>
-          </div>
-          <div *ngIf="loadingResiduos" style="color: #666; font-size: 14px;">Cargando catálogo vía BFF...</div>
-          <div *ngIf="!loadingResiduos && residuos.length === 0" style="color: #888; font-size: 14px;">No hay residuos registrados en el catálogo.</div>
-          <div *ngIf="residuos.length > 0" style="display: flex; flex-direction: column; gap: 10px;">
-            <div *ngFor="let item of residuos" style="background: #f9fbe7; border: 1px solid #e6ee9c; border-radius: 6px; padding: 12px;">
-              <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                <strong style="color: #33691e;">{{ item.nombre }}</strong>
-                <span style="font-size: 12px; font-weight: bold; background: #dce775; padding: 2px 8px; border-radius: 10px;">
-                  \${{ item.precioPorKg }} / kg
-                </span>
-              </div>
-              <div style="font-size: 12px; color: #555; margin-top: 4px;">{{ item.descripcion }}</div>
-              <div style="font-size: 11px; color: #888; margin-top: 4px;">Código: <code>{{ item.codigo }}</code></div>
-            </div>
-          </div>
-        </div>
-
-        <div style="background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 22px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
-          <h3 style="margin-top: 0; margin-bottom: 16px; color: #1565c0; font-size: 18px;">📦 Solicitar Retiro a Domicilio</h3>
+      <!-- Escenario Principal en Cuadrícula Asimétrica Stitch -->
+      <div style="max-width: 1280px; margin: 0 auto; padding: 36px 24px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 540px), 1fr)); gap: 36px; align-items: start;">
           
-          <div *ngIf="createSuccess" style="background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; border-radius: 6px; padding: 10px; font-size: 13px; margin-bottom: 12px;">
-            {{ createSuccess }}
-          </div>
-          <div *ngIf="createError" style="background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; border-radius: 6px; padding: 10px; font-size: 13px; margin-bottom: 12px;">
-            {{ createError }}
-          </div>
-
-          <form (ngSubmit)="submitPickup()" style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- Columna Izquierda: Terminal Ciudadano y Operativo -->
+          <div style="display: flex; flex-direction: column; gap: 24px;">
+            
+            <!-- Encabezado Tipográfico -->
             <div>
-              <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">Tipo de Residuo:</label>
-              <select [(ngModel)]="newPickup.residuoId" name="residuoId" style="width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px;">
-                <option *ngFor="let r of residuos" [value]="r.id">{{ r.nombre }} (\${{ r.precioPorKg }}/kg)</option>
-              </select>
+              <span style="font-size: 12px; color: #013623; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">how_to_reg</span>
+                Acceso Cívico Centralizado
+              </span>
+              <h1 class="font-serif" style="font-size: clamp(28px, 3.5vw, 38px); font-weight: 600; color: #013623; margin: 6px 0 10px; line-height: 1.15;">
+                Identificación de Vecino & Gestión Predial
+              </h1>
+              <p style="font-size: 15px; color: #414943; margin: 0; line-height: 1.5;">
+                Acceso centralizado exclusivo mediante cuenta Microsoft institucional (&#64;ptovaras.cl) o cuenta vecinal verificada para gestión de residuos, pesaje y beneficios prediales.
+              </p>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-              <div>
-                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">Dirección:</label>
-                <input type="text" [(ngModel)]="newPickup.direccion" name="direccion" required placeholder="Ej: Av. Providencia 123" style="width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px;" />
+            <!-- Tarjeta Terminal de Autenticación / Operación -->
+            <div class="card-civic" style="padding: 28px;">
+              
+              <!-- Selector de Pestañas (Vecino / Funcionario) -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; background-color: #edf6ee; padding: 4px; border-radius: 6px; gap: 4px; margin-bottom: 24px; font-size: 13px; font-weight: 600;">
+                <button 
+                  (click)="tabActiva = 'vecino'" 
+                  [style.background-color]="tabActiva === 'vecino' ? '#ffffff' : 'transparent'"
+                  [style.color]="tabActiva === 'vecino' ? '#013623' : '#414943'"
+                  style="padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 150ms ease;">
+                  <span class="material-symbols-outlined" style="font-size: 18px;">cottage</span>
+                  <span>Acceso Vecino / Rol Predial</span>
+                </button>
+
+                <button 
+                  (click)="tabActiva = 'operador'" 
+                  [style.background-color]="tabActiva === 'operador' ? '#ffffff' : 'transparent'"
+                  [style.color]="tabActiva === 'operador' ? '#013623' : '#414943'"
+                  style="padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 150ms ease;">
+                  <span class="material-symbols-outlined" style="font-size: 18px;">local_shipping</span>
+                  <span>Funcionario DIMAO / Cuadrilla</span>
+                </button>
               </div>
-              <div>
-                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">Comuna:</label>
-                <select [(ngModel)]="newPickup.comuna" name="comuna" style="width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px;">
-                  <option value="Providencia">Providencia</option>
-                  <option value="Santiago">Santiago</option>
-                  <option value="Vitacura">Vitacura</option>
-                  <option value="Las Condes">Las Condes</option>
-                  <option value="Ñuñoa">Ñuñoa</option>
-                </select>
+
+              <!-- SI NO ESTÁ AUTENTICADO: Botón Microsoft Entra ID Oficial -->
+              <div *ngIf="!isAuthenticated()" style="display: flex; flex-direction: column; gap: 18px;">
+                
+                <div style="background-color: rgba(237, 246, 238, 0.7); border: 1px solid #c0c9c1; border-radius: 8px; padding: 20px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-size: 11px; font-weight: 700; color: #536257; text-transform: uppercase;">
+                      Autenticación Única Homologada
+                    </span>
+                    <span style="font-size: 12px; font-weight: 600; color: #013623; display: flex; align-items: center; gap: 4px;">
+                      <span class="material-symbols-outlined" style="font-size: 14px;">verified</span>
+                      Microsoft SSO
+                    </span>
+                  </div>
+
+                  <p style="font-size: 13px; color: #414943; margin: 0 0 16px;">
+                    Acceda con su cuenta Microsoft para sincronizar automáticamente sus inmuebles comunales, trazabilidad de reciclaje y certificaciones de pesaje predial.
+                  </p>
+
+                  <!-- Botón Microsoft SSO Stitch -->
+                  <button (click)="login()" type="button" style="width: 100%; padding: 14px 18px; background-color: #ffffff; border: 1px solid #c0c9c1; border-radius: 6px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 150ms ease; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                      <svg width="20" height="20" viewBox="0 0 21 21" fill="none">
+                        <rect x="1" y="1" width="9" height="9" fill="#F25022"/>
+                        <rect x="11" y="1" width="9" height="9" fill="#7FBA00"/>
+                        <rect x="1" y="11" width="9" height="9" fill="#00A4EF"/>
+                        <rect x="11" y="11" width="9" height="9" fill="#FFB900"/>
+                      </svg>
+                      <div style="text-align: left;">
+                        <div style="font-weight: 700; font-size: 14px; color: #161d19;">Iniciar sesión con Microsoft</div>
+                        <div style="font-size: 11px; color: #414943;">Microsoft 365 / Entra ID</div>
+                      </div>
+                    </div>
+                    <span class="material-symbols-outlined" style="color: #013623;">arrow_forward</span>
+                  </button>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 10px; padding: 12px; background-color: #e8f0e8; border-radius: 6px; font-size: 13px; color: #414943;">
+                  <span class="material-symbols-outlined" style="color: #013623; font-size: 20px;">shield</span>
+                  <span>Inicio de sesión seguro para cuentas <strong>&#64;ptovaras.cl</strong>, <strong>&#64;outlook.com</strong> o institucionales.</span>
+                </div>
+
               </div>
-            </div>
 
-            <div>
-              <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">Peso Estimado (kg):</label>
-              <input type="number" step="0.5" [(ngModel)]="newPickup.pesoEstimadoKg" name="pesoEstimadoKg" required style="width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px;" />
-            </div>
-
-            <div>
-              <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">Observaciones:</label>
-              <input type="text" [(ngModel)]="newPickup.observaciones" name="observaciones" placeholder="Ej: Dejar en conserjería" style="width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px;" />
-            </div>
-
-            <button type="submit" [disabled]="submittingPickup" style="margin-top: 6px; padding: 10px; background-color: #2e7d32; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px;">
-              {{ submittingPickup ? 'Enviando solicitud...' : 'Confirmar Solicitud de Retiro' }}
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <div style="background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 22px; margin-bottom: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <h3 style="margin: 0; color: #37474f; font-size: 18px;">📋 Historial de Solicitudes de Retiro</h3>
-          <button (click)="loadPickups()" style="background: #eceff1; border: 1px solid #cfd8dc; color: #37474f; padding: 5px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;">
-            Refrescar
-          </button>
-        </div>
-
-        <div *ngIf="loadingPickups" style="color: #666; font-size: 14px;">Cargando retiros vía BFF...</div>
-        <div *ngIf="!loadingPickups && pickups.length === 0" style="color: #888; font-size: 14px;">No hay retiros registrados.</div>
-
-        <div *ngIf="pickups.length > 0" style="overflow-x: auto;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-            <thead>
-              <tr style="background: #f5f5f5; text-align: left;">
-                <th style="padding: 10px; border-bottom: 2px solid #e0e0e0;">Código</th>
-                <th style="padding: 10px; border-bottom: 2px solid #e0e0e0;">Vecino</th>
-                <th style="padding: 10px; border-bottom: 2px solid #e0e0e0;">Residuo</th>
-                <th style="padding: 10px; border-bottom: 2px solid #e0e0e0;">Dirección</th>
-                <th style="padding: 10px; border-bottom: 2px solid #e0e0e0;">Peso Est.</th>
-                <th style="padding: 10px; border-bottom: 2px solid #e0e0e0;">Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let p of pickups" style="border-bottom: 1px solid #eeeeee;">
-                <td style="padding: 10px; font-family: monospace; font-weight: bold; color: #1565c0;">{{ p.codigoRetiro }}</td>
-                <td style="padding: 10px;">
-                  <div>{{ p.vecinoNombre }}</div>
-                  <div style="font-size: 11px; color: #888;">{{ p.vecinoEmail }}</div>
-                </td>
-                <td style="padding: 10px;">{{ p.residuoNombre || 'Residuo #' + p.residuoId }}</td>
-                <td style="padding: 10px;">{{ p.direccion }}, {{ p.comuna }}</td>
-                <td style="padding: 10px;">{{ p.pesoEstimadoKg }} kg</td>
-                <td style="padding: 10px;">
-                  <span [style.background-color]="getEstadoColor(p.estado)" style="color: white; padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: bold;">
-                    {{ p.estado }}
+              <!-- SI ESTÁ AUTENTICADO: Formulario de Solicitud y Gestión Real -->
+              <div *ngIf="isAuthenticated()" style="display: flex; flex-direction: column; gap: 20px;">
+                
+                <!-- Perfil Activo -->
+                <div style="background-color: #edf6ee; border: 1px solid #c0c9c1; border-radius: 8px; padding: 16px; display: flex; justify-content: space-between; align-items: center;">
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background-color: #013623; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                      {{ userName.charAt(0) }}
+                    </div>
+                    <div>
+                      <div style="font-weight: 700; color: #013623;">{{ userName }}</div>
+                      <div style="font-size: 12px; color: #536257;">{{ userEmail }}</div>
+                    </div>
+                  </div>
+                  <span *ngFor="let r of userRoles" style="background-color: #013623; color: white; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px;">
+                    {{ r }}
                   </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  <span *ngIf="userRoles.length === 0" style="background-color: #d7e6d9; color: #013623; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px;">
+                    Vecino Habilitado
+                  </span>
+                </div>
+
+                <!-- Formulario para Agendar Retiro en Domicilio -->
+                <div>
+                  <h3 class="font-serif" style="font-size: 20px; font-weight: 600; color: #013623; margin: 0 0 12px;">
+                    Solicitar Retiro en su Predio
+                  </h3>
+
+                  <div *ngIf="createSuccess" style="background-color: #d7e6d9; color: #013623; padding: 12px; border-radius: 4px; font-size: 13px; margin-bottom: 12px;">
+                    ✓ {{ createSuccess }}
+                  </div>
+                  <div *ngIf="createError" style="background-color: #ffdad6; color: #ba1a1a; padding: 12px; border-radius: 4px; font-size: 13px; margin-bottom: 12px;">
+                    ⚠ {{ createError }}
+                  </div>
+
+                  <form (ngSubmit)="submitPickup()" style="display: flex; flex-direction: column; gap: 12px;">
+                    
+                    <div>
+                      <label style="display: block; font-size: 12px; font-weight: 600; color: #414943; margin-bottom: 4px;">Tipo de Residuo Segregado</label>
+                      <select [(ngModel)]="newPickup.residuoId" name="residuoId" class="input-civic">
+                        <option *ngFor="let r of residuos" [value]="r.id">
+                          {{ r.nombre }} — \${{ r.precioPorKg }}/kg ({{ r.codigo }})
+                        </option>
+                      </select>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                      <div>
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: #414943; margin-bottom: 4px;">Dirección / Pasaje</label>
+                        <input type="text" [(ngModel)]="newPickup.direccion" name="direccion" required placeholder="Ej. Pérez Rosales 850" class="input-civic" />
+                      </div>
+                      <div>
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: #414943; margin-bottom: 4px;">Sector / Comuna</label>
+                        <select [(ngModel)]="newPickup.comuna" name="comuna" class="input-civic">
+                          <option value="Puerto Varas">Puerto Varas</option>
+                          <option value="Nueva Braunau">Nueva Braunau</option>
+                          <option value="Providencia">Providencia</option>
+                          <option value="Santiago">Santiago</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px;">
+                      <div>
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: #414943; margin-bottom: 4px;">Peso Estimado (Kg)</label>
+                        <input type="number" step="0.5" [(ngModel)]="newPickup.pesoEstimadoKg" name="pesoEstimadoKg" required class="input-civic" />
+                      </div>
+                      <div>
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: #414943; margin-bottom: 4px;">Observaciones para el chofer</label>
+                        <input type="text" [(ngModel)]="newPickup.observaciones" name="observaciones" placeholder="Ej. Dejar en conserjería" class="input-civic" />
+                      </div>
+                    </div>
+
+                    <button type="submit" [disabled]="submittingPickup" class="btn-civic-primary" style="padding: 12px; margin-top: 6px;">
+                      {{ submittingPickup ? 'Enviando solicitud...' : 'Confirmar Retiro en Cuadrante' }}
+                    </button>
+
+                  </form>
+                </div>
+
+                <!-- Historial de Solicitudes Registradas -->
+                <div style="margin-top: 14px; border-top: 1px solid #dce5dd; padding-top: 18px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h4 class="font-serif" style="font-size: 18px; font-weight: 600; color: #013623; margin: 0;">Mis Retiros Registrados</h4>
+                    <button (click)="loadPickups()" class="btn-civic-outline" style="padding: 4px 10px; font-size: 12px;">Refrescar</button>
+                  </div>
+
+                  <div *ngIf="pickups.length === 0" style="font-size: 13px; color: #717973; padding: 12px 0;">
+                    No existen retiros registrados aún.
+                  </div>
+
+                  <div *ngIf="pickups.length > 0" style="display: flex; flex-direction: column; gap: 8px;">
+                    <div *ngFor="let p of pickups" style="background-color: #edf6ee; padding: 12px; border-radius: 6px; border: 1px solid #c0c9c1; font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
+                      <div>
+                        <strong style="color: #013623;">{{ p.codigoRetiro }}</strong> — {{ p.residuoNombre || 'Residuo #' + p.residuoId }}
+                        <div style="font-size: 11px; color: #536257;">{{ p.direccion }}, {{ p.comuna }} ({{ p.pesoEstimadoKg }} kg)</div>
+                      </div>
+                      <span style="font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; background: #ffffff; color: #013623; border: 1px solid #c0c9c1;">
+                        {{ p.estado }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- Micro-franja de métricas bajo tarjeta -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 16px; border-radius: 8px; background-color: #edf6ee;">
+              <div>
+                <div style="font-size: 11px; color: #536257; text-transform: uppercase;">Predios Activos</div>
+                <div class="font-serif" style="font-size: 24px; font-weight: 700; color: #013623;">14.820</div>
+              </div>
+              <div>
+                <div style="font-size: 11px; color: #536257; text-transform: uppercase;">Cuenca Protegida</div>
+                <div class="font-serif" style="font-size: 24px; font-weight: 700; color: #013623;">87,4 km²</div>
+              </div>
+              <div>
+                <div style="font-size: 11px; color: #536257; text-transform: uppercase;">Desvío Relleno</div>
+                <div class="font-serif" style="font-size: 24px; font-weight: 700; color: #013623;">+41,2%</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Columna Derecha: Marco Documental y Beneficios Territoriales -->
+          <div style="display: flex; flex-direction: column; gap: 24px;">
+            
+            <!-- Foto de Cuenca Municipal con Osorno y Lago sin sobrecargas -->
+            <div class="hero-photo-frame">
+              <div style="height: 260px; width: 100%; overflow: hidden; background: #e8f0eb;">
+                <img 
+                  src="https://images.unsplash.com/photo-1544644181-1484b3fdfc62?q=80&w=1200&auto=format&fit=crop" 
+                  alt="Cuenca del Lago Llanquihue y Volcán Osorno, Puerto Varas" 
+                  style="width: 100%; height: 100%; object-fit: cover;"
+                />
+              </div>
+              <div style="padding: 12px 16px; background: #ffffff; border-top: 1px solid #e1ebe3; display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
+                <span style="font-weight: 700; color: #013623;">ZONA COSTANERA · PUERTO VARAS</span>
+                <span class="font-mono" style="color: #1e5e3a; font-weight: 600;">CIRCULACIÓN ACTIVA</span>
+              </div>
+            </div>
+
+            <!-- Ficha de Ventajas del Portal Vecinal (Stitch Oficial) -->
+            <div class="card-civic" style="padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #dce5dd; padding-bottom: 10px;">
+                <span style="font-size: 12px; font-weight: 700; color: #013623; text-transform: uppercase;">
+                  Ventajas del Portal Vecinal Registrado
+                </span>
+                <span style="font-size: 11px; color: #536257; font-weight: 600;">LEY 20.920</span>
+              </div>
+
+              <div style="display: flex; gap: 12px; align-items: flex-start; padding: 10px; background-color: #edf6ee; border-radius: 6px;">
+                <div style="width: 32px; height: 32px; border-radius: 4px; background: #013623; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <span class="material-symbols-outlined" style="font-size: 18px;">scale</span>
+                </div>
+                <div>
+                  <div style="font-size: 14px; font-weight: 600; color: #161d19;">Pesaje en Tiempo Real</div>
+                  <div style="font-size: 12px; color: #414943;">Registro exacto de cartón, vidrio y plástico clasificado retirado desde su vereda.</div>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 12px; align-items: flex-start; padding: 10px; background-color: #edf6ee; border-radius: 6px;">
+                <div style="width: 32px; height: 32px; border-radius: 4px; background: #1e4d38; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <span class="material-symbols-outlined" style="font-size: 18px;">percent</span>
+                </div>
+                <div>
+                  <div style="font-size: 14px; font-weight: 600; color: #161d19;">Descuento Predial Directo</div>
+                  <div style="font-size: 12px; color: #414943;">Acumulación de hasta un -18% en los derechos comunales de aseo domiciliario.</div>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 12px; align-items: flex-start; padding: 10px; background-color: #edf6ee; border-radius: 6px;">
+                <div style="width: 32px; height: 32px; border-radius: 4px; background: #d4e4d6; color: #013623; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <span class="material-symbols-outlined" style="font-size: 18px;">rv_hookup</span>
+                </div>
+                <div>
+                  <div style="font-size: 14px; font-weight: 600; color: #161d19;">Solicitud de Tolva Express</div>
+                  <div style="font-size: 12px; color: #414943;">Acceso prioritario para agendamiento gratuito de podas y enseres voluminosos.</div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Mesa de Ayuda DIMAO Puerto Varas -->
+            <div style="background-color: #013623; color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+              <div style="font-size: 12px; color: #bbeed1; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">contact_support</span>
+                Mesa de Ayuda DIMAO Puerto Varas
+              </div>
+              <div style="font-size: 13px; display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span>Línea Gratuita:</span>
+                  <strong style="color: #bbeed1;">600 360 2200</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span>Correo:</span>
+                  <strong style="color: #bbeed1;">aseo&#64;ptovaras.cl</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; opacity: 0.8; margin-top: 4px;">
+                  <span>Horario Presencial:</span>
+                  <span>Lun a Vie • 08:30 a 14:00 hrs</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
         </div>
       </div>
 
-      <div style="background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 22px; margin-bottom: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
-        <h3 style="margin-top: 0; color: #424242; font-size: 17px;">🔑 Claims del Token JWT</h3>
-        <p style="color: #666; font-size: 13px;">Información extraída del token emitido por Microsoft Entra ID:</p>
-        
-        <div style="max-height: 250px; overflow-y: auto; border: 1px solid #eee; border-radius: 6px;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
-            <tbody>
-              <tr *ngFor="let item of claimsList" style="border-bottom: 1px solid #eee;">
-                <td style="padding: 8px 12px; font-family: monospace; font-weight: bold; color: #333; background: #fafafa; width: 25%;">{{ item.key }}</td>
-                <td style="padding: 8px 12px; word-break: break-all; color: #555;">{{ item.value }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div>
-        <a routerLink="/" style="display: inline-block; padding: 10px 20px; background-color: #424242; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px;">
-          ← Volver al Inicio
-        </a>
-      </div>
     </div>
   `
 })
 export class DashboardComponent implements OnInit {
-  userName: string = '';
-  userEmail: string = '';
-  userRoles: string[] = [];
-  userScopes: string[] = [];
-  claimsList: { key: string; value: string }[] = [];
+  tabActiva: 'vecino' | 'operador' = 'vecino';
 
-  apiResponse: any = null;
-  apiError: any = null;
-  apiStatus: number | null = null;
+  userName = '';
+  userEmail = '';
+  userRoles: string[] = [];
 
   residuos: any[] = [];
   pickups: any[] = [];
-  loadingResiduos: boolean = false;
-  loadingPickups: boolean = false;
-  submittingPickup: boolean = false;
-
-  newPickup = {
-    residuoId: 1,
-    direccion: 'Av. Providencia 1234',
-    comuna: 'Providencia',
-    pesoEstimadoKg: 10,
-    observaciones: ''
-  };
+  loadingPickups = false;
+  submittingPickup = false;
 
   createSuccess: string | null = null;
   createError: string | null = null;
 
+  newPickup = {
+    residuoId: 1,
+    direccion: 'Pérez Rosales 850',
+    comuna: 'Puerto Varas',
+    pesoEstimadoKg: 10,
+    observaciones: ''
+  };
+
   constructor(
     private authService: MsalService,
     private bffService: BffService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     const account = this.authService.instance.getActiveAccount();
-    if (account && account.idTokenClaims) {
-      const claims = account.idTokenClaims as Record<string, any>;
+    if (account) {
+      this.userName = account.name || account.username || 'Vecino Municipal';
+      this.userEmail = account.username || '';
 
-      this.userName = claims['name'] || account.name || account.username;
-      this.userEmail = claims['preferred_username'] || account.username;
-
-      if (claims['roles'] && Array.isArray(claims['roles'])) {
-        this.userRoles = claims['roles'];
-      } else if (claims['roles'] && typeof claims['roles'] === 'string') {
-        this.userRoles = [claims['roles']];
+      const claims = account.idTokenClaims as Record<string, any> | undefined;
+      if (claims && claims['roles']) {
+        this.userRoles = Array.isArray(claims['roles']) ? claims['roles'] : [claims['roles']];
       }
-
-      if (claims['scp'] && typeof claims['scp'] === 'string') {
-        this.userScopes = claims['scp'].split(' ');
-      }
-
-      this.claimsList = Object.keys(claims).map((key) => ({
-        key,
-        value: typeof claims[key] === 'object' ? JSON.stringify(claims[key]) : String(claims[key])
-      }));
     }
 
     this.loadResiduos();
     this.loadPickups();
   }
 
+  isAuthenticated(): boolean {
+    return this.authService.instance.getAllAccounts().length > 0;
+  }
+
+  login(): void {
+    this.authService.loginRedirect();
+  }
+
   loadResiduos(): void {
-    this.loadingResiduos = true;
     this.bffService.getResiduos().subscribe({
       next: (data) => {
         this.residuos = Array.isArray(data) ? data : [];
         if (this.residuos.length > 0) {
           this.newPickup.residuoId = this.residuos[0].id;
         }
-        this.loadingResiduos = false;
-      },
-      error: () => {
-        this.loadingResiduos = false;
       }
     });
   }
@@ -326,15 +414,15 @@ export class DashboardComponent implements OnInit {
     this.createSuccess = null;
     this.createError = null;
 
-    const selectedResiduo = this.residuos.find(r => r.id == this.newPickup.residuoId);
+    const selected = this.residuos.find(r => r.id == this.newPickup.residuoId);
 
     const payload = {
-      vecinoNombre: this.userName,
-      vecinoEmail: this.userEmail,
+      vecinoNombre: this.userName || 'Vecino Puerto Varas',
+      vecinoEmail: this.userEmail || 'vecino@ptovaras.cl',
       direccion: this.newPickup.direccion,
       comuna: this.newPickup.comuna,
       residuoId: this.newPickup.residuoId,
-      residuoNombre: selectedResiduo ? selectedResiduo.nombre : 'Residuo General',
+      residuoNombre: selected ? selected.nombre : 'Residuo General',
       pesoEstimadoKg: this.newPickup.pesoEstimadoKg,
       observaciones: this.newPickup.observaciones
     };
@@ -342,86 +430,14 @@ export class DashboardComponent implements OnInit {
     this.bffService.createPickup(payload).subscribe({
       next: (created) => {
         this.submittingPickup = false;
-        this.createSuccess = `¡Solicitud ${created.codigoRetiro || 'creada'} registrada con éxito! El camión será coordinado a la brevedad.`;
+        this.createSuccess = `Solicitud ${created.codigoRetiro || 'registrada'} confirmada en cuadrante con éxito.`;
+        this.newPickup.observaciones = '';
         this.loadPickups();
       },
       error: (err) => {
         this.submittingPickup = false;
-        this.createError = err?.error?.details || 'Error al enviar la solicitud de retiro al BFF.';
+        this.createError = err?.error?.details || err?.error?.error || 'No fue posible registrar la solicitud.';
       }
     });
-  }
-
-  getEstadoColor(estado: string): string {
-    switch (estado) {
-      case 'SOLICITADO': return '#0288d1';
-      case 'PROGRAMADO': return '#ed6c02';
-      case 'EN_RUTA': return '#9c27b0';
-      case 'RETIRADO': return '#2e7d32';
-      case 'PESADO': return '#00796b';
-      case 'CANCELADO': return '#d32f2f';
-      default: return '#757575';
-    }
-  }
-
-  callProfileApi(): void {
-    this.resetApiFeedback();
-    this.bffService.getProfile().subscribe({
-      next: (data) => {
-        this.apiResponse = data;
-        this.apiStatus = 200;
-      },
-      error: (err) => {
-        this.apiError = err.error || err;
-        this.apiStatus = err.status;
-      }
-    });
-  }
-  callCoordinadorApi(): void {
-    this.resetApiFeedback();
-    this.bffService.getCoordinadorDashboard().subscribe({
-      next: (data) => {
-        this.apiResponse = data;
-        this.apiStatus = 200;
-      },
-      error: (err) => {
-        this.apiError = err.error || err;
-        this.apiStatus = err.status;
-      }
-    });
-  }
-
-  callPickupsSummaryApi(): void {
-    this.resetApiFeedback();
-    this.bffService.getPickupsSummary().subscribe({
-      next: (data) => {
-        this.apiResponse = data;
-        this.apiStatus = 200;
-      },
-      error: (err) => {
-        this.apiError = err.error || err;
-        this.apiStatus = err.status;
-      }
-    });
-  }
-
-  callAdminApi(): void {
-    this.resetApiFeedback();
-    this.bffService.getAdminDashboard().subscribe({
-      next: (data) => {
-        this.apiResponse = data;
-        this.apiStatus = 200;
-      },
-      error: (err) => {
-        this.apiError = err.error || err;
-        this.apiStatus = err.status;
-      }
-    });
-  }
-
-  private resetApiFeedback(): void {
-    this.apiResponse = null;
-    this.apiError = null;
-    this.apiStatus = null;
   }
 }

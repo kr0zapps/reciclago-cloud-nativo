@@ -5,6 +5,7 @@ import { environment } from '../environments/environment';
 import { MsalService, MSAL_INSTANCE, MsalGuard, MsalInterceptor, MSAL_INTERCEPTOR_CONFIG, MSAL_GUARD_CONFIG, MsalBroadcastService } from '@azure/msal-angular';
 import { IPublicClientApplication, PublicClientApplication, InteractionType, BrowserCacheLocation } from '@azure/msal-browser';
 import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 export function MSALInstanceFactory(): IPublicClientApplication {
   return new PublicClientApplication({
@@ -27,6 +28,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideHttpClient(withInterceptorsFromDi()),
+    provideAnimations(),
     {
       provide: HTTP_INTERCEPTORS,
       useClass: MsalInterceptor,

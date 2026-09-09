@@ -1,1 +1,98 @@
-/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-bg: #F0EBE1;              /* Lino cálido más pronunciado, menos blanco */
+    --color-surface: #F9F8F5;
+    --color-border: #E5E0D8;
+    --color-text-primary: #1A1F1C;
+    --color-text-secondary: #5E6662;
+    --color-brand-primary: #134E70;   /* azul-lago profundo */
+    --color-brand-secondary: #163828;
+    --color-accent: #C98A2C;
+    --radius-button: 2px 2px 2px 14px;
+  }
+
+  [data-theme="dark"] {
+    --color-bg: #0A1118;              /* Azul noche profundo real */
+    --color-surface: #141C24;
+    --color-border: #232D38;
+    --color-text-primary: #F0F4F8;
+    --color-text-secondary: #9AA6B2;
+    --color-brand-primary: #5899C5;
+    --color-brand-secondary: #4A8064;
+    --color-accent: #E0A752;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  /* Imagen de fondo ofuscada adaptativa (Montaña/Volcán) */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url('/assets/bg-mountain.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    opacity: 0.25; /* Más opacidad para que se note la montaña */
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    z-index: -1;
+    transition: opacity 0.3s ease, filter 0.3s ease;
+  }
+
+  [data-theme="dark"] body::before {
+    opacity: 0.15; /* En oscuro no necesita tanta opacidad porque el screen resalta mucho */
+    mix-blend-mode: screen;
+    filter: grayscale(40%) contrast(1.1);
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply flex items-center justify-center gap-2 px-6 py-3.5 text-[14px] font-bold text-white transition-all shadow-sm cursor-pointer;
+    background-color: var(--color-brand-primary);
+    border-radius: var(--radius-button);
+  }
+  .btn-primary:hover {
+    filter: brightness(0.9);
+    transform: scale(1.02);
+  }
+  [data-theme="dark"] .btn-primary {
+    color: #10161B; /* Contraste fuerte sobre el azul claro en dark mode */
+  }
+
+  .btn-outline {
+    @apply flex items-center justify-center gap-2 px-5 py-3.5 text-[14px] font-bold transition-all cursor-pointer;
+    background-color: transparent;
+    color: var(--color-brand-primary);
+    border: 2px solid var(--color-brand-primary);
+    border-radius: var(--radius-button);
+  }
+  .btn-outline:hover {
+    background-color: var(--color-brand-primary);
+    color: var(--color-surface);
+  }
+  [data-theme="dark"] .btn-outline {
+    color: var(--color-brand-primary);
+    border-color: var(--color-brand-primary);
+  }
+  [data-theme="dark"] .btn-outline:hover {
+    background-color: var(--color-brand-primary);
+    color: #10161B;
+  }
+
+  .civic-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+}
+
