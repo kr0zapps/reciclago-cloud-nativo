@@ -144,12 +144,9 @@ export class LoginComponent implements OnInit {
   loginWithMicrosoft(): void {
     const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
     sessionStorage.setItem('reciclago_return_url', returnUrl);
-    const origin = typeof window !== 'undefined' && window.location?.origin
-      ? window.location.origin
-      : environment.msalConfig.auth.redirectUri;
     this.authService.loginRedirect({
       ...(this.msalGuardConfig.authRequest as RedirectRequest),
-      redirectUri: origin
+      redirectUri: environment.msalConfig.auth.redirectUri
     });
   }
 }

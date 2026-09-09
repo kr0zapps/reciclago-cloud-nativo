@@ -757,14 +757,12 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   login(): void {
-    const origin = typeof window !== 'undefined' && window.location?.origin
-      ? window.location.origin
-      : environment.msalConfig.auth.redirectUri;
+    const redirectUri = environment.msalConfig.auth.redirectUri;
 
     if (this.msalGuardConfig.interactionType === InteractionType.Popup) {
       this.authService.loginPopup({
         ...(this.msalGuardConfig.authRequest as PopupRequest),
-        redirectUri: origin
+        redirectUri: redirectUri
       }).subscribe((response) => {
         this.authService.instance?.setActiveAccount?.(response.account);
         this.setLoginDisplay();
@@ -772,7 +770,7 @@ export class AppComponent implements OnInit, OnDestroy {
     } else {
       this.authService.loginRedirect({
         ...(this.msalGuardConfig.authRequest as RedirectRequest),
-        redirectUri: origin
+        redirectUri: redirectUri
       });
     }
   }
