@@ -87,12 +87,32 @@ flowchart TD
 
 ## 4. Seguridad, Autenticacion y Autorizacion (RBAC)
 
-La solucion utiliza autenticacion federada mediante **OAuth2 y OpenID Connect** con **Microsoft Entra ID (Azure AD)**:
+La solucion utiliza autenticacion federada mediante **OAuth2 y OpenID Connect** con **Microsoft Entra ID (Azure AD)** implementando una **arquitectura de doble aplicacion (Double App Registration)** segun las mejores practicas de seguridad cloud:
 
-1. **Flujo PKCE en el Frontend**: El cliente Angular implementa `@azure/msal-browser` y `@azure/msal-angular` mediante `PublicClientApplication`.
-2. **Proteccion de Rutas**: Los guards [`auth.guard.ts`](file:///c:/Users/krosa/Desktop/semestre%206/cloud%20nativo/reciclago/frontend-reciclago/src/app/guards/auth.guard.ts) aseguran que las rutas privadas (`/dashboard`, `/pickups`, `/catalog`) requieran una sesion valida.
-3. **Validacion en el BFF**: El microservicio BFF valida la firma criptografica con la clave publica del tenant municipal (`login.microsoftonline.com`), verificando vigencia temporal (`exp`) y audiencia (`aud`).
-4. **Matriz de Roles (RBAC)**:
+### Arquitectura de Doble Aplicacion (Frontend SPA + Backend Resource Server)
+
+Para garantizar la separacion de responsabilidades y la emision diferenciada de tokens (`id_token` para identidad de usuario y `access_token` para autorizacion de APIs), se registraron dos aplicaciones independientes en Microsoft Entra ID:
+
+| Entidad | Nombre en Azure | Client ID | Tipo | Proposito |
+|---|---|---|---|---|
+| **App 1 (Frontend)** | `reciclago-frontend` | `20ae8f6f-ef82-48a6-a4ae-897d36212b4b` | Single-Page Application (SPA) | Autenticacion de usuarios mediante Authorization Code Flow con PKCE. Gestiona inicio y cierre de sesion. |
+| **App 2 (Backend API)** | `reciclago-api` | `9a946a0b-5350-4fe1-a79e-ca332612f60d` | Web API / Resource Server | Expone scopes protegidos y define App Roles (`Admin`, `Coordinador`). Valida firma y audiencia en el BFF. |
+
+- **Tenant ID (Institucional Duoc UC):** `5625266d-cae0-4070-a7ea-b5e88273580f`
+- **Scope Autorizado:** `api://9a946a0b-5350-4fe1-a79e-ca332612f60d/access_as_user`
+- **Redirect URIs Autorizadas:**
+  - Desarrollo local: `http://localhost:4200`
+  - Nube AWS S3 (HTTPS seguro): `https://reciclago-frontend-puertovaras.s3.us-east-1.amazonaws.com/index.html`
+
+### Flujo de Tokens y Control de Acceso (RBAC)
+
+1. **Flujo PKCE en el Frontend**: El cliente Angular solicita la autenticacion incluyendo el scope de la App 2 (`api://9a946a0b-5350-4fe1-a79e-ca332612f60d/access_as_user`).
+2. **Emision de Doble Token**:
+   - `id_token`: Provee la identidad del usuario (`name`, `preferred_username`) para la interfaz grafica.
+   - `access_token`: Provee la autorizacion de consumo hacia el BFF con audiencia `api://9a946a0b-5350-4fe1-a79e-ca332612f60d` y claims de roles (`roles`).
+3. **Proteccion de Rutas**: Los guards [`auth.guard.ts`](file:///c:/Users/krosa/Desktop/semestre%206/cloud%20nativo/reciclago/frontend-reciclago/src/app/guards/auth.guard.ts) aseguran que las rutas privadas (`/dashboard`, `/pickups`, `/catalog`) requieran una sesion valida.
+4. **Validacion en el BFF**: El microservicio BFF valida la firma criptografica con la clave publica del tenant (`login.microsoftonline.com`), verificando vigencia temporal (`exp`), emisor (`iss`) y audiencia (`aud`).
+5. **Matriz de Roles (RBAC)**:
    - `ROLE_Vecino`: Consulta de rutas, solicitud de retiro domiciliario, historial personal.
    - `ROLE_Coordinador`: Asignacion de cuadrantes, monitoreo de camiones, validacion de pesaje.
    - `ROLE_Admin`: Configuracion global, reportes consolidados DIMAO y auditoria comunal.

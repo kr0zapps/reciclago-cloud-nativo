@@ -79,7 +79,10 @@ public class SecurityConfig {
 
         OAuth2TokenValidator<Jwt> withAudience = (Jwt token) -> {
             List<String> audiences = token.getAudience();
-            if (audiences != null && audiences.stream().anyMatch(a -> a.contains("20ae8f6f-ef82-48a6-a4ae-897d36212b4b") || a.contains(audience))) {
+            if (audiences != null && audiences.stream().anyMatch(a ->
+                a.contains("9a946a0b-5350-4fe1-a79e-ca332612f60d") ||
+                a.contains("20ae8f6f-ef82-48a6-a4ae-897d36212b4b") ||
+                a.contains(audience))) {
                 return OAuth2TokenValidatorResult.success();
             }
             return OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token", "Audiencia no corresponde a la aplicacion: " + audiences, null));
@@ -144,7 +147,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        configuration.setAllowedOrigins(List.of(
+            "http://localhost:4200",
+            "http://reciclago-frontend-puertovaras.s3-website-us-east-1.amazonaws.com",
+            "https://reciclago-frontend-puertovaras.s3.us-east-1.amazonaws.com"
+        ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true);

@@ -271,10 +271,48 @@ A continuación se valida el alineamiento estricto del proyecto contra los docum
 | **Rutas en API Manager / Gateway (13%)** | Rutas dirigidas hacia el backend con paths limpios y coherentes. | AWS HTTP API Gateway redirigiendo `/api/*` al puerto `8080` del BFF. |
 | **Configuración CORS (7%)** | CORS seguro y funcional para la comunicación con el frontend. | Configurado para `http://localhost:4200` y dominio cloud en `SecurityConfig.java` del BFF y API Gateway. |
 | **Tenant IDaaS y Usuarios (10%)** | Tenant en Azure AD (Microsoft Entra ID) con usuarios registrados y roles. | Tenant configurado con usuarios de prueba para roles `Vecino`, `Operador`, `Admin`. |
-| **Registro de Aplicación en Tenant (10%)** | `clientId`, redirect URIs (`http://localhost:4200`), roles y scopes expuestos (`api://...`). | App Registration "RecicLaGo" con `SPA` redirect URI y scope `access_as_user`. |
+| **Registro de Aplicación en Tenant (10%)** | `clientId`, redirect URIs (`http://localhost:4200`), roles y scopes expuestos (`api://...`). | **Arquitectura Doble App (Frontend SPA + Backend API)**:<br>• **App 1 (Frontend SPA)**: `20ae8f6f-ef82-48a6-a4ae-897d36212b4b`<br>• **App 2 (Backend API)**: `9a946a0b-5350-4fe1-a79e-ca332612f60d`<br>• **Scope**: `api://9a946a0b-5350-4fe1-a79e-ca332612f60d/access_as_user`<br>• **Tenant ID**: `5625266d-cae0-4070-a7ea-b5e88273580f`<br>• Permisos delegados consentidos y roles (`Admin`, `Coordinador`) asignados. |
 | **Flujo Auth Code con PKCE (15%)** | Flujo OIDC Authorization Code con PKCE activo (sin flujo implícito inseguro). | Nativo en Angular 18 con MSAL Browser 3.x utilizando `InteractionType.Redirect` / `Popup` con `code_challenge` y `code_verifier`. |
 | **Validación JWT en API Manager / BFF (20%)** | Pruebas con y sin token evidenciando respuestas `200`, `401 Unauthorized` y `403 Forbidden`. | Pruebas listas documentadas en `README.md` ejecutables con `curl` y Swagger/Postman. |
 | **Evidencias de Rutas Backend (15%)** | Demostración de llamadas frontend $\leftrightarrow$ backend devolviendo JSON esperado. | Consumo reactivo en Angular mediante `BffService` desplegando datos reales en el dashboard. |
+
+---
+
+### D. Arquitectura de Seguridad Microsoft Entra ID (Doble Aplicación)
+
+Para cumplir con el estándar Enterprise de **OpenID Connect & OAuth 2.0 (RFC 6749)** y las exigencias de rúbrica de Cloud Native, se desacoplaron las entidades de autenticación y autorización en dos registros independientes en Microsoft Entra ID:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Vecino / Funcionario (jon.vidals@duocuc.cl)
+    participant F as App 1: Frontend SPA (20ae8f6f-ef82-48a6-a4ae-897d36212b4b)
+    participant E as Microsoft Entra ID (Tenant: 5625266d-cae0-4070-a7ea-b5e88273580f)
+    participant B as App 2: ms-reciclago-bff (9a946a0b-5350-4fe1-a79e-ca332612f60d)
+
+    U->>F: Clic en "Continuar con Microsoft"
+    F->>E: Redirige con Authorization Code + PKCE (Scope: api://9a946a0b.../access_as_user)
+    E->>U: Solicita credenciales institucionales y MFA
+    U->>E: Ingresa credenciales
+    E->>F: Redirige a redirectUri con Code
+    F->>E: Canjea Code + Code Verifier por Tokens
+    E-->>F: Retorna id_token (Perfil) y access_token (Audiencia: api://9a946a0b..., Roles: [Admin])
+    F->>B: HTTP Request con Header "Authorization: Bearer <access_token>"
+    B->>B: Valida firma (JWKS), emisor (tenant) y audiencia (api://9a946a0b...)
+    B->>B: Convierte claim "roles" en GrantedAuthority ("ROLE_Admin")
+    B-->>F: HTTP 200 OK con datos de microservicios protegidos
+```
+
+1. **App 1 (Frontend SPA - `20ae8f6f-ef82-48a6-a4ae-897d36212b4b`)**:
+   - Tipo de plataforma: Single-Page Application (SPA) con PKCE.
+   - Redirect URIs autorizados: `http://localhost:4200`, `https://reciclago-frontend-puertovaras.s3.us-east-1.amazonaws.com/index.html`.
+   - Permiso delegado concedido: `reciclago-api` -> `access_as_user` (con Admin Consent).
+
+2. **App 2 (Backend API Resource Server - `9a946a0b-5350-4fe1-a79e-ca332612f60d`)**:
+   - Expose an API: URI `api://9a946a0b-5350-4fe1-a79e-ca332612f60d`.
+   - Scope: `access_as_user` (Admin and users).
+   - App Roles: `Admin` (Administrador municipal), `Coordinador` (Gestión de cuadrillas), `Vecino`.
+   - Asignación de Usuarios en Enterprise Applications: Usuario asignado individualmente al rol `Admin`.
 
 ---
 

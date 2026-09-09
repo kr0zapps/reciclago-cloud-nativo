@@ -1,27 +1,56 @@
-# FrontendReciclago
+# RecicLaGo - Frontend Web (Angular 18 SPA)
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.17.
+Portal ciudadano y administrativo municipal para la gestion del reciclaje puerta a puerta en Puerto Varas.
 
-## Development server
+## Tecnologias Principales
+- **Framework:** Angular 18 (Standalone Components, Control Flow `@if/@for`, View Transitions).
+- **Estilos:** Tailwind CSS con paleta civica municipal (Lago Llanquihue y Volcan Osorno).
+- **Autenticacion:** `@azure/msal-browser` y `@azure/msal-angular` 3.x (OAuth2 / OIDC).
+- **Seguridad Cloud:** Arquitectura de Doble Aplicacion (Double App) con Microsoft Entra ID.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+---
 
-## Code scaffolding
+## Configuracion Microsoft Entra ID (Doble Aplicacion)
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+El frontend interactua con dos registros de aplicacion en Azure Entra ID:
 
-## Build
+| Aplicacion | Client ID | Rol en la Arquitectura |
+|---|---|---|
+| **App 1 (Frontend SPA)** | `20ae8f6f-ef82-48a6-a4ae-897d36212b4b` | Cliente publico (SPA) con flujo PKCE. |
+| **App 2 (Backend API)** | `9a946a0b-5350-4fe1-a79e-ca332612f60d` | Resource Server. Expone el scope y los roles. |
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+- **Tenant ID:** `5625266d-cae0-4070-a7ea-b5e88273580f`
+- **Scope Solicitado:** `api://9a946a0b-5350-4fe1-a79e-ca332612f60d/access_as_user`
+- **Redirect URIs Autorizadas:**
+  - `http://localhost:4200` (desarrollo local)
+  - `https://reciclago-frontend-puertovaras.s3.us-east-1.amazonaws.com/index.html` (despliegue AWS S3)
 
-## Running unit tests
+---
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Comandos de Desarrollo
 
-## Running end-to-end tests
+### Instalar dependencias
+```bash
+npm install
+```
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+### Ejecutar localmente
+```bash
+npm start
+# o
+ng serve
+```
+Disponible en `http://localhost:4200/`.
 
-## Further help
+### Compilar para produccion
+```bash
+npm run build
+```
+Genera los archivos compilados en `dist/frontend-reciclago/browser`.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+---
+
+## Despliegue en AWS S3
+El despliegue esta automatizado mediante GitHub Actions en `.github/workflows/deploy-frontend.yml` al hacer push a la rama `main`.
+URL de produccion:
+`http://reciclago-frontend-puertovaras.s3-website-us-east-1.amazonaws.com`
