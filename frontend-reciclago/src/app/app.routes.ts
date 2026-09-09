@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { MsalGuard } from '@azure/msal-angular';
+import { MsalGuard, MsalRedirectComponent } from '@azure/msal-angular';
 import { HomeComponent } from './pages/home/home.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
@@ -12,6 +12,10 @@ export const routes: Routes = [
     path: 'dashboard',
     component: DashboardComponent,
     canActivate: [MsalGuard]
+  },
+  {
+    path: 'auth',
+    component: MsalRedirectComponent
   },
   {
     path: '**',

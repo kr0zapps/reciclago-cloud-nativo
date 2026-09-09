@@ -59,6 +59,15 @@ public class BffController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/api/coordinador/dashboard")
+    public ResponseEntity<Map<String, Object>> getCoordinadorData(@AuthenticationPrincipal Jwt jwt) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Acceso concedido para Coordinadores y Administradores de RecicLaGo");
+        response.put("user", jwt.getClaimAsString("preferred_username"));
+        response.put("roles", jwt.getClaimAsStringList("roles"));
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/api/catalog/residuos")
     public ResponseEntity<?> getResiduos() {
         try {
@@ -83,6 +92,22 @@ public class BffController {
                     .retrieve()
                     .body(List.class);
             return ResponseEntity.ok(tarifas);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Error comunicando con ms-reciclago-catalog");
+            error.put("details", e.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+        }
+    }
+
+    @GetMapping("/api/catalog/camiones")
+    public ResponseEntity<?> getCamiones() {
+        try {
+            List<?> camiones = restClient.get()
+                    .uri(catalogUrl + "/api/catalog/camiones")
+                    .retrieve()
+                    .body(List.class);
+            return ResponseEntity.ok(camiones);
         } catch (Exception e) {
             Map<String, Object> error = new HashMap<>();
             error.put("error", "Error comunicando con ms-reciclago-catalog");
@@ -116,12 +141,14 @@ public class BffController {
         try {
             if (!payload.containsKey("vecinoEmail") || payload.get("vecinoEmail") == null) {
                 String email = jwt.getClaimAsString("preferred_username");
-                if (email == null) email = jwt.getClaimAsString("upn");
+                if (email == null)
+                    email = jwt.getClaimAsString("upn");
                 payload.put("vecinoEmail", email);
             }
             if (!payload.containsKey("vecinoNombre") || payload.get("vecinoNombre") == null) {
                 String name = jwt.getClaimAsString("name");
-                if (name == null) name = jwt.getClaimAsString("preferred_username");
+                if (name == null)
+                    name = jwt.getClaimAsString("preferred_username");
                 payload.put("vecinoNombre", name);
             }
 
@@ -143,7 +170,8 @@ public class BffController {
     @GetMapping("/api/pickups/summary")
     public ResponseEntity<Map<String, Object>> getPickupsSummary(@AuthenticationPrincipal Jwt jwt) {
         String email = jwt.getClaimAsString("preferred_username");
-        if (email == null) email = jwt.getClaimAsString("upn");
+        if (email == null)
+            email = jwt.getClaimAsString("upn");
 
         Map<String, Object> response = new HashMap<>();
         response.put("user", email);
@@ -172,4 +200,76 @@ public class BffController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PatchMapping("/api/pickups/{id}/programar")
+    public ResponseEntity<?> programarPickup(@PathVariable Long id,
+            @RequestBody(required = false) Map<String, Object> body) {
+        try {
+            Object response = restClient.patch()
+                    .uri(pickupsUrl + "/api/pickups/" + id + "/programar")
+                    .body(body != null ? body : Map.of())
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PatchMapping("/api/pickups/{id}/en-ruta")
+    public ResponseEntity<?> enRutaPickup(@PathVariable Long id) {
+        try {
+            Object response = restClient.patch()
+                    .uri(pickupsUrl + "/api/pickups/" + id + "/en-ruta")
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PatchMapping("/api/pickups/{id}/retirado")
+    public ResponseEntity<?> retiradoPickup(@PathVariable Long id) {
+        try {
+            Object response = restClient.patch()
+                    .uri(pickupsUrl + "/api/pickups/" + id + "/retirado")
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PatchMapping("/api/pickups/{id}/pesado")
+    public ResponseEntity<?> pesadoPickup(@PathVariable Long id, @RequestParam Double pesoRealKg) {
+        try {
+            Object response = restClient.patch()
+                    .uri(pickupsUrl + "/api/pickups/" + id + "/pesado?pesoRealKg=" + pesoRealKg)
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PatchMapping("/api/pickups/{id}/cancelar")
+    public ResponseEntity<?> cancelarPickup(@PathVariable Long id, @RequestParam(required = false) String motivo) {
+        try {
+            String uri = pickupsUrl + "/api/pickups/" + id + "/cancelar";
+            if (motivo != null && !motivo.isBlank()) {
+                uri += "?motivo=" + motivo;
+            }
+            Object response = restClient.patch()
+                    .uri(uri)
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        }
+    }
+
 }

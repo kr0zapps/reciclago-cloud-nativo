@@ -37,14 +37,13 @@ export class AppComponent implements OnInit, OnDestroy {
     @Inject(MSAL_GUARD_CONFIG) private msalGuardConfig: MsalGuardConfiguration,
     private authService: MsalService,
     private msalBroadcastService: MsalBroadcastService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.isIframe = window !== window.parent && !window.opener;
-    this.authService.instance.initialize().then(() => {
-      this.authService.instance.handleRedirectPromise().then(() => {
-        this.setLoginDisplay();
-      });
+
+    this.authService.instance.handleRedirectPromise().then(() => {
+      this.setLoginDisplay();
     });
   }
 

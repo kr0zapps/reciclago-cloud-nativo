@@ -1,8 +1,7 @@
-import { ApplicationConfig } from '@angular/core';
+import { ApplicationConfig, APP_INITIALIZER } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
-import { environment } from '../enviroments/environment';
-
+import { environment } from '../environments/environment';
 import { MsalService, MSAL_INSTANCE, MsalGuard, MsalInterceptor, MSAL_INTERCEPTOR_CONFIG, MSAL_GUARD_CONFIG, MsalBroadcastService } from '@azure/msal-angular';
 import { IPublicClientApplication, PublicClientApplication, InteractionType, BrowserCacheLocation } from '@azure/msal-browser';
 import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -20,6 +19,10 @@ export function MSALInstanceFactory(): IPublicClientApplication {
   });
 }
 
+export function MSALInitializerFactory(msalInstance: IPublicClientApplication) {
+  return () => msalInstance.initialize();
+}
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
@@ -32,6 +35,12 @@ export const appConfig: ApplicationConfig = {
     {
       provide: MSAL_INSTANCE,
       useFactory: MSALInstanceFactory
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: MSALInitializerFactory,
+      deps: [MSAL_INSTANCE],
+      multi: true
     },
     MsalService,
     MsalGuard,

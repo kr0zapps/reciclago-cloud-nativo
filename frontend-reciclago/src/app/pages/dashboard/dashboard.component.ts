@@ -69,6 +69,9 @@ import { BffService } from '../../services/bff.service';
             </button>
             <button (click)="callAdminApi()" style="padding: 8px 14px; background-color: #d32f2f; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: left; font-size: 13px;">
               🔒 GET /api/admin/dashboard (Prueba RBAC 403 Forbidden)
+              </button>
+            <button (click)="callCoordinadorApi()" style="padding: 8px 14px; background-color: #f57c00; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: left; font-size: 13px;">
+              📋 GET /api/coordinador/dashboard (Prueba RBAC Coordinador/Admin)
             </button>
           </div>
         </div>
@@ -259,13 +262,13 @@ export class DashboardComponent implements OnInit {
   constructor(
     private authService: MsalService,
     private bffService: BffService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const account = this.authService.instance.getActiveAccount();
     if (account && account.idTokenClaims) {
       const claims = account.idTokenClaims as Record<string, any>;
-      
+
       this.userName = claims['name'] || account.name || account.username;
       this.userEmail = claims['preferred_username'] || account.username;
 
@@ -364,6 +367,19 @@ export class DashboardComponent implements OnInit {
   callProfileApi(): void {
     this.resetApiFeedback();
     this.bffService.getProfile().subscribe({
+      next: (data) => {
+        this.apiResponse = data;
+        this.apiStatus = 200;
+      },
+      error: (err) => {
+        this.apiError = err.error || err;
+        this.apiStatus = err.status;
+      }
+    });
+  }
+  callCoordinadorApi(): void {
+    this.resetApiFeedback();
+    this.bffService.getCoordinadorDashboard().subscribe({
       next: (data) => {
         this.apiResponse = data;
         this.apiStatus = 200;

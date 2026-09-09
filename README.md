@@ -207,16 +207,16 @@ dev1-frontend-bff       dev2-backend-core
 ### Dev 1 (Frontend + BFF) — Checklist
 
 ```
-[ ] 1. APP_INITIALIZER para MSAL (CRÍTICO)
-[ ] 2. MsalRedirectComponent en rutas (CRÍTICO)
-[ ] 3. Endpoint GET /api/coordinador/dashboard en BFF (CRÍTICO)
-[ ] 4. Botón de prueba Coordinador en Dashboard (CRÍTICO)
-[ ] 5. Proxies PATCH de retiros en BFF (IMPORTANTE)
-[ ] 6. Proxy GET /api/catalog/camiones en BFF (IMPORTANTE)
-[ ] 7. Declarar URLs de backend en application.properties (IMPORTANTE)
-[ ] 8. Eliminar app.component.html muerto (LIMPIEZA)
-[ ] 9. Renombrar carpeta enviroments → environments (LIMPIEZA)
-[ ] 10. Actualizar app.component.spec.ts (LIMPIEZA)
+[x] 1. APP_INITIALIZER para MSAL (CRÍTICO)
+[x] 2. MsalRedirectComponent en rutas (CRÍTICO)
+[x] 3. Endpoint GET /api/coordinador/dashboard en BFF (CRÍTICO)
+[x] 4. Botón de prueba Coordinador en Dashboard (CRÍTICO)
+[x] 5. Proxies PATCH de retiros en BFF (IMPORTANTE)
+[x] 6. Proxy GET /api/catalog/camiones en BFF (IMPORTANTE)
+[x] 7. Declarar URLs de backend en application.properties (IMPORTANTE)
+[x] 8. Eliminar app.component.html muerto (LIMPIEZA)
+[x] 9. Renombrar carpeta enviroments → environments (LIMPIEZA)
+[x] 10. Actualizar app.component.spec.ts (LIMPIEZA)
 ```
 
 ### Dev 2 (Backend Core + Infra) — Checklist
