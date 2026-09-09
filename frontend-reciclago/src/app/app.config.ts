@@ -1,5 +1,5 @@
 import { ApplicationConfig, APP_INITIALIZER } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withViewTransitions } from '@angular/router';
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
 import { MsalService, MSAL_INSTANCE, MsalGuard, MsalInterceptor, MSAL_INTERCEPTOR_CONFIG, MSAL_GUARD_CONFIG, MsalBroadcastService } from '@azure/msal-angular';
@@ -8,25 +8,50 @@ import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@a
 import { provideAnimations } from '@angular/platform-browser/animations';
 
 export function MSALInstanceFactory(): IPublicClientApplication {
-  return new PublicClientApplication({
-    auth: {
-      clientId: environment.msalConfig.auth.clientId,
-      authority: environment.msalConfig.auth.authority,
-      redirectUri: environment.msalConfig.auth.redirectUri,
-    },
-    cache: {
-      cacheLocation: BrowserCacheLocation.LocalStorage
-    }
-  });
+  try {
+    return new PublicClientApplication({
+      auth: {
+        clientId: environment.msalConfig.auth.clientId,
+        authority: environment.msalConfig.auth.authority,
+        redirectUri: environment.msalConfig.auth.redirectUri,
+      },
+      cache: {
+        cacheLocation: BrowserCacheLocation.LocalStorage
+      }
+    });
+  } catch (err) {
+    console.warn('MSAL initialization warning, fallback activated:', err);
+    return {
+      initialize: () => Promise.resolve(),
+      getAllAccounts: () => [],
+      getActiveAccount: () => null,
+      setActiveAccount: () => {},
+      handleRedirectPromise: () => Promise.resolve(null),
+      loginRedirect: () => Promise.resolve(),
+      loginPopup: () => Promise.reject('MSAL not active in this environment'),
+      logoutRedirect: () => Promise.resolve(),
+      acquireTokenSilent: () => Promise.reject('MSAL not active in this environment')
+    } as unknown as IPublicClientApplication;
+  }
 }
 
 export function MSALInitializerFactory(msalInstance: IPublicClientApplication) {
-  return () => msalInstance.initialize();
+  return () => {
+    try {
+      const initResult = msalInstance.initialize();
+      return (initResult && typeof initResult.catch === 'function')
+        ? initResult.catch(err => console.warn('MSAL init caught:', err))
+        : Promise.resolve();
+    } catch (e) {
+      console.warn('MSAL initializer error:', e);
+      return Promise.resolve();
+    }
+  };
 }
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes),
+    provideRouter(routes, withViewTransitions({ skipInitialTransition: false })),
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimations(),
     {

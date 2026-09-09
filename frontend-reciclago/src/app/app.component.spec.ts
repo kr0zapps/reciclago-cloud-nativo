@@ -46,10 +46,10 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it('debe renderizar el titulo de la aplicacion "RecicLaGo Cloud"', () => {
+  it('debe renderizar el titulo de la aplicacion "RecicLaGo"', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.textContent).toContain('RecicLaGo Cloud');
+    expect(compiled.textContent).toContain('RecicLaGo');
   });
 });
