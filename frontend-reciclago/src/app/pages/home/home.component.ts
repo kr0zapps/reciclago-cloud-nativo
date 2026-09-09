@@ -91,7 +91,7 @@ import { RouterModule } from '@angular/router';
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch mb-6">
 
         <!-- Columna Izquierda: Tu día de retiro -->
-        <div class="lg:col-span-4 bg-[#eff7ed] rounded-3xl p-6 sm:p-7 border border-[#d6ebd0] flex flex-col justify-between shadow-soft">
+        <div class="lg:col-span-4 bg-[#eff7ed] rounded-3xl p-6 sm:p-7 border border-[#d6ebd0] flex flex-col justify-center shadow-soft">
           <div>
             <div class="flex items-center gap-3 text-[#093554] mb-3">
               <div class="w-11 h-11 rounded-2xl bg-white flex items-center justify-center text-[#4F8A3D] shadow-xs border border-emerald-100">
@@ -102,7 +102,7 @@ import { RouterModule } from '@angular/router';
                 <h2 class="text-sm font-bold text-[#093554] tracking-tight">Tu día de retiro esta semana</h2>
               </div>
             </div>
-            <div class="my-4">
+            <div class="my-3">
               <span class="block text-4xl sm:text-5xl font-black text-[#082a40] tracking-tight font-heading">
                 Martes
               </span>
@@ -113,7 +113,7 @@ import { RouterModule } from '@angular/router';
             </div>
           </div>
 
-          <div class="space-y-4 pt-3">
+          <div class="space-y-3.5 mt-3">
             <div class="bg-[#dcf0d6] rounded-2xl p-4 flex items-center justify-center gap-3.5 border border-[#cbe4c3] shadow-xs">
               <div class="w-7 h-7 rounded-full bg-[#4F8A3D] text-white flex items-center justify-center text-xs flex-shrink-0 shadow-xs">
                 <i class="fa-solid fa-check"></i>
