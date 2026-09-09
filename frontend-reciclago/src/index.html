@@ -3,15 +3,18 @@
 <head>
   <meta charset="utf-8">
   <title>RecicLaGo — Municipalidad de Puerto Varas</title>
-  <!-- Base href dinámico: Preserva index.html en S3 REST endpoint para evitar AccessDenied al presionar F5 -->
+  <base href="/">
+  <!-- Base href dinámico: En S3 REST endpoint preserva /index.html para evitar AccessDenied al presionar F5 -->
   <script>
     (function() {
-      var pathname = (typeof window !== 'undefined' && window.location && window.location.pathname) ? window.location.pathname : '';
-      var baseHref = pathname.indexOf('index.html') !== -1 ? pathname : '/';
-      document.write('<base href="' + baseHref + '">');
+      if (typeof window !== 'undefined' && window.location && window.location.pathname && window.location.pathname.indexOf('index.html') !== -1) {
+        var baseTag = document.getElementsByTagName('base')[0];
+        if (baseTag) {
+          baseTag.setAttribute('href', window.location.pathname);
+        }
+      }
     })();
   </script>
-  <noscript><base href="/"></noscript>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="assets/favicon-reciclago.png">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
