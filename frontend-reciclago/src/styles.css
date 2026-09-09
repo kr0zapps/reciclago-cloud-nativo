@@ -21,6 +21,15 @@
   }
 }
 
+/* Ocultar barra de scroll en contenedores desplazables */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Tipografías personalizadas Stitch */
 .font-script,
 .font-handwriting {
