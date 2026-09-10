@@ -51,6 +51,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/public/**", "/actuator/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/routes/**", "/api/citizens/**", "/api/catalog/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/citizens/contact").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("Admin")
                 .requestMatchers("/api/coordinador/**").hasAnyRole("Admin", "Coordinador")
                 // RBAC estricto en operaciones logisticas de ciclo de vida (solo Admin o Coordinador)

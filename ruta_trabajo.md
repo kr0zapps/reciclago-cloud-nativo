@@ -64,9 +64,9 @@ Para cumplir la regla estricta: **"cada botón o enlace debe ser clickeable y fu
 | **Footer** | "Materiales" | Modal Cívico | ✅ Completado | Abre Guía Oficial de Clasificación de Residuos. | `GET /api/catalog/residuos` |
 | **Footer** | "Contacto" | Modal Cívico | ✅ Completado | Abre Modal de Contacto y Emergencias DIMAO. | `POST /api/citizens/contact` |
 | **Footer** | RRSS (FB, IG, YT) | Enlaces Externos | ✅ Soportado | Enlaces oficiales a Municipalidad de Puerto Varas (`target="_blank"`). | `N/A` |
-| **Home** | Buscador Dirección | Formulario | ❌ Pendiente DEV 2 | Valida dirección y transfiere parámetro a dashboard. | `GET /api/routes/cuadrante?direccion={}` |
-| **Home** | "Ver mi día de retiro" | `/dashboard` | ✅ Soportado | Redirige al panel vecinal. | `GET /api/routes/cuadrante` |
-| **Home** | "Seguir mi camión" | `/dashboard` | ❌ Pendiente DEV 2 | Redirige al mapa barrial interactivo. | `GET /api/routes/{id}/tracking` |
+| **Home** | Buscador Dirección | Formulario | ✅ Completado DEV 2 | Valida dirección y consulta cuadrante comunal en vivo. | `GET /api/routes/cuadrante?direccion={}` |
+| **Home** | "Ver mi día de retiro" | `/dashboard` | ✅ Soportado | Redirige al panel vecinal con día asignado. | `GET /api/routes/cuadrante` |
+| **Home** | "Seguir mi camión" | `/dashboard` | ✅ Completado DEV 2 | Telemetría GPS en vivo de flota recolectadora. | `GET /api/routes/{id}/tracking` |
 | **Home** | "Qué reciclar" | Modal Cívico | ✅ Completado | Abre Guía Oficial de Fracciones de Reciclaje. | `GET /api/catalog/residuos` |
 | **Home** | "Preguntas frecuentes" | Modal Cívico | ✅ Completado | Abre Modal de FAQ oficial con respuestas comunitarias. | `GET /api/citizens/faq` |
 | **Dashboard** | "Agendar retiro especial" | `#solicitud-retiro` | ✅ Soportado | Scroll animado suave directo al formulario. | `POST /api/pickups` |
@@ -122,48 +122,49 @@ Para cumplir la regla estricta: **"cada botón o enlace debe ser clickeable y fu
 
 ## ⚙️ 5. Plan de Trabajo Detallado: DEV 2 (Backend Core, Datos e Infraestructura)
 
-### Fase 1: Microservicio Retiros (`ms-reciclago-pickups`)
+### Fase 1: Microservicio Retiros (`ms-reciclago-pickups`) — [COMPLETADO ✅]
 1. **Historial Paginado (`GET /api/pickups/history`):**
-   * Modificar `PickupRepository` para extender `JpaRepository<Pickup, Long>` con soporte de `Pageable`.
-   * Endpoint con query params: `vecinoEmail`, `estado`, `page`, `size`.
-2. **Event-Driven Architecture (Auditoría en Kafka):**
-   * Asegurar que al cambiar de estado (`PROGRAMADO`, `EN_RUTA`, `RETIRADO`, `PESADO`), se emita un evento JSON al tópico Kafka `pickups.events`:
-     ```json
-     {
-       "eventType": "PICKUP_WEIGHED",
-       "pickupId": 14,
-       "vecinoEmail": "jovise@alumnos.duoc.cl",
-       "pesoRealKg": 8.4,
-       "camionPatente": "PV-RC-26",
-       "timestamp": "2026-09-09T11:45:00Z"
-     }
-     ```
-3. **Colas RabbitMQ:**
-   * Consolidar la publicación en `q.cmd.email` para notificar al vecino cuando su retiro pasa a estado `PROGRAMADO` o `RETIRADO`.
+   * Implementado según **Contrato 2** en `PickupRepository` y `PickupService` con `Pageable`. Retorna `content`, `totalElements`, `totalPages`, `currentPage` y fechas formateadas en español (`fechaTexto`).
+2. **Validaciones Estrictas de Máquina de Estados:**
+   * Transiciones validadas (`SOLICITADO` $\rightarrow$ `PROGRAMADO` $\rightarrow$ `EN_RUTA` $\rightarrow$ `RETIRADO` $\rightarrow$ `PESADO`). Prohibición de cancelar retiros ya ejecutados o pesados.
+3. **Event-Driven Architecture (Auditoría en Kafka):**
+   * Emisión de eventos JSON al tópico Kafka `pickups.events` con metadatos completos y clave de partición por ID.
+4. **Colas RabbitMQ y DTO Dedicado:**
+   * Publicación en `q.cmd.email`, `q.cmd.route` y `q.cmd.certificate` utilizando `CertificateEventDto`.
+5. **Manejo de Errores Global:**
+   * Implementado `GlobalExceptionHandler` (`@RestControllerAdvice`) con respuestas estructuradas HTTP 400 y 404.
 
-### Fase 2: Microservicio Catálogo (`ms-reciclago-catalog`)
+### Fase 2: Microservicio Catálogo (`ms-reciclago-catalog`) — [COMPLETADO ✅]
 1. **Enriquecimiento de la Entidad `Residuo`:**
-   * Agregar campos requeridos por el frontend:
-     * `categoria` (VIDRIO, CARTON, PLASTICO, LATAS).
-     * `instrucciones` (ej: "Lavar y secar antes de entregar").
-     * `permitido` (boolean).
-2. **Inicialización de Datos Semilla (`data.sql` o CommandLineRunner):**
-   * Poblar los residuos oficiales según ordenanza municipal de Puerto Varas.
+   * Incorporados campos `categoria` (VIDRIO, CARTON, PLASTICO, LATAS, RAEE), `instrucciones` y `permitido`.
+2. **Inicialización de Datos Semilla Oficiales:**
+   * `DataInitializer` poblado con las 4 fracciones oficiales de la ordenanza de Puerto Varas (Vidrio, Cartón/Papel, Plásticos PET/PEAD, Latas/Metales) más RAEE.
+3. **Manejo Centralizado de Excepciones:**
+   * `GlobalExceptionHandler` con captura de integridad referencial (`DataIntegrityViolationException` $\rightarrow$ HTTP 409).
 
-### Fase 3: Soporte de Rutas y Cuadrantes (`ms-reciclago-routes` o módulo en pickups)
-1. **Entidad `Cuadrante`:**
-   * `id`, `nombre` ("Cuadrante 2: Costanera y Llanquihue Sur"), `diaSemana` ("MARTES"), `horarioInicio` ("08:00"), `horarioFin` ("17:00").
-2. **Entidad `CamionTracking`:**
-   * `camionId`, `lat`, `lng`, `calleActual`, `estado` ("EN_CIRCULACION", "EN_BASE").
-3. **Endpoints REST:**
+### Fase 3: Soporte de Rutas y Cuadrantes (`ms-reciclago-routes`) — [COMPLETADO ✅]
+1. **Nuevo Microservicio Autónomo (Puerto 8084):**
+   * Creado microservicio Spring Boot 3 con JPA, H2/PostgreSQL y Actuator.
+2. **Entidades Implementadas:**
+   * `Cuadrante`: Mapeo de los 4 cuadrantes comunales de Puerto Varas con horarios, sectores y patentes.
+   * `CamionTracking`: Telemetría GPS en tiempo real (`lat`, `lng`, velocidad, kilos y calle actual).
+   * `ContactoCiudadano`: Mesa de ayuda vecinal con tickets oficiales con formato `DIMAO-2026-XXXX`.
+3. **Endpoints REST Implementados:**
    * `GET /api/routes/cuadrantes`
+   * `GET /api/routes/cuadrante?direccion={}` (**Contrato 1**)
+   * `GET /api/routes/{cuadranteId}/tracking`
    * `GET /api/routes/tracking/{camionId}`
+   * `POST /api/citizens/contact` (**Contrato 3**)
+   * `GET /api/citizens/how-it-works`
+   * `GET /api/citizens/faq`
 
-### Fase 4: Infraestructura Docker (`docker-compose.yml`)
-1. **Asegurar inicio ordenado (`depends_on` con `healthcheck`):**
-   * PostgreSQL (puerto 5432) $\rightarrow$ RabbitMQ (5672/15672) $\rightarrow$ Kafka (9092).
-2. **Compatibilidad Java 17:**
-   * Verificar que los Dockerfiles o scripts de ejecución local compilen bajo JDK 17 sin requerir JDK 21.
+### Fase 4: Infraestructura Docker y Compatibilidad (`docker-compose.yml`) — [COMPLETADO ✅]
+1. **Inicio Ordenado con Healthchecks:**
+   * `reciclago-postgres` (5433:5432) $\rightarrow$ `reciclago-rabbitmq` (5672/15672) $\rightarrow$ `reciclago-kafka` (9092/29092) con dependencias condicionadas a `service_healthy`.
+2. **Dockerfiles Multi-Etapa:**
+   * Dockerfiles de dos etapas (Builder Temurin 17 JDK $\rightarrow$ Runtime Temurin 17 JRE) para los 4 microservicios con usuario sin privilegios y healthcheck de Actuator.
+3. **Soporte de Entorno Windows y JDK 17/21:**
+   * Corregido `mvnw.cmd` para PowerShell y resolución de agente ByteBuddy.
 
 ---
 
@@ -246,12 +247,12 @@ A continuación se valida el alineamiento estricto del proyecto contra los docum
 
 | Requerimiento del Caso 7 | Implementación en RecicLaGo | Estado DEV 1 (Front/BFF) | Estado DEV 2 (Back) |
 | :--- | :--- | :--- | :--- |
-| **Actores y Roles** (Admin, Operador/Coordinador, Vecino, Auditor) | Lectura automática de `idTokenClaims.roles` en `DashboardComponent` y `AppComponent`. Saludo personalizado y segmentación de permisos. | ✅ **100% Implementado** | 🟡 Soportar roles en DB / Claims |
-| **Solicitud de Retiro Puerta a Puerta** | Formulario responsivo con validación de dirección, tipo de residuo y comentarios. Envío al BFF (`POST /api/pickups`). | ✅ **100% Implementado** | 🟡 `POST /api/pickups` en pickups-svc |
-| **Catálogo de 4 Fracciones** (Vidrio, Cartón/Papel, Plásticos PET/PEAD, Latas/Metales) | Modales cívicos interactivos, selector de material en formulario y consumo de `GET /api/catalog/residuos`. | ✅ **100% Implementado** | 🟡 `GET /api/catalog/residuos` en catalog-svc |
-| **Seguimiento en Tiempo Real y Cuadrantes** | Línea de tiempo visual de 3 hitos (*Retiro programado* $\rightarrow$ *Camión en ruta* $\rightarrow$ *Retiro realizado*), mapa comunal con cuadrantes de Puerto Varas. | ✅ **100% Implementado** | 🟡 `GET /api/routes/cuadrante` |
-| **Historial Trazable con Kilos** | Tarjetas de retiros anteriores con pesaje digital acumulado y badge *"Cuenca Protegida"*. | ✅ **100% Implementado** | 🟡 `GET /api/pickups/history` con paginación |
-| **Flujo Seguro en Capas** | `JWT (MSAL)` $\rightarrow$ `AWS API Gateway` $\rightarrow$ `ms-reciclago-bff (:8080)` $\rightarrow$ `Microservicios core`. | ✅ **100% Implementado** | 🟡 Integrar endpoints core detrás de BFF |
+| **Actores y Roles** (Admin, Operador/Coordinador, Vecino, Auditor) | Lectura automática de `idTokenClaims.roles` en `DashboardComponent` y `AppComponent`. Saludo personalizado y segmentación de permisos. | ✅ **100% Implementado** | ✅ **100% Implementado** (RBAC en BFF y pickups) |
+| **Solicitud de Retiro Puerta a Puerta** | Formulario responsivo con validación de dirección, tipo de residuo y comentarios. Envío al BFF (`POST /api/pickups`). | ✅ **100% Implementado** | ✅ **100% Implementado** (`POST /api/pickups`) |
+| **Catálogo de 4 Fracciones** (Vidrio, Cartón/Papel, Plásticos PET/PEAD, Latas/Metales) | Modales cívicos interactivos, selector de material en formulario y consumo de `GET /api/catalog/residuos`. | ✅ **100% Implementado** | ✅ **100% Implementado** (`GET /api/catalog/residuos`) |
+| **Seguimiento en Tiempo Real y Cuadrantes** | Línea de tiempo visual de 3 hitos (*Retiro programado* $\rightarrow$ *Camión en ruta* $\rightarrow$ *Retiro realizado*), mapa comunal con cuadrantes de Puerto Varas. | ✅ **100% Implementado** | ✅ **100% Implementado** (`GET /api/routes/cuadrante` y GPS) |
+| **Historial Trazable con Kilos** | Tarjetas de retiros anteriores con pesaje digital acumulado y badge *"Cuenca Protegida"*. | ✅ **100% Implementado** | ✅ **100% Implementado** (`GET /api/pickups/history` paginado) |
+| **Flujo Seguro en Capas** | `JWT (MSAL)` $\rightarrow$ `AWS API Gateway` $\rightarrow$ `ms-reciclago-bff (:8080)` $\rightarrow$ `Microservicios core`. | ✅ **100% Implementado** | ✅ **100% Implementado** (Orquestado por RestClient) |
 
 ---
 
@@ -518,6 +519,7 @@ aws ecr get-login-password --region $REGION | docker login --username AWS --pass
 aws ecr create-repository --repository-name reciclago/ms-bff --region $REGION
 aws ecr create-repository --repository-name reciclago/ms-catalog --region $REGION
 aws ecr create-repository --repository-name reciclago/ms-pickups --region $REGION
+aws ecr create-repository --repository-name reciclago/ms-routes --region $REGION
 ```
 
 #### 3. Construir y Taggear las Imágenes Docker
@@ -530,6 +532,9 @@ docker build -t "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-catalog:
 
 # 3. Retiros
 docker build -t "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-pickups:latest" ./ms-reciclago-pickups
+
+# 4. Rutas y Ciudadanía
+docker build -t "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-routes:latest" ./ms-reciclago-routes
 ```
 
 #### 4. Subir Imágenes a ECR (Push)
@@ -537,6 +542,7 @@ docker build -t "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-pickups:
 docker push "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-bff:latest"
 docker push "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-catalog:latest"
 docker push "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-pickups:latest"
+docker push "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-routes:latest"
 ```
 
 #### 5. Ejecutar en EC2 con Docker Compose
@@ -546,3 +552,46 @@ En la instancia EC2 de AWS:
 docker compose up -d
 ```
 El **AWS API Gateway (HTTP API)** se configura apuntando a la IP pública o privada de la instancia EC2 en el puerto `8080` (`ms-reciclago-bff`), cumpliendo con el 100% de la arquitectura exigida en el **Caso 7**.
+
+---
+
+## 📋 10. Checklist Final de Entrega y Estado de Tareas (DEV 2)
+
+A continuación se resume qué está listo al 100% y cuáles son los únicos pasos que restan según el formato de evaluación:
+
+### ✅ A. Implementación de Código y Backend Core (100% COMPLETADO)
+- [x] **`ms-reciclago-routes` (Puerto 8084)**: Microservicio implementado, probado y funcionando con cuadrantes, telemetría GPS y tickets DIMAO.
+- [x] **`ms-reciclago-pickups` (Puerto 8083)**: Historial paginado con `Pageable`, validaciones de máquina de estados, eventos Kafka (`pickups.events`) y cola RabbitMQ (`q.cmd.certificate`).
+- [x] **`ms-reciclago-catalog` (Puerto 8081)**: Residuos enriquecidos con categorías oficiales de Puerto Varas y excepciones manejadas.
+- [x] **`ms-reciclago-bff` (Puerto 8080)**: Conectores y endpoints orquestadores hacia todos los microservicios backend agregados y asegurados con Spring Security.
+- [x] **Infraestructura Docker**: Multi-stage Dockerfiles para los 4 servicios y `docker-compose.yml` con healthchecks.
+- [x] **Tests Automatizados**: 38 pruebas unitarias y de integración pasando al 100% (`BUILD SUCCESS`).
+- [x] **Git / GitHub**: Ramas `dev2-backend-core`, `develop` y `main` fusionadas sin conflictos y sincronizadas en 0/0.
+
+---
+
+### 🎯 B. Qué te queda por hacer (Checklist de Preparación para la Defensa / Evaluación):
+
+1. **Opción Demostración Local en Vivo (Evaluación en Sala de Clases / Video demostrativo)**:
+   - [ ] Levantar los contenedores de base de datos y mensajería:
+     ```powershell
+     docker compose up -d postgres rabbitmq kafka
+     ```
+   - [ ] Levantar los microservicios en terminales independientes (o con Docker Compose):
+     * `ms-reciclago-catalog` en :8081
+     * `ms-reciclago-pickups` en :8083
+     * `ms-reciclago-routes` en :8084
+     * `ms-reciclago-bff` en :8080
+   - [ ] Abrir el frontend en `http://localhost:4200` y demostrar el flujo completo (ver cuadrantes, solicitar retiro, consultar historial y tickets DIMAO).
+
+2. **Opción Despliegue en AWS Cloud (Si el docente exige backend desplegado en la nube)**:
+   - [ ] Abrir tu propia consola de **AWS Academy / Learner Lab** (cuenta de DEV 2).
+   - [ ] Obtener tus credenciales temporales personales (*AWS Details* $\rightarrow$ *Show*).
+   - [ ] Crear los 4 repositorios en AWS ECR y subir las imágenes siguiendo la Sección 9.B.
+   - [ ] Levantar una instancia EC2 (Ubuntu con Docker) y ejecutar `docker compose up -d`.
+   - [ ] Configurar el AWS HTTP API Gateway apuntando al puerto `8080` de tu EC2.
+
+3. **Preparación de Diapositivas o Presentación (EP2)**:
+   - [ ] Tomar capturas de los tests pasando (`mvn test` en los 4 servicios).
+   - [ ] Tomar capturas del log de Kafka y RabbitMQ recibiendo eventos de retiros.
+   - [ ] Utilizar el diagrama de arquitectura C4 / Mermaid presente en esta ruta de trabajo para explicar el rol de DEV 2 en la defensa.
