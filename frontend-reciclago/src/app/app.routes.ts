@@ -1,7 +1,9 @@
 import { Routes } from '@angular/router';
-import { MsalGuard, MsalRedirectComponent } from '@azure/msal-angular';
+import { MsalRedirectComponent } from '@azure/msal-angular';
 import { HomeComponent } from './pages/home/home.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { LoginComponent } from './pages/login/login.component';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -9,9 +11,37 @@ export const routes: Routes = [
     component: HomeComponent
   },
   {
+    path: 'index.html',
+    component: HomeComponent
+  },
+  {
+    path: 'login',
+    component: LoginComponent
+  },
+  {
     path: 'dashboard',
     component: DashboardComponent,
-    canActivate: [MsalGuard]
+    canActivate: [authGuard]
+  },
+  {
+    path: 'pickups',
+    component: DashboardComponent,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'catalog',
+    component: DashboardComponent,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'reports',
+    component: DashboardComponent,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'audit',
+    component: DashboardComponent,
+    canActivate: [authGuard]
   },
   {
     path: 'auth',

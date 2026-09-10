@@ -4,95 +4,424 @@
 
 @layer base {
   :root {
-    --color-bg: #F0EBE1;              /* Lino cálido más pronunciado, menos blanco */
-    --color-surface: #F9F8F5;
-    --color-border: #E5E0D8;
-    --color-text-primary: #1A1F1C;
-    --color-text-secondary: #5E6662;
-    --color-brand-primary: #134E70;   /* azul-lago profundo */
-    --color-brand-secondary: #163828;
-    --color-accent: #C98A2C;
-    --radius-button: 2px 2px 2px 14px;
-  }
-
-  [data-theme="dark"] {
-    --color-bg: #0A1118;              /* Azul noche profundo real */
-    --color-surface: #141C24;
-    --color-border: #232D38;
-    --color-text-primary: #F0F4F8;
-    --color-text-secondary: #9AA6B2;
-    --color-brand-primary: #5899C5;
-    --color-brand-secondary: #4A8064;
-    --color-accent: #E0A752;
+    --color-bg: #F8FAF7;
+    --color-surface: #FFFFFF;
+    --color-border: #E2E9E4;
+    --color-text-primary: #183247;
+    --color-text-secondary: #61717A;
+    --color-brand-green: #4F8A3D;
+    --color-brand-navy: #123F5B;
   }
 
   body {
     background-color: var(--color-bg);
     color: var(--color-text-primary);
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-  
-  /* Imagen de fondo ofuscada adaptativa (Montaña/Volcán) */
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-image: url('/assets/bg-mountain.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    opacity: 0.25; /* Más opacidad para que se note la montaña */
-    mix-blend-mode: multiply;
-    pointer-events: none;
-    z-index: -1;
-    transition: opacity 0.3s ease, filter 0.3s ease;
-  }
-
-  [data-theme="dark"] body::before {
-    opacity: 0.15; /* En oscuro no necesita tanta opacidad porque el screen resalta mucho */
-    mix-blend-mode: screen;
-    filter: grayscale(40%) contrast(1.1);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    overflow-x: hidden;
   }
 }
 
-@layer components {
-  .btn-primary {
-    @apply flex items-center justify-center gap-2 px-6 py-3.5 text-[14px] font-bold text-white transition-all shadow-sm cursor-pointer;
-    background-color: var(--color-brand-primary);
-    border-radius: var(--radius-button);
-  }
-  .btn-primary:hover {
-    filter: brightness(0.9);
-    transform: scale(1.02);
-  }
-  [data-theme="dark"] .btn-primary {
-    color: #10161B; /* Contraste fuerte sobre el azul claro en dark mode */
-  }
+/* Ocultar barra de scroll en contenedores desplazables */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
-  .btn-outline {
-    @apply flex items-center justify-center gap-2 px-5 py-3.5 text-[14px] font-bold transition-all cursor-pointer;
-    background-color: transparent;
-    color: var(--color-brand-primary);
-    border: 2px solid var(--color-brand-primary);
-    border-radius: var(--radius-button);
-  }
-  .btn-outline:hover {
-    background-color: var(--color-brand-primary);
-    color: var(--color-surface);
-  }
-  [data-theme="dark"] .btn-outline {
-    color: var(--color-brand-primary);
-    border-color: var(--color-brand-primary);
-  }
-  [data-theme="dark"] .btn-outline:hover {
-    background-color: var(--color-brand-primary);
-    color: #10161B;
-  }
+/* Tipografías personalizadas Stitch */
+.font-script,
+.font-handwriting {
+  font-family: 'Kalam', 'Caveat', cursive;
+}
+.font-heading {
+  font-family: 'Outfit', sans-serif;
+}
 
-  .civic-card {
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+/* Sombras suaves */
+.shadow-soft {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 10px -3px rgba(0, 0, 0, 0.02);
+}
+.shadow-banner {
+  box-shadow: 0 20px 40px -15px rgba(7, 36, 53, 0.2);
+}
+
+/* Estilos de tarjetas cívicas Stitch */
+.civic-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E9E4;
+  border-radius: 1.5rem;
+}
+.civic-card-tint {
+  background: #F4F8F4;
+  border: 1px solid #DFE8E1;
+  border-radius: 1.5rem;
+}
+.card-stitch {
+  background: #FFFFFF;
+  border: 1px solid #E2E9E4;
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+}
+
+/* Botones Stitch */
+.btn-stitch-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #4F8A3D;
+  border-radius: 9999px;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+.btn-stitch-primary:hover {
+  background-color: #3B6E2C;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-stitch-blue {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #123F5B;
+  border-radius: 9999px;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+}
+.btn-stitch-blue:hover {
+  background-color: #0D3549;
+}
+
+.btn-stitch-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #123F5B;
+  border: 1.5px solid #123F5B;
+  background-color: transparent;
+  border-radius: 9999px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.btn-stitch-outline:hover {
+  background-color: #123F5B;
+  color: #ffffff;
+}
+
+/* Inputs Stitch */
+.input-stitch,
+.select-stitch {
+  width: 100%;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-size: 0.875rem;
+  color: #183247;
+  background-color: #F8FAF7;
+  border: 1px solid #DFE8E1;
+  border-radius: 0.75rem;
+  transition: all 0.2s;
+}
+.input-stitch.has-icon,
+.select-stitch.has-icon {
+  padding-left: 2.75rem !important;
+}
+.input-stitch:focus,
+.select-stitch:focus {
+  outline: none;
+  border-color: #4F8A3D;
+  box-shadow: 0 0 0 3px rgba(79, 138, 61, 0.15);
+}
+
+/* Animaciones del camión y tracking GPS Stitch */
+@keyframes truckDriveSmooth {
+  0%, 100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+  25% { transform: translateY(-1.5px) translateX(2px) rotate(0.8deg); }
+  50% { transform: translateY(0.5px) translateX(3.5px) rotate(-0.5deg); }
+  75% { transform: translateY(-1px) translateX(1px) rotate(0.5deg); }
+}
+@keyframes gpsSignalWave {
+  0% { transform: scale(0.8); opacity: 0.7; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+@keyframes shimmerSweep {
+  0% { transform: translateX(-100%) rotate(25deg); }
+  100% { transform: translateX(250%) rotate(25deg); }
+}
+
+.anim-truck-drive {
+  animation: truckDriveSmooth 2.8s ease-in-out infinite;
+}
+.anim-gps-wave {
+  animation: gpsSignalWave 2s ease-out infinite;
+}
+.anim-shimmer {
+  animation: shimmerSweep 4.5s ease-in-out infinite;
+}
+
+/* Animaciones orgánicas naturales para el Index */
+@keyframes leafFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(8deg); }
+}
+@keyframes pulseGentle {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.04); opacity: 0.92; }
+}
+
+.anim-leaf {
+  display: inline-block;
+  animation: leafFloat 3.5s ease-in-out infinite;
+}
+.anim-pulse-gentle {
+  animation: pulseGentle 2.5s ease-in-out infinite;
+}
+
+/* Nuevas animaciones orgánicas de Panel Vecinal Animado */
+@keyframes mountainFloat1 {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-3.5px); }
+}
+@keyframes mountainFloat2 {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-2.8px); }
+}
+@keyframes mountainFloat3 {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes lakeWave {
+  0%, 100% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+}
+@keyframes lakeWaveFooter {
+  0%, 100% { transform: translateX(-10px); }
+  50% { transform: translateX(10px); }
+}
+@keyframes floatSoft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes truckGentleDrive {
+  0%, 100% { transform: translateX(0px) rotate(0deg); }
+  50% { transform: translateX(3px) rotate(0.6deg); }
+}
+@keyframes softPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 4px 14px -2px rgba(31, 102, 133, 0.18); }
+  50% { transform: scale(1.015); box-shadow: 0 8px 24px -2px rgba(31, 102, 133, 0.28); }
+}
+@keyframes routeDraw {
+  from { stroke-dashoffset: 300; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes truckRouteMove {
+  0%, 100% { transform: translateX(0px); }
+  50% { transform: translateX(8px); }
+}
+@keyframes leafSway {
+  0%, 100% { transform: rotate(10deg); }
+  50% { transform: rotate(16deg); }
+}
+@keyframes recycleSpinSlow {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(5deg); }
+}
+@keyframes routeProgressFlow {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.anim-mtn-1 { animation: mountainFloat1 8s ease-in-out infinite; will-change: transform; }
+.anim-mtn-2 { animation: mountainFloat2 7s ease-in-out infinite; will-change: transform; }
+.anim-mtn-3 { animation: mountainFloat3 9s ease-in-out infinite; will-change: transform; }
+.anim-lake-wave { animation: lakeWave 8s ease-in-out infinite; will-change: transform; }
+.anim-lake-footer { animation: lakeWaveFooter 10s ease-in-out infinite; will-change: transform; }
+.anim-float-soft { animation: floatSoft 3.2s ease-in-out infinite; will-change: transform; }
+.anim-truck-gentle { animation: truckGentleDrive 2s ease-in-out infinite; will-change: transform; }
+.anim-soft-pulse { animation: softPulse 2.8s ease-in-out infinite; will-change: transform, box-shadow; }
+.anim-truck-route { animation: truckRouteMove 4s ease-in-out infinite; will-change: transform; }
+.anim-leaf-sway { animation: leafSway 4s ease-in-out infinite; transform-origin: bottom center; will-change: transform; }
+.anim-recycle-spin { animation: recycleSpinSlow 4s ease-in-out infinite; transform-origin: center; will-change: transform; }
+.anim-route-flow { animation: routeProgressFlow 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+
+.route-path-animated {
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+  animation: routeDraw 1.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.card-hover {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -8px rgba(18, 63, 91, 0.08);
+}
+.interactive-icon {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.interactive-icon:hover {
+  transform: scale(1.08) rotate(2deg);
+}
+
+/* ==================== ANIMACIONES DE DESPLIEGUE Y CARGA (NO INTRUSIVA) ==================== */
+
+/* Barra de progreso superior continua y sutil */
+@keyframes topLoaderSlide {
+  0% { transform: translateX(-100%) scaleX(0.2); }
+  45% { transform: translateX(10%) scaleX(0.7); }
+  85% { transform: translateX(60%) scaleX(0.95); }
+  100% { transform: translateX(100%) scaleX(1); }
+}
+
+.anim-top-loader {
+  width: 100%;
+  animation: topLoaderSlide 1.25s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-origin: left center;
+  will-change: transform;
+}
+
+/* Despliegue de página al cambiar de ruta */
+@keyframes pageDeploy {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.992);
+    filter: blur(2px);
+  }
+  60% {
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes deployStagger {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOutFast {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.anim-page-deploy {
+  animation: pageDeploy 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity, filter;
+}
+
+.anim-deploy-delay-1 {
+  animation: deployStagger 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+}
+
+.anim-deploy-delay-2 {
+  animation: deployStagger 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.16s both;
+}
+
+.anim-deploy-delay-3 {
+  animation: deployStagger 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both;
+}
+
+/* Animaciones fluidas para modales de alta gama */
+@keyframes modalBackdropFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalPanelScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.anim-modal-backdrop {
+  animation: modalBackdropFade 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.anim-modal-panel {
+  animation: modalPanelScale 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+/* ==================== DESPLIEGUE FLUIDO ESCALONADO ("ANIMACIÓN PIOLA") ==================== */
+@keyframes smoothFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes smoothFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.anim-fade-up {
+  opacity: 0;
+  animation: smoothFadeUp 0.62s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.anim-fade-in {
+  opacity: 0;
+  animation: smoothFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity;
+}
+
+.anim-delay-1 { animation-delay: 0.05s; }
+.anim-delay-2 { animation-delay: 0.12s; }
+.anim-delay-3 { animation-delay: 0.20s; }
+.anim-delay-4 { animation-delay: 0.28s; }
+.anim-delay-5 { animation-delay: 0.36s; }
+.anim-delay-6 { animation-delay: 0.44s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-fade-up,
+  .anim-fade-in,
+  .anim-page-deploy {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
   }
 }
 

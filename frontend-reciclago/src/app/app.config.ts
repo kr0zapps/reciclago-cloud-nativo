@@ -1,5 +1,5 @@
 import { ApplicationConfig, APP_INITIALIZER } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withViewTransitions, withHashLocation } from '@angular/router';
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
 import { MsalService, MSAL_INSTANCE, MsalGuard, MsalInterceptor, MSAL_INTERCEPTOR_CONFIG, MSAL_GUARD_CONFIG, MsalBroadcastService } from '@azure/msal-angular';
@@ -8,25 +8,52 @@ import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@a
 import { provideAnimations } from '@angular/platform-browser/animations';
 
 export function MSALInstanceFactory(): IPublicClientApplication {
-  return new PublicClientApplication({
-    auth: {
-      clientId: environment.msalConfig.auth.clientId,
-      authority: environment.msalConfig.auth.authority,
-      redirectUri: environment.msalConfig.auth.redirectUri,
-    },
-    cache: {
-      cacheLocation: BrowserCacheLocation.LocalStorage
-    }
-  });
+  try {
+    const redirectUri = environment.msalConfig.auth.redirectUri;
+
+    return new PublicClientApplication({
+      auth: {
+        clientId: environment.msalConfig.auth.clientId,
+        authority: environment.msalConfig.auth.authority,
+        redirectUri: redirectUri,
+      },
+      cache: {
+        cacheLocation: BrowserCacheLocation.LocalStorage
+      }
+    });
+  } catch (err) {
+    console.warn('MSAL initialization warning, fallback activated:', err);
+    return {
+      initialize: () => Promise.resolve(),
+      getAllAccounts: () => [],
+      getActiveAccount: () => null,
+      setActiveAccount: () => {},
+      handleRedirectPromise: () => Promise.resolve(null),
+      loginRedirect: () => Promise.resolve(),
+      loginPopup: () => Promise.reject('MSAL not active in this environment'),
+      logoutRedirect: () => Promise.resolve(),
+      acquireTokenSilent: () => Promise.reject('MSAL not active in this environment')
+    } as unknown as IPublicClientApplication;
+  }
 }
 
 export function MSALInitializerFactory(msalInstance: IPublicClientApplication) {
-  return () => msalInstance.initialize();
+  return () => {
+    try {
+      const initResult = msalInstance.initialize();
+      return (initResult && typeof initResult.catch === 'function')
+        ? initResult.catch(err => console.warn('MSAL init caught:', err))
+        : Promise.resolve();
+    } catch (e) {
+      console.warn('MSAL initializer error:', e);
+      return Promise.resolve();
+    }
+  };
 }
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes),
+    provideRouter(routes, withViewTransitions({ skipInitialTransition: false }), withHashLocation()),
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimations(),
     {
@@ -49,22 +76,31 @@ export const appConfig: ApplicationConfig = {
     MsalBroadcastService,
     {
       provide: MSAL_GUARD_CONFIG,
-      useValue: {
-        interactionType: InteractionType.Redirect,
-        authRequest: {
-          scopes: [
-            'user.read',
-            'api://' + environment.msalConfig.auth.clientId + '/access_as_user'
-          ]
-        }
+      useFactory: () => {
+        return {
+          interactionType: InteractionType.Redirect,
+          authRequest: {
+            scopes: [
+              ...environment.apiConfig.scopes
+            ],
+            redirectUri: environment.msalConfig.auth.redirectUri,
+            redirectStartPage: environment.msalConfig.auth.redirectUri
+          }
+        };
       }
     },
     {
       provide: MSAL_INTERCEPTOR_CONFIG,
       useValue: {
         interactionType: InteractionType.Redirect,
+        strictMatching: false,
         protectedResourceMap: new Map([
-          ['http://localhost:8080/api/*', ['api://' + environment.msalConfig.auth.clientId + '/access_as_user']]
+          ['http://localhost:8080/api/*', environment.apiConfig.scopes],
+          ['http://localhost:8080/api*', environment.apiConfig.scopes],
+          ['http://localhost:8080/api', environment.apiConfig.scopes],
+          ['/api/*', environment.apiConfig.scopes],
+          ['/api*', environment.apiConfig.scopes],
+          ['/api', environment.apiConfig.scopes]
         ])
       }
     }
