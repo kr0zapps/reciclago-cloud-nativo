@@ -164,21 +164,41 @@ Esto inicializara:
 - RabbitMQ en los puertos `5672` (AMQP) y `15672` (Consola Web: user `guest`, pass `guest`)
 - Apache Kafka en el puerto `9092` con Zookeeper en `2181`
 
+### Dev 2 (Backend Core + Infra) — Checklist
+
+```
+[x] 1. Validaciones de máquina de estados en PickupService (CRÍTICO) - COMPLETADO ✅
+[x] 2. Tests para CamionController y TarifaController (CRÍTICO) - COMPLETADO ✅
+[x] 3. Tests PATCH en PickupControllerTest + cancelar en ServiceTest (CRÍTICO) - COMPLETADO ✅
+[x] 4. GlobalExceptionHandler en microservicios catalog, pickups y routes (IMPORTANTE) - COMPLETADO ✅
+[x] 5. DTO CertificateEventDto para RabbitMQ (IMPORTANTE) - COMPLETADO ✅
+[x] 6. Corregir documentación vs docker-compose (IMPORTANTE) - COMPLETADO ✅
+[x] 7. Mejorar generación de codigoRetiro con prefijo RET-PV- (OPCIONAL) - COMPLETADO ✅
+[x] 8. Nuevo microservicio ms-reciclago-routes (puerto 8084) con cuadrantes, tracking y DIMAO (CRÍTICO) - COMPLETADO ✅
+[x] 9. Dockerfiles multi-etapa para todos los microservicios y docker-compose actualizado (IMPORTANTE) - COMPLETADO ✅
+```
+
 ### Paso 2: Iniciar Microservicios Backend
 
-1. **Iniciar ms-reciclago-catalog:**
+1. **Iniciar ms-reciclago-catalog (Puerto 8081):**
 ```bash
 cd ms-reciclago-catalog
 ./mvnw spring-boot:run
 ```
 
-2. **Iniciar ms-reciclago-pickups:**
+2. **Iniciar ms-reciclago-pickups (Puerto 8083):**
 ```bash
 cd ../ms-reciclago-pickups
 ./mvnw spring-boot:run
 ```
 
-3. **Iniciar ms-reciclago-bff:**
+3. **Iniciar ms-reciclago-routes (Puerto 8084):**
+```bash
+cd ../ms-reciclago-routes
+./mvnw spring-boot:run
+```
+
+4. **Iniciar ms-reciclago-bff (Puerto 8080):**
 ```bash
 cd ../ms-reciclago-bff
 ./mvnw spring-boot:run
@@ -277,6 +297,7 @@ reciclago/
 ├── ms-reciclago-bff/                 # Backend for Frontend (Spring Security OAuth2 + Dockerfile)
 ├── ms-reciclago-catalog/             # Microservicio de Catálogo (Residuos, Camiones, Tarifas)
 ├── ms-reciclago-pickups/             # Microservicio de Retiros (Eventos Kafka / RabbitMQ)
+├── ms-reciclago-routes/              # Microservicio de Rutas y Ciudadanía (Cuadrantes, DIMAO, GPS)
 └── frontend-reciclago/               # Portal Web Angular 18
     ├── src/
     │   ├── app/

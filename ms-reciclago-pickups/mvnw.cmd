@@ -27,6 +27,10 @@
 @REM   MVNW_VERBOSE - true: enable verbose log; others: silence the output
 @REM ----------------------------------------------------------------------------
 
+@IF EXIST "C:\Program Files\Java\jdk-21" (
+  @IF "%JAVA_HOME%"=="" SET "JAVA_HOME=C:\Program Files\Java\jdk-21"
+  @SET "PATH=%JAVA_HOME%\bin;%PATH%"
+)
 @IF "%__MVNW_ARG0_NAME__%"=="" (SET __MVNW_ARG0_NAME__=%~nx0)
 @SET __MVNW_CMD__=
 @SET __MVNW_ERROR__=
@@ -131,7 +135,7 @@ $webclient = New-Object System.Net.WebClient
 if ($env:MVNW_USERNAME -and $env:MVNW_PASSWORD) {
   $webclient.Credentials = New-Object System.Net.NetworkCredential($env:MVNW_USERNAME, $env:MVNW_PASSWORD)
 }
-[Net.SecurityProtocolManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 $webclient.DownloadFile($distributionUrl, "$TMP_DOWNLOAD_DIR/$distributionUrlName") | Out-Null
 
 # If specified, validate the SHA-256 sum of the Maven distribution zip file

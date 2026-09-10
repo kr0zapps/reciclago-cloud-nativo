@@ -63,14 +63,15 @@ graph TD
 
 | Componente | Tipo | Puerto | URL / Credenciales |
 | :--- | :--- | :--- | :--- |
-| **PostgreSQL** | Base de Datos | `5432` | `localhost:5432` / user: `postgres`, pass: `postgres123` |
+| **PostgreSQL** | Base de Datos | `5433` (mapeado a `5432` en container) | `localhost:5433` / user: `reciclago`, pass: `reciclagopass` (DB: `reciclago_db`) |
 | **RabbitMQ** | Broker AMQP | `5672` | Conexión AMQP interna |
-| **RabbitMQ UI** | Panel Web | `15672` | [http://localhost:15672](http://localhost:15672) / user: `reciclago`, pass: `reciclago123` |
-| **Kafka Broker** | Event Streaming | `9092` | `localhost:9092` |
+| **RabbitMQ UI** | Panel Web | `15672` | [http://localhost:15672](http://localhost:15672) / user: `guest`, pass: `guest` |
+| **Kafka Broker** | Event Streaming | `9092` / `29092` | `localhost:29092` (host) / `kafka:9092` (docker) |
 | **Zookeeper** | Coordinador Kafka | `2181` | `localhost:2181` |
 | **BFF** | Spring Boot | `8080` | [http://localhost:8080/public/status](http://localhost:8080/public/status) |
 | **Catálogo** | Spring Boot | `8081` | [http://localhost:8081/api/catalog/residuos](http://localhost:8081/api/catalog/residuos) |
 | **Retiros** | Spring Boot | `8083` | [http://localhost:8083/api/pickups](http://localhost:8083/api/pickups) |
+| **Rutas y DIMAO** | Spring Boot | `8084` | [http://localhost:8084/api/routes/cuadrantes](http://localhost:8084/api/routes/cuadrantes) |
 | **Frontend** | Angular | `4200` | [http://localhost:4200](http://localhost:4200) |
 
 ---
@@ -79,8 +80,8 @@ graph TD
 
 Si reinicias tu computador o abres una nueva sesión, sigue estos pasos en orden:
 
-### Paso 1: Levantar Contenedores Docker
-Abre una terminal PowerShell en la raíz del proyecto (`c:\Users\CETECOM\Downloads\reciclago-cloud-nativo`):
+### Paso 1: Levantar Contenedores Docker de Infraestructura
+Abre una terminal PowerShell en la raíz del proyecto:
 ```powershell
 docker compose up -d postgres rabbitmq kafka
 ```
@@ -102,9 +103,14 @@ Abre una ventana/pestaña de terminal para cada servicio:
   cd ms-reciclago-pickups
   .\mvnw.cmd spring-boot:run "-Dspring-boot.run.arguments=--server.port=8083"
   ```
-  *(Nota: Usamos el puerto 8083 ya que el 8082 suele estar reservado por servicios del sistema Windows).*
 
-- **Terminal 3 — Microservicio BFF (Puerto 8080):**
+- **Terminal 3 — Microservicio Rutas y Cuadrantes (Puerto 8084):**
+  ```powershell
+  cd ms-reciclago-routes
+  .\mvnw.cmd spring-boot:run
+  ```
+
+- **Terminal 4 — Microservicio BFF (Puerto 8080):**
   ```powershell
   cd ms-reciclago-bff
   .\mvnw.cmd spring-boot:run
@@ -153,9 +159,33 @@ Puedes abrir una consola y correr estos comandos para validar el correcto funcio
   ```powershell
   curl http://localhost:8083/api/pickups
   ```
+- **Consultar historial paginado (Contrato 2):**
+  ```powershell
+  curl "http://localhost:8083/api/pickups/history?page=0&size=10"
+  ```
 - **Consultar un retiro por ID (ejemplo ID 1):**
   ```powershell
   curl http://localhost:8083/api/pickups/1
+  ```
+
+### 4. Probar Rutas, Cuadrantes y DIMAO (Puerto 8084)
+- **Listar todos los cuadrantes de Puerto Varas:**
+  ```powershell
+  curl http://localhost:8084/api/routes/cuadrantes
+  ```
+- **Consultar cuadrante por dirección (Contrato 1):**
+  ```powershell
+  curl "http://localhost:8084/api/routes/cuadrante?direccion=Los+Guindos+450"
+  ```
+- **Consultar tracking GPS de camión en cuadrante:**
+  ```powershell
+  curl http://localhost:8084/api/routes/2/tracking
+  ```
+- **Ingresar consulta ciudadana a mesa de ayuda DIMAO (Contrato 3):**
+  ```powershell
+  curl -X POST http://localhost:8084/api/citizens/contact `
+    -H "Content-Type: application/json" `
+    -d '{\"nombre\":\"Jonathan Vidal\",\"email\":\"jovise@alumnos.duoc.cl\",\"telefono\":\"+56912345678\",\"asunto\":\"Consulta reciclaje\",\"mensaje\":\"Horario retiro especial\"}'
   ```
 
 ---
