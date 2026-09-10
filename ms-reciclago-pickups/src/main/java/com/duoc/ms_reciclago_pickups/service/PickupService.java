@@ -2,22 +2,24 @@ package com.duoc.ms_reciclago_pickups.service;
 
 import com.duoc.ms_reciclago_pickups.config.KafkaConfig;
 import com.duoc.ms_reciclago_pickups.config.RabbitMQConfig;
-import com.duoc.ms_reciclago_pickups.dto.EmailEventDto;
-import com.duoc.ms_reciclago_pickups.dto.PickupStateChangeEventDto;
-import com.duoc.ms_reciclago_pickups.dto.RouteEventDto;
+import com.duoc.ms_reciclago_pickups.dto.*;
 import com.duoc.ms_reciclago_pickups.model.Pickup;
 import com.duoc.ms_reciclago_pickups.repository.PickupRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -57,10 +59,54 @@ public class PickupService {
         return pickupRepository.findByCodigoRetiro(codigo);
     }
 
+    // Historial Paginado según Contrato DEV 1 <-> DEV 2
+    public PickupHistoryResponse obtenerHistorialPaginado(String vecinoEmail, String estado, Pageable pageable) {
+        Page<Pickup> pageResult;
+        if (vecinoEmail != null && !vecinoEmail.isBlank() && estado != null && !estado.isBlank()) {
+            pageResult = pickupRepository.findByVecinoEmailAndEstado(vecinoEmail, estado, pageable);
+        } else if (vecinoEmail != null && !vecinoEmail.isBlank()) {
+            pageResult = pickupRepository.findByVecinoEmail(vecinoEmail, pageable);
+        } else if (estado != null && !estado.isBlank()) {
+            pageResult = pickupRepository.findByEstado(estado, pageable);
+        } else {
+            pageResult = pickupRepository.findAll(pageable);
+        }
+
+        DateTimeFormatter isoDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter spanishFormat = DateTimeFormatter.ofPattern("EEEE dd MMMM", new Locale("es", "CL"));
+
+        List<PickupHistoryDto> dtoList = pageResult.getContent().stream().map(p -> {
+            LocalDateTime fechaBase = p.getFechaSolicitud() != null ? p.getFechaSolicitud() : LocalDateTime.now();
+            String fechaStr = fechaBase.format(isoDate);
+            String fechaTexto = capitalizar(fechaBase.format(spanishFormat));
+            Double kilos = p.getPesoRealKg() != null ? p.getPesoRealKg() : p.getPesoEstimadoKg();
+            String estadoTexto = p.getEstado() != null ? p.getEstado().toLowerCase() : "solicitado";
+            if ("PESADO".equalsIgnoreCase(p.getEstado()) || "RETIRADO".equalsIgnoreCase(p.getEstado())) {
+                estadoTexto = "completado";
+            }
+            return new PickupHistoryDto(
+                    p.getId(),
+                    fechaStr,
+                    fechaTexto,
+                    p.getResiduoNombre() != null ? p.getResiduoNombre() : "Residuos Reciclables",
+                    kilos,
+                    p.getDireccion(),
+                    estadoTexto
+            );
+        }).collect(Collectors.toList());
+
+        return new PickupHistoryResponse(dtoList, pageResult.getTotalElements(), pageResult.getTotalPages(), pageResult.getNumber());
+    }
+
+    private String capitalizar(String texto) {
+        if (texto == null || texto.isEmpty()) return texto;
+        return Character.toUpperCase(texto.charAt(0)) + texto.substring(1);
+    }
+
     // 1. Crear Solicitud (Estado inicial: SOLICITADO)
     public Pickup crearSolicitud(Pickup pickup) {
         if (pickup.getCodigoRetiro() == null || pickup.getCodigoRetiro().isBlank()) {
-            pickup.setCodigoRetiro("RET-" + System.currentTimeMillis() % 1000000);
+            pickup.setCodigoRetiro("RET-PV-" + System.currentTimeMillis() % 1000000);
         }
         pickup.setEstado("SOLICITADO");
         pickup.setFechaSolicitud(LocalDateTime.now());
@@ -80,6 +126,12 @@ public class PickupService {
     public Pickup programarRetiro(Long id, Long camionId, String camionPatente, LocalDateTime fechaProgramada) {
         Pickup pickup = obtenerPorId(id)
                 .orElseThrow(() -> new RuntimeException("Solicitud de retiro no encontrada con id: " + id));
+
+        if (!"SOLICITADO".equalsIgnoreCase(pickup.getEstado())) {
+            throw new IllegalStateException(
+                    "Regla violada: No se puede programar si el retiro no está en estado SOLICITADO. Estado actual: "
+                            + pickup.getEstado());
+        }
 
         String estadoAnterior = pickup.getEstado();
         pickup.setCamionId(camionId);
@@ -105,8 +157,7 @@ public class PickupService {
         Pickup pickup = obtenerPorId(id)
                 .orElseThrow(() -> new RuntimeException("Solicitud de retiro no encontrada con id: " + id));
 
-        // Regla del Negocio: No se puede pasar a EN_RUTA sin estar previamente en
-        // PROGRAMADO
+        // Regla del Negocio: No se puede pasar a EN_RUTA sin estar previamente en PROGRAMADO
         if (!"PROGRAMADO".equalsIgnoreCase(pickup.getEstado())) {
             throw new IllegalStateException(
                     "Regla violada: No se puede pasar a EN_RUTA si el retiro no está en estado PROGRAMADO. Estado actual: "
@@ -134,6 +185,12 @@ public class PickupService {
         Pickup pickup = obtenerPorId(id)
                 .orElseThrow(() -> new RuntimeException("Solicitud de retiro no encontrada con id: " + id));
 
+        if (!"EN_RUTA".equalsIgnoreCase(pickup.getEstado())) {
+            throw new IllegalStateException(
+                    "Regla violada: No se puede marcar como RETIRADO si el retiro no está en estado EN_RUTA. Estado actual: "
+                            + pickup.getEstado());
+        }
+
         String estadoAnterior = pickup.getEstado();
         pickup.setEstado("RETIRADO");
         pickup.setFechaCompletado(LocalDateTime.now());
@@ -152,6 +209,16 @@ public class PickupService {
         Pickup pickup = obtenerPorId(id)
                 .orElseThrow(() -> new RuntimeException("Solicitud de retiro no encontrada con id: " + id));
 
+        if (!"RETIRADO".equalsIgnoreCase(pickup.getEstado())) {
+            throw new IllegalStateException(
+                    "Regla violada: No se puede registrar pesaje si el retiro no está en estado RETIRADO. Estado actual: "
+                            + pickup.getEstado());
+        }
+
+        if (pesoRealKg == null || pesoRealKg <= 0) {
+            throw new IllegalArgumentException("El peso real recolectado debe ser mayor a 0 kg.");
+        }
+
         String estadoAnterior = pickup.getEstado();
         pickup.setPesoRealKg(pesoRealKg);
         pickup.setEstado("PESADO");
@@ -160,7 +227,7 @@ public class PickupService {
 
         notificarCambioEstadoKafka(actualizado, estadoAnterior, "PESADO");
 
-        // Emitir a q.cmd.certificate en RabbitMQ para generación de certificado PDF
+        // Emitir DTO a q.cmd.certificate en RabbitMQ para generación de certificado PDF
         notificarCertificadoRabbitMQ(actualizado);
 
         return actualizado;
@@ -170,6 +237,12 @@ public class PickupService {
     public Pickup cancelarRetiro(Long id, String motivo) {
         Pickup pickup = obtenerPorId(id)
                 .orElseThrow(() -> new RuntimeException("Solicitud de retiro no encontrada con id: " + id));
+
+        if ("RETIRADO".equalsIgnoreCase(pickup.getEstado()) || "PESADO".equalsIgnoreCase(pickup.getEstado())) {
+            throw new IllegalStateException(
+                    "Regla violada: No se puede cancelar un retiro que ya ha sido RETIRADO o PESADO. Estado actual: "
+                            + pickup.getEstado());
+        }
 
         String estadoAnterior = pickup.getEstado();
         pickup.setEstado("CANCELADO");
@@ -250,7 +323,18 @@ public class PickupService {
 
     private void notificarCertificadoRabbitMQ(Pickup pickup) {
         try {
-            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_CERTIFICATE, pickup);
+            CertificateEventDto certDto = new CertificateEventDto(
+                    pickup.getCodigoRetiro(),
+                    pickup.getVecinoNombre(),
+                    pickup.getVecinoEmail(),
+                    pickup.getDireccion(),
+                    pickup.getComuna(),
+                    pickup.getResiduoNombre(),
+                    pickup.getPesoRealKg(),
+                    pickup.getFechaCompletado(),
+                    LocalDateTime.now()
+            );
+            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_CERTIFICATE, certDto);
             log.info("Mensaje de Certificado publicado en RabbitMQ (cola {}): {}", RabbitMQConfig.QUEUE_CERTIFICATE,
                     pickup.getCodigoRetiro());
         } catch (Exception e) {
@@ -258,3 +342,4 @@ public class PickupService {
         }
     }
 }
+

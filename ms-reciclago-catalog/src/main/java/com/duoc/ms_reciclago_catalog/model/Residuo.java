@@ -34,6 +34,13 @@ public class Residuo {
     @Column(nullable = false)
     private Boolean activo = true;
 
+    private String categoria;
+
+    private String instrucciones;
+
+    @Column(nullable = false)
+    private Boolean permitido = true;
+
     public Residuo() {
     }
 
@@ -45,6 +52,21 @@ public class Residuo {
         this.precioPorKg = precioPorKg;
         this.requiereManejoEspecial = requiereManejoEspecial != null ? requiereManejoEspecial : false;
         this.activo = activo != null ? activo : true;
+        this.permitido = true;
+    }
+
+    public Residuo(Long id, String nombre, String codigo, String descripcion, Double precioPorKg, 
+                   Boolean requiereManejoEspecial, Boolean activo, String categoria, String instrucciones, Boolean permitido) {
+        this.id = id;
+        this.nombre = nombre;
+        this.codigo = codigo;
+        this.descripcion = descripcion;
+        this.precioPorKg = precioPorKg;
+        this.requiereManejoEspecial = requiereManejoEspecial != null ? requiereManejoEspecial : false;
+        this.activo = activo != null ? activo : true;
+        this.categoria = categoria;
+        this.instrucciones = instrucciones;
+        this.permitido = permitido != null ? permitido : true;
     }
 
     public Long getId() {
@@ -101,5 +123,29 @@ public class Residuo {
 
     public void setActivo(Boolean activo) {
         this.activo = activo;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
+
+    public String getInstrucciones() {
+        return instrucciones;
+    }
+
+    public void setInstrucciones(String instrucciones) {
+        this.instrucciones = instrucciones;
+    }
+
+    public Boolean getPermitido() {
+        return permitido;
+    }
+
+    public void setPermitido(Boolean permitido) {
+        this.permitido = permitido;
     }
 }
