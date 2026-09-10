@@ -60,10 +60,10 @@ import { environment } from '../environments/environment';
 
       <!-- ==================== HEADER UNIVERSAL STITCH ==================== -->
       <header class="bg-white/95 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b border-[#E2E9E4]">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4 lg:gap-8">
         
         <!-- LOGO RECICLAGO OFICIAL -->
-        <a routerLink="/" class="flex items-center gap-3.5 group">
+        <a routerLink="/" class="flex items-center gap-3 group flex-shrink-0">
           <div class="w-12 h-12 flex-shrink-0 transition-transform group-hover:scale-105 duration-200">
             <svg class="w-12 h-12" fill="none" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 56L34 24L52 50L60 38L78 56H12Z" fill="#123F5B"></path>
@@ -85,21 +85,21 @@ import { environment } from '../environments/environment';
         </a>
 
         <!-- NAVEGACIÓN -->
-        <nav class="hidden md:flex items-center gap-7 lg:gap-8 text-[15px] font-semibold text-[#183247]">
+        <nav class="hidden md:flex items-center gap-5 lg:gap-7 xl:gap-8 text-[14px] lg:text-[15px] font-semibold text-[#183247]">
           <a routerLink="/" routerLinkActive="text-[#093554] font-bold" [routerLinkActiveOptions]="{exact: true}" class="relative py-2 hover:text-[#4F8A3D] transition-colors flex flex-col items-center">
             <span>Inicio</span>
             <div class="w-6 h-0.5 sm:h-1 bg-[#4F8A3D] rounded-full mt-1"></div>
           </a>
-          <button (click)="showHowItWorks = true" type="button" class="hover:text-[#4F8A3D] transition-colors py-2 font-semibold text-[15px] text-[#183247] cursor-pointer">¿Cómo funciona?</button>
-          <button (click)="showMaterials = true" type="button" class="hover:text-[#4F8A3D] transition-colors py-2 font-semibold text-[15px] text-[#183247] cursor-pointer">Materiales</button>
+          <button (click)="showHowItWorks = true" type="button" class="hover:text-[#4F8A3D] transition-colors py-2 font-semibold text-[14px] lg:text-[15px] text-[#183247] cursor-pointer">¿Cómo funciona?</button>
+          <button (click)="showMaterials = true" type="button" class="hover:text-[#4F8A3D] transition-colors py-2 font-semibold text-[14px] lg:text-[15px] text-[#183247] cursor-pointer">Materiales</button>
           <a routerLink="/dashboard" class="hover:text-[#4F8A3D] transition-colors py-2">Retiro especial</a>
-          <button (click)="showContact = true" type="button" class="hover:text-[#4F8A3D] transition-colors py-2 font-semibold text-[15px] text-[#183247] cursor-pointer">Contacto</button>
+          <button (click)="showContact = true" type="button" class="hover:text-[#4F8A3D] transition-colors py-2 font-semibold text-[14px] lg:text-[15px] text-[#183247] cursor-pointer">Contacto</button>
         </nav>
 
         <!-- ACCIONES DERECHA -->
-        <div class="flex items-center gap-3 sm:gap-4">
+        <div class="flex items-center gap-4 sm:gap-5 lg:gap-6 flex-shrink-0">
           <!-- Sello Municipal Oficial Puerto Varas (Desktop) -->
-          <div class="hidden lg:flex items-center gap-2.5 pr-3 border-r border-[#E2E9E4]">
+          <div class="hidden lg:flex items-center gap-2.5 pr-4 sm:pr-5 lg:pr-6 border-r border-[#E2E9E4]">
             <img src="assets/escudo-puerto-varas.svg" alt="Ilustre Municipalidad de Puerto Varas" class="h-9 w-auto object-contain">
             <div class="text-left leading-tight">
               <div class="text-[9.5px] font-bold text-[#546571] uppercase tracking-wider">Ilustre Municipalidad</div>
@@ -113,16 +113,16 @@ import { environment } from '../environments/environment';
             <span>Mi cuenta</span>
           </a>
 
-          <div *ngIf="loginDisplay" class="hidden sm:flex items-center gap-3 bg-white border border-[#DFE8E1] hover:border-[#4F8A3D]/40 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full shadow-sm transition-all">
-            <a routerLink="/dashboard" class="flex items-center gap-2 sm:gap-3 cursor-pointer">
-              <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#123F5B] text-white text-xs sm:text-sm font-bold flex items-center justify-center flex-shrink-0">
+          <div *ngIf="loginDisplay" class="hidden sm:flex items-center gap-3 bg-white border border-[#DFE8E1] hover:border-[#4F8A3D]/40 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full shadow-sm transition-all">
+            <a routerLink="/dashboard" class="flex items-center gap-2.5 sm:gap-3 cursor-pointer">
+              <div class="w-8 h-8 rounded-full bg-[#123F5B] text-white text-xs sm:text-sm font-bold flex items-center justify-center flex-shrink-0 shadow-xs">
                 {{ currentUser ? currentUser.charAt(0).toUpperCase() : 'V' }}
               </div>
               <div class="text-left hidden sm:block">
-                <span class="text-[13px] sm:text-[14px] font-bold text-[#123F5B] block max-w-[120px] truncate">{{ currentUser }}</span>
+                <span class="text-[13px] sm:text-[14px] font-bold text-[#123F5B] block max-w-[150px] lg:max-w-[200px] truncate">{{ currentUser }}</span>
               </div>
             </a>
-            <button (click)="logout()" class="ml-1 sm:ml-2 text-[11px] font-bold text-red-500 hover:text-red-700 hover:underline transition-colors border-l border-[#DFE8E1] pl-2 sm:pl-3 cursor-pointer">
+            <button (click)="logout()" class="ml-1 sm:ml-2 text-[11.5px] font-bold text-red-500 hover:text-red-700 hover:underline transition-colors border-l border-[#DFE8E1] pl-2.5 sm:pl-3 cursor-pointer">
               Salir
             </button>
           </div>

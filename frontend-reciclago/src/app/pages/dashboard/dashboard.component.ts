@@ -121,9 +121,9 @@ import { MsalService } from '@azure/msal-angular';
             <span class="text-slate-400 text-[11px] font-bold uppercase tracking-wider">Sector:</span>
             <select
               [(ngModel)]="selectedSector"
-              (change)="onHeaderSectorChange()"
+              (ngModelChange)="onHeaderSectorChange()"
               class="font-bold text-[#123F5B] bg-transparent border-none p-0 pr-3 text-xs focus:ring-0 focus:outline-none cursor-pointer">
-              <option *ngFor="let s of sectores" [value]="s.nombre">{{ s.nombre }}</option>
+              <option *ngFor="let s of sectores" [value]="s.nombre">{{ s.nombre }} ({{ s.dia }})</option>
             </select>
           </div>
 
@@ -180,10 +180,10 @@ import { MsalService } from '@azure/msal-angular';
 <span class="text-xs sm:text-sm font-bold uppercase tracking-widest text-brand-muted block">Día asignado para tu hogar</span>
 <div class="flex flex-wrap items-baseline gap-3 sm:gap-4 mt-1">
 <h2 class="font-heading font-black text-4xl sm:text-5xl lg:text-6xl text-brand-navy tracking-tight">
-                🗓 {{ proximoRetiro?.diaSemana?.toUpperCase() || 'MARTES' }}
+                🗓 {{ currentSectorInfo.dia.toUpperCase() }}
               </h2>
 <span class="font-heading font-semibold text-2xl sm:text-3xl text-brand-lake">
-                {{ proximoRetiro?.fechaTexto || 'Día asignado' }}
+                {{ currentSectorInfo.fechaTexto }}
               </span>
 </div>
 </div>
@@ -195,7 +195,7 @@ import { MsalService } from '@azure/msal-angular';
 </div>
 <div>
 <span class="text-xs font-bold uppercase text-brand-muted tracking-wider block">Horario municipal</span>
-<span class="text-base sm:text-[17px] font-bold text-brand-navy">{{ proximoRetiro?.horaInicio ? (proximoRetiro.horaInicio + ' – ' + proximoRetiro.horaFin + ' hrs') : '08:00 – 17:00 hrs' }}</span>
+<span class="text-base sm:text-[17px] font-bold text-brand-navy">{{ currentSectorInfo.horario }}</span>
 </div>
 </div>
 <div class="flex items-center gap-3.5 p-4 rounded-2xl bg-[#F8FAF7] border border-[#E2EAE0] transition-colors hover:bg-white hover:border-brand-green/40">
@@ -203,9 +203,9 @@ import { MsalService } from '@azure/msal-angular';
 <i class="fa-solid fa-location-dot"></i>
 </div>
 <div>
-<span class="text-xs font-bold uppercase text-brand-muted tracking-wider block">Tu dirección</span>
-<span class="text-base sm:text-[17px] font-bold text-brand-navy leading-tight">{{ proximoRetiro?.direccion || 'Calle Los Guindos' }}</span>
-<span class="text-xs text-brand-muted block">Puerto Varas Centro</span>
+<span class="text-xs font-bold uppercase text-brand-muted tracking-wider block">Tu dirección activa</span>
+<span class="text-base sm:text-[17px] font-bold text-brand-navy leading-tight">{{ currentSectorInfo.direccionEjemplo }}</span>
+<span class="text-xs text-brand-muted block">{{ currentSectorInfo.nombre }}, Puerto Varas</span>
 </div>
 </div>
 </div>
@@ -255,7 +255,7 @@ import { MsalService } from '@azure/msal-angular';
 </div>
 </div>
 <p class="text-xs uppercase font-bold text-brand-muted tracking-widest mt-3">Esta semana reciclamos exclusivamente</p>
-<h3 class="font-heading font-black text-3xl sm:text-4xl text-brand-green tracking-wide mt-0.5">{{ proximoRetiro?.residuoNombre?.toUpperCase() || 'VIDRIO' }}</h3>
+<h3 class="font-heading font-black text-3xl sm:text-4xl text-brand-green tracking-wide mt-0.5">{{ currentSectorInfo.materialPrincipal }}</h3>
 </div>
 <!-- INSTRUCCIONES ESENCIALES Y DIRECTAS (Legibles y contrastadas) -->
 <div class="space-y-2 bg-white/90 rounded-2xl p-4 border border-[#DFE8E1] text-left">
@@ -279,7 +279,7 @@ import { MsalService } from '@azure/msal-angular';
 <h3 class="font-heading font-extrabold text-2xl sm:text-3xl text-brand-navy">
             Seguimiento del camión recolector
           </h3>
-<p class="text-base text-brand-muted mt-1">Monitoreo cívico en tiempo real para el cuadrante Costanera Sur</p>
+<p class="text-base text-brand-muted mt-1">Monitoreo cívico en tiempo real para {{ currentSectorInfo.cuadrante }}</p>
 </div>
 <!-- Badge de recorrido activo sin puntos -->
 <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#E8F3F7] text-[#123F5B] border border-[#CFE4ED] self-start sm:self-auto shadow-2xs">
@@ -323,8 +323,8 @@ import { MsalService } from '@azure/msal-angular';
 <div class="anim-route-flow h-full w-1/3 bg-brand-lake rounded-full"></div>
 </div>
 <p class="text-sm text-brand-charcoal font-medium leading-tight">
-            Recorriendo cuadrante Costanera Sur.<br/>
-<strong class="text-brand-navy font-bold text-sm">Estimado: 08:00 – 17:00 hrs</strong>
+            Recorriendo {{ currentSectorInfo.cuadrante }}.<br/>
+<strong class="text-brand-navy font-bold text-sm">Estimado: {{ currentSectorInfo.horario }}</strong>
 </p>
 </div>
 </div>
@@ -375,7 +375,7 @@ import { MsalService } from '@azure/msal-angular';
 <span class="count-metric" data-target="18">{{ pickups.length }}</span>
 </div>
 <p class="text-[16px] font-bold text-brand-charcoal mt-1">Retiros realizados</p>
-<p class="text-sm text-brand-muted">En tu domicilio en Calle Los Guindos</p>
+<p class="text-sm text-brand-muted">En tu domicilio en {{ currentSectorInfo.direccionEjemplo }}</p>
 </div>
 </div>
 <!-- Métrica 2: Kilogramos -->
@@ -543,7 +543,7 @@ import { MsalService } from '@azure/msal-angular';
   <div class="flex items-center justify-between gap-2 mb-3">
     <div class="flex items-center gap-2">
       <i class="fa-solid fa-compass text-brand-lake text-lg"></i>
-      <span class="font-bold text-sm text-brand-navy">Cuadrante 2: Costanera y Llanquihue Sur</span>
+      <span class="font-bold text-sm text-brand-navy">{{ currentSectorInfo.cuadrante }}</span>
     </div>
     <div class="flex items-center gap-2">
       <span class="inline-flex items-center gap-1.5 text-xs bg-white px-2.5 py-1 rounded-md text-brand-lake font-bold border border-[#CCE1EC] shadow-xs">
@@ -793,7 +793,7 @@ import { MsalService } from '@azure/msal-angular';
               <div class='absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-10'>
                 <i class='fa-solid fa-map-location-dot text-[#4F8A3D] text-sm'></i>
               </div>
-              <select [(ngModel)]='newPickup.sector' (change)='onSectorSelect(newPickup.sector)' class='select-stitch has-icon !pl-11 !pr-10 appearance-none font-medium' id='sector' name='sector' required>
+              <select [(ngModel)]='selectedSector' (ngModelChange)='onSectorSelect($event)' class='select-stitch has-icon !pl-11 !pr-10 appearance-none font-medium' id='sector' name='sector' required>
                 <option *ngFor='let sec of sectores' [value]='sec.nombre'>{{ sec.nombre }} ({{ sec.dia }})</option>
               </select>
               <div class='absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none z-10'>
@@ -888,57 +888,25 @@ import { MsalService } from '@azure/msal-angular';
           </p>
 
           <div class="space-y-3 pt-1">
-            <!-- Cuadrante 1 -->
-            <div class="p-4 rounded-2xl bg-[#F8FAF7] border border-[#E2E9E4] hover:border-[#CBDCD1] transition-colors flex items-start gap-3.5">
-              <span class="px-2.5 py-1 rounded-lg bg-[#123F5B] text-white text-xs font-bold mt-0.5 tracking-wide flex-shrink-0">Lunes</span>
-              <div class="min-w-0 flex-1">
-                <h4 class="font-bold text-sm text-[#123F5B]">Cuadrante 1: Puerto Chico y Llanquihue Norte</h4>
-                <p class="text-xs text-slate-500 mt-0.5 flex items-center gap-1.5 flex-wrap">
-                  <span>Vidrio y Cartón</span>
-                  <span class="text-slate-300">•</span>
-                  <span class="font-medium text-slate-600">08:00 – 17:00 hrs</span>
-                </p>
-              </div>
-            </div>
-
-            <!-- Cuadrante 2 (Tu Sector) -->
-            <div class="p-4 rounded-2xl bg-[#EEF5EB] border-2 border-[#4F8A3D]/40 flex items-start gap-3.5 relative overflow-hidden shadow-xs">
-              <span class="px-2.5 py-1 rounded-lg bg-[#4F8A3D] text-white text-xs font-bold mt-0.5 tracking-wide flex-shrink-0">Martes</span>
+            <div *ngFor="let s of sectores"
+                 (click)="onSectorSelect(s.nombre)"
+                 class="p-4 rounded-2xl transition-all flex items-start gap-3.5 cursor-pointer"
+                 [ngClass]="s.nombre === selectedSector ? 'bg-[#EEF5EB] border-2 border-[#4F8A3D]/40 shadow-xs' : 'bg-[#F8FAF7] border border-[#E2E9E4] hover:border-[#CBDCD1]'">
+              <span class="px-2.5 py-1 rounded-lg text-white text-xs font-bold mt-0.5 tracking-wide flex-shrink-0"
+                    [ngClass]="s.nombre === selectedSector ? 'bg-[#4F8A3D]' : 'bg-[#123F5B]'">
+                {{ s.dia }}
+              </span>
               <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-2 flex-wrap">
-                  <h4 class="font-bold text-sm text-[#123F5B]">Cuadrante 2: Costanera Sur y Nueva Braunau</h4>
-                  <span class="px-2 py-0.5 rounded-full bg-[#4F8A3D] text-white text-[10px] font-extrabold uppercase tracking-wider">Tu Sector</span>
+                  <h4 class="font-bold text-sm text-[#123F5B]">{{ s.cuadrante }}</h4>
+                  <span *ngIf="s.nombre === selectedSector" class="px-2 py-0.5 rounded-full bg-[#4F8A3D] text-white text-[10px] font-extrabold uppercase tracking-wider">
+                    Tu Sector Activo
+                  </span>
                 </div>
                 <p class="text-xs text-slate-600 mt-0.5 flex items-center gap-1.5 flex-wrap">
-                  <span>Vidrio, Plásticos y Latas</span>
+                  <span>{{ s.material }}</span>
                   <span class="text-slate-300">•</span>
-                  <span class="font-medium text-slate-700">08:00 – 17:00 hrs</span>
-                </p>
-              </div>
-            </div>
-
-            <!-- Cuadrante 3 -->
-            <div class="p-4 rounded-2xl bg-[#F8FAF7] border border-[#E2E9E4] hover:border-[#CBDCD1] transition-colors flex items-start gap-3.5">
-              <span class="px-2.5 py-1 rounded-lg bg-[#123F5B] text-white text-xs font-bold mt-0.5 tracking-wide flex-shrink-0">Miércoles</span>
-              <div class="min-w-0 flex-1">
-                <h4 class="font-bold text-sm text-[#123F5B]">Cuadrante 3: Sector Centro, Estación y Colón</h4>
-                <p class="text-xs text-slate-500 mt-0.5 flex items-center gap-1.5 flex-wrap">
-                  <span>Cartón, Papel y Plásticos</span>
-                  <span class="text-slate-300">•</span>
-                  <span class="font-medium text-slate-600">08:00 – 17:00 hrs</span>
-                </p>
-              </div>
-            </div>
-
-            <!-- Cuadrante 4 -->
-            <div class="p-4 rounded-2xl bg-[#F8FAF7] border border-[#E2E9E4] hover:border-[#CBDCD1] transition-colors flex items-start gap-3.5">
-              <span class="px-2.5 py-1 rounded-lg bg-[#123F5B] text-white text-xs font-bold mt-0.5 tracking-wide flex-shrink-0">Jueves</span>
-              <div class="min-w-0 flex-1">
-                <h4 class="font-bold text-sm text-[#123F5B]">Cuadrante 4: Ensenada, Ralún y Camino a Petrohué</h4>
-                <p class="text-xs text-slate-500 mt-0.5 flex items-center gap-1.5 flex-wrap">
-                  <span>Todas las fracciones clasificadas</span>
-                  <span class="text-slate-300">•</span>
-                  <span class="font-medium text-slate-600">09:00 – 16:00 hrs</span>
+                  <span class="font-medium text-slate-700">{{ s.horario }}</span>
                 </p>
               </div>
             </div>
@@ -1099,73 +1067,337 @@ export class DashboardComponent implements OnInit, OnDestroy {
   currentTruckIndex = 0;
   private truckTimer: any = null;
 
-  truckWaypoints = [
-    {
-      name: 'Av. Vicente Pérez Rosales (Costanera)',
-      detail: 'Bordeando Lago Llanquihue • Sector Costanera',
-      eta: '14 min',
-      distancia: '650 m',
-      x: 8,
-      y: 72,
-      estado: 'En tránsito costanero'
-    },
-    {
-      name: 'Av. Pérez Rosales esq. San Francisco',
-      detail: 'Giro hacia sector comercial y cuadrante céntrico',
-      eta: '11 min',
-      distancia: '480 m',
-      x: 28,
-      y: 72,
-      estado: 'Giro a la derecha'
-    },
-    {
-      name: 'Calle San Francisco (Sector Iglesia del Sagrado Corazón)',
-      detail: 'Recolectando campanas de vidrio y cartón',
-      eta: '8 min',
-      distancia: '350 m',
-      x: 28,
-      y: 28,
-      estado: 'Recolección activa'
-    },
-    {
-      name: 'Calle Del Salvador (Centro Histórico)',
-      detail: 'Avanzando hacia cuadrante residencial',
-      eta: '5 min',
-      distancia: '220 m',
-      x: 52,
-      y: 28,
-      estado: 'Tránsito fluido'
-    },
-    {
-      name: 'Calle Santa Rosa hacia Costanera',
-      detail: 'Próxima parada: Tu sector habitacional',
-      eta: '2 min',
-      distancia: '90 m',
-      x: 52,
-      y: 72,
-      estado: 'Aproximándose a tu domicilio'
-    },
-    {
-      name: 'Tu Domicilio (Sector Costanera Sur)',
-      detail: '¡Camión municipal en tu puerta! Retiro en curso',
-      eta: '¡Llegando ahora!',
-      distancia: '0 m',
-      x: 82,
-      y: 72,
-      estado: 'Retiro en tu domicilio'
-    }
-  ];
-
-  get activeWaypoint() {
-    return this.truckWaypoints[this.currentTruckIndex];
-  }
-
   sectores = [
-    { id: 'braunau', nombre: 'Población Nueva Braunau', dia: 'Martes' },
-    { id: 'chico', nombre: 'Puerto Chico / Los Colonos', dia: 'Miércoles' },
-    { id: 'costanera', nombre: 'Costanera / Centro', dia: 'Lunes' },
-    { id: 'ensenada', nombre: 'Ensenada / Ruta 225', dia: 'Jueves' },
-    { id: 'mirador', nombre: 'El Mirador / Alta Esperanza', dia: 'Viernes' }
+    {
+      id: 'braunau',
+      nombre: 'Población Nueva Braunau',
+      dia: 'Martes',
+      horario: '08:00 – 17:00 hrs',
+      direccionEjemplo: 'Calle Las Lengas 210, Nueva Braunau',
+      cuadrante: 'Cuadrante 2: Sector Nueva Braunau y Poniente',
+      material: 'Vidrio, Plásticos y Latas',
+      materialPrincipal: 'VIDRIO',
+      waypoints: [
+        {
+          name: 'Av. Otto Klein (Entrada Nueva Braunau)',
+          detail: 'Ingreso cuadrante habitacional Nueva Braunau',
+          eta: '14 min',
+          distancia: '650 m',
+          x: 8,
+          y: 72,
+          estado: 'En tránsito'
+        },
+        {
+          name: 'Calle Las Lengas esq. Los Alerces',
+          detail: 'Recolección campanas de reciclaje',
+          eta: '11 min',
+          distancia: '480 m',
+          x: 28,
+          y: 72,
+          estado: 'Recolección activa'
+        },
+        {
+          name: 'Plaza Nueva Braunau (Punto Verde)',
+          detail: 'Retiro en punto comunitario',
+          eta: '8 min',
+          distancia: '350 m',
+          x: 28,
+          y: 28,
+          estado: 'Recolección activa'
+        },
+        {
+          name: 'Calle Los Radales hacia cuadrante habitacional',
+          detail: 'Avanzando por sector residencial',
+          eta: '5 min',
+          distancia: '220 m',
+          x: 52,
+          y: 28,
+          estado: 'Tránsito fluido'
+        },
+        {
+          name: 'Calle Los Copihues',
+          detail: 'Próxima parada: Tu sector habitacional',
+          eta: '2 min',
+          distancia: '90 m',
+          x: 52,
+          y: 72,
+          estado: 'Aproximándose'
+        },
+        {
+          name: 'Tu Domicilio (Calle Las Lengas 210)',
+          detail: '¡Camión municipal en tu puerta! Retiro en curso',
+          eta: '¡Llegando ahora!',
+          distancia: '0 m',
+          x: 82,
+          y: 72,
+          estado: 'Retiro en tu domicilio'
+        }
+      ]
+    },
+    {
+      id: 'chico',
+      nombre: 'Puerto Chico / Los Colonos',
+      dia: 'Miércoles',
+      horario: '08:00 – 17:00 hrs',
+      direccionEjemplo: 'Av. Los Colonos 840, Puerto Chico',
+      cuadrante: 'Cuadrante 1: Sector Puerto Chico y Los Colonos',
+      material: 'Vidrio y Cartón',
+      materialPrincipal: 'CARTÓN Y PAPEL',
+      waypoints: [
+        {
+          name: 'Av. Colón esq. Imperial',
+          detail: 'Ingreso cuadrante Puerto Chico',
+          eta: '15 min',
+          distancia: '700 m',
+          x: 8,
+          y: 72,
+          estado: 'En tránsito'
+        },
+        {
+          name: 'Calle Los Colonos (Frente a Costanera)',
+          detail: 'Recolección campanas de reciclaje',
+          eta: '12 min',
+          distancia: '510 m',
+          x: 28,
+          y: 72,
+          estado: 'Recolección activa'
+        },
+        {
+          name: 'Pasaje Los Notros (Punto Verde)',
+          detail: 'Retiro comunitario de cartón y vidrio',
+          eta: '8 min',
+          distancia: '340 m',
+          x: 28,
+          y: 28,
+          estado: 'Recolección activa'
+        },
+        {
+          name: 'Calle Purísima hacia sector residencial',
+          detail: 'Avanzando por sector habitacional',
+          eta: '4 min',
+          distancia: '190 m',
+          x: 52,
+          y: 28,
+          estado: 'Tránsito fluido'
+        },
+        {
+          name: 'Av. Los Colonos hacia tu pasaje',
+          detail: 'Próxima parada: Tu domicilio en Puerto Chico',
+          eta: '2 min',
+          distancia: '75 m',
+          x: 52,
+          y: 72,
+          estado: 'Aproximándose'
+        },
+        {
+          name: 'Tu Domicilio (Av. Los Colonos 840)',
+          detail: '¡Camión municipal en tu puerta! Retiro en curso',
+          eta: '¡Llegando ahora!',
+          distancia: '0 m',
+          x: 82,
+          y: 72,
+          estado: 'Retiro en tu domicilio'
+        }
+      ]
+    },
+    {
+      id: 'costanera',
+      nombre: 'Costanera / Centro',
+      dia: 'Lunes',
+      horario: '08:00 – 17:00 hrs',
+      direccionEjemplo: 'Av. Vicente Pérez Rosales 450, Costanera',
+      cuadrante: 'Cuadrante 3: Sector Costanera y Centro',
+      material: 'Cartón, Papel y Plásticos',
+      materialPrincipal: 'PLÁSTICOS (PET)',
+      waypoints: [
+        {
+          name: 'Av. Vicente Pérez Rosales (Costanera)',
+          detail: 'Bordeando Lago Llanquihue • Sector Costanera',
+          eta: '14 min',
+          distancia: '650 m',
+          x: 8,
+          y: 72,
+          estado: 'En tránsito costanero'
+        },
+        {
+          name: 'Av. Pérez Rosales esq. San Francisco',
+          detail: 'Giro hacia sector comercial y cuadrante céntrico',
+          eta: '11 min',
+          distancia: '480 m',
+          x: 28,
+          y: 72,
+          estado: 'Giro a la derecha'
+        },
+        {
+          name: 'Calle San Francisco (Sector Parroquia Sagrado Corazón)',
+          detail: 'Recolectando campanas de vidrio y cartón',
+          eta: '8 min',
+          distancia: '350 m',
+          x: 28,
+          y: 28,
+          estado: 'Recolección activa'
+        },
+        {
+          name: 'Calle Del Salvador (Centro Histórico)',
+          detail: 'Avanzando hacia cuadrante residencial',
+          eta: '5 min',
+          distancia: '220 m',
+          x: 52,
+          y: 28,
+          estado: 'Tránsito fluido'
+        },
+        {
+          name: 'Calle Santa Rosa hacia Costanera',
+          detail: 'Próxima parada: Tu sector habitacional',
+          eta: '2 min',
+          distancia: '90 m',
+          x: 52,
+          y: 72,
+          estado: 'Aproximándose a tu domicilio'
+        },
+        {
+          name: 'Tu Domicilio (Av. Vicente Pérez Rosales 450)',
+          detail: '¡Camión municipal en tu puerta! Retiro en curso',
+          eta: '¡Llegando ahora!',
+          distancia: '0 m',
+          x: 82,
+          y: 72,
+          estado: 'Retiro en tu domicilio'
+        }
+      ]
+    },
+    {
+      id: 'ensenada',
+      nombre: 'Ensenada / Ruta 225',
+      dia: 'Jueves',
+      horario: '09:00 – 16:00 hrs',
+      direccionEjemplo: 'Ruta 225 Km 14, Sector Ensenada',
+      cuadrante: 'Cuadrante 4: Sector Ensenada y Ruta 225',
+      material: 'Todas las fracciones clasificadas',
+      materialPrincipal: 'VIDRIO Y METALES',
+      waypoints: [
+        {
+          name: 'Ruta 225 Km 10 (Acceso Ensenada)',
+          detail: 'Recorrido rural bordeando Lago Llanquihue',
+          eta: '18 min',
+          distancia: '900 m',
+          x: 8,
+          y: 72,
+          estado: 'En tránsito'
+        },
+        {
+          name: 'Cruce Los Riscos hacia Ensenada',
+          detail: 'Avanzando hacia cuadrante lacustre',
+          eta: '13 min',
+          distancia: '620 m',
+          x: 28,
+          y: 72,
+          estado: 'En ruta'
+        },
+        {
+          name: 'Villa Ensenada (Punto Verde Comunal)',
+          detail: 'Recolección campanas comunitarias',
+          eta: '9 min',
+          distancia: '410 m',
+          x: 28,
+          y: 28,
+          estado: 'Recolección activa'
+        },
+        {
+          name: 'Camino a Petrohué esq. Ruta 225',
+          detail: 'Retiro en sector rural y habitacional',
+          eta: '5 min',
+          distancia: '240 m',
+          x: 52,
+          y: 28,
+          estado: 'Tránsito fluido'
+        },
+        {
+          name: 'Entrada sector residencial Ensenada',
+          detail: 'Próxima parada: Tu domicilio en Ensenada',
+          eta: '2 min',
+          distancia: '80 m',
+          x: 52,
+          y: 72,
+          estado: 'Aproximándose'
+        },
+        {
+          name: 'Tu Domicilio (Ruta 225 Km 14)',
+          detail: '¡Camión municipal en tu puerta! Retiro en curso',
+          eta: '¡Llegando ahora!',
+          distancia: '0 m',
+          x: 82,
+          y: 72,
+          estado: 'Retiro en tu domicilio'
+        }
+      ]
+    },
+    {
+      id: 'mirador',
+      nombre: 'El Mirador / Alta Esperanza',
+      dia: 'Viernes',
+      horario: '08:30 – 17:30 hrs',
+      direccionEjemplo: 'Pasaje Los Alerces 135, El Mirador',
+      cuadrante: 'Cuadrante 5: Sector El Mirador y Alta Esperanza',
+      material: 'Cartón, Vidrio y Plásticos',
+      materialPrincipal: 'CARTÓN Y PAPEL',
+      waypoints: [
+        {
+          name: 'Subida El Mirador (Av. Gramado)',
+          detail: 'Ingreso al cuadrante alto de la comuna',
+          eta: '15 min',
+          distancia: '720 m',
+          x: 8,
+          y: 72,
+          estado: 'En tránsito'
+        },
+        {
+          name: 'Calle Las Rosas esq. Alta Esperanza',
+          detail: 'Recolección campanas de reciclaje',
+          eta: '11 min',
+          distancia: '500 m',
+          x: 28,
+          y: 72,
+          estado: 'Recolección activa'
+        },
+        {
+          name: 'Plaza El Mirador (Punto Limpio)',
+          detail: 'Retiro vecinal de residuos valorizables',
+          eta: '7 min',
+          distancia: '320 m',
+          x: 28,
+          y: 28,
+          estado: 'Recolección activa'
+        },
+        {
+          name: 'Pasaje Los Mañíos hacia sector residencial',
+          detail: 'Avanzando por sector habitacional',
+          eta: '4 min',
+          distancia: '180 m',
+          x: 52,
+          y: 28,
+          estado: 'Tránsito fluido'
+        },
+        {
+          name: 'Pasaje Los Alerces (En aproximación)',
+          detail: 'Próxima parada: Tu domicilio en El Mirador',
+          eta: '2 min',
+          distancia: '60 m',
+          x: 52,
+          y: 72,
+          estado: 'Aproximándose'
+        },
+        {
+          name: 'Tu Domicilio (Pasaje Los Alerces 135)',
+          detail: '¡Camión municipal en tu puerta! Retiro en curso',
+          eta: '¡Llegando ahora!',
+          distancia: '0 m',
+          x: 82,
+          y: 72,
+          estado: 'Retiro en tu domicilio'
+        }
+      ]
+    }
   ];
 
   selectedSector = 'Población Nueva Braunau';
@@ -1178,14 +1410,49 @@ export class DashboardComponent implements OnInit, OnDestroy {
     comentarios: ''
   };
 
+  truckWaypoints: any[] = [];
+
+  get currentSectorInfo() {
+    const sec = this.sectores.find(s => s.nombre === this.selectedSector) || this.sectores[0];
+    return {
+      ...sec,
+      fechaTexto: this.getNextDateForDay(sec.dia)
+    };
+  }
+
+  getNextDateForDay(dayName: string): string {
+    const daysMap: Record<string, number> = {
+      'domingo': 0, 'lunes': 1, 'martes': 2, 'miércoles': 3, 'miercoles': 3, 'jueves': 4, 'viernes': 5, 'sábado': 6, 'sabado': 6
+    };
+    const targetDay = daysMap[dayName.toLowerCase()] ?? 2;
+    const now = new Date();
+    const currentDay = now.getDay();
+    let diff = targetDay - currentDay;
+    if (diff <= 0) diff += 7;
+    const nextDate = new Date(now.getTime() + diff * 24 * 60 * 60 * 1000);
+    const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    return `${dayName} ${String(nextDate.getDate()).padStart(2, '0')} ${months[nextDate.getMonth()]}`;
+  }
+
+  get activeWaypoint() {
+    return this.truckWaypoints[this.currentTruckIndex] || this.truckWaypoints[0] || {
+      name: 'Ruta activa', detail: 'Recorriendo cuadrante', eta: '5 min', distancia: '200 m', x: 50, y: 50
+    };
+  }
+
   onHeaderSectorChange(): void {
     this.newPickup.sector = this.selectedSector;
     this.userActiveAddress = `${this.selectedSector}, Puerto Varas`;
+    this.truckWaypoints = this.currentSectorInfo.waypoints;
+    this.currentTruckIndex = 0;
   }
 
   onSectorSelect(sector: string): void {
     this.selectedSector = sector;
+    this.newPickup.sector = sector;
     this.userActiveAddress = `${sector}, Puerto Varas`;
+    this.truckWaypoints = this.currentSectorInfo.waypoints;
+    this.currentTruckIndex = 0;
   }
 
   @HostListener('document:keydown.escape')
@@ -1212,6 +1479,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     }
 
+    this.truckWaypoints = this.currentSectorInfo.waypoints;
     this.loadResiduos();
     this.loadPickups();
     this.startTruckSimulation();
