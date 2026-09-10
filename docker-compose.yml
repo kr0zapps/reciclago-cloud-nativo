@@ -89,6 +89,95 @@ services:
     networks:
       - reciclago-net
 
+  ms-catalog:
+    build:
+      context: ./ms-reciclago-catalog
+      dockerfile: Dockerfile
+    container_name: reciclago-ms-catalog
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/reciclago_db
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-reciclago}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-reciclagopass}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - reciclago-net
+    profiles:
+      - apps
+
+  ms-pickups:
+    build:
+      context: ./ms-reciclago-pickups
+      dockerfile: Dockerfile
+    container_name: reciclago-ms-pickups
+    restart: unless-stopped
+    ports:
+      - "8083:8083"
+    environment:
+      SERVER_PORT: 8083
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/reciclago_db
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-reciclago}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-reciclagopass}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - reciclago-net
+    profiles:
+      - apps
+
+  ms-routes:
+    build:
+      context: ./ms-reciclago-routes
+      dockerfile: Dockerfile
+    container_name: reciclago-ms-routes
+    restart: unless-stopped
+    ports:
+      - "8084:8084"
+    environment:
+      SERVER_PORT: 8084
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/reciclago_db
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-reciclago}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-reciclagopass}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - reciclago-net
+    profiles:
+      - apps
+
+  ms-bff:
+    build:
+      context: ./ms-reciclago-bff
+      dockerfile: Dockerfile
+    container_name: reciclago-ms-bff
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      RECICLAGO_SERVICES_CATALOG_URL: http://ms-catalog:8081
+      RECICLAGO_SERVICES_PICKUPS_URL: http://ms-pickups:8083
+      RECICLAGO_SERVICES_ROUTES_URL: http://ms-routes:8084
+    depends_on:
+      - ms-catalog
+      - ms-pickups
+      - ms-routes
+    networks:
+      - reciclago-net
+    profiles:
+      - apps
+
 networks:
   reciclago-net:
     driver: bridge

@@ -222,14 +222,15 @@ dev1-frontend-bff       dev2-backend-core
 ### Dev 2 (Backend Core + Infra) — Checklist
 
 ```
-[ ] 1. Validaciones de máquina de estados en PickupService (CRÍTICO)
-[ ] 2. Tests para CamionController y TarifaController (CRÍTICO)
-[ ] 3. Tests PATCH en PickupControllerTest + cancelar en ServiceTest (CRÍTICO)
-[ ] 4. GlobalExceptionHandler en ambos microservicios (IMPORTANTE)
-[ ] 5. DTO CertificateEventDto para RabbitMQ (IMPORTANTE)
-[ ] 6. Corregir documentación vs docker-compose (IMPORTANTE)
-[ ] 7. Mejorar generación de codigoRetiro (OPCIONAL)
-[ ] 8. Agregar Swagger/OpenAPI (OPCIONAL)
+[x] 1. Validaciones de máquina de estados en PickupService (CRÍTICO) - COMPLETADO ✅
+[x] 2. Tests para CamionController y TarifaController (CRÍTICO) - COMPLETADO ✅
+[x] 3. Tests PATCH en PickupControllerTest + cancelar en ServiceTest (CRÍTICO) - COMPLETADO ✅
+[x] 4. GlobalExceptionHandler en microservicios catalog, pickups y routes (IMPORTANTE) - COMPLETADO ✅
+[x] 5. DTO CertificateEventDto para RabbitMQ (IMPORTANTE) - COMPLETADO ✅
+[x] 6. Corregir documentación vs docker-compose (IMPORTANTE) - COMPLETADO ✅
+[x] 7. Mejorar generación de codigoRetiro con prefijo RET-PV- (OPCIONAL) - COMPLETADO ✅
+[x] 8. Nuevo microservicio ms-reciclago-routes (puerto 8084) con cuadrantes, tracking y DIMAO (CRÍTICO) - COMPLETADO ✅
+[x] 9. Dockerfiles multi-etapa para todos los microservicios y docker-compose actualizado (IMPORTANTE) - COMPLETADO ✅
 ```
 
 ---

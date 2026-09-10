@@ -1,8 +1,12 @@
 package com.duoc.ms_reciclago_pickups.controller;
 
+import com.duoc.ms_reciclago_pickups.dto.PickupHistoryResponse;
 import com.duoc.ms_reciclago_pickups.model.Pickup;
 import com.duoc.ms_reciclago_pickups.service.PickupService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +24,16 @@ public class PickupController {
 
     public PickupController(PickupService pickupService) {
         this.pickupService = pickupService;
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<PickupHistoryResponse> obtenerHistorial(
+            @RequestParam(required = false) String vecinoEmail,
+            @RequestParam(required = false) String estado,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "fechaSolicitud"));
+        return ResponseEntity.ok(pickupService.obtenerHistorialPaginado(vecinoEmail, estado, pageable));
     }
 
     @GetMapping
