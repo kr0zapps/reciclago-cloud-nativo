@@ -211,56 +211,40 @@ import { environment } from '../environments/environment';
             </a>
           </div>
 
-          <!-- MINI PERFIL PRO EN BLANCO Y VERDE MUNICIPAL -->
-          <div *ngIf="loginDisplay" class="rounded-2xl p-3.5 bg-[#F8FAF7] border border-[#DFE8E1] shadow-xs">
-            <div class="flex items-center gap-3 mb-3">
-              <!-- Avatar con anillo limpio y estado verde -->
-              <div class="relative flex-shrink-0">
-                <div class="w-11 h-11 rounded-full bg-[#123F5B] text-white text-sm font-extrabold flex items-center justify-center shadow-xs ring-2 ring-[#4F8A3D]/40 ring-offset-2 ring-offset-[#F8FAF7]">
-                  {{ currentUser ? currentUser.charAt(0).toUpperCase() : 'V' }}
-                </div>
-                <span class="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-3 w-3 bg-[#4F8A3D] border-2 border-white"></span>
-                </span>
+          <!-- PERFIL CIUDADANO SOBRIO Y PROFESIONAL (ESTILO STRIPE / TAILWIND UI ENTERPRISE) -->
+          <div *ngIf="loginDisplay" class="bg-[#F8FAF7] border border-[#E2EAE0] rounded-2xl p-3 flex items-center justify-between gap-3 hover:border-[#123F5B]/20 transition-all">
+            <!-- Área clickeable de identidad: Avatar + Nombre + Link al Dashboard -->
+            <a routerLink="/dashboard"
+               (click)="mobileMenuOpen = false"
+               class="flex items-center gap-3 min-w-0 flex-1 group cursor-pointer">
+              <!-- Avatar minimalista con inicial -->
+              <div class="w-10 h-10 rounded-xl bg-[#123F5B] text-white text-sm font-bold flex items-center justify-center flex-shrink-0 shadow-2xs group-hover:scale-102 transition-transform">
+                {{ currentUser ? currentUser.charAt(0).toUpperCase() : 'V' }}
               </div>
 
-              <!-- Información de Identidad Ciudadana -->
+              <!-- Tipografía ejecutiva limpia -->
               <div class="min-w-0 flex-1">
-                <h4 class="text-[13px] font-bold text-[#123F5B] truncate">
+                <div class="text-[13.5px] font-bold text-[#123F5B] truncate group-hover:text-[#4F8A3D] transition-colors leading-tight">
                   {{ currentUser }}
-                </h4>
-                <div class="flex items-center gap-1.5 mt-0.5">
-                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E8F4E5] text-[#2F6D20] border border-[#C5E4BE]">
-                    <i class="fa-solid fa-circle-check text-[9px] text-[#4F8A3D]"></i>
-                    <span>Vecino Verificado</span>
-                  </span>
                 </div>
-                <p class="text-[10.5px] text-[#546571] mt-0.5 flex items-center gap-1 truncate font-medium">
-                  <i class="fa-solid fa-location-dot text-[#4F8A3D] text-[10px]"></i>
-                  <span>Cuadrante Costanera Sur • Puerto Varas</span>
-                </p>
+                <div class="text-[11.5px] text-[#61717A] flex items-center gap-1.5 mt-0.5">
+                  <span class="font-semibold text-[#3D742F]">Mi Panel</span>
+                  <span class="text-slate-300">•</span>
+                  <span class="text-slate-500">Puerto Varas</span>
+                </div>
               </div>
-            </div>
 
-            <!-- Botones de Acción Divididos: Mi Panel + Salir -->
-            <div class="grid grid-cols-4 gap-2 pt-2.5 border-t border-[#DFEAE1]">
-              <a routerLink="/dashboard"
-                 (click)="mobileMenuOpen = false"
-                 class="col-span-3 flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white text-xs font-bold transition-all shadow-xs hover:shadow active:scale-[0.98] cursor-pointer group">
-                <div class="flex items-center gap-2">
-                  <i class="fa-solid fa-gauge-high text-xs opacity-90 group-hover:rotate-12 transition-transform"></i>
-                  <span>Mi Panel Vecinal</span>
-                </div>
-                <i class="fa-solid fa-arrow-right text-[11px] opacity-80 group-hover:translate-x-0.5 transition-transform"></i>
-              </a>
+              <!-- Indicador sutil de navegación -->
+              <i class="fa-solid fa-chevron-right text-xs text-slate-300 group-hover:text-[#123F5B] group-hover:translate-x-0.5 transition-all mr-1"></i>
+            </a>
 
+            <!-- Separador vertical sutil y botón de salida sobrio -->
+            <div class="flex items-center pl-2 border-l border-[#E2EAE0]">
               <button (click)="logout(); mobileMenuOpen = false"
                       type="button"
                       title="Cerrar sesión"
-                      class="col-span-1 flex items-center justify-center gap-1 px-2 py-2.5 rounded-xl bg-white hover:bg-rose-50 text-rose-600 hover:text-rose-700 text-xs font-bold border border-rose-200 transition-all active:scale-[0.98] cursor-pointer shadow-2xs">
+                      class="w-8 h-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all flex items-center justify-center flex-shrink-0 cursor-pointer">
                 <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
-                <span class="text-[11px]">Salir</span>
               </button>
             </div>
           </div>

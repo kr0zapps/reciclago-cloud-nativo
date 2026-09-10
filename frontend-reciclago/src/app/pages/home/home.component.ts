@@ -32,7 +32,7 @@ export interface SectorInfo {
         </div>
 
         <!-- Contenido Hero -->
-        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 w-full flex flex-col justify-center">
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 w-full flex flex-col justify-center anim-fade-up anim-delay-1">
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
 
             <!-- Columna Izquierda: Mensaje y Buscador -->
@@ -161,7 +161,7 @@ export interface SectorInfo {
       </section>
 
       <!-- ==================== SECCIÓN: DÍA DE RETIRO + 4 BINS + CAMIÓN (TAL CUAL MOCKUP) ==================== -->
-      <section id="tu-dia-de-retiro" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 scroll-mt-6">
+      <section id="tu-dia-de-retiro" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 scroll-mt-6 anim-fade-up anim-delay-2">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
 
           <!-- 1. Tarjeta Izquierda: Tu día de retiro esta semana (lg:col-span-3) -->
@@ -283,7 +283,7 @@ export interface SectorInfo {
       </section>
 
       <!-- ==================== SECCIÓN: RETIRO ESPECIAL & 4 ACCIONES RÁPIDAS (TAL CUAL MOCKUP) ==================== -->
-      <section class="bg-gradient-to-r from-[#eaf4ec] via-[#edf7ee] to-[#f4f9f4] py-10 sm:py-12 border-t border-[#e2efe4] relative overflow-hidden">
+      <section class="bg-gradient-to-r from-[#eaf4ec] via-[#edf7ee] to-[#f4f9f4] py-10 sm:py-12 border-t border-[#e2efe4] relative overflow-hidden anim-fade-up anim-delay-3">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
 
@@ -357,7 +357,7 @@ export interface SectorInfo {
       </section>
 
       <!-- ==================== SECCIÓN: COSTANERA PUERTO VARAS & COMPROMISO COMUNAL (TAL CUAL MOCKUP) ==================== -->
-      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 anim-fade-up anim-delay-4">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
 
           <!-- Foto Panorámica Costanera con Lema Manuscrito Completo -->
