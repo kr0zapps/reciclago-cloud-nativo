@@ -93,8 +93,13 @@ export const appConfig: ApplicationConfig = {
       provide: MSAL_INTERCEPTOR_CONFIG,
       useValue: {
         interactionType: InteractionType.Redirect,
+        strictMatching: false,
         protectedResourceMap: new Map([
+          ['http://localhost:8080/api/*', environment.apiConfig.scopes],
+          ['http://localhost:8080/api*', environment.apiConfig.scopes],
           ['http://localhost:8080/api', environment.apiConfig.scopes],
+          ['/api/*', environment.apiConfig.scopes],
+          ['/api*', environment.apiConfig.scopes],
           ['/api', environment.apiConfig.scopes]
         ])
       }

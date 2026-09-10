@@ -98,7 +98,7 @@ Para garantizar la separacion de responsabilidades y la emision diferenciada de 
 | **App 1 (Frontend)** | `reciclago-frontend` | `20ae8f6f-ef82-48a6-a4ae-897d36212b4b` | Single-Page Application (SPA) | Autenticacion de usuarios mediante Authorization Code Flow con PKCE. Gestiona inicio y cierre de sesion. |
 | **App 2 (Backend API)** | `reciclago-api` | `9a946a0b-5350-4fe1-a79e-ca332612f60d` | Web API / Resource Server | Expone scopes protegidos y define App Roles (`Admin`, `Coordinador`). Valida firma y audiencia en el BFF. |
 
-- **Tenant ID (Institucional Duoc UC):** `5625266d-cae0-4070-a7ea-b5e88273580f`
+- **Tenant ID (Tenant Proyecto RecicLago):** `5625266d-cae0-4070-a7ea-b5e88273580f`
 - **Scope Autorizado:** `api://9a946a0b-5350-4fe1-a79e-ca332612f60d/access_as_user`
 - **Redirect URIs Autorizadas:**
   - Desarrollo local: `http://localhost:4200`
