@@ -114,13 +114,17 @@ import { MsalService } from '@azure/msal-angular';
 <section class="relative pt-2 pb-2 anim-fade-up anim-delay-1">
 <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
 <div class="max-w-3xl space-y-2.5">
-        <!-- Identificador Cívico de Dirección del Vecino -->
+        <!-- Selector Cívico de Sector de Puerto Varas -->
         <div class="flex items-center gap-2.5 flex-wrap">
-          <div class="inline-flex items-center gap-2 text-xs font-semibold text-[#123F5B] bg-white/85 backdrop-blur-xs border border-[#E2E9E4] px-3.5 py-1.5 rounded-xl shadow-2xs">
+          <div class="inline-flex items-center gap-2 text-xs font-semibold text-[#123F5B] bg-white/90 backdrop-blur-xs border border-[#E2E9E4] px-3.5 py-1.5 rounded-xl shadow-2xs">
             <i class="fa-solid fa-location-dot text-[#4F8A3D] text-xs"></i>
-            <span class="font-bold">{{ userActiveAddress }}</span>
-            <span class="text-slate-300">•</span>
-            <span class="text-slate-600 font-medium">Puerto Varas</span>
+            <span class="text-slate-400 text-[11px] font-bold uppercase tracking-wider">Sector:</span>
+            <select
+              [(ngModel)]="selectedSector"
+              (change)="onHeaderSectorChange()"
+              class="font-bold text-[#123F5B] bg-transparent border-none p-0 pr-3 text-xs focus:ring-0 focus:outline-none cursor-pointer">
+              <option *ngFor="let s of sectores" [value]="s.nombre">{{ s.nombre }}</option>
+            </select>
           </div>
 
           <!-- Indicador de sincronización únicamente durante la carga -->
@@ -481,6 +485,35 @@ import { MsalService } from '@azure/msal-angular';
         </div>
       </div>
     </div>
+
+    <!-- Materiales Voluminosos Autorizados y Garantía DIMAO -->
+    <div class="space-y-2.5 pt-1">
+      <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 block">
+        Residuos voluminosos autorizados:
+      </span>
+      <div class="grid grid-cols-2 gap-2">
+        <div class="flex items-center gap-2 p-2 rounded-xl bg-[#F8FAF7] border border-[#E2E9E4]">
+          <i class="fa-solid fa-couch text-[#437d32] text-xs flex-shrink-0"></i>
+          <span class="text-[11px] font-bold text-[#093554] truncate">Muebles y colchones</span>
+        </div>
+        <div class="flex items-center gap-2 p-2 rounded-xl bg-[#F8FAF7] border border-[#E2E9E4]">
+          <i class="fa-solid fa-tv text-[#1479b8] text-xs flex-shrink-0"></i>
+          <span class="text-[11px] font-bold text-[#093554] truncate">Electrodomésticos</span>
+        </div>
+        <div class="flex items-center gap-2 p-2 rounded-xl bg-[#F8FAF7] border border-[#E2E9E4]">
+          <i class="fa-solid fa-tree text-[#c4871d] text-xs flex-shrink-0"></i>
+          <span class="text-[11px] font-bold text-[#093554] truncate">Ramas y podas</span>
+        </div>
+        <div class="flex items-center gap-2 p-2 rounded-xl bg-[#F8FAF7] border border-[#E2E9E4]">
+          <i class="fa-solid fa-wrench text-[#c94b43] text-xs flex-shrink-0"></i>
+          <span class="text-[11px] font-bold text-[#093554] truncate">Chatarra y fierros</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 p-2.5 rounded-xl bg-[#EEF5EB] border border-[#D5E6D2] text-[11px] text-[#2B7239] font-medium">
+        <i class="fa-solid fa-circle-check text-xs flex-shrink-0"></i>
+        <span>Servicio municipal gratuito. Coordinación previa con 48 hrs de antelación.</span>
+      </div>
+    </div>
   </div>
 
   <div class="pt-5">
@@ -752,16 +785,35 @@ import { MsalService } from '@azure/msal-angular';
           </div>
         </div>
 
-        <div class='grid grid-cols-1 md:grid-cols-2 gap-6'>
+        <div class='grid grid-cols-1 md:grid-cols-3 gap-5'>
+          <!-- 1. Sector oficial de la comuna -->
           <div class='space-y-2'>
-            <label class='block text-xs font-bold uppercase tracking-wider text-[#123F5B] ml-1' for='direccion'>Dirección exacta</label>
+            <label class='block text-xs font-bold uppercase tracking-wider text-[#123F5B] ml-1' for='sector'>Sector de Puerto Varas</label>
+            <div class='relative'>
+              <div class='absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-10'>
+                <i class='fa-solid fa-map-location-dot text-[#4F8A3D] text-sm'></i>
+              </div>
+              <select [(ngModel)]='newPickup.sector' (change)='onSectorSelect(newPickup.sector)' class='select-stitch has-icon !pl-11 !pr-10 appearance-none font-medium' id='sector' name='sector' required>
+                <option *ngFor='let sec of sectores' [value]='sec.nombre'>{{ sec.nombre }} ({{ sec.dia }})</option>
+              </select>
+              <div class='absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none z-10'>
+                <i class='fa-solid fa-chevron-down text-[#61717A] text-xs'></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Dirección exacta -->
+          <div class='space-y-2'>
+            <label class='block text-xs font-bold uppercase tracking-wider text-[#123F5B] ml-1' for='direccion'>Calle y número</label>
             <div class='relative'>
               <div class='absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-10'>
                 <i class='fa-solid fa-location-dot text-[#61717A] text-sm'></i>
               </div>
-              <input [(ngModel)]='newPickup.direccion' class='input-stitch has-icon !pl-11 pr-4' id='direccion' name='direccion' placeholder='Ej: Calle Los Guindos 450, Puerto Varas' required type='text' />
+              <input [(ngModel)]='newPickup.direccion' class='input-stitch has-icon !pl-11 pr-4' id='direccion' name='direccion' placeholder='Ej: Calle Los Guindos 450' required type='text' />
             </div>
           </div>
+
+          <!-- 3. Material a reciclar -->
           <div class='space-y-2'>
             <label class='block text-xs font-bold uppercase tracking-wider text-[#123F5B] ml-1' for='residuoNombre'>Material a reciclar</label>
             <div class='relative'>
@@ -769,7 +821,7 @@ import { MsalService } from '@azure/msal-angular';
                 <i class='fa-solid fa-recycle text-[#61717A] text-sm'></i>
               </div>
               <select [(ngModel)]='newPickup.residuoNombre' class='select-stitch has-icon !pl-11 !pr-10 appearance-none' id='residuoNombre' name='residuoNombre' required>
-                <option value=''>Selecciona el tipo de material principal</option>
+                <option value=''>Selecciona material principal</option>
                 <option *ngFor='let res of residuos' [value]='res.nombre'>{{ res.nombre }}</option>
               </select>
               <div class='absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none z-10'>
@@ -1108,11 +1160,32 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return this.truckWaypoints[this.currentTruckIndex];
   }
 
-  get userActiveAddress(): string {
-    if (this.pickups && this.pickups.length > 0 && this.pickups[0].direccion) {
-      return this.pickups[0].direccion;
-    }
-    return 'Comuna de Puerto Varas';
+  sectores = [
+    { id: 'braunau', nombre: 'Población Nueva Braunau', dia: 'Martes' },
+    { id: 'chico', nombre: 'Puerto Chico / Los Colonos', dia: 'Miércoles' },
+    { id: 'costanera', nombre: 'Costanera / Centro', dia: 'Lunes' },
+    { id: 'ensenada', nombre: 'Ensenada / Ruta 225', dia: 'Jueves' },
+    { id: 'mirador', nombre: 'El Mirador / Alta Esperanza', dia: 'Viernes' }
+  ];
+
+  selectedSector = 'Población Nueva Braunau';
+  userActiveAddress = 'Población Nueva Braunau, Puerto Varas';
+
+  newPickup = {
+    sector: 'Población Nueva Braunau',
+    direccion: '',
+    residuoNombre: '',
+    comentarios: ''
+  };
+
+  onHeaderSectorChange(): void {
+    this.newPickup.sector = this.selectedSector;
+    this.userActiveAddress = `${this.selectedSector}, Puerto Varas`;
+  }
+
+  onSectorSelect(sector: string): void {
+    this.selectedSector = sector;
+    this.userActiveAddress = `${sector}, Puerto Varas`;
   }
 
   @HostListener('document:keydown.escape')
@@ -1120,12 +1193,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.showRutaModal = false;
     this.showHistorialModal = false;
   }
-
-  newPickup = {
-    direccion: '',
-    residuoNombre: '',
-    comentarios: ''
-  };
 
   isSubmitting = false;
   submitStatus: 'idle' | 'success' | 'error' = 'idle';
@@ -1280,11 +1347,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.isSubmitting = true;
     this.submitStatus = 'idle';
 
-    this.bffService.createPickup(this.newPickup).subscribe({
+    const fullDireccion = this.newPickup.direccion.includes(this.newPickup.sector)
+      ? this.newPickup.direccion
+      : `${this.newPickup.direccion}, ${this.newPickup.sector}`;
+
+    const payload = {
+      direccion: fullDireccion,
+      residuoNombre: this.newPickup.residuoNombre,
+      comentarios: this.newPickup.comentarios
+    };
+
+    this.bffService.createPickup(payload).subscribe({
       next: (res) => {
         this.isSubmitting = false;
         this.submitStatus = 'success';
-        this.newPickup = { direccion: '', residuoNombre: '', comentarios: '' };
+        this.userActiveAddress = fullDireccion;
+        this.newPickup = { sector: this.selectedSector, direccion: '', residuoNombre: '', comentarios: '' };
         this.loadPickups();
         setTimeout(() => this.submitStatus = 'idle', 5000);
       },
@@ -1299,15 +1377,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
             fechaTexto: 'Programado para próximo recorrido',
             residuoNombre: this.newPickup.residuoNombre,
             kilosRecolectados: 0,
-            direccion: this.newPickup.direccion,
+            direccion: fullDireccion,
             estado: 'pendiente',
             comentarios: this.newPickup.comentarios
           };
           this.pickups.unshift(nuevo);
           this.proximoRetiro = nuevo;
+          this.userActiveAddress = fullDireccion;
           this.isSubmitting = false;
           this.submitStatus = 'success';
-          this.newPickup = { direccion: '', residuoNombre: '', comentarios: '' };
+          this.newPickup = { sector: this.selectedSector, direccion: '', residuoNombre: '', comentarios: '' };
           setTimeout(() => this.submitStatus = 'idle', 5000);
           return;
         }
