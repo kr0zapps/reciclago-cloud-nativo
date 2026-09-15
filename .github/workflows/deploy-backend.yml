@@ -164,11 +164,17 @@ jobs:
               echo "✅ Docker ya está instalado: $(docker --version)"
             fi
 
-            # ── Instalar AWS CLI si no está presente ─────────────────────────
+            # ── Instalar AWS CLI v2 si no está presente ──────────────────────
             if ! command -v aws &> /dev/null; then
-              echo "☁️ AWS CLI no encontrado. Instalando..."
-              sudo apt-get install -y awscli -qq
-              echo "✅ AWS CLI instalado."
+              echo "☁️ AWS CLI v2 no encontrado. Instalando..."
+              sudo apt-get install -y unzip curl -qq
+              curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+              unzip -q /tmp/awscliv2.zip -d /tmp/
+              sudo /tmp/aws/install
+              rm -rf /tmp/awscliv2.zip /tmp/aws
+              echo "✅ AWS CLI v2 instalado: $(aws --version)"
+            else
+              echo "✅ AWS CLI ya está instalado: $(aws --version)"
             fi
 
             mkdir -p ~/reciclago
