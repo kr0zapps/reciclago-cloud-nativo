@@ -705,7 +705,7 @@ import { MsalService } from '@azure/msal-angular';
 <h3 class="font-heading font-extrabold text-2xl text-brand-navy">Mis retiros anteriores</h3>
 <p class="text-base text-brand-muted">Historial transparente de aportes reciclables en tu domicilio</p>
 </div>
-<button (click)="showHistorialModal = true" type="button" class="btn-action text-sm font-bold text-brand-lake hover:text-brand-navy flex items-center gap-1.5 transition-colors self-start sm:self-auto cursor-pointer">
+<button (click)="openHistorialModal()" type="button" class="btn-action text-sm font-bold text-brand-lake hover:text-brand-navy flex items-center gap-1.5 transition-colors self-start sm:self-auto cursor-pointer">
 <span>Ver todos los retiros</span>
 <i class="fa-solid fa-chevron-right text-xs btn-arrow"></i>
 </button>
@@ -724,17 +724,51 @@ import { MsalService } from '@azure/msal-angular';
           <span class="text-sm font-bold text-brand-green px-2.5 py-0.5 rounded-full bg-[#EBF5E7]">{{ pickup.residuoNombre }}</span>
         </div>
         <p class="text-sm sm:text-base text-brand-muted mt-0.5">
-          {{ pickup.direccion }} • <strong class="text-brand-charcoal font-semibold">{{ pickup.estado === 'completado' ? (pickup.kilosRecolectados + ' kg') : 'Pendiente' }}</strong>
+          {{ pickup.direccion }} • <strong class="text-brand-charcoal font-semibold">{{ (pickup.estado === 'completado' || pickup.estado === 'PESADO' || pickup.estado === 'RETIRADO') ? (pickup.kilosRecolectados + ' kg') : pickup.estado }}</strong>
         </p>
       </div>
     </div>
-    <div class="self-start sm:self-center">
-      <span *ngIf="pickup.estado === 'completado'" class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-bold bg-[#EAF5E6] text-brand-green border border-[#CDE9C6] transition-colors group-hover:bg-[#dff0db]">
-        <i class="fa-solid fa-check text-xs"></i> Retirado con éxito
+    <div class="self-start sm:self-center flex items-center gap-2 flex-wrap">
+      <span *ngIf="pickup.estado === 'completado' || pickup.estado === 'PESADO' || pickup.estado === 'RETIRADO'" class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-bold bg-[#EAF5E6] text-brand-green border border-[#CDE9C6] transition-colors">
+        <i class="fa-solid fa-check text-xs"></i> {{ pickup.kilosRecolectados ? (pickup.kilosRecolectados + ' kg certificados') : 'Retirado' }}
       </span>
-      <span *ngIf="pickup.estado !== 'completado'" class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-bold bg-slate-100 text-slate-600 border border-slate-200 transition-colors group-hover:bg-slate-200">
+      <span *ngIf="pickup.estado !== 'completado' && pickup.estado !== 'PESADO' && pickup.estado !== 'RETIRADO'" class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-bold bg-slate-100 text-slate-600 border border-slate-200 transition-colors">
         <i class="fa-regular fa-clock text-xs"></i> {{ pickup.estado }}
       </span>
+
+      <!-- Acciones de Ciclo de Vida para Staff (Admin / Coordinador) -->
+      <div *ngIf="isStaff" class="flex items-center gap-1.5 ml-2 flex-wrap">
+        <button *ngIf="pickup.estado === 'SOLICITADO' || pickup.estado === 'pendiente'"
+                (click)="openActionModal(pickup, 'programar')"
+                type="button" class="text-xs font-bold px-2.5 py-1 bg-sky-50 text-sky-700 border border-sky-200 rounded-lg hover:bg-sky-100 transition-colors cursor-pointer"
+                title="Asignar camión y fecha">
+          Programar
+        </button>
+        <button *ngIf="pickup.estado === 'PROGRAMADO'"
+                (click)="openActionModal(pickup, 'en-ruta')"
+                type="button" class="text-xs font-bold px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors cursor-pointer"
+                title="Despachar camión">
+          En Ruta
+        </button>
+        <button *ngIf="pickup.estado === 'EN_RUTA'"
+                (click)="openActionModal(pickup, 'retirado')"
+                type="button" class="text-xs font-bold px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors cursor-pointer"
+                title="Confirmar retiro en puerta">
+          Retirar
+        </button>
+        <button *ngIf="pickup.estado === 'RETIRADO'"
+                (click)="openActionModal(pickup, 'pesado')"
+                type="button" class="text-xs font-bold px-2.5 py-1 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors cursor-pointer"
+                title="Registrar pesaje digital">
+          Pesar (kg)
+        </button>
+        <button *ngIf="pickup.estado !== 'completado' && pickup.estado !== 'PESADO' && pickup.estado !== 'CANCELADO'"
+                (click)="openActionModal(pickup, 'cancelar')"
+                type="button" class="text-xs font-bold px-2 py-1 bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100 transition-colors cursor-pointer"
+                title="Cancelar retiro">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
     </div>
   </div>
   
@@ -802,15 +836,26 @@ import { MsalService } from '@azure/msal-angular';
             </div>
           </div>
 
-          <!-- 2. Dirección exacta -->
+          <!-- 2. Dirección exacta con Detector de Cuadrante -->
           <div class='space-y-2'>
-            <label class='block text-xs font-bold uppercase tracking-wider text-[#123F5B] ml-1' for='direccion'>Calle y número</label>
+            <div class="flex items-center justify-between">
+              <label class='block text-xs font-bold uppercase tracking-wider text-[#123F5B] ml-1' for='direccion'>Calle y número</label>
+              <button (click)="detectarCuadrante()" type="button" class="text-[11px] font-bold text-[#4F8A3D] hover:underline flex items-center gap-1 cursor-pointer">
+                <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i>
+                <span *ngIf="!isDetectingCuadrante">Detectar cuadrante</span>
+                <span *ngIf="isDetectingCuadrante">Detectando...</span>
+              </button>
+            </div>
             <div class='relative'>
               <div class='absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-10'>
                 <i class='fa-solid fa-location-dot text-[#61717A] text-sm'></i>
               </div>
-              <input [(ngModel)]='newPickup.direccion' class='input-stitch has-icon !pl-11 pr-4' id='direccion' name='direccion' placeholder='Ej: Calle Los Guindos 450' required type='text' />
+              <input [(ngModel)]='newPickup.direccion' (blur)="detectarCuadrante()" class='input-stitch has-icon !pl-11 pr-4' id='direccion' name='direccion' placeholder='Ej: Calle Los Guindos 450' required type='text' />
             </div>
+            <p *ngIf="detectedCuadrante" class="text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200/60 flex items-center gap-1.5 mt-1">
+              <i class="fa-solid fa-circle-check text-[11px] text-emerald-600"></i>
+              <span>{{ detectedCuadrante }}</span>
+            </p>
           </div>
 
           <!-- 3. Material a reciclar -->
@@ -985,14 +1030,14 @@ import { MsalService } from '@azure/msal-angular';
 
           <!-- Lista de retiros -->
           <div class="divide-y divide-[#E2E9E4] border border-[#E2E9E4] rounded-2xl overflow-hidden bg-white">
-            <div *ngFor="let p of pickups" class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#F8FAF7] transition-colors">
+            <div *ngFor="let p of historialList" class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#F8FAF7] transition-colors">
               <div class="flex items-start gap-3">
                 <div class="w-9 h-9 rounded-xl bg-slate-100 text-[#123F5B] flex items-center justify-center text-sm flex-shrink-0 mt-0.5">
                   <i class="fa-solid fa-box-archive"></i>
                 </div>
                 <div>
                   <div class="flex items-center gap-2 flex-wrap">
-                    <span class="font-bold text-sm text-[#123F5B]">{{ p.fechaTexto || 'Fecha por confirmar' }}</span>
+                    <span class="font-bold text-sm text-[#123F5B]">{{ p.fechaTexto || p.fecha || 'Fecha por confirmar' }}</span>
                     <span class="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
                       {{ p.residuoNombre }}
                     </span>
@@ -1005,9 +1050,9 @@ import { MsalService } from '@azure/msal-angular';
               </div>
               <div class="sm:text-right flex items-center sm:flex-col sm:items-end justify-between gap-1 pl-12 sm:pl-0">
                 <span class="text-xs font-bold px-2.5 py-1 rounded-full inline-flex items-center gap-1"
-                      [ngClass]="p.estado === 'completado' ? 'bg-[#EEF5EB] text-[#4F8A3D] border border-[#D5E6D2]' : 'bg-amber-50 text-amber-700 border border-amber-200'">
-                  <i [class]="p.estado === 'completado' ? 'fa-solid fa-check text-[10px]' : 'fa-solid fa-hourglass-half text-[10px]'"></i>
-                  {{ p.estado === 'completado' ? (p.kilosRecolectados + ' kg pesados') : 'Pendiente' }}
+                      [ngClass]="(p.estado === 'completado' || p.estado === 'PESADO' || p.estado === 'RETIRADO') ? 'bg-[#EEF5EB] text-[#4F8A3D] border border-[#D5E6D2]' : 'bg-amber-50 text-amber-700 border border-amber-200'">
+                  <i [class]="(p.estado === 'completado' || p.estado === 'PESADO' || p.estado === 'RETIRADO') ? 'fa-solid fa-check text-[10px]' : 'fa-solid fa-hourglass-half text-[10px]'"></i>
+                  {{ (p.estado === 'completado' || p.estado === 'PESADO' || p.estado === 'RETIRADO') ? (p.kilosRecolectados + ' kg pesados') : p.estado }}
                 </span>
                 <span *ngIf="p.comentarios" class="text-[11px] text-slate-400 italic max-w-xs truncate">
                   "{{ p.comentarios }}"
@@ -1016,7 +1061,7 @@ import { MsalService } from '@azure/msal-angular';
             </div>
 
             <!-- Estado vacío -->
-            <div *ngIf="pickups.length === 0" class="py-12 px-4 text-center">
+            <div *ngIf="historialList.length === 0" class="py-12 px-4 text-center">
               <div class="w-12 h-12 mx-auto rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-lg mb-3">
                 <i class="fa-solid fa-calendar-xmark"></i>
               </div>
@@ -1025,6 +1070,25 @@ import { MsalService } from '@azure/msal-angular';
                 Agenda un retiro especial arriba o espera el día correspondiente a tu cuadrante.
               </p>
             </div>
+          </div>
+
+          <!-- Paginación de Historial (ms-reciclago-pickups) -->
+          <div *ngIf="historialTotalPages > 1" class="flex items-center justify-between pt-3 text-xs text-slate-600">
+            <button (click)="loadHistorialPaginado(historialPage - 1)"
+                    [disabled]="historialPage === 0"
+                    type="button"
+                    class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-medium cursor-pointer">
+              <i class="fa-solid fa-chevron-left text-[10px]"></i> Anterior
+            </button>
+            <span class="font-semibold">
+              Página {{ historialPage + 1 }} de {{ historialTotalPages }} (Total: {{ historialTotalElements }} retiros)
+            </span>
+            <button (click)="loadHistorialPaginado(historialPage + 1)"
+                    [disabled]="historialPage >= historialTotalPages - 1"
+                    type="button"
+                    class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-medium cursor-pointer">
+              Siguiente <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </button>
           </div>
         </div>
 
@@ -1043,11 +1107,66 @@ import { MsalService } from '@azure/msal-angular';
       </div>
     </div>
 
+    <!-- ==================== MODAL 3: GESTIÓN OPERATIVA DE RETIROS (STAFF) ==================== -->
+    <div *ngIf="showActionModal" (click)="showActionModal = false" class="fixed inset-0 z-50 overflow-y-auto bg-[#041D2D]/60 backdrop-blur-md flex items-center justify-center p-4 anim-modal-backdrop">
+      <div (click)="$event.stopPropagation()" class="relative w-full max-w-md bg-white rounded-[2rem] shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel p-6 text-slate-800 my-auto">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-heading font-bold text-lg sm:text-xl text-[#123F5B]">
+            Operación: {{ actionType | uppercase }} #{{ selectedPickupForAction?.id }}
+          </h3>
+          <button (click)="showActionModal = false" type="button" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs cursor-pointer">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <p class="text-xs text-slate-500 mb-4">{{ selectedPickupForAction?.direccion }} ({{ selectedPickupForAction?.residuoNombre }})</p>
+
+        <!-- Formulario dinámico -->
+        <div *ngIf="actionType === 'programar'" class="space-y-3 text-left">
+          <label class="block text-xs font-bold uppercase text-[#123F5B]">Fecha y Hora Programada</label>
+          <input type="datetime-local" [(ngModel)]="actionFechaProgramada" class="input-stitch w-full py-2 px-3 text-sm">
+          <label class="block text-xs font-bold uppercase text-[#123F5B] mt-2">Patente Camión Asignado</label>
+          <input type="text" [(ngModel)]="actionCamionPatente" class="input-stitch w-full py-2 px-3 text-sm" placeholder="PV-RC-2026">
+        </div>
+
+        <div *ngIf="actionType === 'en-ruta'" class="space-y-2 text-left">
+          <p class="text-sm text-slate-600">¿Confirmar que el camión recolector municipal está en ruta hacia este domicilio?</p>
+          <p class="text-xs text-slate-500">Se notificará al sistema y se actualizará el estado a EN_RUTA.</p>
+        </div>
+
+        <div *ngIf="actionType === 'retirado'" class="space-y-2 text-left">
+          <p class="text-sm text-slate-600">¿Confirmar que el residuo ha sido recolectado en la puerta del vecino?</p>
+          <p class="text-xs text-slate-500">El retiro quedará listo para pesaje en báscula del camión.</p>
+        </div>
+
+        <div *ngIf="actionType === 'pesado'" class="space-y-3 text-left">
+          <label class="block text-xs font-bold uppercase text-[#123F5B]">Pesaje Digital Certificado (Kg)</label>
+          <input type="number" step="0.1" [(ngModel)]="actionPesoKg" class="input-stitch w-full py-2.5 px-3 text-base font-bold text-center" placeholder="Ej: 8.5">
+          <p class="text-xs text-slate-500">Se emitirá evento a Kafka (pickups.events) para registro de huella ecológica.</p>
+        </div>
+
+        <div *ngIf="actionType === 'cancelar'" class="space-y-3 text-left">
+          <label class="block text-xs font-bold uppercase text-[#123F5B]">Motivo de Cancelación</label>
+          <input type="text" [(ngModel)]="actionMotivo" class="input-stitch w-full py-2 px-3 text-sm" placeholder="Ej: Domicilio cerrado o reprogramado">
+        </div>
+
+        <div class="mt-6 flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+          <button (click)="showActionModal = false" type="button" class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer">
+            Cancelar
+          </button>
+          <button (click)="executePickupAction()" [disabled]="isSubmittingAction" type="button" class="btn-stitch-primary px-5 py-2 text-xs font-bold cursor-pointer">
+            <span *ngIf="!isSubmittingAction">Confirmar</span>
+            <span *ngIf="isSubmittingAction"><i class="fa-solid fa-spinner fa-spin"></i> Guardando...</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
   </main>
 `
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   userName = '';
+  userEmail = '';
   userRoles: string[] = [];
 
   residuos: any[] = [];
@@ -1060,6 +1179,33 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   showRutaModal = false;
   showHistorialModal = false;
+
+  // Conexión con microservicio ms-reciclago-routes
+  cuadrantesBackend: any[] = [];
+  trackingLive: any = null;
+  detectedCuadrante = '';
+  isDetectingCuadrante = false;
+
+  // Conexión con historial paginado ms-reciclago-pickups
+  historialPage = 0;
+  historialTotalPages = 1;
+  historialTotalElements = 0;
+  historialList: any[] = [];
+  isLoadingHistorial = false;
+
+  // Modal de ciclo de vida para Staff (Admin / Coordinador)
+  showActionModal = false;
+  selectedPickupForAction: any = null;
+  actionType: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar' = 'programar';
+  actionPesoKg = 5.0;
+  actionMotivo = '';
+  actionCamionPatente = 'PV-RC-2026';
+  actionFechaProgramada = '';
+  isSubmittingAction = false;
+
+  get isStaff(): boolean {
+    return this.userRoles.includes('Admin') || this.userRoles.includes('Coordinador');
+  }
 
   // Simulación interactiva del camión recolector en Puerto Varas
   truckSimulationRunning = true;
@@ -1474,14 +1620,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (account) {
       this.userName = account.name || account.username || '';
       const claims = account.idTokenClaims as Record<string, any> | undefined;
-      if (claims && claims['roles']) {
-        this.userRoles = claims['roles'];
+      if (claims) {
+        if (claims['roles']) {
+          this.userRoles = claims['roles'];
+        }
+        this.userEmail = (claims['preferred_username'] || claims['upn'] || account.username || '') as string;
+      } else {
+        this.userEmail = account.username || '';
       }
     }
 
     this.truckWaypoints = this.currentSectorInfo.waypoints;
     this.loadResiduos();
     this.loadPickups();
+    this.loadCuadrantes();
+    this.loadLiveTracking();
     this.startTruckSimulation();
   }
 
@@ -1669,7 +1822,158 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   getTotalKilos(): number {
     return this.pickups
-      .filter(p => p.estado === 'completado' && p.kilosRecolectados)
+      .filter(p => (p.estado === 'completado' || p.estado === 'PESADO' || p.estado === 'RETIRADO') && p.kilosRecolectados)
       .reduce((sum, p) => sum + p.kilosRecolectados, 0);
+  }
+
+  loadCuadrantes(): void {
+    this.bffService.getCuadrantes().subscribe({
+      next: (data) => {
+        if (data && data.length > 0) {
+          this.cuadrantesBackend = data;
+          data.forEach((c: any) => {
+            const sec = this.sectores.find(s => s.cuadrante?.includes(String(c.numero)) || s.nombre?.toLowerCase().includes(c.sector?.toLowerCase()));
+            if (sec) {
+              sec.id = c.id;
+              sec.cuadrante = c.nombre;
+              sec.dia = c.diaSemana ? (c.diaSemana.charAt(0).toUpperCase() + c.diaSemana.slice(1).toLowerCase()) : sec.dia;
+              sec.horario = c.horario || sec.horario;
+            }
+          });
+        }
+      },
+      error: () => {
+        console.warn('BFF / ms-reciclago-routes no disponible. Usando cuadrantes comunales locales.');
+      }
+    });
+  }
+
+  loadLiveTracking(): void {
+    const activeSec = this.sectores.find(s => s.nombre === this.selectedSector);
+    const cuadranteId = (activeSec && typeof activeSec.id === 'number') ? activeSec.id : 2;
+    this.bffService.getTracking(cuadranteId).subscribe({
+      next: (tracking) => {
+        if (tracking && tracking.calleActual) {
+          this.trackingLive = tracking;
+          this.truckWaypoints[0] = {
+            name: tracking.calleActual,
+            detail: `Camión ${tracking.camionPatente || 'PV-RC-2026'} en ${tracking.estado || 'EN_RUTA'} (${tracking.velocidad || 25} km/h)`,
+            eta: 'En sector',
+            distancia: 'En ruta',
+            x: 50,
+            y: 50,
+            estado: tracking.estado || 'En ruta'
+          };
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  detectarCuadrante(): void {
+    if (!this.newPickup.direccion || this.newPickup.direccion.trim().length < 3) return;
+    this.isDetectingCuadrante = true;
+    this.bffService.getCuadrante(this.newPickup.direccion).subscribe({
+      next: (res) => {
+        this.isDetectingCuadrante = false;
+        if (res && res.cuadranteId) {
+          this.detectedCuadrante = `Detectado: ${res.nombre} (${res.diaSemana}) • Horario: ${res.horario}`;
+          const matchingSec = this.sectores.find(s => 
+            s.cuadrante?.includes(String(res.cuadranteId)) || 
+            s.nombre?.toLowerCase().includes(res.sector?.toLowerCase()) ||
+            res.nombre?.toLowerCase().includes(s.nombre?.toLowerCase())
+          );
+          if (matchingSec) {
+            this.onSectorSelect(matchingSec.nombre);
+          }
+        }
+      },
+      error: () => {
+        this.isDetectingCuadrante = false;
+      }
+    });
+  }
+
+  openHistorialModal(): void {
+    this.showHistorialModal = true;
+    this.loadHistorialPaginado(0);
+  }
+
+  loadHistorialPaginado(page: number = 0): void {
+    this.isLoadingHistorial = true;
+    this.historialPage = page;
+    const emailToQuery = this.isStaff ? '' : this.userEmail;
+    this.bffService.getPickupsHistory(emailToQuery, '', page, 6).subscribe({
+      next: (res) => {
+        this.isLoadingHistorial = false;
+        if (res && res.content) {
+          this.historialList = res.content;
+          this.historialTotalPages = res.totalPages || 1;
+          this.historialTotalElements = res.totalElements || res.content.length;
+        } else if (Array.isArray(res)) {
+          this.historialList = res;
+          this.historialTotalPages = 1;
+          this.historialTotalElements = res.length;
+        } else {
+          this.historialList = this.pickups;
+        }
+      },
+      error: () => {
+        this.isLoadingHistorial = false;
+        this.historialList = this.pickups;
+      }
+    });
+  }
+
+  openActionModal(pickup: any, action: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar'): void {
+    this.selectedPickupForAction = pickup;
+    this.actionType = action;
+    this.actionPesoKg = pickup.kilosRecolectados || 5.0;
+    this.actionMotivo = '';
+    this.actionCamionPatente = 'PV-RC-2026';
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    this.actionFechaProgramada = tomorrow.toISOString().slice(0, 16);
+    this.showActionModal = true;
+  }
+
+  executePickupAction(): void {
+    if (!this.selectedPickupForAction) return;
+    const id = this.selectedPickupForAction.id;
+    this.isSubmittingAction = true;
+
+    let obs;
+    if (this.actionType === 'programar') {
+      obs = this.bffService.programarPickup(id, {
+        camionId: 1,
+        camionPatente: this.actionCamionPatente,
+        fechaProgramada: this.actionFechaProgramada
+      });
+    } else if (this.actionType === 'en-ruta') {
+      obs = this.bffService.enRutaPickup(id);
+    } else if (this.actionType === 'retirado') {
+      obs = this.bffService.retiradoPickup(id);
+    } else if (this.actionType === 'pesado') {
+      obs = this.bffService.pesadoPickup(id, this.actionPesoKg);
+    } else if (this.actionType === 'cancelar') {
+      obs = this.bffService.cancelarPickup(id, this.actionMotivo);
+    }
+
+    if (obs) {
+      obs.subscribe({
+        next: () => {
+          this.isSubmittingAction = false;
+          this.showActionModal = false;
+          this.loadPickups();
+          if (this.showHistorialModal) {
+            this.loadHistorialPaginado(this.historialPage);
+          }
+        },
+        error: (err) => {
+          this.isSubmittingAction = false;
+          alert('Error al actualizar retiro: ' + (err.error?.error || err.message || 'Error de comunicación'));
+        }
+      });
+    }
   }
 }
