@@ -99,14 +99,26 @@ jobs:
     name: 🚀 Deploy to AWS EC2 via SSH
     needs: build-and-push-ecr
     runs-on: ubuntu-latest
-    if: ${{ secrets.EC2_HOST != '' && secrets.EC2_SSH_KEY != '' }}
     continue-on-error: true # Permite que el pipeline sea exitoso aun si la instancia EC2 esta detenida o en creacion
 
     steps:
+      - name: ℹ️ Verificar disponibilidad de credenciales EC2
+        id: check-ec2
+        run: |
+          if [ -z "${{ secrets.EC2_HOST }}" ] || [ -z "${{ secrets.EC2_SSH_KEY }}" ]; then
+            echo "⚠️ Secretos EC2_HOST o EC2_SSH_KEY no definidos. Omitiendo despliegue en servidor EC2 (imágenes ya disponibles en ECR)."
+            echo "ec2_ready=false" >> $GITHUB_OUTPUT
+          else
+            echo "✅ Parámetros de EC2 detectados. Procediendo con el despliegue..."
+            echo "ec2_ready=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: 📥 Clonar repositorio
+        if: steps.check-ec2.outputs.ec2_ready == 'true'
         uses: actions/checkout@v4
 
       - name: 📁 Transferir docker-compose.yml a la instancia EC2
+        if: steps.check-ec2.outputs.ec2_ready == 'true'
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -116,6 +128,7 @@ jobs:
           target: '~/reciclago/'
 
       - name: 🚀 Ejecutar Despliegue en EC2 vía SSH
+        if: steps.check-ec2.outputs.ec2_ready == 'true'
         uses: appleboy/ssh-action@v1.0.3
         env:
           REGISTRY: ${{ needs.build-and-push-ecr.outputs.registry }}
