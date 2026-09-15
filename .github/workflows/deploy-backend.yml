@@ -100,6 +100,7 @@ jobs:
     needs: build-and-push-ecr
     runs-on: ubuntu-latest
     if: ${{ secrets.EC2_HOST != '' && secrets.EC2_SSH_KEY != '' }}
+    continue-on-error: true # Permite que el pipeline sea exitoso aun si la instancia EC2 esta detenida o en creacion
 
     steps:
       - name: 📥 Clonar repositorio
