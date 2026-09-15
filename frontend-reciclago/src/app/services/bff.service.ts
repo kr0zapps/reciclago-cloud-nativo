@@ -73,6 +73,52 @@ export class BffService {
     return this.http.patch(url, {});
   }
 
+  getPickupsHistory(vecinoEmail?: string, estado?: string, page: number = 0, size: number = 10): Observable<any> {
+    let url = `${this.baseUrl}/api/pickups/history?page=${page}&size=${size}`;
+    if (vecinoEmail) url += `&vecinoEmail=${encodeURIComponent(vecinoEmail)}`;
+    if (estado) url += `&estado=${encodeURIComponent(estado)}`;
+    return this.http.get(url);
+  }
+
+  getPickupById(id: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/api/pickups/${id}`);
+  }
+
+  getCuadrantes(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/api/routes/cuadrantes`);
+  }
+
+  getCuadrante(direccion?: string): Observable<any> {
+    const url = direccion 
+      ? `${this.baseUrl}/api/routes/cuadrante?direccion=${encodeURIComponent(direccion)}`
+      : `${this.baseUrl}/api/routes/cuadrante`;
+    return this.http.get(url);
+  }
+
+  getTracking(cuadranteId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/api/routes/${cuadranteId}/tracking`);
+  }
+
+  getCamionTracking(camionId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/api/routes/tracking/${camionId}`);
+  }
+
+  sendCitizenContact(payload: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/api/citizens/contact`, payload);
+  }
+
+  getCitizenContacts(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/api/citizens/contact`);
+  }
+
+  getHowItWorks(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/api/citizens/how-it-works`);
+  }
+
+  getFaqs(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/api/citizens/faq`);
+  }
+
   getPublicStatus(): Observable<any> {
     return this.http.get(`${this.baseUrl}/public/status`);
   }
