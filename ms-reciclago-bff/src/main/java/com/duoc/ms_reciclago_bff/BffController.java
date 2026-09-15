@@ -24,6 +24,9 @@ public class BffController {
     @Value("${reciclago.services.pickups-url:http://localhost:8083}")
     private String pickupsUrl;
 
+    @Value("${reciclago.services.routes-url:http://localhost:8084}")
+    private String routesUrl;
+
     public BffController(RestClient.Builder restClientBuilder) {
         this.restClient = restClientBuilder.build();
     }
@@ -293,4 +296,207 @@ public class BffController {
         }
     }
 
+    @GetMapping("/api/pickups/history")
+    public ResponseEntity<?> getPickupsHistory(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam(required = false) String vecinoEmail,
+            @RequestParam(required = false) String estado,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        try {
+            List<String> roles = jwt != null ? jwt.getClaimAsStringList("roles") : null;
+            boolean isStaff = roles != null && (roles.contains("Admin") || roles.contains("Coordinador"));
+            String effectiveEmail = vecinoEmail;
+            if (!isStaff && jwt != null) {
+                effectiveEmail = jwt.getClaimAsString("preferred_username");
+                if (effectiveEmail == null) {
+                    effectiveEmail = jwt.getClaimAsString("upn");
+                }
+            }
+            String uri = pickupsUrl + "/api/pickups/history?page=" + page + "&size=" + size;
+            if (effectiveEmail != null && !effectiveEmail.isBlank()) {
+                uri += "&vecinoEmail=" + java.net.URLEncoder.encode(effectiveEmail, java.nio.charset.StandardCharsets.UTF_8);
+            }
+            if (estado != null && !estado.isBlank()) {
+                uri += "&estado=" + java.net.URLEncoder.encode(estado, java.nio.charset.StandardCharsets.UTF_8);
+            }
+            Object history = restClient.get()
+                    .uri(uri)
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(history);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Error comunicando con ms-reciclago-pickups");
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+        }
+    }
+
+    @GetMapping("/api/pickups/{id}")
+    public ResponseEntity<?> getPickupById(@PathVariable Long id) {
+        try {
+            Object pickup = restClient.get()
+                    .uri(pickupsUrl + "/api/pickups/" + id)
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(pickup);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Retiro no encontrado", "details", e.getMessage()));
+        }
+    }
+
+    // ==========================================
+    // Endpoints de Rutas y Cuadrantes (ms-reciclago-routes)
+    // ==========================================
+
+    @GetMapping("/api/routes/cuadrantes")
+    public ResponseEntity<?> getCuadrantes() {
+        try {
+            List<?> cuadrantes = restClient.get()
+                    .uri(routesUrl + "/api/routes/cuadrantes")
+                    .retrieve()
+                    .body(List.class);
+            return ResponseEntity.ok(cuadrantes);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(Map.of("error", "ms-reciclago-routes no disponible", "details", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/api/routes/cuadrantes/{id}")
+    public ResponseEntity<?> getCuadranteById(@PathVariable Long id) {
+        try {
+            Object cuadrante = restClient.get()
+                    .uri(routesUrl + "/api/routes/cuadrantes/" + id)
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(cuadrante);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Cuadrante no encontrado"));
+        }
+    }
+
+    @GetMapping("/api/routes/cuadrante")
+    public ResponseEntity<?> consultarCuadrante(@RequestParam(required = false) String direccion) {
+        try {
+            String uri = routesUrl + "/api/routes/cuadrante";
+            if (direccion != null && !direccion.isBlank()) {
+                uri += "?direccion=" + java.net.URLEncoder.encode(direccion, java.nio.charset.StandardCharsets.UTF_8);
+            }
+            Object response = restClient.get()
+                    .uri(uri)
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(Map.of("error", "Error consultando cuadrante", "details", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/api/routes/{cuadranteId}/tracking")
+    public ResponseEntity<?> getTrackingPorCuadrante(@PathVariable Long cuadranteId) {
+        try {
+            Object tracking = restClient.get()
+                    .uri(routesUrl + "/api/routes/" + cuadranteId + "/tracking")
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(tracking);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Tracking no disponible para el cuadrante"));
+        }
+    }
+
+    @GetMapping("/api/routes/tracking/{camionId}")
+    public ResponseEntity<?> getTrackingPorCamion(@PathVariable Long camionId) {
+        try {
+            Object tracking = restClient.get()
+                    .uri(routesUrl + "/api/routes/tracking/" + camionId)
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(tracking);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Tracking no disponible para el camion"));
+        }
+    }
+
+    @PutMapping("/api/routes/tracking/{camionId}")
+    public ResponseEntity<?> actualizarTracking(
+            @PathVariable Long camionId,
+            @RequestParam Double lat,
+            @RequestParam Double lng,
+            @RequestParam(required = false) String calle,
+            @RequestParam(required = false) String estado,
+            @RequestParam(required = false) Double velocidad) {
+        try {
+            String uri = routesUrl + "/api/routes/tracking/" + camionId + "?lat=" + lat + "&lng=" + lng;
+            if (calle != null) uri += "&calle=" + java.net.URLEncoder.encode(calle, java.nio.charset.StandardCharsets.UTF_8);
+            if (estado != null) uri += "&estado=" + java.net.URLEncoder.encode(estado, java.nio.charset.StandardCharsets.UTF_8);
+            if (velocidad != null) uri += "&velocidad=" + velocidad;
+
+            Object response = restClient.put()
+                    .uri(uri)
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // ==========================================
+    // Endpoints Cívicos y Ciudadanos DIMAO
+    // ==========================================
+
+    @PostMapping("/api/citizens/contact")
+    public ResponseEntity<?> registrarContactoCiudadano(@RequestBody Map<String, Object> payload) {
+        try {
+            Object response = restClient.post()
+                    .uri(routesUrl + "/api/citizens/contact")
+                    .body(payload)
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Error al enviar mensaje DIMAO", "details", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/api/citizens/contact")
+    public ResponseEntity<?> listarContactosCiudadanos() {
+        try {
+            List<?> contactos = restClient.get()
+                    .uri(routesUrl + "/api/citizens/contact")
+                    .retrieve()
+                    .body(List.class);
+            return ResponseEntity.ok(contactos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(Map.of("error", "Servicio no disponible"));
+        }
+    }
+
+    @GetMapping("/api/citizens/how-it-works")
+    public ResponseEntity<?> getGuiaCiudadana() {
+        try {
+            Object guia = restClient.get()
+                    .uri(routesUrl + "/api/citizens/how-it-works")
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(guia);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(Map.of("error", "Guia ciudadana no disponible"));
+        }
+    }
+
+    @GetMapping("/api/citizens/faq")
+    public ResponseEntity<?> getFaqsCiudadanas() {
+        try {
+            List<?> faqs = restClient.get()
+                    .uri(routesUrl + "/api/citizens/faq")
+                    .retrieve()
+                    .body(List.class);
+            return ResponseEntity.ok(faqs);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(Map.of("error", "FAQ no disponible"));
+        }
+    }
 }

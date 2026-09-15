@@ -51,8 +51,15 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/public/**", "/actuator/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                // Acceso público a información cívica y consultas comunitarias
+                .requestMatchers(HttpMethod.GET, "/api/citizens/how-it-works", "/api/citizens/faq").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/citizens/contact").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/routes/cuadrante", "/api/routes/cuadrantes").permitAll()
+                // Paneles administrativos y de coordinación
                 .requestMatchers("/api/admin/**").hasRole("Admin")
                 .requestMatchers("/api/coordinador/**").hasAnyRole("Admin", "Coordinador")
+                .requestMatchers(HttpMethod.GET, "/api/citizens/contact").hasAnyRole("Admin", "Coordinador")
+                .requestMatchers(HttpMethod.PUT, "/api/routes/tracking/**").hasAnyRole("Admin", "Coordinador")
                 // RBAC estricto en operaciones logisticas de ciclo de vida (solo Admin o Coordinador)
                 .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/programar").hasAnyRole("Admin", "Coordinador")
                 .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/en-ruta").hasAnyRole("Admin", "Coordinador")
@@ -60,6 +67,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/pesado").hasAnyRole("Admin", "Coordinador")
                 .requestMatchers("/api/pickups/**").authenticated()
                 .requestMatchers("/api/catalog/**").authenticated()
+                .requestMatchers("/api/routes/**").authenticated()
                 .requestMatchers("/api/me").authenticated()
                 .anyRequest().authenticated()
             )
