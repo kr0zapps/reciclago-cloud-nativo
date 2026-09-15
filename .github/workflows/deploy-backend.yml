@@ -197,7 +197,22 @@ jobs:
             export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY"
             export AWS_SESSION_TOKEN="$AWS_SESSION_TOKEN"
             export AWS_DEFAULT_REGION="$AWS_REGION"
-            aws ecr get-login-password --region "$AWS_REGION" | sudo docker login --username AWS --password-stdin "$REGISTRY"
+
+            echo "🔐 Registrando en ECR: $REGISTRY (región: $AWS_REGION)"
+
+            if [ -z "$REGISTRY" ]; then
+              echo "❌ REGISTRY está vacío. Verificar output del job build-and-push-ecr."
+              exit 1
+            fi
+
+            ECR_PASSWORD=$(aws ecr get-login-password --region "$AWS_REGION")
+            if [ -z "$ECR_PASSWORD" ]; then
+              echo "❌ No se pudo obtener token ECR. Verificar credenciales AWS (pueden haber expirado)."
+              exit 1
+            fi
+
+            echo "$ECR_PASSWORD" | sudo docker login --username AWS --password-stdin "$REGISTRY"
+            echo "✅ Login en ECR exitoso."
 
             echo "Descargando imágenes actualizadas de ECR..."
             sudo docker compose pull ms-bff ms-catalog ms-pickups ms-routes || true
