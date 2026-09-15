@@ -17,3 +17,4 @@ node_modules/
 .angular/
 dist/
 .env*
+!.env.example

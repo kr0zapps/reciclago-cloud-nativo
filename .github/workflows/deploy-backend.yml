@@ -1,0 +1,168 @@
+name: Deploy Backend RecicLaGo to AWS ECR & EC2
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - dev2-backend-core
+    paths:
+      - 'ms-reciclago-bff/**'
+      - 'ms-reciclago-catalog/**'
+      - 'ms-reciclago-pickups/**'
+      - 'ms-reciclago-routes/**'
+      - 'docker-compose.yml'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch: # Permite ejecución manual desde la pestaña Actions de GitHub
+
+jobs:
+  build-and-push-ecr:
+    name: 🐳 Build Docker Images & Push to AWS ECR
+    runs-on: ubuntu-latest
+    outputs:
+      registry: ${{ steps.login-ecr.outputs.registry }}
+
+    steps:
+      - name: 📥 Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: 🔑 Configurar credenciales de AWS Backend (DEV 2)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_BACKEND_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_BACKEND_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_BACKEND_SESSION_TOKEN }} # Requerido para cuentas AWS Academy / Learner Lab
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: 📦 Login en Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: 🛠️ Asegurar existencia de Repositorios en ECR
+        run: |
+          REGION="${{ secrets.AWS_REGION || 'us-east-1' }}"
+          REPOS=("reciclago/ms-bff" "reciclago/ms-catalog" "reciclago/ms-pickups" "reciclago/ms-routes")
+          for repo in "${REPOS[@]}"; do
+            echo "Verificando repositorio ECR: $repo"
+            aws ecr describe-repositories --repository-names "$repo" --region "$REGION" > /dev/null 2>&1 || \
+            aws ecr create-repository --repository-name "$repo" --region "$REGION"
+          done
+
+      - name: 🏗️ Compilar y Publicar Microservicio BFF
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          echo "Construyendo ms-bff..."
+          docker build -t "$REGISTRY/reciclago/ms-bff:latest" -t "$REGISTRY/reciclago/ms-bff:${{ github.sha }}" ./ms-reciclago-bff
+          docker push "$REGISTRY/reciclago/ms-bff:latest"
+          docker push "$REGISTRY/reciclago/ms-bff:${{ github.sha }}"
+
+      - name: 🏗️ Compilar y Publicar Microservicio Catálogo
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          echo "Construyendo ms-catalog..."
+          docker build -t "$REGISTRY/reciclago/ms-catalog:latest" -t "$REGISTRY/reciclago/ms-catalog:${{ github.sha }}" ./ms-reciclago-catalog
+          docker push "$REGISTRY/reciclago/ms-catalog:latest"
+          docker push "$REGISTRY/reciclago/ms-catalog:${{ github.sha }}"
+
+      - name: 🏗️ Compilar y Publicar Microservicio Retiros
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          echo "Construyendo ms-pickups..."
+          docker build -t "$REGISTRY/reciclago/ms-pickups:latest" -t "$REGISTRY/reciclago/ms-pickups:${{ github.sha }}" ./ms-reciclago-pickups
+          docker push "$REGISTRY/reciclago/ms-pickups:latest"
+          docker push "$REGISTRY/reciclago/ms-pickups:${{ github.sha }}"
+
+      - name: 🏗️ Compilar y Publicar Microservicio Rutas
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          echo "Construyendo ms-routes..."
+          docker build -t "$REGISTRY/reciclago/ms-routes:latest" -t "$REGISTRY/reciclago/ms-routes:${{ github.sha }}" ./ms-reciclago-routes
+          docker push "$REGISTRY/reciclago/ms-routes:latest"
+          docker push "$REGISTRY/reciclago/ms-routes:${{ github.sha }}"
+
+      - name: ✅ Resumen de Publicación ECR
+        run: |
+          echo "Todas las imágenes Docker de backend han sido publicadas exitosamente en Amazon ECR."
+
+  deploy-ec2:
+    name: 🚀 Deploy to AWS EC2 via SSH
+    needs: build-and-push-ecr
+    runs-on: ubuntu-latest
+    if: ${{ secrets.EC2_HOST != '' && secrets.EC2_SSH_KEY != '' }}
+
+    steps:
+      - name: 📥 Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: 📁 Transferir docker-compose.yml a la instancia EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER || 'ubuntu' }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: 'docker-compose.yml'
+          target: '~/reciclago/'
+
+      - name: 🚀 Ejecutar Despliegue en EC2 vía SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          REGISTRY: ${{ needs.build-and-push-ecr.outputs.registry }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_BACKEND_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_BACKEND_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_BACKEND_SESSION_TOKEN }}
+          AWS_REGION: ${{ secrets.AWS_REGION || 'us-east-1' }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER || 'ubuntu' }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: REGISTRY,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_SESSION_TOKEN,AWS_REGION
+          script: |
+            set -e
+            echo "Conectado exitosamente a la instancia EC2..."
+            mkdir -p ~/reciclago
+            cd ~/reciclago
+
+            # Configurar variables en .env para docker compose
+            cat <<EOF > .env
+            COMPOSE_PROFILES=apps
+            POSTGRES_DB=reciclago_db
+            POSTGRES_USER=reciclago
+            POSTGRES_PASSWORD=reciclagopass
+            RABBITMQ_USER=guest
+            RABBITMQ_PASS=guest
+            ECR_REGISTRY=$REGISTRY
+            IMAGE_TAG=latest
+            EOF
+
+            # Autenticar Docker con Amazon ECR en la instancia EC2
+            if command -v aws &> /dev/null; then
+              export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID"
+              export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY"
+              export AWS_SESSION_TOKEN="$AWS_SESSION_TOKEN"
+              export AWS_DEFAULT_REGION="$AWS_REGION"
+              aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$REGISTRY"
+            fi
+
+            echo "Descargando imágenes actualizadas de ECR..."
+            docker compose pull ms-bff ms-catalog ms-pickups ms-routes || true
+
+            echo "Iniciando infraestructura y microservicios con Docker Compose..."
+            docker compose up -d
+
+            echo "Limpiando imágenes antiguas en desuso..."
+            docker image prune -f || true
+
+            echo "Estado actual de los contenedores:"
+            docker compose ps
+            echo "✅ Despliegue completado con éxito en EC2."
