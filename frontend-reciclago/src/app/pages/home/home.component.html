@@ -1,33 +1,28 @@
 <div class="anim-fade-in">
-  <!-- 1. Hero Section con Búsqueda Panorámica y Volcán Osorno -->
-  <app-home-hero
-    [allSectors]="allSectors"
-    [popularSectors]="popularSectors"
-    [selectedSector]="selectedSector"
-    (sectorSelected)="onSectorSelected($event)"
-    (searchSubmitted)="onSearchSubmitted($event)">
-  </app-home-hero>
+  <!-- 1. Hero Section: Retiro Domiciliario Inteligente con Volcán Osorno y Camión RecicLaGo -->
+  <app-home-hero></app-home-hero>
 
-  <!-- 2. Tu Día de Retiro, 4 Bins de Reciclaje y Camión Municipal -->
-  <app-home-schedule-bins
-    [sector]="selectedSector"
-    [justUpdated]="justUpdated">
-  </app-home-schedule-bins>
+  <!-- 2. ¿Cómo funciona? El ciclo de vida del retiro en 5 pasos -->
+  <app-home-cycle></app-home-cycle>
 
-  <!-- 3. Retiro Especial y 4 Acciones Rápidas -->
-  <app-home-special-pickup
-    (openMaterialsModal)="showMaterialsModal = true"
-    (openFaqModal)="showFaqModal = true">
-  </app-home-special-pickup>
+  <!-- 3. Tu comuna, cuatro cuadrantes: Cuadrantes y Residuos Comunales (Reactivo al Catálogo Oficial) -->
+  <app-home-quadrants
+    (quadrantSelected)="onQuadrantSelected($event)">
+  </app-home-quadrants>
 
-  <!-- 4. Costanera Puerto Varas y Compromiso Comunal -->
-  <app-home-commitment></app-home-commitment>
+  <!-- 4. Nuestra huella: Impacto en la comuna y Banner Panorámico de Compromiso -->
+  <app-home-impact
+    (openInfoModal)="showFaqModal = true">
+  </app-home-impact>
 
-  <!-- 5. Modales Cívicos (Materiales Aceptados y Preguntas Frecuentes) -->
+  <!-- 5. Modales Cívicos (Detalle de Cuadrante, Catálogo de Materiales y Orientación Municipal) -->
   <app-home-modals
+    [selectedQuadrant]="selectedQuadrantForModal"
     [showMaterialsModal]="showMaterialsModal"
     [showFaqModal]="showFaqModal"
+    (closeQuadrant)="selectedQuadrantForModal = null"
     (closeMaterials)="showMaterialsModal = false"
     (closeFaq)="showFaqModal = false">
   </app-home-modals>
 </div>
+

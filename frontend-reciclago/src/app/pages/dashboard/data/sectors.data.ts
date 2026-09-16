@@ -31,6 +31,12 @@ export interface Residuo {
   nombre: string;
   descripcion?: string;
   categoria?: string;
+  tipo?: string;
+  instrucciones?: string;
+  precioBase?: number;
+  especial?: boolean;
+  activo?: boolean;
+  semanal?: boolean;
 }
 
 export interface Camion {

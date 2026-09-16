@@ -1,14 +1,14 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { SectorInfo, ALL_HOME_SECTORS, POPULAR_HOME_SECTORS } from './data/home-sectors.data';
+import { QuadrantCardInfo, SectorInfo, ALL_HOME_SECTORS } from './data/home-sectors.data';
 import { HomeHeroComponent } from './components/home-hero.component';
-import { HomeScheduleBinsComponent } from './components/home-schedule-bins.component';
-import { HomeSpecialPickupComponent } from './components/home-special-pickup.component';
-import { HomeCommitmentComponent } from './components/home-commitment.component';
+import { HomeCycleComponent } from './components/home-cycle.component';
+import { HomeQuadrantsComponent } from './components/home-quadrants.component';
+import { HomeImpactComponent } from './components/home-impact.component';
 import { HomeModalsComponent } from './components/home-modals.component';
 
-export { SectorInfo };
+export { SectorInfo, QuadrantCardInfo };
 
 @Component({
   selector: 'app-home',
@@ -16,9 +16,9 @@ export { SectorInfo };
   imports: [
     CommonModule,
     HomeHeroComponent,
-    HomeScheduleBinsComponent,
-    HomeSpecialPickupComponent,
-    HomeCommitmentComponent,
+    HomeCycleComponent,
+    HomeQuadrantsComponent,
+    HomeImpactComponent,
     HomeModalsComponent
   ],
   templateUrl: './home.component.html'
@@ -26,32 +26,18 @@ export { SectorInfo };
 export class HomeComponent {
   showMaterialsModal = false;
   showFaqModal = false;
-  justUpdated = false;
+  selectedQuadrantForModal: QuadrantCardInfo | null = null;
 
-  allSectors: SectorInfo[] = [...ALL_HOME_SECTORS];
-  popularSectors: SectorInfo[] = [...POPULAR_HOME_SECTORS];
-  selectedSector: SectorInfo = this.allSectors[0];
-
-  onSectorSelected(sector: SectorInfo): void {
-    this.selectedSector = sector;
-    this.justUpdated = true;
-    setTimeout(() => {
-      this.justUpdated = false;
-    }, 2500);
-  }
-
-  onSearchSubmitted(sector: SectorInfo): void {
-    this.onSectorSelected(sector);
-    const el = document.getElementById('tu-dia-de-retiro');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  onQuadrantSelected(quadrant: QuadrantCardInfo): void {
+    this.selectedQuadrantForModal = quadrant;
   }
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
     this.showMaterialsModal = false;
     this.showFaqModal = false;
+    this.selectedQuadrantForModal = null;
     document.body.style.overflow = '';
   }
 }
+

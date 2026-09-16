@@ -61,6 +61,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/citizens/how-it-works", "/api/citizens/faq").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/citizens/contact").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/routes/cuadrante", "/api/routes/cuadrantes", "/api/routes/cuadrantes/*", "/api/routes/*/tracking", "/api/routes/tracking/*").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/catalog/residuos", "/api/catalog/camiones").permitAll()
                 // Paneles administrativos, coordinación y chofer
                 .requestMatchers("/api/admin/**").hasRole("Admin")
                 .requestMatchers("/api/coordinador/**").hasAnyRole("Admin", "Coordinador")
