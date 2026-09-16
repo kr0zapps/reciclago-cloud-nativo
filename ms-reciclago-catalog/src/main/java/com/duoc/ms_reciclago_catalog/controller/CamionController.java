@@ -58,6 +58,16 @@ public class CamionController {
         }
     }
 
+    @PatchMapping("/{id}/reducir-capacidad")
+    public ResponseEntity<Camion> reducirCapacidad(@PathVariable Long id, @RequestParam Double pesoKg) {
+        try {
+            Camion actualizado = camionService.reducirCapacidad(id, pesoKg);
+            return ResponseEntity.ok(actualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         camionService.eliminar(id);

@@ -52,6 +52,15 @@ public class CamionService {
         }).orElseThrow(() -> new RuntimeException("Camión no encontrado con id: " + id));
     }
 
+    public Camion reducirCapacidad(Long id, Double pesoKg) {
+        return camionRepository.findById(id).map(c -> {
+            double actual = c.getCapacidadDisponibleKg() != null ? c.getCapacidadDisponibleKg() : c.getCapacidadTotalKg();
+            double restar = pesoKg != null ? pesoKg : 0.0;
+            c.setCapacidadDisponibleKg(Math.max(0.0, actual - restar));
+            return camionRepository.save(c);
+        }).orElseThrow(() -> new RuntimeException("Camión no encontrado con id: " + id));
+    }
+
     public void eliminar(Long id) {
         camionRepository.deleteById(id);
     }
