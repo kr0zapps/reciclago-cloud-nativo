@@ -9,7 +9,4 @@ import java.util.Optional;
 
 @Repository
 public interface ContactoCiudadanoRepository extends JpaRepository<ContactoCiudadano, Long> {
-    Optional<ContactoCiudadano> findByTicketId(String ticketId);
-    List<ContactoCiudadano> findByEmail(String email);
-    List<ContactoCiudadano> findByStatus(String status);
 }

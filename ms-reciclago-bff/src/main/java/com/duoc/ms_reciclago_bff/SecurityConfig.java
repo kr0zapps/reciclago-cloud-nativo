@@ -14,7 +14,11 @@ import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
-import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
@@ -24,7 +28,9 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -54,17 +60,19 @@ public class SecurityConfig {
                 // Acceso público a información cívica y consultas comunitarias
                 .requestMatchers(HttpMethod.GET, "/api/citizens/how-it-works", "/api/citizens/faq").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/citizens/contact").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/routes/cuadrante", "/api/routes/cuadrantes").permitAll()
-                // Paneles administrativos y de coordinación
+                .requestMatchers(HttpMethod.GET, "/api/routes/cuadrante", "/api/routes/cuadrantes", "/api/routes/cuadrantes/*", "/api/routes/*/tracking", "/api/routes/tracking/*").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/catalog/residuos", "/api/catalog/camiones").permitAll()
+                // Paneles administrativos, coordinación y chofer
                 .requestMatchers("/api/admin/**").hasRole("Admin")
                 .requestMatchers("/api/coordinador/**").hasAnyRole("Admin", "Coordinador")
+                .requestMatchers("/api/chofer/**").hasAnyRole("Admin", "Coordinador", "Chofer")
                 .requestMatchers(HttpMethod.GET, "/api/citizens/contact").hasAnyRole("Admin", "Coordinador")
-                .requestMatchers(HttpMethod.PUT, "/api/routes/tracking/**").hasAnyRole("Admin", "Coordinador")
-                // RBAC estricto en operaciones logisticas de ciclo de vida (solo Admin o Coordinador)
+                .requestMatchers(HttpMethod.PUT, "/api/routes/tracking/**").hasAnyRole("Admin", "Coordinador", "Chofer")
+                // RBAC estricto en operaciones logisticas de ciclo de vida (Admin, Coordinador y Chofer)
                 .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/programar").hasAnyRole("Admin", "Coordinador")
-                .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/en-ruta").hasAnyRole("Admin", "Coordinador")
-                .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/retirado").hasAnyRole("Admin", "Coordinador")
-                .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/pesado").hasAnyRole("Admin", "Coordinador")
+                .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/en-ruta").hasAnyRole("Admin", "Coordinador", "Chofer")
+                .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/retirado").hasAnyRole("Admin", "Coordinador", "Chofer")
+                .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/pesado").hasAnyRole("Admin", "Coordinador", "Chofer")
                 .requestMatchers("/api/pickups/**").authenticated()
                 .requestMatchers("/api/catalog/**").authenticated()
                 .requestMatchers("/api/routes/**").authenticated()
@@ -120,7 +128,27 @@ public class SecurityConfig {
             Object rolesClaim = jwt.getClaims().get("roles");
             if (rolesClaim instanceof List<?> rolesList && !rolesList.isEmpty()) {
                 for (Object role : rolesList) {
-                    authorities.add(new SimpleGrantedAuthority("ROLE_" + role.toString()));
+                    if (role != null) {
+                        String r = role.toString().trim();
+                        authorities.add(new SimpleGrantedAuthority("ROLE_" + r));
+                        if (!r.isEmpty()) {
+                            String cap = Character.toUpperCase(r.charAt(0)) + (r.length() > 1 ? r.substring(1).toLowerCase() : "");
+                            if (!cap.equals(r)) {
+                                authorities.add(new SimpleGrantedAuthority("ROLE_" + cap));
+                            }
+                        }
+                    }
+                }
+            } else if (rolesClaim instanceof String roleStr && !roleStr.isBlank()) {
+                for (String r : roleStr.split(",")) {
+                    r = r.trim();
+                    authorities.add(new SimpleGrantedAuthority("ROLE_" + r));
+                    if (!r.isEmpty()) {
+                        String cap = Character.toUpperCase(r.charAt(0)) + (r.length() > 1 ? r.substring(1).toLowerCase() : "");
+                        if (!cap.equals(r)) {
+                            authorities.add(new SimpleGrantedAuthority("ROLE_" + cap));
+                        }
+                    }
                 }
             } else {
                 authorities.add(new SimpleGrantedAuthority("ROLE_Vecino"));

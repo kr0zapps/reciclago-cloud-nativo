@@ -10,7 +10,5 @@ import java.util.Optional;
 @Repository
 public interface CamionTrackingRepository extends JpaRepository<CamionTracking, Long> {
     Optional<CamionTracking> findByCamionId(Long camionId);
-    Optional<CamionTracking> findByPatente(String patente);
     Optional<CamionTracking> findByCuadranteId(Long cuadranteId);
-    List<CamionTracking> findByEstado(String estado);
 }

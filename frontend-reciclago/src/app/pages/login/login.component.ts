@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MsalService, MSAL_GUARD_CONFIG, MsalGuardConfiguration } from '@azure/msal-angular';
-import { InteractionType, RedirectRequest } from '@azure/msal-browser';
+import { RedirectRequest } from '@azure/msal-browser';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -44,7 +44,7 @@ import { environment } from '../../../environments/environment';
           </span>
         </div>
 
-        <span class="text-[11px] font-extrabold uppercase tracking-widest text-[#093554]/70 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 mb-6">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200 mb-6">
           Puerto Varas • Portal Comunal
         </span>
 
@@ -97,7 +97,7 @@ import { environment } from '../../../environments/environment';
             <span class="font-script text-xl text-[#093554] font-bold">
               Juntos por una Puerto Varas más limpia
             </span>
-            <span class="text-xs text-[#72be36]">🍃</span>
+            <span class="text-xs text-[#72be36]"><i class="fa-solid fa-leaf"></i></span>
           </div>
         </div>
 

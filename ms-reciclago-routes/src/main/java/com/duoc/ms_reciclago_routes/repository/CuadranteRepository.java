@@ -9,7 +9,4 @@ import java.util.Optional;
 
 @Repository
 public interface CuadranteRepository extends JpaRepository<Cuadrante, Long> {
-    Optional<Cuadrante> findByNumero(Integer numero);
-    List<Cuadrante> findBySector(String sector);
-    List<Cuadrante> findByDiaSemana(String diaSemana);
 }

@@ -7,6 +7,11 @@ import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
 
+/**
+ * Inicializador de datos de prueba para el ambiente de desarrollo.
+ * Crea 3 retiros de ejemplo en distintos estados del flujo
+ * usando direcciones y patentes coherentes con Puerto Varas.
+ */
 @Configuration
 public class DataInitializer implements CommandLineRunner {
 
@@ -19,35 +24,37 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (pickupRepository.count() == 0) {
+            // Retiro PROGRAMADO — Cuadrante 1 (Puerto Chico), Cartón/Papel, Lunes
             pickupRepository.save(new Pickup(
                     null,
-                    "RET-1001",
+                    "RET-PV-SEED01",
                     "Juan Pérez",
-                    "juan.perez@example.com",
-                    "Av. Providencia 1234, Apt 402",
-                    "Providencia",
+                    "jon.vidals@duocuc.cl",
+                    "Av. Puerto Chico 234",
+                    "Puerto Varas",
                     1L,
-                    "Plástico PET",
+                    "Cartón y Papel",
                     1L,
-                    "AB-123-CD",
+                    "PV-RC-2026",
                     15.5,
                     null,
                     "PROGRAMADO",
                     LocalDateTime.now().minusDays(1),
                     LocalDateTime.now().plusDays(1),
                     null,
-                    "Retiro por la mañana antes de las 12:00"
+                    "Cajas de cartón desarmadas en el portón"
             ));
 
+            // Retiro SOLICITADO — Cuadrante 2 (Costanera Sur), Vidrio, Martes
             pickupRepository.save(new Pickup(
                     null,
-                    "RET-1002",
+                    "RET-PV-SEED02",
                     "María González",
-                    "maria.gonzalez@example.com",
-                    "Calle Alameda 567",
-                    "Santiago",
+                    "maria.gonzalez@puertovaras.cl",
+                    "Costanera Sur 567",
+                    "Puerto Varas",
                     2L,
-                    "Cartón y Papel",
+                    "Vidrio",
                     null,
                     null,
                     45.0,
@@ -56,28 +63,30 @@ public class DataInitializer implements CommandLineRunner {
                     LocalDateTime.now(),
                     null,
                     null,
-                    "Cajas de cartón desarmadas en el portón"
+                    "Botellas de vidrio clasificadas por color"
             ));
 
+            // Retiro PESADO — Cuadrante 3 (Ensenada), Plásticos, Miércoles
             pickupRepository.save(new Pickup(
                     null,
-                    "RET-1003",
+                    "RET-PV-SEED03",
                     "Carlos Silva",
-                    "carlos.silva@example.com",
-                    "Av. Vitacura 890",
-                    "Vitacura",
+                    "carlos.silva@puertovaras.cl",
+                    "Camino Ensenada 890",
+                    "Puerto Varas",
                     3L,
-                    "Vidrio",
+                    "Plástico PET",
                     2L,
-                    "EF-456-GH",
+                    "PV-RC-2027",
                     80.0,
                     82.4,
                     "PESADO",
                     LocalDateTime.now().minusDays(3),
                     LocalDateTime.now().minusDays(2),
                     LocalDateTime.now().minusDays(2),
-                    "Botellas de vidrio clasificadas por color"
+                    "Envases plásticos limpios y compactados"
             ));
         }
     }
 }
+

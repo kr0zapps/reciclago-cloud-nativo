@@ -14,7 +14,6 @@ public interface PickupRepository extends JpaRepository<Pickup, Long> {
     Optional<Pickup> findByCodigoRetiro(String codigoRetiro);
     List<Pickup> findByEstado(String estado);
     List<Pickup> findByVecinoEmail(String vecinoEmail);
-    List<Pickup> findByComuna(String comuna);
 
     Page<Pickup> findByVecinoEmail(String vecinoEmail, Pageable pageable);
     Page<Pickup> findByEstado(String estado, Pageable pageable);

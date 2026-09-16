@@ -1,548 +1,449 @@
-# 🗺️ Ruta de Trabajo y Plan de Implementación: RecicLaGo
-**Sistema Municipal de Reciclaje Puerta a Puerta — Comuna de Puerto Varas**  
-*Asignatura: Cloud Nativo (Duoc UC)*
+﻿# 🗺️ Hoja de Ruta y Guía de Implementación: DEV 2 (Backend, EDA & AWS Cloud)
+**Proyecto: RecicLaGo — Plataforma Cloud Native de Reciclaje Municipal (Puerto Varas)**  
+*Asignatura: Cloud Nativo (Duoc UC)*  
+*Responsable: DEV 2 (Ingeniería de Backend, Mensajería Asíncrona e Infraestructura AWS)*
 
 ---
 
-## 📌 1. Visión y Objetivos del Proyecto
+## 📌 1. Resumen Ejecutivo del Estado del Proyecto
 
-El proyecto **RecicLaGo** es una plataforma Cloud Native orientada al reciclaje municipal sustentable en Puerto Varas, diseñada bajo una arquitectura de microservicios con **Event-Driven Architecture (EDA)** y Frontend desacoplado con **BFF (Backend For Frontend)**.
+El desarrollo correspondiente a **DEV 1 (Frontend Angular 19, MSAL Entra ID y ms-bff Gateway en puerto 8080)** se encuentra **100% completado, modularizado y desplegado en AWS S3**. 
+
+Los 4 microservicios backend ya están dockerizados, compilados y funcionando en Docker Compose:
+- `ms-reciclago-bff` (Puerto 8080 — Edge Gateway / Resource Server OAuth2)
+- `ms-reciclago-catalog` (Puerto 8081 — Residuos, Camiones y Tarifas)
+- `ms-reciclago-pickups` (Puerto 8083 — Ciclo de vida de retiros, Pesaje y Productores EDA)
+- `ms-reciclago-routes` (Puerto 8084 — Cuadrantes, Telemetría y Contacto DIMAO)
+- Contenedores de soporte: PostgreSQL 15 (`5433:5432`), RabbitMQ 3 (`5672 / 15672`), Kafka (`9092 / 29092`) y Zookeeper (`2181`).
+
+> [!IMPORTANT]
+> **ESTE DOCUMENTO CONTIENE EXCLUSIVAMENTE LO QUE LE FALTA POR HACER A DEV 2**. Todo lo relativo a DEV 1 ya fue entregado, verificado y no requiere más trabajo.
+
+---
+
+## 📋 2. Matriz de Tareas Pendientes para DEV 2
 
 ```mermaid
 graph TD
-    Client["🌐 Frontend Angular 18 (Puerto 4200)<br>Standalone Components + Tailwind CSS"] -->|"OAuth2 JWT (MSAL)"| BFF["🛡️ ms-reciclago-bff (Puerto 8080)<br>Resource Server + Orquestación"]
-    
-    subgraph "Responsabilidad DEV 1"
-        Client
-        BFF
+    subgraph "TAREA 1: Event-Driven Consumers (RabbitMQ y Kafka)"
+        R1["🐇 Consumidor RabbitMQ: q.cmd.email"]
+        R2["🐇 Consumidor RabbitMQ: q.cmd.certificate"]
+        R3["🐇 Consumidor RabbitMQ: q.cmd.route"]
+        K1["⚡ Consumidor Kafka: pickups.events"]
+        K2["⚡ Consumidor Kafka: audit.timeline"]
     end
 
-    BFF -->|"HTTP REST"| Catalog["📦 ms-reciclago-catalog (Puerto 8081)<br>Residuos, Camiones, Tarifas"]
-    BFF -->|"HTTP REST"| Pickups["🚛 ms-reciclago-pickups (Puerto 8083)<br>Gestión de Retiros y Solicitudes"]
-    BFF -.->|"HTTP REST (Nuevo)"| Routes["📍 Módulo / ms-reciclago-routes<br>Cuadrantes y GPS Camiones"]
-
-    subgraph "Responsabilidad DEV 2"
-        Catalog
-        Pickups
-        Routes
-        Postgres[("🐘 PostgreSQL (5432)<br>reciclago_db")]
-        RabbitMQ["🐇 RabbitMQ (5672 / 15672)<br>q.cmd.email, q.cmd.route"]
-        Kafka["⚡ Apache Kafka (9092)<br>Topic: pickups.events"]
+    subgraph "TAREA 2: AWS ECR (Registro de Imágenes)"
+        ECR1["📦 ECR: reciclago/ms-bff"]
+        ECR2["📦 ECR: reciclago/ms-catalog"]
+        ECR3["📦 ECR: reciclago/ms-pickups"]
+        ECR4["📦 ECR: reciclago/ms-routes"]
     end
 
-    Catalog --> Postgres
-    Pickups --> Postgres
-    Pickups --> RabbitMQ
-    Pickups --> Kafka
+    subgraph "TAREA 3: Despliegue en AWS EC2"
+        EC2["💻 Instancia EC2 (t3.medium + 4GB Swap + LabRole)"]
+        SG["🛡️ Security Group (SSH 22, HTTP 8080)"]
+        DC["🐳 Docker Compose Pull & Up (8 Contenedores)"]
+    end
+
+    subgraph "TAREA 4: AWS API Gateway + JWT Authorizer (20% Rúbrica EP2)"
+        APIGW["🌐 HTTP API Gateway -> EC2:8080"]
+        AUTH["🔑 JWT Authorizer (Microsoft Entra ID)"]
+        CORS["🔒 CORS habilitado para S3 de DEV 1"]
+    end
+
+    R1 --> DC
+    K1 --> DC
+    ECR1 --> EC2
+    EC2 --> SG --> APIGW
+    APIGW --> AUTH
+    APIGW --> CORS
 ```
 
----
-
-## 👥 2. Matriz de Roles y Asignación de Responsabilidades
-
-| Rol | Componentes a Cargo | Tecnologías Clave | Responsabilidad Primaria |
-| :--- | :--- | :--- | :--- |
-| **DEV 1** | • `frontend-reciclago`<br>• `ms-reciclago-bff` | Angular 18, Tailwind CSS, MSAL Entra ID, Spring Boot 3, Spring Security OAuth2, RestClient. | • Experiencia de Usuario (UI/UX), diseño responsivo móvil/desktop.<br>• Interactividad del 100% de botones y enlaces (cero `#`).<br>• Centralización de seguridad y consumo unificado en el BFF. |
-| **DEV 2** | • `ms-reciclago-catalog`<br>• `ms-reciclago-pickups`<br>• `docker-compose.yml` | Java 17, Spring Boot 3, Spring Data JPA, PostgreSQL, RabbitMQ, Apache Kafka. | • Lógica de negocio core, persistencia relacional y migraciones.<br>• Ciclo de vida del retiro y emisión de eventos Kafka.<br>• Gestión de infraestructura en contenedores Docker y compatibilidad Java 17. |
-
----
-
-## 🔍 3. Auditoría de Interactividad Frontend (Todos los `<a>` y `<button>`)
-
-Para cumplir la regla estricta: **"cada botón o enlace debe ser clickeable y funcional"**, a continuación se define el estado y la acción para cada elemento del sistema:
-
-| Componente | Elemento UI | Destino Actual | Estado Backend / Mock | Acción Frontend | Endpoint Backend Requerido (DEV 2) |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Header** | Logo RecicLaGo | `/` | ✅ Soportado | Navega a inicio sin recargar. | `N/A` |
-| **Header** | Enlace "Inicio" | `/` | ✅ Soportado | RouterLink activo con indicador visual. | `N/A` |
-| **Header** | "¿Cómo funciona?" | Modal Cívico | ✅ Completado | Abre Modal Guía Ciudadana en 4 pasos + tip condominios. | `GET /api/citizens/how-it-works` (Opcional) |
-| **Header** | "Materiales" | Modal Cívico | ✅ Completado | Abre Modal con las 4 Fracciones Oficiales DIMAO. | `GET /api/catalog/residuos` |
-| **Header** | "Retiro especial" | `/dashboard` | ✅ Soportado | Redirige al Dashboard y enfoca el formulario. | `POST /api/pickups` |
-| **Header** | "Contacto DIMAO" | Modal Cívico | ✅ Completado | Abre Modal Mesa de Ayuda DIMAO (Teléfono, correo, oficina). | `POST /api/citizens/contact` |
-| **Header** | "Mi cuenta" | `/login` | ✅ Soportado | Redirige al login comunal con soporte `returnUrl`. | `N/A (MSAL)` |
-| **Header** | Salir | `logout()` | ✅ Soportado | Limpia tokens y redirige a la portada. | `N/A (MSAL)` |
-| **Footer** | "Materiales" | Modal Cívico | ✅ Completado | Abre Guía Oficial de Clasificación de Residuos. | `GET /api/catalog/residuos` |
-| **Footer** | "Contacto" | Modal Cívico | ✅ Completado | Abre Modal de Contacto y Emergencias DIMAO. | `POST /api/citizens/contact` |
-| **Footer** | RRSS (FB, IG, YT) | Enlaces Externos | ✅ Soportado | Enlaces oficiales a Municipalidad de Puerto Varas (`target="_blank"`). | `N/A` |
-| **Home** | Buscador Dirección | Formulario | ❌ Pendiente DEV 2 | Valida dirección y transfiere parámetro a dashboard. | `GET /api/routes/cuadrante?direccion={}` |
-| **Home** | "Ver mi día de retiro" | `/dashboard` | ✅ Soportado | Redirige al panel vecinal. | `GET /api/routes/cuadrante` |
-| **Home** | "Seguir mi camión" | `/dashboard` | ❌ Pendiente DEV 2 | Redirige al mapa barrial interactivo. | `GET /api/routes/{id}/tracking` |
-| **Home** | "Qué reciclar" | Modal Cívico | ✅ Completado | Abre Guía Oficial de Fracciones de Reciclaje. | `GET /api/catalog/residuos` |
-| **Home** | "Preguntas frecuentes" | Modal Cívico | ✅ Completado | Abre Modal de FAQ oficial con respuestas comunitarias. | `GET /api/citizens/faq` |
-| **Dashboard** | "Agendar retiro especial" | `#solicitud-retiro` | ✅ Soportado | Scroll animado suave directo al formulario. | `POST /api/pickups` |
-| **Dashboard** | "Ver recorrido completo" | Modal Cívico | ✅ Completado | Abre Modal con Cuadrantes 1 al 4 y "Tu Sector". | `GET /api/routes/cuadrante` |
-| **Dashboard** | "Ver todos los retiros" | Modal Cívico | ✅ Completado | Abre Modal de Historial Trazable con kilos acumulados. | `GET /api/pickups/history` |
-| **Dashboard** | "Agendar retiro municipal" | `type="submit"` | ✅ Soportado | Envío directo de solicitud vía BFF. | `POST /api/pickups` |
+| # | Área de Trabajo | Descripción del Requerimiento | Estado | Prioridad |
+|---|---|---|:---:|:---:|
+| **1** | **Consumidores RabbitMQ** | Implementar listeners `@RabbitListener` para `q.cmd.email`, `q.cmd.certificate` y `q.cmd.route`. | ❌ **Pendiente** | 🔴 Crítica |
+| **2** | **Consumidores Kafka** | Implementar listeners `@KafkaListener` para topics `pickups.events` y `audit.timeline` (Auditoría DIMAO). | ❌ **Pendiente** | 🔴 Crítica |
+| **3** | **Amazon ECR** | Crear los 4 repositorios en AWS ECR con la cuenta de DEV 2 y subir las imágenes Docker taggeadas. | ❌ **Pendiente** | 🔴 Crítica |
+| **4** | **Amazon EC2** | Levantar instancia EC2 Ubuntu, asociar rol `LabRole`, configurar 4 GB Swap, SG (8080/22) y Docker Compose. | ❌ **Pendiente** | 🔴 Crítica |
+| **5** | **AWS API Gateway + JWT Authorizer** | Configurar HTTP API Gateway con JWT Authorizer de Microsoft Entra ID (20% nota EP2) y CORS. | ❌ **Pendiente** | 🔴 Crítica |
+| **6** | **Secretos GitHub** | Cargar las credenciales de AWS de DEV 2 en los secretos del repositorio para CI/CD continuo. | ❌ **Pendiente** | 🟢 Media |
 
 ---
 
-## 🛠️ 4. Plan de Trabajo Detallado: DEV 1 (Frontend + BFF)
+## 🛠️ 3. Tarea 1: Implementación de Consumidores Asíncronos (Código Java Listo para Copiar)
 
-### Fase 1: Frontend Angular 18 (`frontend-reciclago`) — [COMPLETADO ✅]
-1. **Autenticación Interna & Auth Guard Personalizado:**
-   * Sustituido `MsalGuard` genérico por `authGuard` funcional: al intentar acceder a rutas protegidas (`/dashboard`), el usuario no autenticado es redirigido a `/login?returnUrl=...` (pantalla comunal de RecicLaGo) en lugar de ser enviado bruscamente a Microsoft Online.
-   * `LoginComponent` y `AppComponent` capturan el `returnUrl` (mediante `ActivatedRoute` y `sessionStorage`) y tras autenticarse con Microsoft Entra ID redirigen fluidamente al `/dashboard`.
-2. **Menú Móvil Responsivo (Hamburger Menu):**
-   * Botón hamburguesa interactivo (`md:hidden`) con animación de apertura/cierre (`fa-bars` / `fa-xmark`).
-   * Desplegable móvil que expone el 100% de los accesos de desktop: `Inicio`, `¿Cómo funciona?`, `Materiales`, `Retiro especial`, `Contacto DIMAO`, e inicio/cierre de sesión vecinal con badge oficial.
-3. **Identidad Visual Oficial de Puerto Varas:**
-   * Incorporado el **Escudo Heráldico Oficial de la Municipalidad de Puerto Varas** (`assets/escudo-puerto-varas.svg`: corona mural dorada, Volcán Osorno nevado, Lago Llanquihue y estrella) tanto en el Header de escritorio como en el Footer universal y el cajón móvil.
-4. **Interactividad Total (Cero Enlaces Inertes):**
-   * Eliminados todos los `href="#"`: modales interactivos para `¿Cómo funciona?`, `Materiales`, `Contacto DIMAO`, `Preguntas frecuentes` y `Rutas de recolección`.
-   * Desplazamiento animado suave (`scrollIntoView`) en el Dashboard hacia el formulario de solicitud de retiro.
-5. **Integración Armónica de Fondos (Sin Cortes Cuadrados):**
-   * El fondo fotográfico 4K y la silueta vectorial del Volcán Osorno comparten armónicamente el fondo del sitio `#F8FAF7` mediante máscaras de degradado CSS (`mask-image`), eliminando cortes abruptos y enfocando la cumbre en pantallas móviles.
-6. **Sistema de Carga con Identidad Visual RecicLaGo & Animación de Despliegue:**
-   * **Loader Central con Identidad de Marca:** Tarjeta flotante de cristal esmerilado (`backdrop-blur-md`) que presenta el logo oficial de **RecicLaGo** (volcán, hoja y ondas del lago) con pulso suave (`anim-pulse-gentle`), halo verde radiante, tipografía comunal y mini barra degradada. Proporciona identidad visual instantánea con un fondo semitransparente suave (`bg-[#041D2D]/20`) que no enceguece ni bloquea al usuario.
-   * **Top Progress Bar Global (`anim-top-loader`):** Delgada barra superior degradada en los colores de Puerto Varas (`#4F8A3D` $\rightarrow$ `#38BDF8` $\rightarrow$ `#123F5B`) vinculada a los eventos del `Router` (`NavigationStart`, `NavigationEnd`).
-   * **Animación de Despliegue Suave (`anim-page-deploy`):** Transición de despliegue vertical con curva desacelerada (`cubic-bezier(0.16, 1, 0.3, 1)`) y desenfoque suave al cambiar de página, con escalonamiento por capas (`anim-deploy-delay-*`) en tarjetas clave.
-7. **Sistema Profesional de Modales Cívicos (Estándar `frontend-design`):**
-   * **Backdrop Lake-Navy con Desenfoque:** Reemplazo de overlays negros opacos por `bg-[#041D2D]/60 backdrop-blur-md`, evocando la atmósfera del Lago Llanquihue.
-   * **Animaciones de Entrada Cohesivas:** `.anim-modal-backdrop` (fade suave de 0.2s) y `.anim-modal-panel` (elevación elástica de escala `0.96` a `1.0` y desplazamiento vertical de `10px` a `0`).
-   * **Ergonomía y Accesibilidad Completa:** Cierre al hacer clic fuera de la tarjeta con `$event.stopPropagation()`, y cierre por teclado con la tecla `Escape` implementado con `@HostListener('document:keydown.escape')` en todos los componentes.
-   * **Identidad Institucional:** Franja superior de 3px con gradiente comunal (`#4F8A3D` $\rightarrow$ `#38BDF8` $\rightarrow$ `#123F5B`), eliminación de patrones "arcoíris pastel" en favor de tarjetas cívicas sobrias en `#F8FAF7`, y pie con escudo oficial de Puerto Varas y firma DIMAO.
-8. **Refinamiento Visual del Encabezado del Dashboard:**
-   * Sustitución de pastillas flotantes toscas por un identificador cívico sobrio en cristal esmerilado (`bg-white/85 backdrop-blur-xs border border-[#E2E9E4] px-3.5 py-1.5 rounded-xl`) con ícono geográfico y tipografía jerarquizada.
-   * Eliminación de la pastilla invasiva permanente *"Datos actualizados"*, incorporando un chip sutil *"Sincronizando..."* que solo aparece durante la carga y desaparece limpiamente al terminar.
+### Contexto de Negocio
+En `ms-reciclago-pickups`, el servicio `PickupService.java` ya **emite** los eventos hacia RabbitMQ y Kafka cuando un retiro cambia de estado (`PROGRAMADO`, `EN_RUTA`, `RETIRADO`, `PESADO`).
 
-### Fase 2: Backend For Frontend (`ms-reciclago-bff`) — [COMPLETADO / LISTO PARA SERVICIOS DEV 2 ✅]
-1. **Estado y Compilación:**
-   * Microservicio compilando limpiamente bajo Java 17 (`BUILD SUCCESS`).
-   * `BffController.java` y `BffService.java` listos para orquestar llamadas a Catálogo (`8081`), Retiros (`8083`) y Rutas.
-2. **Próximos Endpoints de Consumo para Conectar con DEV 2:**
-   * `GET /api/routes/cuadrante?direccion={txt}`: Consulta el cuadrante correspondiente a una calle.
-   * `GET /api/routes/{cuadranteId}/tracking`: Consulta la posición y estado del camión en el sector.
-   * `GET /api/pickups/history?page={n}&size={m}`: Consume el historial paginado de `ms-reciclago-pickups`.
-   * `POST /api/citizens/contact`: Recibe y valida mensajes de contacto vecinal.
-3. **Seguridad y Claims de Azure AD:**
-   * Paso transparente del JWT Bearer Token hacia los microservicios backend.
-   * Inyección automática del `vecinoEmail` y `vecinoNombre` a partir del token autenticado.
+Crea los siguientes archivos en el paquete:
+`ms-reciclago-pickups/src/main/java/com/duoc/ms_reciclago_pickups/consumer/`
 
 ---
 
-## ⚙️ 5. Plan de Trabajo Detallado: DEV 2 (Backend Core, Datos e Infraestructura)
+### A. Consumidor de Correos Ciudadanos: `EmailNotificationConsumer.java`
+- **Cola:** `q.cmd.email` (`RabbitMQConfig.QUEUE_EMAIL`)
+- **DTO:** `EmailEventDto`
+- **Propósito:** Notificar al vecino ante cada hito de su solicitud.
 
-### Fase 1: Microservicio Retiros (`ms-reciclago-pickups`)
-1. **Historial Paginado (`GET /api/pickups/history`):**
-   * Modificar `PickupRepository` para extender `JpaRepository<Pickup, Long>` con soporte de `Pageable`.
-   * Endpoint con query params: `vecinoEmail`, `estado`, `page`, `size`.
-2. **Event-Driven Architecture (Auditoría en Kafka):**
-   * Asegurar que al cambiar de estado (`PROGRAMADO`, `EN_RUTA`, `RETIRADO`, `PESADO`), se emita un evento JSON al tópico Kafka `pickups.events`:
-     ```json
-     {
-       "eventType": "PICKUP_WEIGHED",
-       "pickupId": 14,
-       "vecinoEmail": "jovise@alumnos.duoc.cl",
-       "pesoRealKg": 8.4,
-       "camionPatente": "PV-RC-26",
-       "timestamp": "2026-09-09T11:45:00Z"
-     }
-     ```
-3. **Colas RabbitMQ:**
-   * Consolidar la publicación en `q.cmd.email` para notificar al vecino cuando su retiro pasa a estado `PROGRAMADO` o `RETIRADO`.
+```java
+package com.duoc.ms_reciclago_pickups.consumer;
 
-### Fase 2: Microservicio Catálogo (`ms-reciclago-catalog`)
-1. **Enriquecimiento de la Entidad `Residuo`:**
-   * Agregar campos requeridos por el frontend:
-     * `categoria` (VIDRIO, CARTON, PLASTICO, LATAS).
-     * `instrucciones` (ej: "Lavar y secar antes de entregar").
-     * `permitido` (boolean).
-2. **Inicialización de Datos Semilla (`data.sql` o CommandLineRunner):**
-   * Poblar los residuos oficiales según ordenanza municipal de Puerto Varas.
+import com.duoc.ms_reciclago_pickups.config.RabbitMQConfig;
+import com.duoc.ms_reciclago_pickups.dto.EmailEventDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
 
-### Fase 3: Soporte de Rutas y Cuadrantes (`ms-reciclago-routes` o módulo en pickups)
-1. **Entidad `Cuadrante`:**
-   * `id`, `nombre` ("Cuadrante 2: Costanera y Llanquihue Sur"), `diaSemana` ("MARTES"), `horarioInicio` ("08:00"), `horarioFin` ("17:00").
-2. **Entidad `CamionTracking`:**
-   * `camionId`, `lat`, `lng`, `calleActual`, `estado` ("EN_CIRCULACION", "EN_BASE").
-3. **Endpoints REST:**
-   * `GET /api/routes/cuadrantes`
-   * `GET /api/routes/tracking/{camionId}`
+@Component
+public class EmailNotificationConsumer {
 
-### Fase 4: Infraestructura Docker (`docker-compose.yml`)
-1. **Asegurar inicio ordenado (`depends_on` con `healthcheck`):**
-   * PostgreSQL (puerto 5432) $\rightarrow$ RabbitMQ (5672/15672) $\rightarrow$ Kafka (9092).
-2. **Compatibilidad Java 17:**
-   * Verificar que los Dockerfiles o scripts de ejecución local compilen bajo JDK 17 sin requerir JDK 21.
+    private static final Logger log = LoggerFactory.getLogger(EmailNotificationConsumer.class);
 
----
-
-## 📋 6. Contratos de API (JSON Schemas) para Integración DEV 1 $\leftrightarrow$ DEV 2
-
-### 1. Consulta de Cuadrante por Dirección
-* **Endpoint:** `GET /api/routes/cuadrante?direccion=Los+Guindos+450`
-* **Respuesta Exitosa (200 OK):**
-```json
-{
-  "cuadranteId": 2,
-  "nombre": "Costanera Sur y Llanquihue Sur",
-  "sector": "Sector Lago",
-  "diaSemana": "MARTES",
-  "horario": "08:00 - 17:00 hrs",
-  "camionPatente": "PV-RC-2026",
-  "camionEnRuta": true
-}
-```
-
-### 2. Historial Paginado de Retiros
-* **Endpoint:** `GET /api/pickups/history?vecinoEmail=usuario@duoc.cl&page=0&size=10`
-* **Respuesta Exitosa (200 OK):**
-```json
-{
-  "content": [
-    {
-      "id": 14,
-      "fecha": "2026-09-02",
-      "fechaTexto": "Miércoles 02 Septiembre",
-      "residuoNombre": "Cartón y Papel",
-      "kilosRecolectados": 12.5,
-      "direccion": "Calle Los Guindos 450",
-      "estado": "completado"
+    @RabbitListener(queues = RabbitMQConfig.QUEUE_EMAIL)
+    public void receiveEmailCommand(EmailEventDto emailDto) {
+        log.info("📧 [NOTIFICACIÓN CIUDADANA DIMAO] Enviando correo electrónico:");
+        log.info("   -> Código Retiro: {}", emailDto.getCodigoRetiro());
+        log.info("   -> Destinatario: {}", emailDto.getDestinatarioEmail());
+        log.info("   -> Asunto: {}", emailDto.getAsunto());
+        log.info("   -> Nuevo Estado: {}", emailDto.getNuevoEstado());
+        log.info("   -> Mensaje: {}", emailDto.getMensaje());
     }
-  ],
-  "totalElements": 24,
-  "totalPages": 3,
-  "currentPage": 0
-}
-```
-
-### 3. Contacto Ciudadano DIMAO
-* **Endpoint:** `POST /api/citizens/contact`
-* **Payload:**
-```json
-{
-  "nombre": "Jonathan Vidal",
-  "email": "jovise@alumnos.duoc.cl",
-  "telefono": "+56912345678",
-  "asunto": "Consulta retiro de ramas y poda",
-  "mensaje": "Estimados, quisiera saber si las podas de árboles nativos entran en el retiro especial de este mes."
-}
-```
-* **Respuesta Exitosa (201 Created):**
-```json
-{
-  "ticketId": "DIMAO-2026-0941",
-  "status": "RECIBIDO",
-  "mensaje": "Su solicitud ha sido ingresada a la Dirección de Medio Ambiente de Puerto Varas."
 }
 ```
 
 ---
 
-## 🏁 7. Criterios de Aceptación y Entrega
+### B. Consumidor de Certificados Ambientales: `CertificateGenerationConsumer.java`
+- **Cola:** `q.cmd.certificate` (`RabbitMQConfig.QUEUE_CERTIFICATE`)
+- **DTO:** `CertificateEventDto`
+- **Propósito:** Generar certificado ambiental municipal y cálculo de CO2 evitado tras el pesaje.
 
-1. **Frontend 100% Clickeable:** Ningún botón o hipervínculo en toda la aplicación queda sin acción o redirige a `#`.
-2. **Diseño Armónico:** La portada y el panel vecinal mantienen las ilustraciones limpias de Puerto Varas (Volcán Osorno y Lago) compartiendo el color de fondo `#F8FAF7` sin cortes cuadrados.
-3. **Resiliencia Cloud Native:** Si un microservicio backend no está encendido, el BFF y el Frontend responden con mensajes amigables y fallbacks, sin romper la pantalla con errores en consola.
-4. **Demostración de Evaluación:** Se cuenta con scripts y comandos `curl` listos en `README.md` para probar tanto llamadas públicas como autenticadas por roles (`ROLE_Vecino`, `ROLE_Admin`).
+```java
+package com.duoc.ms_reciclago_pickups.consumer;
 
----
+import com.duoc.ms_reciclago_pickups.config.RabbitMQConfig;
+import com.duoc.ms_reciclago_pickups.dto.CertificateEventDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
 
-## 📊 8. Matriz de Cumplimiento: Caso 7, Pauta EP1 (Informe/Encargo) y EP2 (Presentación)
+@Component
+public class CertificateGenerationConsumer {
 
-A continuación se valida el alineamiento estricto del proyecto contra los documentos académicos de **Duoc UC**:
+    private static final Logger log = LoggerFactory.getLogger(CertificateGenerationConsumer.class);
 
-### A. Alineación con el Caso Semestral (*Caso 7 - RecicLaGo*)
-
-| Requerimiento del Caso 7 | Implementación en RecicLaGo | Estado DEV 1 (Front/BFF) | Estado DEV 2 (Back) |
-| :--- | :--- | :--- | :--- |
-| **Actores y Roles** (Admin, Operador/Coordinador, Vecino, Auditor) | Lectura automática de `idTokenClaims.roles` en `DashboardComponent` y `AppComponent`. Saludo personalizado y segmentación de permisos. | ✅ **100% Implementado** | 🟡 Soportar roles en DB / Claims |
-| **Solicitud de Retiro Puerta a Puerta** | Formulario responsivo con validación de dirección, tipo de residuo y comentarios. Envío al BFF (`POST /api/pickups`). | ✅ **100% Implementado** | 🟡 `POST /api/pickups` en pickups-svc |
-| **Catálogo de 4 Fracciones** (Vidrio, Cartón/Papel, Plásticos PET/PEAD, Latas/Metales) | Modales cívicos interactivos, selector de material en formulario y consumo de `GET /api/catalog/residuos`. | ✅ **100% Implementado** | 🟡 `GET /api/catalog/residuos` en catalog-svc |
-| **Seguimiento en Tiempo Real y Cuadrantes** | Línea de tiempo visual de 3 hitos (*Retiro programado* $\rightarrow$ *Camión en ruta* $\rightarrow$ *Retiro realizado*), mapa comunal con cuadrantes de Puerto Varas. | ✅ **100% Implementado** | 🟡 `GET /api/routes/cuadrante` |
-| **Historial Trazable con Kilos** | Tarjetas de retiros anteriores con pesaje digital acumulado y badge *"Cuenca Protegida"*. | ✅ **100% Implementado** | 🟡 `GET /api/pickups/history` con paginación |
-| **Flujo Seguro en Capas** | `JWT (MSAL)` $\rightarrow$ `AWS API Gateway` $\rightarrow$ `ms-reciclago-bff (:8080)` $\rightarrow$ `Microservicios core`. | ✅ **100% Implementado** | 🟡 Integrar endpoints core detrás de BFF |
-
----
-
-### B. Alineación con la Pauta de Evaluación Parcial N° 1 (*EP1 Encargo - 16%*)
-
-| Indicador EP1 | Criterio de Rúbrica (100% Logro) | Evidencia en el Código |
-| :--- | :--- | :--- |
-| **1. Configuración y uso de MSAL en Angular (60%)** | • MSAL integrado y operativo.<br>• Inicio y cierre de sesión funcionales.<br>• Guards (`authGuard`) y `MsalInterceptor` operando sin fallas.<br>• Tokens Bearer adjuntados automáticamente en cada llamada HTTP.<br>• Lectura de roles y scopes desde claims del JWT. | • `auth.config.ts` (MSAL configuration).<br>• `app.config.ts` (`provideHttpClient(withInterceptorsFromDi())`, `MSAL_INTERCEPTOR`).<br>• `auth.guard.ts` (protege `/dashboard` y preserva `returnUrl`).<br>• `login.component.ts` (login comunal con Entra ID). |
-| **2. Configuración y validación del BFF con IDaaS (40%)** | • BFF valida `issuer` y `audience` correctamente.<br>• Verifica firma del token y su vigencia.<br>• Aplica autorización por rol cuando corresponde.<br>• Responde con códigos de error adecuados (200, 401, 403). | • `ms-reciclago-bff/src/main/resources/application.yml` (`issuer-uri`, `audiences`).<br>• `SecurityConfig.java` (Resource Server con decodificador JWT de Azure AD).<br>• `BffController.java` (inyección de usuario autenticado y orquestación con RestClient). |
-
----
-
-### C. Alineación con la Pauta de Evaluación Parcial N° 2 (*EP2 Presentación - 24%*)
-
-| Criterio EP2 | Requerimiento de Demostración en Vivo | Estrategia y Preparación para la Defensa |
-| :--- | :--- | :--- |
-| **Rutas en API Manager / Gateway (13%)** | Rutas dirigidas hacia el backend con paths limpios y coherentes. | AWS HTTP API Gateway redirigiendo `/api/*` al puerto `8080` del BFF. |
-| **Configuración CORS (7%)** | CORS seguro y funcional para la comunicación con el frontend. | Configurado para `http://localhost:4200` y dominio cloud en `SecurityConfig.java` del BFF y API Gateway. |
-| **Tenant IDaaS y Usuarios (10%)** | Tenant en Azure AD (Microsoft Entra ID) con usuarios registrados y roles. | Tenant configurado con usuarios de prueba para roles `Vecino`, `Operador`, `Admin`. |
-| **Registro de Aplicación en Tenant (10%)** | `clientId`, redirect URIs (`http://localhost:4200`), roles y scopes expuestos (`api://...`). | **Arquitectura Doble App (Frontend SPA + Backend API)**:<br>• **App 1 (Frontend SPA)**: `20ae8f6f-ef82-48a6-a4ae-897d36212b4b`<br>• **App 2 (Backend API)**: `9a946a0b-5350-4fe1-a79e-ca332612f60d`<br>• **Scope**: `api://9a946a0b-5350-4fe1-a79e-ca332612f60d/access_as_user`<br>• **Tenant ID**: `5625266d-cae0-4070-a7ea-b5e88273580f`<br>• Permisos delegados consentidos y roles (`Admin`, `Coordinador`) asignados. |
-| **Flujo Auth Code con PKCE (15%)** | Flujo OIDC Authorization Code con PKCE activo (sin flujo implícito inseguro). | Nativo en Angular 18 con MSAL Browser 3.x utilizando `InteractionType.Redirect` / `Popup` con `code_challenge` y `code_verifier`. |
-| **Validación JWT en API Manager / BFF (20%)** | Pruebas con y sin token evidenciando respuestas `200`, `401 Unauthorized` y `403 Forbidden`. | Pruebas listas documentadas en `README.md` ejecutables con `curl` y Swagger/Postman. |
-| **Evidencias de Rutas Backend (15%)** | Demostración de llamadas frontend $\leftrightarrow$ backend devolviendo JSON esperado. | Consumo reactivo en Angular mediante `BffService` desplegando datos reales en el dashboard. |
-
----
-
-### D. Arquitectura de Seguridad Microsoft Entra ID (Doble Aplicación)
-
-Para cumplir con el estándar Enterprise de **OpenID Connect & OAuth 2.0 (RFC 6749)** y las exigencias de rúbrica de Cloud Native, se desacoplaron las entidades de autenticación y autorización en dos registros independientes en Microsoft Entra ID:
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor U as Vecino / Funcionario (jon.vidals@duocuc.cl)
-    participant F as App 1: Frontend SPA (20ae8f6f-ef82-48a6-a4ae-897d36212b4b)
-    participant E as Microsoft Entra ID (Tenant: 5625266d-cae0-4070-a7ea-b5e88273580f)
-    participant B as App 2: ms-reciclago-bff (9a946a0b-5350-4fe1-a79e-ca332612f60d)
-
-    U->>F: Clic en "Continuar con Microsoft"
-    F->>E: Redirige con Authorization Code + PKCE (Scope: api://9a946a0b.../access_as_user)
-    E->>U: Solicita credenciales institucionales y MFA
-    U->>E: Ingresa credenciales
-    E->>F: Redirige a redirectUri con Code
-    F->>E: Canjea Code + Code Verifier por Tokens
-    E-->>F: Retorna id_token (Perfil) y access_token (Audiencia: api://9a946a0b..., Roles: [Admin])
-    F->>B: HTTP Request con Header "Authorization: Bearer <access_token>"
-    B->>B: Valida firma (JWKS), emisor (tenant) y audiencia (api://9a946a0b...)
-    B->>B: Convierte claim "roles" en GrantedAuthority ("ROLE_Admin")
-    B-->>F: HTTP 200 OK con datos de microservicios protegidos
-```
-
-1. **App 1 (Frontend SPA - `20ae8f6f-ef82-48a6-a4ae-897d36212b4b`)**:
-   - Tipo de plataforma: Single-Page Application (SPA) con PKCE.
-   - Redirect URIs autorizados: `http://localhost:4200`, `https://reciclago-frontend-puertovaras.s3.us-east-1.amazonaws.com/index.html`.
-   - Permiso delegado concedido: `reciclago-api` -> `access_as_user` (con Admin Consent).
-
-2. **App 2 (Backend API Resource Server - `9a946a0b-5350-4fe1-a79e-ca332612f60d`)**:
-   - Expose an API: URI `api://9a946a0b-5350-4fe1-a79e-ca332612f60d`.
-   - Scope: `access_as_user` (Admin and users).
-   - App Roles: `Admin` (Administrador municipal), `Coordinador` (Gestión de cuadrillas), `Vecino`.
-   - Asignación de Usuarios en Enterprise Applications: Usuario asignado individualmente al rol `Admin`.
-
----
-
-## ☁️ 9. Guía de Despliegue en AWS Cloud: S3 Static Website (DEV 1) y ECR / EC2 (DEV 2)
-
-Para la entrega y defensa de **Cloud Native (Duoc UC)**, la infraestructura se divide limpiamente entre ambos desarrolladores:
-
-```mermaid
-graph LR
-    subgraph "DEV 1 (Frontend en S3)"
-        Angular["🌐 Angular 18 (SPA)<br>dist/frontend-reciclago/browser"] -->|"Static Website / HTTPS"| S3["🪣 AWS S3 Bucket<br>https://reciclago-frontend-puertovaras.s3.us-east-1.amazonaws.com/index.html"]
-    end
-
-    subgraph "DEV 2 (Backend en ECR + EC2)"
-        Docker["🐳 Docker Images<br>BFF, Catalog, Pickups"] -->|"Push"| ECR["📦 AWS ECR (Registry)"]
-        ECR -->|"Pull & Run"| EC2["💻 AWS EC2 Instance<br>docker compose up (Microservicios + DB + MQ + Kafka)"]
-    end
-
-    S3 -->|"API Calls (Bearer JWT)"| APIGW["🛡️ AWS API Gateway (HTTP API)"]
-    APIGW -->|"Port 8080"| EC2
-```
-
----
-
-### 🌐 Parte A: Guía Paso a Paso para DEV 1 (Subir Frontend a S3 Bucket)
-
-#### 1. Requisitos Previos: Credenciales de AWS
-Dado que las cuentas de estudiante (**AWS Academy / Learner Lab**) utilizan tokens temporales que caducan cada 4 horas:
-1. En la consola de AWS Academy, presiona el botón **"AWS Details"**.
-2. Haz clic en **"Show"** en la sección *AWS CLI credentials*.
-3. Copia el bloque de texto que contiene:
-   ```ini
-   [default]
-   aws_access_key_id = ASIA...
-   aws_secret_access_key = ...
-   aws_session_token = ...
-   ```
-4. Pégalo en tu archivo local `~/.aws/credentials` (en Windows: `C:\Users\<TuUsuario>\.aws\credentials`), o exporta las variables en tu terminal PowerShell:
-   ```powershell
-   $env:AWS_ACCESS_KEY_ID="ASIA..."
-   $env:AWS_SECRET_ACCESS_KEY="..."
-   $env:AWS_SESSION_TOKEN="..."
-   $env:AWS_DEFAULT_REGION="us-east-1"
-   ```
-5. Verifica que tu sesión esté activa:
-   ```powershell
-   aws sts get-caller-identity
-   ```
-
----
-
-#### 2. Compilar el Frontend Angular para Producción
-En la carpeta `frontend-reciclago`:
-```powershell
-cd "c:\Users\krosa\Desktop\semestre 6\cloud nativo\reciclago\frontend-reciclago"
-npm run build
-```
-*Los archivos optimizados para producción quedarán en: `dist/frontend-reciclago/browser`.*
-
----
-
-#### 3. Crear el Bucket S3
-Elige un nombre único a nivel mundial (por ejemplo: `reciclago-frontend-puertovaras`):
-```powershell
-$BUCKET_NAME = "reciclago-frontend-puertovaras"
-$REGION = "us-east-1"
-
-# Crear el bucket
-aws s3 mb "s3://$BUCKET_NAME" --region $REGION
-```
-
----
-
-#### 4. Deshabilitar el Bloqueo de Acceso Público
-Para que el sitio web sea accesible desde cualquier navegador:
-```powershell
-aws s3api put-public-access-block `
-  --bucket $BUCKET_NAME `
-  --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false"
-```
-
----
-
-#### 5. Aplicar Política de Bucket (Bucket Policy Pública)
-Crea una política que permita a los usuarios leer los archivos del sitio (`s3:GetObject`):
-```powershell
-$policy = @"
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "PublicReadGetObject",
-      "Effect": "Allow",
-      "Principal": "*",
-      "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::$BUCKET_NAME/*"
+    @RabbitListener(queues = RabbitMQConfig.QUEUE_CERTIFICATE)
+    public void generateCertificate(CertificateEventDto certDto) {
+        double co2Evitado = certDto.getPesoRealKg() != null ? certDto.getPesoRealKg() * 1.85 : 0.0;
+        log.info("📜 [CERTIFICADO AMBIENTAL EMITIDO - DIMAO PUERTO VARAS]:");
+        log.info("   -> Folio Certificado: DIMAO-CERT-{}", certDto.getCodigoRetiro());
+        log.info("   -> Vecino Beneficiario: {}", certDto.getVecinoEmail());
+        log.info("   -> Kilos Verificados en Báscula: {} kg", certDto.getPesoRealKg());
+        log.info("   -> Fecha de Pesaje: {}", certDto.getFechaCompletado());
+        log.info("   -> Huella CO2 Evitada estimada: {} kg CO2e", String.format("%.2f", co2Evitado));
     }
-  ]
 }
-"@
-
-aws s3api put-bucket-policy --bucket $BUCKET_NAME --policy $policy
 ```
 
 ---
 
-#### 6. Configurar S3 Static Website Hosting (¡Regla Crítica para Angular SPA!)
-> [!IMPORTANT]
-> En aplicaciones Angular Single Page Application (SPA) con rutas cliente (`/dashboard`, `/login`), **tanto el documento índice como el documento de error deben apuntar a `index.html`**. Esto asegura que al recargar la página o ingresar directamente a una ruta interna, S3 no arroje error `404 Not Found`, sino que cargue el enrutador de Angular.
+### C. Consumidor de Hoja de Ruta Logística: `RouteDispatchConsumer.java`
+- **Cola:** `q.cmd.route` (`RabbitMQConfig.QUEUE_ROUTE`)
+- **DTO:** `RouteEventDto`
+- **Propósito:** Notificar a la central de despacho municipal y chofer sobre paradas asignadas.
 
-```powershell
-aws s3 website "s3://$BUCKET_NAME" `
-  --index-document index.html `
-  --error-document index.html
+```java
+package com.duoc.ms_reciclago_pickups.consumer;
+
+import com.duoc.ms_reciclago_pickups.config.RabbitMQConfig;
+import com.duoc.ms_reciclago_pickups.dto.RouteEventDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class RouteDispatchConsumer {
+
+    private static final Logger log = LoggerFactory.getLogger(RouteDispatchConsumer.class);
+
+    @RabbitListener(queues = RabbitMQConfig.QUEUE_ROUTE)
+    public void receiveRouteCommand(RouteEventDto routeDto) {
+        log.info("🚛 [HOJA DE RUTA DIMAO - DESPACHO MUNICIPAL]:");
+        log.info("   -> Código Retiro: {}", routeDto.getCodigoRetiro());
+        log.info("   -> Camión Asignado: {}", routeDto.getCamionPatente());
+        log.info("   -> Sector / Cuadrante: {}", routeDto.getSector());
+        log.info("   -> Fecha Programada: {}", routeDto.getFechaProgramada());
+    }
+}
 ```
 
 ---
 
-#### 7. Sincronizar y Subir los Archivos al Bucket
-Sube todo el contenido de la carpeta `dist/frontend-reciclago/browser`:
-```powershell
-aws s3 sync dist/frontend-reciclago/browser "s3://$BUCKET_NAME" --delete
-```
+### D. Consumidor de Auditoría Inmutable Kafka: `PickupAuditKafkaConsumer.java`
+- **Topics:** `pickups.events` y `audit.timeline`
+- **DTO:** `PickupStateChangeEventDto`
+- **Consumer Group:** `dimao-audit-group`
+- **Propósito:** Registro inmutable en Kafka para auditoría municipal y analítica.
 
----
+```java
+package com.duoc.ms_reciclago_pickups.consumer;
 
-#### 8. URL Pública de tu Frontend
-Tu sitio web queda inmediatamente disponible en la URL oficial de S3 Website:
-```text
-http://reciclago-frontend-puertovaras.s3-website-us-east-1.amazonaws.com
+import com.duoc.ms_reciclago_pickups.config.KafkaConfig;
+import com.duoc.ms_reciclago_pickups.dto.PickupStateChangeEventDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class PickupAuditKafkaConsumer {
+
+    private static final Logger log = LoggerFactory.getLogger(PickupAuditKafkaConsumer.class);
+
+    @KafkaListener(topics = {KafkaConfig.TOPIC_PICKUPS_EVENTS, KafkaConfig.TOPIC_AUDIT_TIMELINE}, groupId = "dimao-audit-group")
+    public void consumeStateChangeEvent(PickupStateChangeEventDto event) {
+        log.info("⚡ [KAFKA EVENT LOG - AUDITORÍA INMUTABLE DIMAO]:");
+        log.info("   -> ID: {} | Código: {}", event.getPickupId(), event.getCodigoRetiro());
+        log.info("   -> Transición: {} ===> {}", event.getEstadoAnterior(), event.getEstadoNuevo());
+        log.info("   -> Vecino: {} | Comuna: {}", event.getVecinoEmail(), event.getComuna());
+        log.info("   -> Residuo: {} | Peso Est.: {} kg | Peso Real: {} kg",
+                event.getResiduoNombre(), event.getPesoEstimadoKg(), event.getPesoRealKg());
+        log.info("   -> Timestamp: {}", event.getTimestamp());
+    }
+}
 ```
 
 > [!NOTE]
-> **Compatibilidad MSAL en Sitios HTTP de S3**: 
-> Los navegadores modernos restringen la API nativa `window.crypto.subtle` exclusivamente a contextos seguros (`HTTPS` o `localhost`). Para que la biblioteca `@azure/msal-browser` no lance la excepción `BrowserAuthError: crypto_nonexistent` al cargarse sobre el endpoint HTTP de S3 Website, se integró un polyfill ligero y autónomo de SHA-256 en `index.html`. Toda la autenticación se gestiona exclusivamente a través de Microsoft Entra ID (SSO).
+> Las propiedades de deserialización de Kafka para `dimao-audit-group` ya fueron agregadas en `ms-reciclago-pickups/src/main/resources/application.properties`.
 
 ---
 
-#### 9. CI/CD Automatizado: GitHub Actions -> AWS S3
-Para cumplir con el estándar **DevOps Cloud Native**, el repositorio incluye el flujo de automatización [deploy-frontend.yml](file:///.github/workflows/deploy-frontend.yml). Cada vez que hagas un `git push` a la rama `main` afectando la carpeta `frontend-reciclago/`:
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Dev as DEV 1 (Frontend)
-    participant GH as GitHub Repo (main)
-    participant Runner as GitHub Actions Runner
-    participant S3 as AWS S3 Bucket
-
-    Dev->>GH: git push origin main
-    GH->>Runner: Trigger Workflow (deploy-frontend.yml)
-    Runner->>Runner: Setup Node 20 & npm ci
-    Runner->>Runner: npm run build (Angular Prod)
-    Runner->>Runner: Configure AWS Credentials (Secrets)
-    Runner->>S3: aws s3 sync dist/... s3://$BUCKET --delete
-    S3-->>Dev: Sitio actualizado en vivo automáticamente
-```
-
-**Secretos requeridos en tu repositorio GitHub** (`Settings` > `Secrets and variables` > `Actions`):
-1. `AWS_ACCESS_KEY_ID`: Tu Access Key de AWS.
-2. `AWS_SECRET_ACCESS_KEY`: Tu Secret Access Key de AWS.
-3. `AWS_SESSION_TOKEN`: Session Token (si usas AWS Academy / Learner Lab).
-4. `S3_BUCKET_NAME`: `reciclago-frontend-puertovaras`
-5. `AWS_REGION`: `us-east-1`
-
-### 📦 Parte B: Guía para DEV 2 (Backend a ECR y Despliegue en EC2)
+## ☁️ 4. Tarea 2: Subir Imágenes a Amazon ECR (Cuenta AWS de DEV 2)
 
 > [!CAUTION]
-> **🚨 AVISO CRÍTICO PARA DEV 2 — USO DE CREDENCIALES AWS SEPARADAS**:
-> - **Frontend (S3)**: Está alojado en la cuenta AWS de **DEV 1** (`reciclago-frontend-puertovaras`).
-> - **Backend (ECR + EC2)**: Se desplegará en la cuenta AWS de **DEV 2**.
-> - **IMPORTANTE**: DEV 2 **NO DEBE USAR LAS CREDENCIALES DE DEV 1**. Debes copiar tus propias credenciales desde la consola de AWS Learner Lab / Academy (botón *AWS Details* ➔ *Show*) y ejecutarlas en tu terminal local o configurarlas en los secretos de GitHub para no mezclar recursos ni sobreescribir permisos.
+> **🚨 AVISO DE CREDENCIALES**:
+> DEV 2 **NO DEBE USAR LAS CREDENCIALES DE DEV 1**. Debes copiar tus propias credenciales desde la consola de **AWS Learner Lab / Academy** (botón *AWS Details* ➔ *Show*).
 
-#### 🔑 Matriz de Secretos en GitHub (`Settings` > `Secrets and variables` > `Actions`)
-
-| Secreto | Cuenta Perteneciente | Propósito |
-|---|---|---|
-| `AWS_ACCESS_KEY_ID` | **DEV 1 (Frontend)** | Despliegue automatizado al bucket S3 |
-| `AWS_SECRET_ACCESS_KEY` | **DEV 1 (Frontend)** | Despliegue automatizado al bucket S3 |
-| `AWS_SESSION_TOKEN` | **DEV 1 (Frontend)** | Sesión activa Learner Lab DEV 1 |
-| `S3_BUCKET_NAME` | **DEV 1 (Frontend)** | Nombre del bucket: `reciclago-frontend-puertovaras` |
-| `AWS_REGION` | Global | `us-east-1` |
-| `AWS_BACKEND_ACCESS_KEY_ID` | **DEV 2 (Backend)** | Login y subida a AWS ECR / EC2 |
-| `AWS_BACKEND_SECRET_ACCESS_KEY` | **DEV 2 (Backend)** | Login y subida a AWS ECR / EC2 |
-| `AWS_BACKEND_SESSION_TOKEN` | **DEV 2 (Backend)** | Sesión activa Learner Lab DEV 2 |
-| `AWS_BACKEND_ACCOUNT_ID` | **DEV 2 (Backend)** | Account ID numérico de DEV 2 |
-| `EC2_HOST` | **DEV 2 (Backend)** | IP pública de la instancia EC2 de DEV 2 |
-| `EC2_SSH_KEY` | **DEV 2 (Backend)** | Llave privada SSH (.pem) para EC2 |
-
----
-
-#### 1. Autenticación en AWS ECR (En la máquina de DEV 2 con sus credenciales)
+### Paso 1: Configurar Credenciales en Terminal Local
 ```powershell
-# Obtiene el ID de la cuenta propia de DEV 2 automáticamente
+$env:AWS_ACCESS_KEY_ID="ASIA..."
+$env:AWS_SECRET_ACCESS_KEY="..."
+$env:AWS_SESSION_TOKEN="..."
+$env:AWS_DEFAULT_REGION="us-east-1"
+
+# Validar identidad
+aws sts get-caller-identity
+```
+
+### Paso 2: Autenticar Docker con Amazon ECR
+```powershell
 $ACCOUNT_ID = (aws sts get-caller-identity --query Account --output text)
 $REGION = "us-east-1"
 
 aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com"
 ```
 
-#### 2. Crear Repositorios en ECR
+### Paso 3: Crear los 4 Repositorios ECR
 ```powershell
 aws ecr create-repository --repository-name reciclago/ms-bff --region $REGION
 aws ecr create-repository --repository-name reciclago/ms-catalog --region $REGION
 aws ecr create-repository --repository-name reciclago/ms-pickups --region $REGION
+aws ecr create-repository --repository-name reciclago/ms-routes --region $REGION
 ```
 
-#### 3. Construir y Taggear las Imágenes Docker
+### Paso 4: Construir, Taggear y Subir Imágenes
 ```powershell
-# 1. BFF
+# 1. ms-bff
 docker build -t "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-bff:latest" ./ms-reciclago-bff
-
-# 2. Catálogo
-docker build -t "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-catalog:latest" ./ms-reciclago-catalog
-
-# 3. Retiros
-docker build -t "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-pickups:latest" ./ms-reciclago-pickups
-```
-
-#### 4. Subir Imágenes a ECR (Push)
-```powershell
 docker push "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-bff:latest"
+
+# 2. ms-catalog
+docker build -t "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-catalog:latest" ./ms-reciclago-catalog
 docker push "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-catalog:latest"
+
+# 3. ms-pickups
+docker build -t "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-pickups:latest" ./ms-reciclago-pickups
 docker push "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-pickups:latest"
+
+# 4. ms-routes
+docker build -t "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-routes:latest" ./ms-reciclago-routes
+docker push "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-routes:latest"
 ```
 
-#### 5. Ejecutar en EC2 con Docker Compose
-En la instancia EC2 de AWS:
+---
+
+## 💻 5. Tarea 3: Aprovisionamiento y Despliegue en AWS EC2
+
+### Paso 1: Lanzar Instancia EC2
+- **AMI:** Ubuntu Server 22.04 LTS o 24.04 LTS (x86_64).
+- **Tipo:** `t3.medium` (4 GB RAM).
+- **Almacenamiento:** Mínimo 25 GB gp3.
+- **IAM Role:** Asignar el rol `LabRole` a la instancia (Consola EC2 ➔ Seleccionar instancia ➔ *Actions* ➔ *Security* ➔ *Modify IAM role* ➔ Elegir `LabRole`). Esto permite hacer login a ECR sin ingresar credenciales temporales.
+- **Key Pair:** Descargar llave `.pem`.
+
+### Paso 2: Security Group de EC2
+| Tipo | Puerto | Origen | Propósito |
+|---|---|---|---|
+| **SSH** | `22` | `Mi IP` | Conexión terminal |
+| **Custom TCP** | `8080` | `0.0.0.0/0` | ms-bff (expuesto hacia API Gateway / Frontend) |
+| **Custom TCP (Opcional)** | `15672` | `Mi IP` | Panel Web RabbitMQ |
+
+### Paso 3: Conectar por SSH y Configurar 4 GB de Swap
 ```bash
-# Iniciar infraestructura de mensajería, BD y microservicios
-docker compose up -d
+ssh -i "tu-llave.pem" ubuntu@<IP_PUBLICA_EC2>
+
+# Configurar 4 GB de Swap
+sudo fallocate -l 4G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+free -h
 ```
-El **AWS API Gateway (HTTP API)** se configura apuntando a la IP pública o privada de la instancia EC2 en el puerto `8080` (`ms-reciclago-bff`), cumpliendo con el 100% de la arquitectura exigida en el **Caso 7**.
+
+### Paso 4: Instalar Docker, Docker Compose y AWS CLI
+```bash
+sudo apt update
+sudo apt install -y docker.io docker-compose-plugin awscli
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+### Paso 5: Login a ECR y Despliegue de Contenedores
+```bash
+# Login a ECR usando el rol LabRole (automático sin credenciales manuales)
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "<ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com"
+
+# Clonar el proyecto
+git clone https://github.com/kr0zapps/reciclago-cloud-nativo.git
+cd reciclago-cloud-nativo
+
+# Descargar las imágenes desde ECR (evita compilar en la máquina para no saturar memoria)
+export ECR_REGISTRY="<ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/reciclago"
+docker compose pull ms-bff ms-catalog ms-pickups ms-routes
+
+# Levantar los 8 contenedores
+docker compose up -d --no-build
+
+# Verificar estado
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+```
+
+---
+
+## 🛡️ 6. Tarea 4: AWS API Gateway + JWT Authorizer (20% Ponderación Rúbrica EP2)
+
+> [!IMPORTANT]
+> **REQUISITO EVALUADO DIRECTAMENTE POR LA RÚBRICA DE EVALUACIÓN**:
+> La pauta docente exige que el API Gateway valide tokens JWT de Azure AD, rechazando peticiones no autorizadas y aceptando las válidas.
+
+### Paso 1: Crear HTTP API
+1. En la consola de **AWS API Gateway**, crear una **HTTP API**.
+2. Nombre: `reciclago-api-gateway`.
+3. Integración inicial: Tipo `HTTP`, URL: `http://<IP_PUBLICA_EC2>:8080`.
+
+### Paso 2: Crear el JWT Authorizer
+1. En el menú lateral de la API, ir a **Authorization** ➔ pestaña **Manage authorizers** ➔ **Create authorizer**.
+2. **Authorizer type:** `JWT`
+3. **Name:** `EntraIdAuthorizer`
+4. **Identity source:** `$request.header.Authorization`
+5. **Issuer:** `https://login.microsoftonline.com/5625266d-cae0-4070-a7ea-b5e88273580f/v2.0`
+6. **Audience:** `api://9a946a0b-5350-4fe1-a79e-ca332612f60d`
+7. Clic en **Create**.
+
+### Paso 3: Configurar Rutas y Asociar el Authorizer
+1. Crear la ruta `ANY /api/{proxy+}` vinculada a la integración HTTP `http://<IP_PUBLICA_EC2>:8080`.
+2. Asociar el `EntraIdAuthorizer` a la ruta `ANY /api/{proxy+}`.
+3. Crear excepciones públicas (sin Authorizer) para endpoints de consulta comunitaria:
+   - `GET /public/{proxy+}` ➔ Sin Authorizer
+   - `OPTIONS /{proxy+}` ➔ Sin Authorizer (requerido para preflight CORS)
+
+### Paso 4: Habilitar CORS en API Gateway
+1. Ir a **CORS** en el menú de la API.
+2. **Access-Control-Allow-Origin:**  
+   `http://reciclago-frontend-puertovaras.s3-website-us-east-1.amazonaws.com`  
+   `https://reciclago-frontend-puertovaras.s3.us-east-1.amazonaws.com`  
+   `http://localhost:4200`
+3. **Access-Control-Allow-Headers:** `Authorization, Content-Type, Accept`
+4. **Access-Control-Allow-Methods:** `GET, POST, PUT, PATCH, DELETE, OPTIONS`
+5. **Access-Control-Allow-Credentials:** `true`
+
+---
+
+## 🧪 7. Guía de Pruebas de Integración para la Defensa Docente
+
+### Opción A: Pruebas Rápidas Locales en EC2 (Directo a ms-pickups sin Token JWT)
+Permite verificar en segundos que RabbitMQ y Kafka procesan eventos sin requerir token OAuth2:
+
+```bash
+# 1. Crear solicitud (SOLICITADO)
+curl -X POST "http://localhost:8083/api/pickups" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "direccion": "Costanera Sur 567, Puerto Varas",
+    "comuna": "Puerto Varas",
+    "residuoId": 2,
+    "residuoNombre": "Vidrio",
+    "pesoEstimadoKg": 12.0,
+    "vecinoEmail": "jon.vidals@duocuc.cl",
+    "vecinoNombre": "Jonatan Vidal",
+    "comentarios": "Botellas de vidrio clasificadas"
+  }'
+
+# 2. Programar retiro (SOLICITADO -> PROGRAMADO)
+curl -X PATCH "http://localhost:8083/api/pickups/1/programar?camionId=1&camionPatente=PV-RC-2026&fechaProgramada=2026-09-22T10:30:00"
+
+# 3. Chofer inicia ruta (PROGRAMADO -> EN_RUTA)
+curl -X PATCH "http://localhost:8083/api/pickups/1/en-ruta"
+
+# 4. Chofer recolecta en domicilio (EN_RUTA -> RETIRADO)
+curl -X PATCH "http://localhost:8083/api/pickups/1/retirado"
+
+# 5. Báscula digital registra pesaje (RETIRADO -> PESADO)
+curl -X PATCH "http://localhost:8083/api/pickups/1/pesado?pesoRealKg=11.8"
+
+# 6. Ver logs de RabbitMQ y Kafka en vivo:
+docker logs -f reciclago-ms-pickups
+```
+
+### Opción B: Pruebas Completas a través del BFF (Puerto 8080 con Bearer Token)
+```bash
+TOKEN="<TU_TOKEN_JWT_DE_AZURE_AD>"
+
+# Crear retiro
+curl -X POST "http://<IP_EC2>:8080/api/pickups" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"direccion": "Costanera Sur 567", "residuoId": 2, "pesoEstimadoKg": 12.0}'
+
+# Programar
+curl -X PATCH "http://<IP_EC2>:8080/api/pickups/1/programar?camionId=1&camionPatente=PV-RC-2026&fechaProgramada=2026-09-22T10:30:00" \
+  -H "Authorization: Bearer $TOKEN"
+
+# En ruta
+curl -X PATCH "http://<IP_EC2>:8080/api/pickups/1/en-ruta" \
+  -H "Authorization: Bearer $TOKEN"
+
+# Retirado
+curl -X PATCH "http://<IP_EC2>:8080/api/pickups/1/retirado" \
+  -H "Authorization: Bearer $TOKEN"
+
+# Pesado
+curl -X PATCH "http://<IP_EC2>:8080/api/pickups/1/pesado?pesoRealKg=11.8" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+---
+
+## 👥 8. Cuentas de Prueba Oficiales (Microsoft Entra ID)
+
+| Rol | Correo Institucional | Funcionalidad en la Evaluación Docente |
+|:---|:---|:---|
+| **Vecino** | `jon.vidals@duocuc.cl` | Solicita retiro, ingresa peso estimado (kg), visualiza seguimiento 3 pasos. |
+| **Coordinador** | `coordinador@reciclago.onmicrosoft.com` | Calendario restrictivo por cuadrante, asigna camión oficial y fecha municipal. |
+| **Chofer** | `chofer@reciclago.onmicrosoft.com` | Filtra por patente (`PV-RC-2026`), inicia recorrido, confirma retiro y pesaje báscula. |
+| **Admin** | `admin@reciclago.onmicrosoft.com` | Métricas comunales de huella CO2, auditoría DIMAO y monitoreo de flota. |

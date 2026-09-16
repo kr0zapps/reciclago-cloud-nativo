@@ -52,28 +52,6 @@ public class CamionService {
         }).orElseThrow(() -> new RuntimeException("Camión no encontrado con id: " + id));
     }
 
-    public Camion reducirCapacidad(Long id, Double pesoKg) {
-        return camionRepository.findById(id).map(c -> {
-            if (c.getCapacidadDisponibleKg() < pesoKg) {
-                throw new IllegalArgumentException("Capacidad insuficiente en el camión. Disponible: " 
-                    + c.getCapacidadDisponibleKg() + "kg, requerido: " + pesoKg + "kg");
-            }
-            c.setCapacidadDisponibleKg(c.getCapacidadDisponibleKg() - pesoKg);
-            return camionRepository.save(c);
-        }).orElseThrow(() -> new RuntimeException("Camión no encontrado con id: " + id));
-    }
-
-    public Camion liberarCapacidad(Long id, Double pesoKg) {
-        return camionRepository.findById(id).map(c -> {
-            double nuevaCapacidad = c.getCapacidadDisponibleKg() + pesoKg;
-            if (nuevaCapacidad > c.getCapacidadTotalKg()) {
-                nuevaCapacidad = c.getCapacidadTotalKg();
-            }
-            c.setCapacidadDisponibleKg(nuevaCapacidad);
-            return camionRepository.save(c);
-        }).orElseThrow(() -> new RuntimeException("Camión no encontrado con id: " + id));
-    }
-
     public void eliminar(Long id) {
         camionRepository.deleteById(id);
     }

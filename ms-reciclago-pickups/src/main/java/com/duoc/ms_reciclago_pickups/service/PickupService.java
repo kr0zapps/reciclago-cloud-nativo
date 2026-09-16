@@ -2,7 +2,12 @@ package com.duoc.ms_reciclago_pickups.service;
 
 import com.duoc.ms_reciclago_pickups.config.KafkaConfig;
 import com.duoc.ms_reciclago_pickups.config.RabbitMQConfig;
-import com.duoc.ms_reciclago_pickups.dto.*;
+import com.duoc.ms_reciclago_pickups.dto.CertificateEventDto;
+import com.duoc.ms_reciclago_pickups.dto.EmailEventDto;
+import com.duoc.ms_reciclago_pickups.dto.PickupHistoryDto;
+import com.duoc.ms_reciclago_pickups.dto.PickupHistoryResponse;
+import com.duoc.ms_reciclago_pickups.dto.PickupStateChangeEventDto;
+import com.duoc.ms_reciclago_pickups.dto.RouteEventDto;
 import com.duoc.ms_reciclago_pickups.model.Pickup;
 import com.duoc.ms_reciclago_pickups.repository.PickupRepository;
 import org.slf4j.Logger;
@@ -106,7 +111,7 @@ public class PickupService {
     // 1. Crear Solicitud (Estado inicial: SOLICITADO)
     public Pickup crearSolicitud(Pickup pickup) {
         if (pickup.getCodigoRetiro() == null || pickup.getCodigoRetiro().isBlank()) {
-            pickup.setCodigoRetiro("RET-PV-" + System.currentTimeMillis() % 1000000);
+            pickup.setCodigoRetiro("RET-PV-" + java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         }
         pickup.setEstado("SOLICITADO");
         pickup.setFechaSolicitud(LocalDateTime.now());
@@ -127,9 +132,9 @@ public class PickupService {
         Pickup pickup = obtenerPorId(id)
                 .orElseThrow(() -> new RuntimeException("Solicitud de retiro no encontrada con id: " + id));
 
-        if (!"SOLICITADO".equalsIgnoreCase(pickup.getEstado())) {
+        if (!"SOLICITADO".equalsIgnoreCase(pickup.getEstado()) && !"PROGRAMADO".equalsIgnoreCase(pickup.getEstado())) {
             throw new IllegalStateException(
-                    "Regla violada: No se puede programar si el retiro no está en estado SOLICITADO. Estado actual: "
+                    "Regla violada: No se puede programar o editar la programación si el retiro no está en estado SOLICITADO o PROGRAMADO. Estado actual: "
                             + pickup.getEstado());
         }
 

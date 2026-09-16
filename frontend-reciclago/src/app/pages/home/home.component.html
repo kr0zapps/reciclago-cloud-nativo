@@ -1,0 +1,28 @@
+<div class="anim-fade-in">
+  <!-- 1. Hero Section: Retiro Domiciliario Inteligente con Volcán Osorno y Camión RecicLaGo -->
+  <app-home-hero></app-home-hero>
+
+  <!-- 2. ¿Cómo funciona? El ciclo de vida del retiro en 5 pasos -->
+  <app-home-cycle></app-home-cycle>
+
+  <!-- 3. Tu comuna, cuatro cuadrantes: Cuadrantes y Residuos Comunales (Reactivo al Catálogo Oficial) -->
+  <app-home-quadrants
+    (quadrantSelected)="onQuadrantSelected($event)">
+  </app-home-quadrants>
+
+  <!-- 4. Nuestra huella: Impacto en la comuna y Banner Panorámico de Compromiso -->
+  <app-home-impact
+    (openInfoModal)="showFaqModal = true">
+  </app-home-impact>
+
+  <!-- 5. Modales Cívicos (Detalle de Cuadrante, Catálogo de Materiales y Orientación Municipal) -->
+  <app-home-modals
+    [selectedQuadrant]="selectedQuadrantForModal"
+    [showMaterialsModal]="showMaterialsModal"
+    [showFaqModal]="showFaqModal"
+    (closeQuadrant)="selectedQuadrantForModal = null"
+    (closeMaterials)="showMaterialsModal = false"
+    (closeFaq)="showFaqModal = false">
+  </app-home-modals>
+</div>
+
