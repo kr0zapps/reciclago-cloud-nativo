@@ -237,15 +237,22 @@ jobs:
             echo "$ECR_PASSWORD" | sudo docker login --username AWS --password-stdin "$REGISTRY"
             echo "✅ Login en ECR exitoso."
 
-            echo "Descargando imágenes actualizadas de ECR..."
-            sudo docker compose pull ms-bff ms-catalog ms-pickups ms-routes || true
+            # ── Detectar comando Docker Compose disponible (v1 ó v2) ───────────
+            if sudo docker compose version &>/dev/null; then
+              DC="sudo docker compose"
+            else
+              DC="sudo docker-compose"
+            fi
 
-            echo "Iniciando infraestructura y microservicios con Docker Compose..."
-            sudo docker compose up -d
+            echo "Descargando imágenes actualizadas de ECR con $DC..."
+            $DC pull ms-bff ms-catalog ms-pickups ms-routes || true
+
+            echo "Iniciando infraestructura y microservicios..."
+            $DC up -d
 
             echo "Limpiando imágenes antiguas en desuso..."
             sudo docker image prune -f || true
 
             echo "Estado actual de los contenedores:"
-            sudo docker compose ps
+            $DC ps
             echo "✅ Despliegue completado con éxito en EC2."
