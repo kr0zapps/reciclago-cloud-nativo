@@ -123,7 +123,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
             </div>
             <div>
               <span class="text-[11px] font-black uppercase tracking-wider text-[#1F6685] block">
-                {{ activeDriverStop?.estado === 'RETIRADO' ? '⚠️ Retiro Realizado — Pendiente Registrar Báscula' : 'Próxima Parada Inmediata en Hoja de Ruta' }}
+                {{ activeDriverStop?.estado === 'RETIRADO' ? '⚠️ Retiro Realizado — Pendiente Registrar Báscula' : (activeDriverStop?.estado === 'SOLICITADO' ? '⏳ Esperando Visto Bueno del Coordinador' : 'Próxima Parada Inmediata en Hoja de Ruta') }}
               </span>
               <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy mt-0.5">
                 {{ activeDriverStop?.direccion || '¡Ruta completada! Todas las direcciones atendidas' }}
@@ -146,7 +146,18 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
 
           <!-- Botón Táctil Gigante Cabina -->
           <div *ngIf="activeDriverStop" class="flex-shrink-0 flex flex-wrap items-center gap-2">
-            <button *ngIf="activeDriverStop.estado === 'PROGRAMADO' || activeDriverStop.estado === 'SOLICITADO'"
+            <!-- Aviso si está SOLICITADO: Debe esperar al coordinador -->
+            <div *ngIf="activeDriverStop.estado === 'SOLICITADO'"
+                 class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 flex items-center gap-3 shadow-xs">
+              <i class="fa-regular fa-clock text-amber-600 text-xl flex-shrink-0"></i>
+              <div class="text-left">
+                <span class="text-xs font-black uppercase tracking-wider block text-amber-950">Esperando Visto Bueno</span>
+                <span class="text-[11px] text-amber-900 leading-tight">Tu Coordinador debe programar fecha y camión antes de salir a ruta.</span>
+              </div>
+            </div>
+
+            <!-- Iniciar Ruta solo si está PROGRAMADO -->
+            <button *ngIf="activeDriverStop.estado === 'PROGRAMADO'"
                     (click)="requestAction(activeDriverStop, 'en-ruta')"
                     type="button"
                     class="w-full sm:w-auto px-6 py-4 rounded-2xl bg-[#123F5B] hover:bg-[#0D3549] text-white text-sm sm:text-base font-extrabold shadow-sm transition-all cursor-pointer flex items-center justify-center gap-3">
@@ -237,8 +248,16 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
 
             <!-- Botones Grandes Táctiles para Conductor -->
             <div class="flex items-center gap-2 flex-shrink-0">
-              <!-- 1. SOLICITADO o PROGRAMADO -> Iniciar Ruta -->
-              <button *ngIf="p.estado === 'SOLICITADO' || p.estado === 'PROGRAMADO'"
+              <!-- 1. SOLICITADO -> Esperando Visto Bueno del Coordinador -->
+              <div *ngIf="p.estado === 'SOLICITADO'"
+                   class="px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-50 text-amber-950 border border-amber-300 flex items-center gap-1.5 shadow-2xs"
+                   title="Debes esperar el visto bueno de tu Coordinador para seguir esta orden">
+                <i class="fa-regular fa-clock text-amber-600"></i>
+                <span>Esperando Visto Bueno</span>
+              </div>
+
+              <!-- 2. PROGRAMADO -> Iniciar Ruta -->
+              <button *ngIf="p.estado === 'PROGRAMADO'"
                       (click)="requestAction(p, 'en-ruta')"
                       type="button"
                       class="px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-[#123F5B] hover:bg-[#0D3549] text-white transition-all cursor-pointer shadow-xs flex items-center gap-2">

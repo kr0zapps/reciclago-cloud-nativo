@@ -57,7 +57,21 @@ import { Camion } from '../data/sectors.data';
           </div>
         </div>
 
-        <div *ngIf="actionType === 'en-ruta'" class="space-y-2 text-left p-3 rounded-2xl bg-amber-50/70 border border-amber-200/70">
+        <div *ngIf="actionType === 'en-ruta' && pickup?.estado === 'SOLICITADO'" class="space-y-2 text-left p-4 rounded-2xl bg-amber-50 border border-amber-300">
+          <div class="flex items-start gap-3">
+            <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-base flex-shrink-0">
+              <i class="fa-regular fa-clock"></i>
+            </div>
+            <div>
+              <p class="text-sm font-bold text-amber-950">Esperando Visto Bueno del Coordinador</p>
+              <p class="text-xs text-amber-900 leading-relaxed mt-1">
+                Debes esperar el visto bueno de tu Coordinador para seguir esta orden. La solicitud aún está en estado <strong>SOLICITADO</strong> y debe ser programada con fecha y camión asignado antes de salir a ruta.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="actionType === 'en-ruta' && pickup?.estado !== 'SOLICITADO'" class="space-y-2 text-left p-3 rounded-2xl bg-amber-50/70 border border-amber-200/70">
           <p class="text-sm font-bold text-amber-950">¿Confirmar despacho del camión a ruta?</p>
           <p class="text-xs text-amber-900 leading-relaxed">Se notificará al sistema y el estado del retiro pasará a <strong>EN_RUTA</strong>, habilitando la telemetría GPS.</p>
         </div>
@@ -96,14 +110,14 @@ import { Camion } from '../data/sectors.data';
           <input type="text" [(ngModel)]="actionMotivo" class="input-stitch w-full py-2 px-3 text-sm" placeholder="Ej: Domicilio cerrado o reprogramado">
         </div>
 
-        <!-- Banner de Error Sobrio -->
-        <div *ngIf="errorMessage" class="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5 text-left">
-          <i class="fa-solid fa-triangle-exclamation text-rose-500 text-sm mt-0.5 flex-shrink-0"></i>
+        <!-- Banner de Aviso / Error Sobrio -->
+        <div *ngIf="errorMessage" class="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 text-xs flex items-start gap-2.5 text-left">
+          <i class="fa-solid fa-circle-exclamation text-amber-600 text-base mt-0.5 flex-shrink-0"></i>
           <div class="flex-1 min-w-0">
-            <span class="font-bold block">No se pudo confirmar la operación</span>
-            <span class="text-[11px] opacity-90 leading-tight mt-0.5 block">{{ errorMessage }}</span>
+            <span class="font-bold block text-sm text-amber-950">{{ errorTitle || 'Aviso de Operación' }}</span>
+            <span class="text-xs text-amber-900 leading-relaxed mt-0.5 block">{{ errorMessage }}</span>
           </div>
-          <button (click)="errorMessage = ''" type="button" class="text-rose-400 hover:text-rose-700 text-xs cursor-pointer">
+          <button (click)="errorMessage = ''" type="button" class="text-amber-500 hover:text-amber-800 text-xs cursor-pointer">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -111,9 +125,13 @@ import { Camion } from '../data/sectors.data';
         <!-- Botonera inferior -->
         <div class="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
           <button (click)="onClose()" type="button" class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer">
-            Cancelar
+            {{ (actionType === 'en-ruta' && pickup?.estado === 'SOLICITADO') ? 'Entendido' : 'Cancelar' }}
           </button>
-          <button (click)="executePickupAction()" [disabled]="isSubmittingAction" type="button" class="btn-stitch-primary px-5 py-2.5 text-xs font-bold cursor-pointer">
+          <button *ngIf="!(actionType === 'en-ruta' && pickup?.estado === 'SOLICITADO')"
+                  (click)="executePickupAction()"
+                  [disabled]="isSubmittingAction"
+                  type="button"
+                  class="btn-stitch-primary px-5 py-2.5 text-xs font-bold cursor-pointer">
             <span *ngIf="!isSubmittingAction">Confirmar Operación</span>
             <span *ngIf="isSubmittingAction"><i class="fa-solid fa-spinner fa-spin"></i> Guardando...</span>
           </button>
@@ -137,12 +155,14 @@ export class StaffModalComponent implements OnChanges, OnDestroy {
   actionFechaProgramada = '';
   isSubmittingAction = false;
   errorMessage = '';
+  errorTitle = '';
 
   constructor(private bffService: BffService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isOpen']) {
       this.errorMessage = '';
+      this.errorTitle = '';
       if (this.isOpen) {
         document.body.style.overflow = 'hidden';
       } else {
@@ -151,6 +171,7 @@ export class StaffModalComponent implements OnChanges, OnDestroy {
     }
     if (changes['pickup'] && this.pickup) {
       this.errorMessage = '';
+      this.errorTitle = '';
       this.actionPesoKg = Number(this.pickup.kilosRecolectados) || Number(this.pickup.pesoEstimadoKg) || 5.0;
       this.actionMotivo = '';
       if (this.camionesDisponibles && this.camionesDisponibles.length > 0) {
@@ -168,6 +189,7 @@ export class StaffModalComponent implements OnChanges, OnDestroy {
 
   onClose(): void {
     this.errorMessage = '';
+    this.errorTitle = '';
     document.body.style.overflow = '';
     this.close.emit();
   }
@@ -177,6 +199,7 @@ export class StaffModalComponent implements OnChanges, OnDestroy {
     const id = this.pickup.id;
     this.isSubmittingAction = true;
     this.errorMessage = '';
+    this.errorTitle = '';
 
     let obs;
     if (this.actionType === 'programar') {
@@ -209,16 +232,79 @@ export class StaffModalComponent implements OnChanges, OnDestroy {
         next: () => {
           this.isSubmittingAction = false;
           this.errorMessage = '';
+          this.errorTitle = '';
           this.actionCompleted.emit();
           this.onClose();
         },
         error: (err) => {
           this.isSubmittingAction = false;
-          this.errorMessage = err.error?.error || err.error?.message || (typeof err.error === 'string' ? err.error : null) || err.message || 'Error de comunicación al actualizar retiro';
+          const parsed = this.parseBackendError(err);
+          this.errorTitle = parsed.title;
+          this.errorMessage = parsed.message;
         }
       });
     } else {
       this.isSubmittingAction = false;
     }
+  }
+
+  private parseBackendError(err: any): { title: string, message: string } {
+    const raw = err?.error?.error || err?.error?.message || (typeof err?.error === 'string' ? err.error : null) || err?.message || '';
+    const str = typeof raw === 'string' ? raw : JSON.stringify(raw);
+
+    if (str.includes('No se puede pasar a EN_RUTA') && (str.includes('SOLICITADO') || str.includes('PROGRAMADO'))) {
+      return {
+        title: 'Esperando Visto Bueno del Coordinador',
+        message: 'Debes esperar el visto bueno de tu Coordinador para seguir esta orden. La solicitud aún se encuentra en estado SOLICITADO y debe ser programada con fecha y camión en la planilla de despacho.'
+      };
+    }
+    if (str.includes('No se puede pasar a EN_RUTA')) {
+      return {
+        title: 'Orden No Programada',
+        message: 'Esta orden debe ser aprobada y programada por el Coordinador antes de iniciar el despacho a ruta.'
+      };
+    }
+    if (str.includes('No se puede programar si el retiro no está en estado SOLICITADO')) {
+      return {
+        title: 'Solicitud ya Procesada',
+        message: 'Esta solicitud ya cuenta con programación asignada o se encuentra avanzada en el circuito de retiro.'
+      };
+    }
+    if (str.includes('No se puede marcar como RETIRADO si el retiro no está en estado EN_RUTA')) {
+      return {
+        title: 'Camión No Iniciado',
+        message: 'El camión debe iniciar ruta hacia este domicilio antes de confirmar la recolección física de los residuos.'
+      };
+    }
+    if (str.includes('No se puede registrar pesaje si el retiro no está en estado RETIRADO')) {
+      return {
+        title: 'Retiro Pendiente',
+        message: 'Debes confirmar primero el retiro en el domicilio antes de registrar el pesaje en la báscula digital.'
+      };
+    }
+    if (str.includes('No se puede cancelar')) {
+      return {
+        title: 'Acción No Permitida',
+        message: 'No es posible cancelar una orden que ya fue completada, pesada o retirada en terreno.'
+      };
+    }
+
+    let cleaned = str;
+    try {
+      if (cleaned.includes('{')) {
+        const match = cleaned.match(/\{.*\}/);
+        if (match) {
+          const parsed = JSON.parse(match[0]);
+          cleaned = parsed.error || parsed.message || cleaned;
+        }
+      }
+    } catch (_) {}
+
+    cleaned = cleaned.replace(/^4\d\d\s+Bad\s+Request:\s*/i, '').replace(/^"|"$/g, '').trim();
+
+    return {
+      title: 'No se pudo completar la operación',
+      message: cleaned || 'Hubo una dificultad al procesar la solicitud en el servidor municipal.'
+    };
   }
 }
