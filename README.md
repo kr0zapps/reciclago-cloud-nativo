@@ -76,46 +76,35 @@ flowchart TD
 
 ## 3. Microservicios y Componentes
 
-| Servicio | Puerto | Tecnologia | Rol Principal |
+| Servicio | Puerto | Tecnología | Rol Principal |
 |---|:---:|---|---|
-| **frontend-reciclago** | 4200 / S3 | Angular 18 + Tailwind CSS + MSAL | Portal vecinal responsive con diseno civico institucional, mapa de cuadrantes, calendario y solicitud de retiros. |
-| **ms-reciclago-bff** | 8080 | Spring Boot 3 + Spring Security | Backend for Frontend. Resource Server OAuth2, validacion de emisor, audiencia y firma JWT, control de acceso por roles (RBAC) y proxy hacia microservicios internos. |
-| **ms-reciclago-catalog** | 8081 | Spring Boot 3 + Spring Data JPA | Catalogo de tipos de residuos (papel, vidrio, plastico, metales), flota municipal de camiones y parametrizacion de capacidades. |
-| **ms-reciclago-pickups** | 8083 | Spring Boot 3 + Spring Cloud Streams | Ciclo de vida de las solicitudes de retiro (SOLICITADO -> EN_RUTA -> RECOLECTADO -> PESADO -> CERTIFICADO), publicador en Kafka y RabbitMQ. |
+| **frontend-reciclago** | 4200 / S3 | Angular 18 + Tailwind CSS + MSAL | Portal vecinal y operativo con dashboards especializados para los 4 roles comunales, tracking en tiempo real y solicitud de retiros. |
+| **ms-reciclago-bff** | 8080 | Spring Boot 3 + Spring Security 6 | Backend for Frontend (API Gateway). Resource Server OAuth2, validación de emisor, audiencia y firma JWT, control RBAC y proxy resiliente hacia microservicios. |
+| **ms-reciclago-catalog** | 8081 | Spring Boot 3 + Spring Data JPA | Catálogo de tipos de residuos (vidrio, plástico, cartón, metales), flota de camiones municipales y parametrización de capacidades. |
+| **ms-reciclago-pickups** | 8083 | Spring Boot 3 + Spring Data JPA | Ciclo de vida logístico de retiros (`SOLICITADO` ➔ `PROGRAMADO` ➔ `EN_RUTA` ➔ `RETIRADO` ➔ `PESADO`), publicador en Kafka y RabbitMQ. |
+| **ms-reciclago-routes** | 8084 | Spring Boot 3 + Spring Data JPA | Gestión de cuadrantes barriales comunales (Puerto Chico, Costanera, Ensenada, Nueva Braunau), simulación GPS y tracking ciudadano. |
 
 ---
 
-## 4. Seguridad, Autenticacion y Autorizacion (RBAC)
+## 4. Seguridad, Autenticación y Cuentas de Prueba (RBAC)
 
-La solucion utiliza autenticacion federada mediante **OAuth2 y OpenID Connect** con **Microsoft Entra ID (Azure AD)** implementando una **arquitectura de doble aplicacion (Double App Registration)** segun las mejores practicas de seguridad cloud:
+La solución utiliza autenticación federada mediante **OAuth2 y OpenID Connect** con **Microsoft Entra ID (Azure AD)** implementando una **arquitectura de doble aplicación (Double App Registration)**:
 
-### Arquitectura de Doble Aplicacion (Frontend SPA + Backend Resource Server)
+### Matriz de Roles y Cuentas de Prueba Oficiales
 
-Para garantizar la separacion de responsabilidades y la emision diferenciada de tokens (`id_token` para identidad de usuario y `access_token` para autorizacion de APIs), se registraron dos aplicaciones independientes en Microsoft Entra ID:
+Para probar el flujo completo en local (`http://localhost:4200`) o producción, se han aprovisionado las siguientes credenciales en el Tenant de Microsoft Entra ID:
 
-| Entidad | Nombre en Azure | Client ID | Tipo | Proposito |
-|---|---|---|---|---|
-| **App 1 (Frontend)** | `reciclago-frontend` | `20ae8f6f-ef82-48a6-a4ae-897d36212b4b` | Single-Page Application (SPA) | Autenticacion de usuarios mediante Authorization Code Flow con PKCE. Gestiona inicio y cierre de sesion. |
-| **App 2 (Backend API)** | `reciclago-api` | `9a946a0b-5350-4fe1-a79e-ca332612f60d` | Web API / Resource Server | Expone scopes protegidos y define App Roles (`Admin`, `Coordinador`). Valida firma y audiencia en el BFF. |
+| Rol | Correo de Prueba (Entra ID) | Permisos en BFF | Vista en Frontend |
+|---|---|---|---|
+| **Administrador** | `admin@reciclago.onmicrosoft.com` | `ROLE_Admin` | Dashboard integral DIMAO, auditoría Kafka, gestión de flota, exportación CSV y control total del ciclo de vida. |
+| **Coordinador** | `coordinador@reciclago.onmicrosoft.com` | `ROLE_Coordinador` | Dashboard de despacho logístico, recepción de avisos barriales, programación de retiros y asignación de camiones. |
+| **Chofer** | `chofer@reciclago.onmicrosoft.com` | `ROLE_Chofer` | Dashboard operativo de ruta, inicio de viaje (`EN_RUTA`), confirmación de recolección (`RETIRADO`) y registro de pesaje real (`PESADO`). |
+| **Vecino** | `jon.vidals@duocuc.cl`<br>*(o cualquier cuenta Microsoft/Duoc)* | `ROLE_Vecino` *(por defecto)* | Portal ciudadano: consulta de cuadrantes/días de recolección, solicitud de retiro particular, tracking de camión barrial e historial personal aislado (BOLA/IDOR safe). |
 
-- **Tenant ID (Tenant Proyecto RecicLago):** `5625266d-cae0-4070-a7ea-b5e88273580f`
+- **Tenant ID (RecicLaGo):** `5625266d-cae0-4070-a7ea-b5e88273580f`
+- **Client ID Backend (API):** `9a946a0b-5350-4fe1-a79e-ca332612f60d`
+- **Client ID Frontend (SPA):** `20ae8f6f-ef82-48a6-a4ae-897d36212b4b`
 - **Scope Autorizado:** `api://9a946a0b-5350-4fe1-a79e-ca332612f60d/access_as_user`
-- **Redirect URIs Autorizadas:**
-  - Desarrollo local: `http://localhost:4200`
-  - Nube AWS S3 (HTTPS seguro): `https://reciclago-frontend-puertovaras.s3.us-east-1.amazonaws.com/index.html`
-
-### Flujo de Tokens y Control de Acceso (RBAC)
-
-1. **Flujo PKCE en el Frontend**: El cliente Angular solicita la autenticacion incluyendo el scope de la App 2 (`api://9a946a0b-5350-4fe1-a79e-ca332612f60d/access_as_user`).
-2. **Emision de Doble Token**:
-   - `id_token`: Provee la identidad del usuario (`name`, `preferred_username`) para la interfaz grafica.
-   - `access_token`: Provee la autorizacion de consumo hacia el BFF con audiencia `api://9a946a0b-5350-4fe1-a79e-ca332612f60d` y claims de roles (`roles`).
-3. **Proteccion de Rutas**: Los guards [`auth.guard.ts`](file:///c:/Users/krosa/Desktop/semestre%206/cloud%20nativo/reciclago/frontend-reciclago/src/app/guards/auth.guard.ts) aseguran que las rutas privadas (`/dashboard`, `/pickups`, `/catalog`) requieran una sesion valida.
-4. **Validacion en el BFF**: El microservicio BFF valida la firma criptografica con la clave publica del tenant (`login.microsoftonline.com`), verificando vigencia temporal (`exp`), emisor (`iss`) y audiencia (`aud`).
-5. **Matriz de Roles (RBAC)**:
-   - `ROLE_Vecino`: Consulta de rutas, solicitud de retiro domiciliario, historial personal.
-   - `ROLE_Coordinador`: Asignacion de cuadrantes, monitoreo de camiones, validacion de pesaje.
-   - `ROLE_Admin`: Configuracion global, reportes consolidados DIMAO y auditoria comunal.
 
 ---
 
@@ -146,75 +135,143 @@ sequenceDiagram
 
 ---
 
-## 6. Instalacion y Ejecucion en Entorno Local
+## 5. Cómo Funciona la Aplicación (Ciclo End-to-End y Arquitectura Cloud Native)
 
-### Prerrequisitos
-- Java 17 JDK instalado y configurado en `PATH`.
-- Node.js 20+ y `npm`.
-- Docker y Docker Compose.
-- Git.
+RecicLaGo opera bajo un flujo logístico colaborativo en tiempo real que conecta al vecino de Puerto Varas con la Dirección de Medio Ambiente (DIMAO) y el personal operativo en terreno:
 
-### Paso 1: Levantar Infraestructura de Mensajeria y Base de Datos
-Desde la raiz del proyecto:
-```bash
-docker compose up -d
-```
-Esto inicializara:
-- PostgreSQL 16 en el puerto `5432` (`reciclago_db`)
-- RabbitMQ en los puertos `5672` (AMQP) y `15672` (Consola Web: user `guest`, pass `guest`)
-- Apache Kafka en el puerto `9092` con Zookeeper en `2181`
-
-### Dev 2 (Backend Core + Infra) — Checklist
-
-```
-[x] 1. Validaciones de máquina de estados en PickupService (CRÍTICO) - COMPLETADO ✅
-[x] 2. Tests para CamionController y TarifaController (CRÍTICO) - COMPLETADO ✅
-[x] 3. Tests PATCH en PickupControllerTest + cancelar en ServiceTest (CRÍTICO) - COMPLETADO ✅
-[x] 4. GlobalExceptionHandler en microservicios catalog, pickups y routes (IMPORTANTE) - COMPLETADO ✅
-[x] 5. DTO CertificateEventDto para RabbitMQ (IMPORTANTE) - COMPLETADO ✅
-[x] 6. Corregir documentación vs docker-compose (IMPORTANTE) - COMPLETADO ✅
-[x] 7. Mejorar generación de codigoRetiro con prefijo RET-PV- (OPCIONAL) - COMPLETADO ✅
-[x] 8. Nuevo microservicio ms-reciclago-routes (puerto 8084) con cuadrantes, tracking y DIMAO (CRÍTICO) - COMPLETADO ✅
-[x] 9. Dockerfiles multi-etapa para todos los microservicios y docker-compose actualizado (IMPORTANTE) - COMPLETADO ✅
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> SOLICITADO: Vecino o Coordinador crea retiro
+    SOLICITADO --> PROGRAMADO: Coordinador asigna camión y fecha
+    PROGRAMADO --> EN_RUTA: Chofer inicia recorrido barrial
+    EN_RUTA --> RETIRADO: Chofer recolecta residuos en domicilio
+    RETIRADO --> PESADO: Chofer registra pesaje verificado en balanza
+    PESADO --> [*]: Certificado generado (RabbitMQ q.cmd.certificate)
+    
+    SOLICITADO --> CANCELADO: Cancelación justificada
+    PROGRAMADO --> CANCELADO: Cancelación justificada
+    EN_RUTA --> CANCELADO: Imprevisto en terreno
 ```
 
-### Paso 2: Iniciar Microservicios Backend
+### Flujo Operativo por Rol:
 
-1. **Iniciar ms-reciclago-catalog (Puerto 8081):**
-```bash
-cd ms-reciclago-catalog
-./mvnw spring-boot:run
-```
+1. **🧑‍🌾 Ciudadano / Vecino (`ROLE_Vecino`)**:
+   - Ingresa con su cuenta institucional o personal (`jon.vidals@duocuc.cl`).
+   - Consulta el calendario comunal de recolección y el mapa de su cuadrante barrial (Costanera, Puerto Chico, Ensenada o Nueva Braunau).
+   - Registra una **Solicitud de Retiro Puerta a Puerta** indicando tipo de material (vidrio, cartón, plástico, metales), peso estimado y observaciones.
+   - Estado inicial: `SOLICITADO`. Su historial personal permanece protegido contra accesos indebidos (BOLA/IDOR safe).
 
-2. **Iniciar ms-reciclago-pickups (Puerto 8083):**
-```bash
-cd ../ms-reciclago-pickups
-./mvnw spring-boot:run
-```
+2. **📋 Coordinador Logístico DIMAO (`ROLE_Coordinador`)**:
+   - Ingresa con `coordinador@reciclago.onmicrosoft.com`.
+   - Visualiza en tiempo real las solicitudes comunales en estado `SOLICITADO`.
+   - Abre el modal de operación, selecciona un camión recolector disponible del catálogo municipal (`ms-catalog`), define fecha y hora de recogida y confirma la operación.
+   - El estado pasa a `PROGRAMADO`. Automáticamente se emiten eventos a **RabbitMQ** (`q.cmd.email`, `q.cmd.route`) y **Kafka** (`pickups.events`).
 
-3. **Iniciar ms-reciclago-routes (Puerto 8084):**
-```bash
-cd ../ms-reciclago-routes
-./mvnw spring-boot:run
-```
+3. **🚛 Chofer / Conductor Operativo (`ROLE_Chofer`)**:
+   - Ingresa con `chofer@reciclago.onmicrosoft.com`.
+   - Visualiza los retiros programados asignados a su camión y cuadrante.
+   - Al comenzar el viaje, presiona **Iniciar Ruta** (estado ➔ `EN_RUTA`).
+   - Al llegar al domicilio del vecino, recolecta el material y presiona **Marcar Retirado** (estado ➔ `RETIRADO`).
+   - Pesa el residuo en la balanza municipal e ingresa los kilogramos reales verificados (estado ➔ `PESADO`). Se emite un comando asíncrono a RabbitMQ (`q.cmd.certificate`).
 
-4. **Iniciar ms-reciclago-bff (Puerto 8080):**
-```bash
-cd ../ms-reciclago-bff
-./mvnw spring-boot:run
-```
-
-### Paso 3: Iniciar Frontend Angular
-```bash
-cd ../frontend-reciclago
-npm install
-npm start
-```
-El portal estara disponible localmente en `http://localhost:4200`.
+4. **🏛️ Administrador Comunal (`ROLE_Admin`)**:
+   - Ingresa con `admin@reciclago.onmicrosoft.com`.
+   - Supervisa el cumplimiento de metas comunales de reciclaje de la Ley REP, kilogramos recuperados y CO₂ mitigado.
+   - Monitorea la disponibilidad de la flota y el estado de cuadrantes.
+   - Audita en vivo los eventos de trazabilidad publicados en Kafka (`audit.timeline`).
+   - Exporta reportes consolidados y tiene facultades para reprogramar o cancelar operaciones.
 
 ---
 
-## 7. Verificación de Seguridad y Rutas con cURL (Rúbrica EP2 - Indicador 8)
+## 6. Instalación y Ejecución en Entorno Local (Docker Desktop)
+
+Todos los componentes de backend están dockerizados e integrados en una sola red virtual (`reciclago-net`).
+
+### Prerrequisitos
+- **Docker Desktop** (con soporte WSL2 en Windows o Docker Engine en Linux/macOS).
+- **Node.js 20+** y `npm`.
+- **Git**.
+
+### Paso 1: Levantar Todo el Backend en Docker Desktop
+Desde la raíz del repositorio:
+```bash
+docker compose up -d
+```
+Este único comando descargará/construirá y levantará los **8 contenedores** de la solución en segundo plano:
+
+| Contenedor | Puerto Host | Descripción |
+|---|---|---|
+| `reciclago-ms-bff` | `8080` | API Gateway BFF (Spring Security OAuth2 + RBAC) |
+| `reciclago-ms-pickups` | `8083` | Microservicio de Retiros y Ciclo de Vida |
+| `reciclago-ms-catalog` | `8081` | Microservicio de Catálogo de Flotas y Residuos |
+| `reciclago-ms-routes` | `8084` | Microservicio de Cuadrantes y Tracking Barrial |
+| `reciclago-postgres` | `5433` | Base de datos PostgreSQL (`reciclago_db`) |
+| `reciclago-rabbitmq` | `5672` / `15672` | Broker AMQP + Consola Web (`guest` / `guest`) |
+| `reciclago-kafka` | `9092` / `29092` | Broker de Event Streaming |
+| `reciclago-zookeeper` | `2181` | Coordinador de Clúster Kafka |
+
+> [!TIP]
+> Puedes abrir **Docker Desktop** y verás el proyecto `reciclago` con sus 8 contenedores en estado *Running* y saludables (*Healthy*).
+
+### Paso 2: Iniciar el Frontend Angular
+En una terminal:
+```bash
+cd frontend-reciclago
+npm install
+npm start
+```
+El portal estará disponible en `http://localhost:4200`.
+
+---
+
+## 7. División de Responsabilidades: ¿Qué Pega le Queda a DEV 2?
+
+### Resumen del Trabajo Realizado por DEV 1 (Frontend + BFF):
+- ✅ Frontend Angular 18 multi-rol modularizado ([`AdminDashboardComponent`](file:///c:/Users/krosa/Desktop/semestre%206/cloud%20nativo/reciclago/frontend-reciclago/src/app/pages/dashboard/components/admin-dashboard.component.ts), [`CoordinadorDashboardComponent`](file:///c:/Users/krosa/Desktop/semestre%206/cloud%20nativo/reciclago/frontend-reciclago/src/app/pages/dashboard/components/coordinador-dashboard.component.ts), [`ChoferDashboardComponent`](file:///c:/Users/krosa/Desktop/semestre%206/cloud%20nativo/reciclago/frontend-reciclago/src/app/pages/dashboard/components/chofer-dashboard.component.ts) y vista de Vecino).
+- ✅ Integración federada Microsoft Entra ID (SSO, PKCE, validación JWT, extracción resiliente de identidad y control RBAC).
+- ✅ Reemplazo de browser alerts bloqueantes por banners modales integrados.
+- ✅ Configuración de `JdkClientHttpRequestFactory` en BFF para soporte nativo de HTTP `PATCH`.
+- ✅ Dockerización completa de los 4 microservicios por defecto en `docker-compose.yml` (resolviendo la directiva oculta `profiles: ['apps']`).
+- ✅ Pipeline CI/CD a AWS S3 Bucket ([deploy-frontend.yml](file:///.github/workflows/deploy-frontend.yml)).
+
+---
+
+### Checklist de Tareas Pendientes para DEV 2 (Backend Core + Nube AWS):
+
+De acuerdo a la rúbrica de evaluación y la arquitectura distribuida del proyecto, las responsabilidades pendientes de **DEV 2** son:
+
+```
+[ ] 1. Despliegue del Backend en AWS Cloud (ECR + EC2) — CRÍTICO:
+    - Autenticarse en AWS con sus propias credenciales de Learner Lab / Academy (separadas de DEV 1).
+    - Ejecutar el script `scripts/deploy-backend.ps1` para compilar y subir las imágenes Docker a AWS ECR:
+      * reciclago/ms-bff
+      * reciclago/ms-catalog
+      * reciclago/ms-pickups
+      * reciclago/ms-routes
+    - Aprovisionar una instancia EC2 (Ubuntu/Amazon Linux con Docker y Docker Compose).
+    - Clonar o transferir el `docker-compose.yml` a la instancia EC2 y levantar el stack productivo (`docker compose up -d`).
+    - Configurar los Security Groups de la instancia EC2 para permitir tráfico de entrada en el puerto 8080 (BFF).
+
+[ ] 2. Consumidores / Workers Asíncronos de RabbitMQ — IMPORTANTE:
+    - El microservicio `ms-reciclago-pickups` ya emite correctamente mensajes a las colas:
+      * `q.cmd.email`: Eventos de notificación por email al cambiar de estado.
+      * `q.cmd.certificate`: Evento emitido al completar el pesaje (`PESADO`) con datos del vecino, peso y fecha.
+    - DEV 2 debe implementar o verificar los consumidores (@RabbitListener) que procesen estas colas:
+      * Worker simulador de envío de correos (imprimir log o integrar servicio de correo).
+      * Worker generador de certificado PDF de reciclaje y mitigación de huella de carbono.
+
+[ ] 3. Consumidor de Auditoría en Apache Kafka (`audit.timeline`) — IMPORTANTE:
+    - El servicio emite los eventos `PickupStateChangeEventDto` a los tópicos `pickups.events` y `audit.timeline`.
+    - DEV 2 puede implementar o verificar un @KafkaListener de auditoría que persista o procese esta línea de tiempo para consultas de DIMAO.
+
+[ ] 4. Pruebas de Carga y Resiliencia en Nube — RECOMENDADO:
+    - Verificar la tolerancia a fallos en la instancia EC2 (reinicio automático de contenedores con `restart: unless-stopped`).
+```
+
+---
+
+## 8. Verificación de Seguridad y Rutas con cURL (Rúbrica EP2 - Indicador 8)
 
 A continuación se presentan los comandos formales de prueba mediante cURL para demostrar el comportamiento del Resource Server BFF frente a diferentes escenarios de autenticación y autorización (códigos HTTP 200, 401 y 403):
 
@@ -285,14 +342,14 @@ curl -i -X PATCH -H "Authorization: Bearer <TOKEN_ADMIN>" \
 
 ---
 
-## 8. Estructura del Repositorio
+## 9. Estructura del Repositorio
 
 ```text
 reciclago/
 ├── .github/
 │   └── workflows/
 │       └── deploy-frontend.yml       # Pipeline CI/CD automático GitHub -> AWS S3
-├── docker-compose.yml                # Infraestructura local (Postgres, RabbitMQ, Kafka)
+├── docker-compose.yml                # Infraestructura completa Docker Desktop (8 contenedores)
 ├── ruta_trabajo.md                   # Bitácora técnica y guía detallada DEV 1 / DEV 2
 ├── ms-reciclago-bff/                 # Backend for Frontend (Spring Security OAuth2 + Dockerfile)
 ├── ms-reciclago-catalog/             # Microservicio de Catálogo (Residuos, Camiones, Tarifas)
@@ -305,7 +362,7 @@ reciclago/
     │   │   ├── pages/
     │   │   │   ├── home/             # Landing page institucional comunal
     │   │   │   ├── login/            # Pantalla de acceso SSO Microsoft
-    │   │   │   └── dashboard/        # Panel vecinal, simulación de camión y cuadrantes
+    │   │   │   └── dashboard/        # Dashboards especializados (Admin, Coord, Chofer, Vecino)
     │   │   ├── services/             # BffService (Comunicación REST reactiva)
     │   │   ├── app.component.ts      # Header universal, menú móvil fluido y modales
     │   │   ├── app.config.ts         # Configuración MSAL y Providers Angular
@@ -316,7 +373,7 @@ reciclago/
 
 ---
 
-## 9. Cumplimiento Académico (Caso 7 & Pautas DSY1107)
+## 10. Cumplimiento Académico (Caso 7 & Pautas DSY1107)
 
 El proyecto da cumplimiento íntegro a los requisitos solicitados en la asignatura **Cloud Nativo**:
 

@@ -246,12 +246,12 @@ A continuación se valida el alineamiento estricto del proyecto contra los docum
 
 | Requerimiento del Caso 7 | Implementación en RecicLaGo | Estado DEV 1 (Front/BFF) | Estado DEV 2 (Back) |
 | :--- | :--- | :--- | :--- |
-| **Actores y Roles** (Admin, Operador/Coordinador, Vecino, Auditor) | Lectura automática de `idTokenClaims.roles` en `DashboardComponent` y `AppComponent`. Saludo personalizado y segmentación de permisos. | ✅ **100% Implementado** | 🟡 Soportar roles en DB / Claims |
-| **Solicitud de Retiro Puerta a Puerta** | Formulario responsivo con validación de dirección, tipo de residuo y comentarios. Envío al BFF (`POST /api/pickups`). | ✅ **100% Implementado** | 🟡 `POST /api/pickups` en pickups-svc |
-| **Catálogo de 4 Fracciones** (Vidrio, Cartón/Papel, Plásticos PET/PEAD, Latas/Metales) | Modales cívicos interactivos, selector de material en formulario y consumo de `GET /api/catalog/residuos`. | ✅ **100% Implementado** | 🟡 `GET /api/catalog/residuos` en catalog-svc |
-| **Seguimiento en Tiempo Real y Cuadrantes** | Línea de tiempo visual de 3 hitos (*Retiro programado* $\rightarrow$ *Camión en ruta* $\rightarrow$ *Retiro realizado*), mapa comunal con cuadrantes de Puerto Varas. | ✅ **100% Implementado** | 🟡 `GET /api/routes/cuadrante` |
-| **Historial Trazable con Kilos** | Tarjetas de retiros anteriores con pesaje digital acumulado y badge *"Cuenca Protegida"*. | ✅ **100% Implementado** | 🟡 `GET /api/pickups/history` con paginación |
-| **Flujo Seguro en Capas** | `JWT (MSAL)` $\rightarrow$ `AWS API Gateway` $\rightarrow$ `ms-reciclago-bff (:8080)` $\rightarrow$ `Microservicios core`. | ✅ **100% Implementado** | 🟡 Integrar endpoints core detrás de BFF |
+| **Actores y Roles** (Admin, Coordinador, Chofer, Vecino) | Paneles especializados por rol, lectura de `roles` desde JWT en `SecurityConfig` y dashboards modulares. | ✅ **100% Implementado** | ✅ **100% Operativo** (`ROLE_Admin`, `ROLE_Coordinador`, `ROLE_Chofer`, `ROLE_Vecino`) |
+| **Solicitud de Retiro Puerta a Puerta** | Formulario responsivo con validación de dirección, tipo de residuo y comentarios. Envío al BFF (`POST /api/pickups`). | ✅ **100% Implementado** | ✅ **100% Operativo** (`ms-reciclago-pickups` en Docker) |
+| **Catálogo de 4 Fracciones y Flota** | Modales cívicos interactivos, selector de material en formulario y consumo de `GET /api/catalog/residuos` y `camiones`. | ✅ **100% Implementado** | ✅ **100% Operativo** (`ms-reciclago-catalog` en Docker) |
+| **Seguimiento en Tiempo Real y Cuadrantes** | Línea de tiempo visual, selector de camión, mapa comunal con cuadrantes de Puerto Varas y tracking. | ✅ **100% Implementado** | ✅ **100% Operativo** (`ms-reciclago-routes` en Docker) |
+| **Historial Trazable con Kilos y Ciclo de Vida** | Estados logísticos (`SOLICITADO` ➔ `PROGRAMADO` ➔ `EN_RUTA` ➔ `RETIRADO` ➔ `PESADO`) con emisión a RabbitMQ y Kafka. | ✅ **100% Implementado** | ✅ **100% Operativo** (Eventos emitidos) |
+| **Flujo Seguro en Capas** | `JWT (MSAL)` $\rightarrow$ `ms-reciclago-bff (:8080)` $\rightarrow$ `Microservicios core en Docker`. | ✅ **100% Implementado** | ✅ **100% Operativo** (8 contenedores activos) |
 
 ---
 
