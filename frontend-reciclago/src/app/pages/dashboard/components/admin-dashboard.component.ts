@@ -274,12 +274,16 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
 
                 <div class="text-xs text-slate-500 mt-1 flex items-center gap-2 flex-wrap">
                   <span><i class="fa-regular fa-calendar text-slate-400 mr-1"></i>{{ p.fechaTexto || p.fecha || 'Fecha por asignar' }}</span>
-                  <span class="text-slate-300">•</span>
-                  <span *ngIf="p.kilosRecolectados" class="font-bold text-emerald-800">
+                  <span class="text-slate-300" *ngIf="p.pesoEstimadoKg">•</span>
+                  <span *ngIf="p.pesoEstimadoKg" class="font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                    <i class="fa-solid fa-weight-hanging mr-1 text-slate-400"></i>Est: {{ p.pesoEstimadoKg }} kg
+                  </span>
+                  <span class="text-slate-300" *ngIf="p.kilosRecolectados">•</span>
+                  <span *ngIf="p.kilosRecolectados" class="font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                     <i class="fa-solid fa-scale-balanced mr-1"></i>{{ p.kilosRecolectados }} kg certificados
                   </span>
                   <span *ngIf="!p.kilosRecolectados" class="text-slate-500">
-                    Pendiente de pesaje
+                    {{ p.estado === 'RETIRADO' ? '⚠️ Retirado (pendiente pesaje)' : 'Pendiente de pesaje' }}
                   </span>
                   <span *ngIf="p.comentarios" class="text-slate-400 italic truncate max-w-xs">
                     "{{ p.comentarios }}"

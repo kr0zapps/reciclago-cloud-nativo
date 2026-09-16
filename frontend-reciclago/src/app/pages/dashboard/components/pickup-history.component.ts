@@ -55,7 +55,11 @@ import { Pickup } from '../data/sectors.data';
                 </span>
               </div>
               <p class="text-sm sm:text-base text-brand-muted mt-0.5 truncate">
-                {{ pickup.direccion }} • <strong class="text-brand-charcoal font-semibold">{{ (isRetiradoOPesado(pickup) && pickup.kilosRecolectados) ? (pickup.kilosRecolectados + ' kg certificados') : (pickup.estado || 'En proceso') }}</strong>
+                {{ pickup.direccion }}
+                <span *ngIf="pickup.pesoEstimadoKg && !pickup.kilosRecolectados" class="text-xs font-semibold text-slate-500">
+                  • Est: {{ pickup.pesoEstimadoKg }} kg
+                </span>
+                • <strong class="text-brand-charcoal font-semibold">{{ (isRetiradoOPesado(pickup) && pickup.kilosRecolectados) ? (pickup.kilosRecolectados + ' kg certificados') : (pickup.estado || 'En proceso') }}</strong>
               </p>
             </div>
           </div>
@@ -64,7 +68,7 @@ import { Pickup } from '../data/sectors.data';
           <div class="self-start sm:self-center flex items-center gap-2 flex-wrap flex-shrink-0">
             <!-- Badge de Estado -->
             <span *ngIf="isRetiradoOPesado(pickup)" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs sm:text-sm font-bold bg-[#EAF5E6] text-brand-green border border-[#CDE9C6] transition-colors">
-              <i class="fa-solid fa-check text-xs"></i> {{ pickup.kilosRecolectados ? (pickup.kilosRecolectados + ' kg pesados') : 'Retirado' }}
+              <i class="fa-solid fa-check text-xs"></i> {{ pickup.kilosRecolectados ? (pickup.kilosRecolectados + ' kg pesados') : 'Retirado (pendiente pesaje)' }}
             </span>
             <span *ngIf="!isRetiradoOPesado(pickup)" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs sm:text-sm font-bold bg-slate-100 text-slate-600 border border-slate-200 transition-colors">
               <i class="fa-regular fa-clock text-xs"></i> {{ pickup.estado }}
@@ -103,7 +107,7 @@ import { Pickup } from '../data/sectors.data';
               </button>
 
               <!-- Botón Pesar (kg) -->
-              <button *ngIf="pickup.estado === 'RETIRADO'"
+              <button *ngIf="pickup.estado === 'RETIRADO' || pickup.estado === 'EN_RUTA'"
                       (click)="requestAction(pickup, 'pesado')"
                       type="button"
                       class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl shadow-xs transition-colors cursor-pointer"
@@ -218,7 +222,7 @@ import { Pickup } from '../data/sectors.data';
                 <span class="text-xs font-bold px-2.5 py-1 rounded-lg inline-flex items-center gap-1"
                       [ngClass]="isRetiradoOPesado(p) ? 'bg-[#EEF5EB] text-[#4F8A3D] border border-[#D5E6D2]' : 'bg-amber-50 text-amber-700 border border-amber-200'">
                   <i [class]="isRetiradoOPesado(p) ? 'fa-solid fa-check text-[10px]' : 'fa-solid fa-hourglass-half text-[10px]'"></i>
-                  {{ (isRetiradoOPesado(p) && p.kilosRecolectados) ? (p.kilosRecolectados + ' kg pesados') : (p.estado || 'En proceso') }}
+                  {{ (isRetiradoOPesado(p) && p.kilosRecolectados) ? (p.kilosRecolectados + ' kg pesados') : (p.pesoEstimadoKg ? (p.estado + ' • Est: ' + p.pesoEstimadoKg + ' kg') : (p.estado || 'En proceso')) }}
                 </span>
                 <span *ngIf="p.comentarios" class="text-[11px] text-slate-400 italic max-w-xs truncate">
                   "{{ p.comentarios }}"

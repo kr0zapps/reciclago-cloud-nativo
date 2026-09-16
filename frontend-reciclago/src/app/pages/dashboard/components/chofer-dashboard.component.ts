@@ -123,7 +123,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
             </div>
             <div>
               <span class="text-[11px] font-black uppercase tracking-wider text-[#1F6685] block">
-                Próxima Parada Inmediata en Hoja de Ruta
+                {{ activeDriverStop?.estado === 'RETIRADO' ? '⚠️ Retiro Realizado — Pendiente Registrar Báscula' : 'Próxima Parada Inmediata en Hoja de Ruta' }}
               </span>
               <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy mt-0.5">
                 {{ activeDriverStop?.direccion || '¡Ruta completada! Todas las direcciones atendidas' }}
@@ -131,6 +131,10 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
               <p class="text-xs text-slate-600 mt-1 flex items-center gap-2 flex-wrap" *ngIf="activeDriverStop">
                 <span class="font-bold text-[#4F8A3D] px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200">
                   Material: {{ activeDriverStop.residuoNombre || 'Reciclaje' }}
+                </span>
+                <span class="text-slate-300" *ngIf="activeDriverStop.pesoEstimadoKg">•</span>
+                <span class="font-bold text-slate-700 px-2 py-0.5 rounded bg-slate-100 border border-slate-200" *ngIf="activeDriverStop.pesoEstimadoKg">
+                  <i class="fa-solid fa-weight-hanging mr-1 text-slate-500"></i>Est. Vecino: {{ activeDriverStop.pesoEstimadoKg }} kg
                 </span>
                 <span class="text-slate-300">•</span>
                 <span class="text-slate-600 font-medium" *ngIf="activeDriverStop.comentarios">
@@ -141,7 +145,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
           </div>
 
           <!-- Botón Táctil Gigante Cabina -->
-          <div *ngIf="activeDriverStop" class="flex-shrink-0">
+          <div *ngIf="activeDriverStop" class="flex-shrink-0 flex flex-wrap items-center gap-2">
             <button *ngIf="activeDriverStop.estado === 'PROGRAMADO' || activeDriverStop.estado === 'SOLICITADO'"
                     (click)="requestAction(activeDriverStop, 'en-ruta')"
                     type="button"
@@ -150,12 +154,27 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
               <span>Iniciar Ruta a esta Dirección</span>
             </button>
 
-            <button *ngIf="activeDriverStop.estado === 'EN_RUTA'"
-                    (click)="requestAction(activeDriverStop, 'retirado')"
+            <ng-container *ngIf="activeDriverStop.estado === 'EN_RUTA'">
+              <button (click)="requestAction(activeDriverStop, 'retirado')"
+                      type="button"
+                      class="w-full sm:w-auto px-5 py-4 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white text-sm sm:text-base font-extrabold shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2">
+                <i class="fa-solid fa-box-open text-lg"></i>
+                <span>Confirmar Retiro</span>
+              </button>
+              <button (click)="requestAction(activeDriverStop, 'pesado')"
+                      type="button"
+                      class="w-full sm:w-auto px-5 py-4 rounded-2xl bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white text-sm sm:text-base font-extrabold shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2">
+                <i class="fa-solid fa-scale-balanced text-lg"></i>
+                <span>Pesar en Báscula</span>
+              </button>
+            </ng-container>
+
+            <button *ngIf="activeDriverStop.estado === 'RETIRADO'"
+                    (click)="requestAction(activeDriverStop, 'pesado')"
                     type="button"
-                    class="w-full sm:w-auto px-6 py-4 rounded-2xl bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white text-sm sm:text-base font-extrabold shadow-sm transition-all cursor-pointer flex items-center justify-center gap-3">
-              <i class="fa-solid fa-box-open text-lg"></i>
-              <span>Confirmar Retiro en Puerta</span>
+                    class="w-full sm:w-auto px-6 py-4 rounded-2xl bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white text-sm sm:text-base font-extrabold shadow-md transition-all cursor-pointer flex items-center justify-center gap-3 ring-2 ring-emerald-400">
+              <i class="fa-solid fa-scale-balanced text-xl"></i>
+              <span>Registrar Pesaje en Báscula (kg)</span>
             </button>
           </div>
         </div>
@@ -198,12 +217,16 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
 
                 <div class="text-xs text-slate-500 mt-1 flex items-center gap-2 flex-wrap">
                   <span><i class="fa-regular fa-calendar text-slate-400 mr-1"></i>{{ p.fechaTexto || p.fecha || 'Hoy' }}</span>
+                  <span class="text-slate-300" *ngIf="p.pesoEstimadoKg">•</span>
+                  <span *ngIf="p.pesoEstimadoKg" class="font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                    <i class="fa-solid fa-weight-hanging mr-1 text-slate-400"></i>Est: {{ p.pesoEstimadoKg }} kg
+                  </span>
                   <span class="text-slate-300">•</span>
-                  <span *ngIf="p.kilosRecolectados" class="font-bold text-emerald-800">
+                  <span *ngIf="p.kilosRecolectados" class="font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                     <i class="fa-solid fa-scale-balanced mr-1"></i>{{ p.kilosRecolectados }} kg pesados
                   </span>
                   <span *ngIf="!p.kilosRecolectados" class="text-slate-400 italic">
-                    Pendiente de retiro
+                    {{ p.estado === 'RETIRADO' ? '⚠️ Retirado (pendiente báscula)' : 'Pendiente de retiro' }}
                   </span>
                   <span *ngIf="p.comentarios" class="text-slate-600 font-medium">
                     — "{{ p.comentarios }}"
@@ -223,21 +246,28 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
                 <span>Iniciar Ruta</span>
               </button>
 
-              <!-- 2. EN_RUTA -> Marcar Retirado -->
-              <button *ngIf="p.estado === 'EN_RUTA'"
-                      (click)="requestAction(p, 'retirado')"
-                      type="button"
-                      class="px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-amber-600 hover:bg-amber-700 text-white transition-all cursor-pointer shadow-xs flex items-center gap-2">
-                <i class="fa-solid fa-box-open"></i>
-                <span>Confirmar Retiro</span>
-              </button>
+              <!-- 2. EN_RUTA -> Marcar Retirado o Pesar Báscula Directo -->
+              <ng-container *ngIf="p.estado === 'EN_RUTA'">
+                <button (click)="requestAction(p, 'retirado')"
+                        type="button"
+                        class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-amber-600 hover:bg-amber-700 text-white transition-all cursor-pointer shadow-xs flex items-center gap-1.5">
+                  <i class="fa-solid fa-box-open"></i>
+                  <span>Retirar</span>
+                </button>
+                <button (click)="requestAction(p, 'pesado')"
+                        type="button"
+                        class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white transition-all cursor-pointer shadow-xs flex items-center gap-1.5">
+                  <i class="fa-solid fa-scale-balanced"></i>
+                  <span>Pesar</span>
+                </button>
+              </ng-container>
 
               <!-- 3. RETIRADO -> Pesar en Báscula -->
               <button *ngIf="p.estado === 'RETIRADO'"
                       (click)="requestAction(p, 'pesado')"
                       type="button"
-                      class="px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white transition-all cursor-pointer shadow-xs flex items-center gap-2">
-                <i class="fa-solid fa-scale-balanced"></i>
+                      class="px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white transition-all cursor-pointer shadow-md flex items-center gap-2 ring-2 ring-emerald-300">
+                <i class="fa-solid fa-scale-balanced text-sm"></i>
                 <span>Registrar Báscula</span>
               </button>
 
@@ -369,7 +399,7 @@ export class ChoferDashboardComponent implements OnInit, OnChanges {
   }
 
   get countChoferPendientes(): number {
-    return this.pickups.filter(p => p.estado === 'PROGRAMADO' || p.estado === 'EN_RUTA' || p.estado === 'SOLICITADO').length;
+    return this.pickups.filter(p => p.estado === 'PROGRAMADO' || p.estado === 'EN_RUTA' || p.estado === 'SOLICITADO' || p.estado === 'RETIRADO').length;
   }
 
   get choferKilosTurno(): number {
@@ -384,7 +414,10 @@ export class ChoferDashboardComponent implements OnInit, OnChanges {
   }
 
   get activeDriverStop(): Pickup | undefined {
-    return this.pickups.find(p => p.estado === 'EN_RUTA') || this.pickups.find(p => p.estado === 'PROGRAMADO') || this.pickups.find(p => p.estado === 'SOLICITADO');
+    return this.pickups.find(p => p.estado === 'EN_RUTA')
+      || this.pickups.find(p => p.estado === 'RETIRADO')
+      || this.pickups.find(p => p.estado === 'PROGRAMADO')
+      || this.pickups.find(p => p.estado === 'SOLICITADO');
   }
 
   requestAction(pickup: any, action: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar'): void {

@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { switchMap } from 'rxjs';
 import { BffService } from '../../../services/bff.service';
 import { Camion } from '../data/sectors.data';
 
@@ -67,15 +68,26 @@ import { Camion } from '../data/sectors.data';
         </div>
 
         <div *ngIf="actionType === 'pesado'" class="space-y-3 text-left">
-          <div class="p-3 rounded-2xl bg-[#EEF5EB] border border-[#CCE4C8] text-center">
+          <div class="p-4 rounded-2xl bg-[#EEF5EB] border border-[#CCE4C8] text-center">
             <span class="text-[11px] font-bold uppercase tracking-wider text-[#4F8A3D] block">Pesaje Digital Certificado en Camión</span>
-            <div class="flex items-center justify-center gap-2 mt-2">
-              <input type="number" step="0.1" min="0.1" [(ngModel)]="actionPesoKg" class="input-stitch w-36 py-2.5 px-3 text-2xl font-black text-center text-[#123F5B] bg-white" placeholder="Ej: 8.5">
+            <div class="flex items-center justify-center gap-2 mt-2.5">
+              <input type="number" step="0.1" min="0.1" [(ngModel)]="actionPesoKg" class="input-stitch w-36 py-2 px-3 text-2xl font-black text-center text-[#123F5B] bg-white shadow-2xs" placeholder="Ej: 8.5">
               <span class="text-lg font-bold text-slate-500">kg</span>
+            </div>
+
+            <!-- Botones de Pesaje Rápido en Terreno -->
+            <div class="flex items-center justify-center gap-1.5 flex-wrap mt-3">
+              <button *ngFor="let w of [2.0, 5.0, 8.5, 12.0, 15.0, 25.0]"
+                      (click)="actionPesoKg = w"
+                      type="button"
+                      class="px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors cursor-pointer"
+                      [ngClass]="actionPesoKg === w ? 'bg-[#4F8A3D] text-white border-[#4F8A3D]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'">
+                {{ w }} kg
+              </button>
             </div>
           </div>
           <p class="text-xs text-slate-500 text-center">
-            <i class="fa-solid fa-satellite-dish text-emerald-600 mr-1"></i> Se emitirá evento a Kafka (<code>pickups.events</code>) para balance de huella ecológica.
+            <i class="fa-solid fa-satellite-dish text-emerald-600 mr-1"></i> Se emitirá evento a Kafka y comando de certificado a RabbitMQ (<code>q.cmd.certificate</code>).
           </p>
         </div>
 
@@ -139,7 +151,7 @@ export class StaffModalComponent implements OnChanges, OnDestroy {
     }
     if (changes['pickup'] && this.pickup) {
       this.errorMessage = '';
-      this.actionPesoKg = Number(this.pickup.kilosRecolectados) || 5.0;
+      this.actionPesoKg = Number(this.pickup.kilosRecolectados) || Number(this.pickup.pesoEstimadoKg) || 5.0;
       this.actionMotivo = '';
       if (this.camionesDisponibles && this.camionesDisponibles.length > 0) {
         this.actionCamionPatente = this.camionesDisponibles[0].patente;
@@ -180,7 +192,14 @@ export class StaffModalComponent implements OnChanges, OnDestroy {
     } else if (this.actionType === 'retirado') {
       obs = this.bffService.retiradoPickup(id);
     } else if (this.actionType === 'pesado') {
-      obs = this.bffService.pesadoPickup(id, Number(this.actionPesoKg));
+      if (this.pickup.estado === 'EN_RUTA') {
+        // Si aún está en ruta, marca primero retirado y luego registra el pesaje
+        obs = this.bffService.retiradoPickup(id).pipe(
+          switchMap(() => this.bffService.pesadoPickup(id, Number(this.actionPesoKg)))
+        );
+      } else {
+        obs = this.bffService.pesadoPickup(id, Number(this.actionPesoKg));
+      }
     } else if (this.actionType === 'cancelar') {
       obs = this.bffService.cancelarPickup(id, this.actionMotivo);
     }

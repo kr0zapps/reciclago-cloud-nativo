@@ -134,6 +134,45 @@ import { Sector, Residuo } from '../data/sectors.data';
           </div>
         </div>
 
+        <!-- 4. Estimación de Kilos (Vecino) -->
+        <div class="p-4 bg-[#F8FAF7] border border-[#E2E9E4] rounded-2xl space-y-2">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] ml-1" for="pesoEstimado">
+              <i class="fa-solid fa-weight-scale text-[#4F8A3D] mr-1.5"></i> Kilos Estimados de Residuos (Aprox.)
+            </label>
+            <span class="text-[11px] font-semibold text-slate-500">
+              Selecciona una cantidad sugerida o escribe tu peso estimado
+            </span>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center gap-3">
+            <div class="relative w-full sm:w-44">
+              <input [(ngModel)]="newPickup.pesoEstimadoKg"
+                     class="input-stitch !py-2.5 !px-3 font-extrabold text-base text-[#123F5B] text-center"
+                     id="pesoEstimado"
+                     name="pesoEstimado"
+                     type="number"
+                     step="0.5"
+                     min="0.5"
+                     max="500"
+                     placeholder="Ej: 5.0"
+                     required />
+              <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">kg</span>
+            </div>
+
+            <!-- Chips de acceso rápido -->
+            <div class="flex items-center gap-1.5 flex-wrap w-full sm:w-auto">
+              <button type="button"
+                      *ngFor="let k of [2, 5, 10, 15, 25]"
+                      (click)="setQuickWeight(k)"
+                      class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border"
+                      [ngClass]="newPickup.pesoEstimadoKg === k ? 'bg-[#4F8A3D] text-white border-[#4F8A3D] shadow-2xs' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'">
+                {{ k }} kg
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div class="space-y-2">
           <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] ml-1" for="comentarios">
             {{ isRetiroEspecial ? 'Detalles de la solicitud especial (volumen, tipo de residuo o instrucciones)' : 'Comentarios adicionales (opcional)' }}
@@ -169,6 +208,7 @@ export class PickupFormComponent implements OnChanges {
     sector: '',
     direccion: '',
     residuoNombre: '',
+    pesoEstimadoKg: 5.0,
     comentarios: ''
   };
 
@@ -224,6 +264,10 @@ export class PickupFormComponent implements OnChanges {
     });
   }
 
+  setQuickWeight(kilos: number): void {
+    this.newPickup.pesoEstimadoKg = kilos;
+  }
+
   onSubmit(): void {
     if (!this.newPickup.direccion) return;
 
@@ -248,6 +292,10 @@ export class PickupFormComponent implements OnChanges {
       ? `${tipoPrefijo} ${this.newPickup.comentarios}` 
       : `${tipoPrefijo} Notificación vecinal para el cuadrante`;
 
+    const pesoFinal = Number(this.newPickup.pesoEstimadoKg) > 0 
+      ? Number(this.newPickup.pesoEstimadoKg) 
+      : (this.isRetiroEspecial ? 10.0 : 5.0);
+
     const payload = {
       vecinoEmail: this.userEmail || 'vecino@puertovaras.cl',
       vecinoNombre: this.userName || 'Vecino Puerto Varas',
@@ -255,7 +303,7 @@ export class PickupFormComponent implements OnChanges {
       comuna: 'Puerto Varas',
       residuoId: Number(residuoId),
       residuoNombre: residuoNombre,
-      pesoEstimadoKg: this.isRetiroEspecial ? 10.0 : 5.0,
+      pesoEstimadoKg: pesoFinal,
       observaciones: comentarioCompleto,
       comentarios: comentarioCompleto
     };
@@ -266,6 +314,7 @@ export class PickupFormComponent implements OnChanges {
         this.submitStatus = 'success';
         this.newPickup.direccion = '';
         this.newPickup.comentarios = '';
+        this.newPickup.pesoEstimadoKg = 5.0;
         this.isRetiroEspecial = false;
         this.syncOfficialMaterialForSector();
         this.pickupCreated.emit(res || payload);

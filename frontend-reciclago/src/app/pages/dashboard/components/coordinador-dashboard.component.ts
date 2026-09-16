@@ -204,6 +204,14 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
 
                 <div class="text-xs text-slate-500 mt-1 flex items-center gap-2 flex-wrap">
                   <span><i class="fa-regular fa-calendar text-slate-400 mr-1"></i>{{ p.fechaTexto || p.fecha || 'Sin fecha' }}</span>
+                  <span class="text-slate-300" *ngIf="p.pesoEstimadoKg">•</span>
+                  <span *ngIf="p.pesoEstimadoKg" class="font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                    <i class="fa-solid fa-weight-hanging mr-1 text-slate-400"></i>Est: {{ p.pesoEstimadoKg }} kg
+                  </span>
+                  <span class="text-slate-300" *ngIf="p.kilosRecolectados">•</span>
+                  <span *ngIf="p.kilosRecolectados" class="font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    <i class="fa-solid fa-scale-balanced mr-1"></i>{{ p.kilosRecolectados }} kg pesados
+                  </span>
                   <span class="text-slate-300">•</span>
                   <span *ngIf="p.comentarios" class="text-slate-600 font-medium">
                     "{{ p.comentarios }}"
@@ -251,10 +259,19 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
                   <span>Confirmar Retiro</span>
                 </button>
 
-                <div *ngIf="p.estado === 'RETIRADO' || p.estado === 'PESADO'"
+                <!-- 4. RETIRADO -> Pesar en Báscula -->
+                <button *ngIf="p.estado === 'RETIRADO'"
+                        (click)="requestAction(p, 'pesado')"
+                        type="button"
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
+                  <i class="fa-solid fa-scale-balanced text-xs"></i>
+                  <span>Registrar Báscula</span>
+                </button>
+
+                <div *ngIf="p.estado === 'PESADO'"
                      class="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#EBF5E7] text-emerald-900 border border-[#CDE8C7] flex items-center gap-1">
                   <i class="fa-solid fa-check text-emerald-600 text-xs"></i>
-                  <span>{{ p.kilosRecolectados ? p.kilosRecolectados + ' kg' : 'En Acopio' }}</span>
+                  <span>{{ p.kilosRecolectados ? p.kilosRecolectados + ' kg' : 'Pesado' }}</span>
                 </div>
               </div>
             </div>

@@ -47,6 +47,8 @@ export interface Pickup {
   fechaTexto?: string;
   residuoNombre?: string;
   kilosRecolectados?: number;
+  pesoRealKg?: number;
+  pesoEstimadoKg?: number;
   direccion?: string;
   estado?: string;
   comentarios?: string;

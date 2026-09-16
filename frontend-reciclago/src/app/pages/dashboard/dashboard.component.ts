@@ -234,7 +234,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
             fechaTexto: p.fechaProgramada 
               ? new Date(p.fechaProgramada).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' })
               : (p.fechaTexto || (p.fechaSolicitud ? new Date(p.fechaSolicitud).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' }) : 'Hoy')),
-            kilosRecolectados: p.pesoRealKg != null ? p.pesoRealKg : (p.pesoEstimadoKg != null ? p.pesoEstimadoKg : (p.kilosRecolectados || 0)),
+            kilosRecolectados: p.pesoRealKg != null ? p.pesoRealKg : (p.estado === 'PESADO' ? (p.kilosRecolectados || null) : null),
+            pesoRealKg: p.pesoRealKg != null ? p.pesoRealKg : null,
+            pesoEstimadoKg: p.pesoEstimadoKg != null ? p.pesoEstimadoKg : null,
             comentarios: p.observaciones || p.comentarios || ''
           }));
         } else {
