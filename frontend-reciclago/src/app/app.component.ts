@@ -23,9 +23,8 @@ import { environment } from '../environments/environment';
       
       <div class="bg-white/95 backdrop-blur-md rounded-3xl p-7 shadow-2xl border border-white/90 flex flex-col items-center text-center max-w-xs mx-4 anim-page-deploy pointer-events-auto">
         
-        <!-- Logo RecicLaGo con Pulso Orgánico y Halo -->
+        <!-- Logo RecicLaGo Oficial -->
         <div class="relative w-16 h-16 mb-2.5 flex items-center justify-center">
-          <div class="absolute inset-0 rounded-full bg-[#4F8A3D]/25 animate-ping opacity-75"></div>
           <svg class="w-16 h-16 relative z-10 anim-float-soft drop-shadow-sm" fill="none" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 56L34 24L52 50L60 38L78 56H12Z" fill="#123F5B"></path>
             <path d="M34 24L41 34L34 38L27 34L34 24Z" fill="#FFFFFF"></path>
@@ -309,7 +308,7 @@ import { environment } from '../environments/environment';
                 <span class="text-white">Recic</span>
                 <span class="text-[#72be36]">LaGo</span>
               </div>
-              <span class="text-xs font-bold uppercase tracking-wider text-emerald-300">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-300">
                 Puerto Varas recicla • Cuenca Protegida
               </span>
             </div>
@@ -317,15 +316,15 @@ import { environment } from '../environments/environment';
 
           <!-- Enlaces de Navegación del Footer -->
           <nav class="flex flex-wrap justify-center items-center gap-x-3 sm:gap-x-4 gap-y-2 text-xs sm:text-sm text-slate-200 font-medium">
-            <a class="hover:text-emerald-300 transition-colors" routerLink="/">Inicio</a>
+            <a class="hover:text-[#72be36] transition-colors" routerLink="/">Inicio</a>
             <span class="text-white/40">|</span>
-            <button (click)="showHowItWorks = true" type="button" class="hover:text-emerald-300 transition-colors cursor-pointer">¿Cómo funciona?</button>
+            <button (click)="showHowItWorks = true" type="button" class="hover:text-[#72be36] transition-colors cursor-pointer">¿Cómo funciona?</button>
             <span class="text-white/40">|</span>
-            <button (click)="showMaterials = true" type="button" class="hover:text-emerald-300 transition-colors cursor-pointer">Materiales</button>
+            <button (click)="showMaterials = true" type="button" class="hover:text-[#72be36] transition-colors cursor-pointer">Materiales</button>
             <span class="text-white/40">|</span>
-            <a class="hover:text-emerald-300 transition-colors" routerLink="/dashboard">Retiro especial</a>
+            <a class="hover:text-[#72be36] transition-colors" routerLink="/dashboard">Retiro especial</a>
             <span class="text-white/40">|</span>
-            <button (click)="showContact = true" type="button" class="hover:text-emerald-300 transition-colors cursor-pointer">Contacto</button>
+            <button (click)="showContact = true" type="button" class="hover:text-[#72be36] transition-colors cursor-pointer">Contacto</button>
           </nav>
 
           <!-- Sello Municipal y Redes Sociales Oficiales -->
@@ -364,7 +363,7 @@ import { environment } from '../environments/environment';
             <span class="font-script text-white text-2xl sm:text-3xl font-bold tracking-wide">
               Puerto Varas, más limpia, es posible
             </span>
-            <span class="text-emerald-400 text-xl">♡</span>
+            <span class="text-[#72be36] text-sm"><i class="fa-solid fa-leaf"></i></span>
           </div>
         </div>
 
@@ -774,7 +773,7 @@ export class AppComponent implements OnInit, OnDestroy {
       if (!this.authService.instance?.getActiveAccount?.()) {
         try { this.authService.instance?.setActiveAccount?.(active); } catch (e) {}
       }
-      this.currentUser = active.name || active.username || 'Vecino Activo';
+      this.currentUser = active.name || active.username || 'Vecino de Puerto Varas';
     } else {
       this.loginDisplay = false;
       this.currentUser = '';

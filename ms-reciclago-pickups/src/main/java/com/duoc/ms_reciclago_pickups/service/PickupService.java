@@ -106,7 +106,7 @@ public class PickupService {
     // 1. Crear Solicitud (Estado inicial: SOLICITADO)
     public Pickup crearSolicitud(Pickup pickup) {
         if (pickup.getCodigoRetiro() == null || pickup.getCodigoRetiro().isBlank()) {
-            pickup.setCodigoRetiro("RET-PV-" + System.currentTimeMillis() % 1000000);
+            pickup.setCodigoRetiro("RET-PV-" + java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         }
         pickup.setEstado("SOLICITADO");
         pickup.setFechaSolicitud(LocalDateTime.now());

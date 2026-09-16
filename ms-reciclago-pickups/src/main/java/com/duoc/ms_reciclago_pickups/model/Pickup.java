@@ -1,5 +1,6 @@
 package com.duoc.ms_reciclago_pickups.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "retira_pickups")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Pickup {
 
     @Id
@@ -223,5 +225,15 @@ public class Pickup {
 
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
+    }
+
+    public String getComentarios() {
+        return observaciones;
+    }
+
+    public void setComentarios(String comentarios) {
+        if (this.observaciones == null || this.observaciones.isBlank()) {
+            this.observaciones = comentarios;
+        }
     }
 }

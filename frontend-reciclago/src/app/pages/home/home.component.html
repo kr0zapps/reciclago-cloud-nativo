@@ -1,0 +1,33 @@
+<div class="anim-fade-in">
+  <!-- 1. Hero Section con Búsqueda Panorámica y Volcán Osorno -->
+  <app-home-hero
+    [allSectors]="allSectors"
+    [popularSectors]="popularSectors"
+    [selectedSector]="selectedSector"
+    (sectorSelected)="onSectorSelected($event)"
+    (searchSubmitted)="onSearchSubmitted($event)">
+  </app-home-hero>
+
+  <!-- 2. Tu Día de Retiro, 4 Bins de Reciclaje y Camión Municipal -->
+  <app-home-schedule-bins
+    [sector]="selectedSector"
+    [justUpdated]="justUpdated">
+  </app-home-schedule-bins>
+
+  <!-- 3. Retiro Especial y 4 Acciones Rápidas -->
+  <app-home-special-pickup
+    (openMaterialsModal)="showMaterialsModal = true"
+    (openFaqModal)="showFaqModal = true">
+  </app-home-special-pickup>
+
+  <!-- 4. Costanera Puerto Varas y Compromiso Comunal -->
+  <app-home-commitment></app-home-commitment>
+
+  <!-- 5. Modales Cívicos (Materiales Aceptados y Preguntas Frecuentes) -->
+  <app-home-modals
+    [showMaterialsModal]="showMaterialsModal"
+    [showFaqModal]="showFaqModal"
+    (closeMaterials)="showMaterialsModal = false"
+    (closeFaq)="showFaqModal = false">
+  </app-home-modals>
+</div>

@@ -42,19 +42,29 @@ public class RouteService {
         Cuadrante seleccionado = null;
         if (direccion != null && !direccion.isBlank()) {
             String dirNorm = direccion.toLowerCase();
-            if (dirNorm.contains("guindo") || dirNorm.contains("costanera") || dirNorm.contains("vicente") || dirNorm.contains("imperial") || dirNorm.contains("san francisco")) {
-                seleccionado = cuadrantes.stream().filter(c -> c.getNumero() == 2).findFirst().orElse(null);
-            } else if (dirNorm.contains("chico") || dirNorm.contains("colo") || dirNorm.contains("decher") || dirNorm.contains("mirador") || dirNorm.contains("colon")) {
-                seleccionado = cuadrantes.stream().filter(c -> c.getNumero() == 1).findFirst().orElse(null);
-            } else if (dirNorm.contains("ensenada") || dirNorm.contains("colono") || dirNorm.contains("risco")) {
-                seleccionado = cuadrantes.stream().filter(c -> c.getNumero() == 3).findFirst().orElse(null);
-            } else if (dirNorm.contains("braunau") || dirNorm.contains("otto")) {
-                seleccionado = cuadrantes.stream().filter(c -> c.getNumero() == 4).findFirst().orElse(null);
+            for (Cuadrante c : cuadrantes) {
+                if (c.getCallesPrincipales() != null) {
+                    for (String calle : c.getCallesPrincipales().split(",")) {
+                        String calleTrim = calle.trim().toLowerCase();
+                        if (!calleTrim.isBlank() && dirNorm.contains(calleTrim)) {
+                            seleccionado = c;
+                            break;
+                        }
+                    }
+                }
+                if (seleccionado != null) break;
+                if (c.getSector() != null && dirNorm.contains(c.getSector().toLowerCase())) {
+                    seleccionado = c;
+                    break;
+                }
+                if (c.getNombre() != null && dirNorm.contains(c.getNombre().toLowerCase())) {
+                    seleccionado = c;
+                    break;
+                }
             }
         }
 
         if (seleccionado == null) {
-            // Default al Cuadrante 2 (Costanera/Centro Lago)
             seleccionado = cuadrantes.stream().filter(c -> c.getNumero() == 2).findFirst().orElse(cuadrantes.get(0));
         }
 
