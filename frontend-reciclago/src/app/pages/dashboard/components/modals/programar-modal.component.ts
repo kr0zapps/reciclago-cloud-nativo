@@ -4,16 +4,17 @@ import { FormsModule } from '@angular/forms';
 import { BffService } from '../../../../services/bff.service';
 import { Camion, Pickup, Sector, DEFAULT_SECTORES } from '../../data/sectors.data';
 
-interface DateOption {
+export interface DateOption {
   value: string;       // YYYY-MM-DD
-  label: string;       // "Martes 22 Sept"
+  label: string;       // "22 Sep"
   diaSemana: string;   // "Martes"
   fullLabel: string;   // "Martes 22 de Septiembre"
+  sublabel: string;    // "Próximo recorrido", "En 1 semana", etc.
 }
 
-interface TimeSlot {
+export interface TimeSlot {
   value: string;       // "09:30"
-  label: string;       // "09:30 hrs"
+  label: string;       // "09:30"
   periodo: string;     // "Turno Mañana"
 }
 
@@ -43,10 +44,10 @@ interface TimeSlot {
             <div>
               <span class="text-[10px] font-black uppercase tracking-wider block"
                     [ngClass]="isRetiroEspecial ? 'text-amber-800' : 'text-[#1F6685]'">
-                {{ isEditMode ? 'Editar Programación (Antes de Iniciar Ruta)' : (isRetiroEspecial ? 'Despacho de Servicio Especial' : 'Planificación Logística Comunal') }}
+                {{ isEditMode ? 'Modificación de Agenda (Antes de Iniciar Ruta)' : (isRetiroEspecial ? 'Despacho de Servicio Especial' : 'Planificación Logística Comunal') }}
               </span>
               <h3 class="font-heading font-extrabold text-lg sm:text-xl text-[#123F5B]">
-                {{ isEditMode ? 'Editar Programación' : 'Programar Retiro' }} #{{ pickup?.id }}
+                {{ isEditMode ? 'Editar Programación' : 'Despachar / Programar Retiro' }} #{{ pickup?.id }}
               </h3>
             </div>
           </div>
@@ -59,13 +60,14 @@ interface TimeSlot {
         <div class="p-3 rounded-2xl bg-[#F8FAF7] border border-[#E2E9E4] mb-4 text-xs text-slate-600">
           <div class="flex items-center justify-between gap-2">
             <span class="font-bold text-[#123F5B] truncate">{{ pickup?.direccion }}</span>
-            <span class="px-2 py-0.5 rounded-md font-bold text-xs bg-emerald-100 text-emerald-900 border border-emerald-200 flex-shrink-0">
+            <span class="px-2.5 py-0.5 rounded-md font-bold text-xs bg-emerald-100 text-emerald-900 border border-emerald-200 flex-shrink-0">
               {{ materialName }}
             </span>
           </div>
           <div class="flex items-center gap-2 mt-1 text-[11px] text-slate-500 flex-wrap">
-            <span>Sector detectado: <strong class="text-slate-700">{{ sectorName }}</strong></span>
+            <span>Sector: <strong class="text-slate-700">{{ sectorName }}</strong></span>
             <span *ngIf="pickup?.pesoEstimadoKg">• Est: <strong class="text-slate-700">{{ pickup?.pesoEstimadoKg }} kg</strong></span>
+            <span *ngIf="isEditMode" class="text-sky-700 font-semibold">• Modo Edición Activo</span>
           </div>
         </div>
 
@@ -93,120 +95,121 @@ interface TimeSlot {
           </div>
         </div>
 
-        <!-- 2. TARJETA INFORMATIVA DE REGLAS DE DÍAS Y HORAS -->
-        <div class="p-3.5 rounded-2xl mb-4 text-xs border"
+        <!-- 2. TARJETA INFORMATIVA DE DÍAS OFICIALES -->
+        <div class="p-3 rounded-2xl mb-4 text-xs border"
              [ngClass]="isRetiroEspecial ? 'bg-amber-50/80 border-amber-200 text-amber-950' : 'bg-sky-50/80 border-sky-200 text-[#123F5B]'">
           <div class="flex items-start gap-2.5">
             <i [ngClass]="isRetiroEspecial ? 'fa-solid fa-calendar-star text-amber-600' : 'fa-solid fa-circle-info text-sky-600'" class="text-sm mt-0.5 flex-shrink-0"></i>
             <div>
-              <span class="font-bold block text-[13px]">
-                {{ isRetiroEspecial ? 'Servicio Especial de Voluminosos' : 'Calendario Comunal: ' + materialName }}
+              <span class="font-bold block text-xs">
+                {{ isRetiroEspecial ? 'Días Operativos Especiales DIMAO' : 'Día de Recolección para ' + materialName }}
               </span>
               <p class="text-[11px] mt-0.5 leading-relaxed opacity-90">
                 <span *ngIf="!isRetiroEspecial">
-                  En <strong>{{ sectorName }}</strong>, la recolección de <strong>{{ materialName }}</strong> opera exclusivamente los días <strong>{{ allowedDayNames.join(' o ') | uppercase }}</strong> en horario de <strong>{{ officialHoursRange }}</strong>.
+                  En {{ sectorName }}, este material se recolecta exclusivamente los <strong>{{ allowedDayNames.join(', ') | uppercase }}</strong> en horario de <strong>{{ officialHoursRange }}</strong>.
                 </span>
                 <span *ngIf="isRetiroEspecial">
-                  Los retiros especiales de voluminosos y fuera de calendario se coordinan en horario municipal oficial de <strong>09:00 a 14:00 hrs</strong> (Viernes y Sábados operativos).
+                  Los retiros especiales de voluminosos se atienden los días <strong>VIERNES Y SÁBADOS</strong> en jornada de <strong>09:00 a 14:00 hrs</strong>.
                 </span>
               </p>
             </div>
           </div>
         </div>
 
-        <!-- 3. SELECTOR DE FECHAS OFICIALES PERMITIDAS -->
-        <div class="space-y-3 text-left mb-4">
-          <div>
-            <div class="flex items-center justify-between mb-1">
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B]">
-                Fecha de Recolección
-              </label>
-              <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                Día: {{ isRetiroEspecial ? 'Viernes / Sábado (Especial)' : allowedDayNames.join(', ') }}
-              </span>
-            </div>
-
-            <!-- Chips de Fechas Oficiales Próximas (Sin opción a error) -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-1.5 mb-2">
-              <button *ngFor="let d of nextDateOptions"
-                      (click)="seleccionarFecha(d.value)"
-                      type="button"
-                      class="p-2 rounded-xl text-left border transition-all cursor-pointer"
-                      [ngClass]="selectedFecha === d.value ? (isRetiroEspecial ? 'bg-amber-500 text-white border-amber-600 shadow-2xs font-bold' : 'bg-[#123F5B] text-white border-[#123F5B] shadow-2xs font-bold') : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'">
-                <span class="text-[10px] opacity-80 uppercase block">{{ d.diaSemana }}</span>
-                <span class="text-xs font-black block leading-tight">{{ d.label }}</span>
-              </button>
-            </div>
-
-            <!-- Selector manual alternativo con validación estricta -->
-            <div class="flex items-center gap-2">
-              <input type="date"
-                     [(ngModel)]="selectedFecha"
-                     (ngModelChange)="onManualDateChange()"
-                     class="input-stitch w-full py-2 px-3 text-xs font-bold"
-                     [min]="minDate">
-            </div>
-          </div>
-
-          <!-- 4. SELECTOR DE HORARIO OFICIAL (Slots Válidos) -->
-          <div>
-            <div class="flex items-center justify-between mb-1">
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B]">
-                Franja Horaria Oficial
-              </label>
-              <span class="text-[10px] font-semibold text-slate-500">
-                Turno: {{ isRetiroEspecial ? '09:00 – 14:00 hrs' : '08:00 – 17:00 hrs' }}
-              </span>
-            </div>
-
-            <!-- Chips de Slots Horarios Permitidos -->
-            <div class="flex items-center gap-1.5 flex-wrap mb-2">
-              <button *ngFor="let slot of availableTimeSlots"
-                      (click)="selectedHora = slot.value; onTimeChange()"
-                      type="button"
-                      class="px-2.5 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer"
-                      [ngClass]="selectedHora === slot.value ? (isRetiroEspecial ? 'bg-amber-600 text-white border-amber-600 shadow-2xs' : 'bg-[#4F8A3D] text-white border-[#4F8A3D] shadow-2xs') : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'">
-                {{ slot.label }}
-              </button>
-            </div>
-
-            <!-- Selector manual de hora con validación estricta de rango -->
-            <div class="flex items-center gap-2">
-              <span class="text-xs text-slate-500 font-semibold">Hora específica:</span>
-              <input type="time"
-                     [(ngModel)]="selectedHora"
-                     (ngModelChange)="onTimeChange()"
-                     class="input-stitch w-32 py-1.5 px-2.5 text-xs font-bold text-center">
-            </div>
-          </div>
-
-          <!-- 5. SELECTOR DE CAMIÓN -->
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">
-              Camión Recolector Municipal
+        <!-- 3. SELECTOR INTUITIVO DE DÍAS OFICIALES (SIN ENTRADA LIBRE) -->
+        <div class="mb-4 text-left">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B]">
+              1. Selecciona el Día de Recolección
             </label>
-            <select [(ngModel)]="actionCamionPatente" class="select-stitch w-full py-2 px-3 text-xs font-medium">
-              <option *ngFor="let c of camionesDisponibles" [value]="c.patente">
-                {{ c.patente }} — Cap: {{ c.capacidadKilos || c.capacidadMaximaKg || 1500 }} kg ({{ (c.estado === 'ACTIVO' || !c.estado) ? 'Operativo' : c.estado }})
-              </option>
-            </select>
+            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+              Solo días oficiales: {{ allowedDayNames.join(', ') }}
+            </span>
+          </div>
+
+          <!-- Grilla de Tarjetas de Días Válidos -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button *ngFor="let d of nextDateOptions"
+                    (click)="seleccionarFecha(d.value)"
+                    type="button"
+                    class="p-2.5 rounded-2xl text-left border-2 transition-all cursor-pointer flex flex-col justify-between"
+                    [ngClass]="selectedFecha === d.value ? (isRetiroEspecial ? 'bg-amber-500 text-white border-amber-600 shadow-md ring-2 ring-amber-300 font-bold' : 'bg-[#123F5B] text-white border-[#123F5B] shadow-md ring-2 ring-sky-300 font-bold') : 'bg-[#F8FAF7] text-slate-700 border-[#E2E9E4] hover:bg-slate-100 hover:border-slate-300'">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-black uppercase tracking-wider opacity-85">{{ d.diaSemana }}</span>
+                  <i *ngIf="selectedFecha === d.value" class="fa-solid fa-circle-check text-xs text-white"></i>
+                </div>
+                <span class="text-sm font-black block mt-0.5 leading-tight">{{ d.label }}</span>
+              </div>
+              <span class="text-[9px] mt-1.5 block font-semibold opacity-80 truncate">{{ d.sublabel }}</span>
+            </button>
           </div>
         </div>
 
-        <!-- 6. BADGES DE VALIDACIÓN EN VIVO -->
-        <div *ngIf="validationError" class="mb-4 p-3 rounded-2xl bg-rose-50 border border-rose-300 text-rose-900 text-xs flex items-start gap-2 text-left anim-fade-up">
+        <!-- 4. SELECTOR INTUITIVO DE HORAS DE TRABAJO (SIN ENTRADA LIBRE) -->
+        <div class="mb-4 text-left">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B]">
+              2. Selecciona la Hora de Trabajo
+            </label>
+            <span class="text-[10px] font-semibold text-slate-500">
+              Jornada: {{ isRetiroEspecial ? '09:00 – 14:00 hrs' : '08:00 – 17:00 hrs' }}
+            </span>
+          </div>
+
+          <!-- Grilla de Bloques Horarios Oficiales -->
+          <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+            <button *ngFor="let slot of availableTimeSlots"
+                    (click)="seleccionarHora(slot.value)"
+                    type="button"
+                    class="py-2 px-1.5 rounded-xl text-center border-2 transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5"
+                    [ngClass]="selectedHora === slot.value ? (isRetiroEspecial ? 'bg-amber-600 text-white border-amber-700 shadow-md ring-2 ring-amber-300 font-black' : 'bg-[#4F8A3D] text-white border-[#4F8A3D] shadow-md ring-2 ring-emerald-300 font-black') : 'bg-[#F8FAF7] text-slate-700 border-[#E2E9E4] hover:bg-slate-100 hover:border-slate-300'">
+              <div class="flex items-center gap-1">
+                <span class="text-xs font-black">{{ slot.label }}</span>
+                <i *ngIf="selectedHora === slot.value" class="fa-solid fa-circle-check text-[10px]"></i>
+              </div>
+              <span class="text-[9px] font-medium opacity-85">{{ slot.periodo }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 5. SELECTOR DE CAMIÓN -->
+        <div class="mb-4 text-left">
+          <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">
+            3. Camión Recolector Municipal Asignado
+          </label>
+          <select [(ngModel)]="actionCamionPatente" class="select-stitch w-full py-2 px-3 text-xs font-medium">
+            <option *ngFor="let c of camionesDisponibles" [value]="c.patente">
+              {{ c.patente }} — Cap: {{ c.capacidadKilos || c.capacidadMaximaKg || 1500 }} kg ({{ (c.estado === 'ACTIVO' || !c.estado) ? 'Operativo' : c.estado }})
+            </option>
+          </select>
+        </div>
+
+        <!-- 6. RESUMEN RECONFIRMATIVO EN VIVO -->
+        <div class="p-3 rounded-2xl bg-[#EEF5EB] border border-[#CCE4C8] text-emerald-950 text-xs flex items-center gap-3 mb-4 text-left">
+          <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm flex-shrink-0">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <span class="font-extrabold text-[10px] uppercase tracking-wider block text-emerald-900">
+              {{ isEditMode ? 'Reprogramación Validada' : 'Turno Operativo Válido' }}
+            </span>
+            <p class="text-xs text-emerald-950 font-bold mt-0.5 truncate">
+              {{ selectedFechaFullText }} a las {{ selectedHora }} hrs ({{ selectedPeriodo }})
+            </p>
+            <span class="text-[10px] text-emerald-800 font-medium block">
+              Camión: <strong>{{ actionCamionPatente }}</strong> • {{ isRetiroEspecial ? 'Servicio DIMAO' : 'Sector ' + sectorName }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Banner de Error si fallara el guardado -->
+        <div *ngIf="errorMessage" class="mb-4 p-3 rounded-2xl bg-rose-50 border border-rose-300 text-rose-900 text-xs flex items-start gap-2 text-left anim-fade-up">
           <i class="fa-solid fa-triangle-exclamation text-rose-500 text-sm mt-0.5 flex-shrink-0"></i>
           <div>
-            <span class="font-bold block">Restricción de Calendario Comunal</span>
-            <span class="text-[11px] leading-tight block mt-0.5">{{ validationError }}</span>
+            <span class="font-bold block">Error al Guardar</span>
+            <span class="text-[11px] leading-tight block mt-0.5">{{ errorMessage }}</span>
           </div>
-        </div>
-
-        <div *ngIf="!validationError" class="mb-4 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-center gap-2 text-left">
-          <i class="fa-solid fa-circle-check text-emerald-600 text-sm flex-shrink-0"></i>
-          <span class="font-semibold text-[11px]">
-            Fecha y hora conformes a la ordenanza ({{ selectedFecha }} a las {{ selectedHora }} hrs).
-          </span>
         </div>
 
         <!-- Botonera inferior -->
@@ -215,7 +218,7 @@ interface TimeSlot {
             Cancelar
           </button>
           <button (click)="confirmarProgramacion()"
-                  [disabled]="isSubmitting || !!validationError"
+                  [disabled]="isSubmitting"
                   type="button"
                   class="btn-stitch-primary px-5 py-2.5 text-xs font-bold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
             <span *ngIf="!isSubmitting">{{ isEditMode ? 'Guardar Cambios' : 'Confirmar Programación' }}</span>
@@ -240,15 +243,11 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
   actionCamionPatente: string = 'PV-RC-2026';
   isSubmitting: boolean = false;
   errorMessage: string = '';
-  minDate: string = '';
 
   nextDateOptions: DateOption[] = [];
   availableTimeSlots: TimeSlot[] = [];
 
-  constructor(private bffService: BffService) {
-    const today = new Date();
-    this.minDate = today.toISOString().split('T')[0];
-  }
+  constructor(private bffService: BffService) {}
 
   get materialName(): string {
     return this.pickup?.residuoNombre || 'Vidrio';
@@ -302,42 +301,20 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
     return this.sectorDetected.horario || '08:00 – 17:00 hrs';
   }
 
-  get validationError(): string | null {
-    if (!this.selectedFecha) return 'Debes seleccionar una fecha oficial de recolección.';
-    if (!this.selectedHora) return 'Debes indicar una hora dentro del turno operativo.';
-
-    const [y, m, d] = this.selectedFecha.split('-').map(Number);
-    const dateObj = new Date(y, m - 1, d);
-    const dayOfWeek = dateObj.getDay();
-
-    const [hStr, mStr] = this.selectedHora.split(':');
-    const hourDec = Number(hStr) + (Number(mStr) || 0) / 60;
-
-    if (!this.isRetiroEspecial) {
-      // 1. Validar día oficial para el sector/material
-      if (!this.allowedDayNumbers.includes(dayOfWeek)) {
-        return `Día no permitido: Para ${this.materialName} en ${this.sectorName} solo se atiende los días ${this.allowedDayNames.join(' o ').toUpperCase()}. Si necesitas retirar otro día, activa "Retiro Especial DIMAO".`;
-      }
-      // 2. Validar rango horario de recolección regular (08:00 a 17:00)
-      if (hourDec < 8.0 || hourDec > 17.0) {
-        return `Hora fuera de rango: El horario de recolección municipal para ${this.materialName} es estrictamente de 08:00 a 17:00 hrs. La hora ingresada (${this.selectedHora}) no es válida.`;
-      }
-    } else {
-      // Retiro Especial
-      // Horario estricto: 09:00 a 14:00
-      if (hourDec < 9.0 || hourDec > 14.0) {
-        return `Hora fuera de rango: El servicio de Retiro Especial DIMAO opera estrictamente de 09:00 a 14:00 hrs. La hora ingresada (${this.selectedHora}) no es válida.`;
-      }
-      if (dayOfWeek === 0) {
-        return 'Día no permitido: El servicio municipal no realiza operativos los días domingo.';
-      }
-    }
-
-    return null;
-  }
-
   get isEditMode(): boolean {
     return this.pickup?.estado === 'PROGRAMADO';
+  }
+
+  get selectedFechaFullText(): string {
+    const found = this.nextDateOptions.find(d => d.value === this.selectedFecha);
+    if (found) return found.fullLabel;
+    if (!this.selectedFecha) return 'Sin fecha seleccionada';
+    return this.selectedFecha;
+  }
+
+  get selectedPeriodo(): string {
+    const found = this.availableTimeSlots.find(s => s.value === this.selectedHora);
+    return found ? found.periodo : 'Turno Oficial';
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -351,7 +328,7 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
     }
     if (changes['pickup'] && this.pickup) {
       this.errorMessage = '';
-      // Detectar si el vecino ya había pedido retiro especial en observaciones
+      // Detectar si el vecino pidió retiro especial en observaciones
       const obs = (this.pickup.comentarios || '').toUpperCase();
       this.isRetiroEspecial = obs.includes('ESPECIAL');
       this.updateConfiguration();
@@ -365,9 +342,13 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
           const parts = String(this.pickup.fechaProgramada).split('T');
           if (parts[0]) {
             this.selectedFecha = parts[0];
+            // Asegurar que esta fecha exista en la grilla visual
+            this.ensureFechaInOptions(parts[0]);
           }
           if (parts[1]) {
-            this.selectedHora = parts[1].substring(0, 5);
+            const hora = parts[1].substring(0, 5);
+            this.selectedHora = hora;
+            this.ensureHoraInSlots(hora);
           }
         }
       }
@@ -409,7 +390,10 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
     let checkDate = new Date(now);
     checkDate.setDate(checkDate.getDate() + 1); // Empezar desde mañana
 
-    while (dates.length < 3) {
+    const sublabels = ['Próximo recorrido', 'Semana siguiente', 'En 2 semanas', 'En 3 semanas'];
+    let count = 0;
+
+    while (dates.length < 4) {
       if (targetDays.includes(checkDate.getDay())) {
         const y = checkDate.getFullYear();
         const m = String(checkDate.getMonth() + 1).padStart(2, '0');
@@ -420,13 +404,32 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
           value: `${y}-${m}-${d}`,
           diaSemana: dayName,
           label: `${d} ${months[checkDate.getMonth()]}`,
-          fullLabel: `${dayName} ${d} de ${months[checkDate.getMonth()]}`
+          fullLabel: `${dayName} ${d} de ${months[checkDate.getMonth()]}`,
+          sublabel: sublabels[count] || 'Recorrido oficial'
         });
+        count++;
       }
       checkDate.setDate(checkDate.getDate() + 1);
     }
 
     this.nextDateOptions = dates;
+  }
+
+  ensureFechaInOptions(fechaStr: string): void {
+    const exists = this.nextDateOptions.some(d => d.value === fechaStr);
+    if (!exists) {
+      const [y, m, d] = fechaStr.split('-').map(Number);
+      const dateObj = new Date(y, m - 1, d);
+      const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+      const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+      this.nextDateOptions.unshift({
+        value: fechaStr,
+        diaSemana: dayNames[dateObj.getDay()] || 'Fecha',
+        label: `${String(d).padStart(2, '0')} ${months[m - 1] || ''}`,
+        fullLabel: `${dayNames[dateObj.getDay()] || ''} ${d} de ${months[m - 1] || ''}`,
+        sublabel: 'Fecha Actual Asignada'
+      });
+    }
   }
 
   computeAvailableTimeSlots(): void {
@@ -435,8 +438,9 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
       this.availableTimeSlots = [
         { value: '09:00', label: '09:00', periodo: 'Apertura' },
         { value: '10:00', label: '10:00', periodo: 'Mañana' },
-        { value: '11:30', label: '11:30', periodo: 'Mediodía' },
-        { value: '12:45', label: '12:45', periodo: 'Tarde' },
+        { value: '11:00', label: '11:00', periodo: 'Media Mañana' },
+        { value: '12:00', label: '12:00', periodo: 'Mediodía' },
+        { value: '13:00', label: '13:00', periodo: 'Tarde' },
         { value: '13:30', label: '13:30', periodo: 'Cierre' }
       ];
     } else {
@@ -446,10 +450,24 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
         { value: '09:30', label: '09:30', periodo: 'Mañana' },
         { value: '10:30', label: '10:30', periodo: 'Media Mañana' },
         { value: '11:30', label: '11:30', periodo: 'Mediodía' },
+        { value: '12:30', label: '12:30', periodo: 'Mediodía' },
         { value: '14:00', label: '14:00', periodo: 'Tarde' },
-        { value: '15:30', label: '15:30', periodo: 'Media Tarde' },
+        { value: '15:00', label: '15:00', periodo: 'Media Tarde' },
+        { value: '16:00', label: '16:00', periodo: 'Tarde' },
         { value: '16:30', label: '16:30', periodo: 'Cierre de Ruta' }
       ];
+    }
+  }
+
+  ensureHoraInSlots(horaStr: string): void {
+    const exists = this.availableTimeSlots.some(s => s.value === horaStr);
+    if (!exists) {
+      this.availableTimeSlots.push({
+        value: horaStr,
+        label: horaStr,
+        periodo: 'Hora Asignada'
+      });
+      this.availableTimeSlots.sort((a, b) => a.value.localeCompare(b.value));
     }
   }
 
@@ -457,12 +475,8 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
     this.selectedFecha = fechaVal;
   }
 
-  onManualDateChange(): void {
-    // La validación reactiva en validationError se encarga del feedback en vivo
-  }
-
-  onTimeChange(): void {
-    // La validación reactiva en validationError se encarga del feedback en vivo
+  seleccionarHora(horaVal: string): void {
+    this.selectedHora = horaVal;
   }
 
   onClose(): void {
@@ -472,7 +486,7 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
   }
 
   confirmarProgramacion(): void {
-    if (!this.pickup || this.validationError) return;
+    if (!this.pickup || !this.selectedFecha || !this.selectedHora) return;
     this.isSubmitting = true;
     this.errorMessage = '';
 

@@ -274,6 +274,7 @@
     [isOpen]="showActionModal && (actionType === 'en-ruta' || actionType === 'retirado')"
     [pickup]="selectedPickupForAction"
     [actionType]="actionType === 'en-ruta' ? 'en-ruta' : 'retirado'"
+    [camionesDisponibles]="camionesDisponibles"
     (close)="showActionModal = false"
     (actionCompleted)="onActionCompleted()">
   </app-chofer-operacion-modal>
