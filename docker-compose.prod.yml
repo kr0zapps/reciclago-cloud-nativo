@@ -1,0 +1,197 @@
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: reciclago-postgres
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5433:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-reciclago_db}
+      POSTGRES_USER: ${POSTGRES_USER:-reciclago}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-reciclagopass}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-reciclago} -d ${POSTGRES_DB:-reciclago_db}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - reciclago-net
+
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: reciclago-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - reciclago-net
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: reciclago-zookeeper
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+      - zookeeper_log:/var/lib/zookeeper/log
+    healthcheck:
+      test: [ "CMD-SHELL", "nc -z localhost 2181 || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - reciclago-net
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: reciclago-kafka
+    restart: unless-stopped
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:9092:9092"
+      - "127.0.0.1:29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test: [ "CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list" ]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - reciclago-net
+
+  # ── Microservicios: solo imagen ECR, sin build local ─────────────────────
+  ms-catalog:
+    image: ${ECR_REGISTRY}/reciclago/ms-catalog:${IMAGE_TAG:-latest}
+    container_name: reciclago-ms-catalog
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:8081"
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m -Djava.net.preferIPv4Stack=true"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-reciclago_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-reciclago}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-reciclagopass}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - reciclago-net
+
+  ms-pickups:
+    image: ${ECR_REGISTRY}/reciclago/ms-pickups:${IMAGE_TAG:-latest}
+    container_name: reciclago-ms-pickups
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8083:8083"
+    environment:
+      SERVER_PORT: 8083
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m -Djava.net.preferIPv4Stack=true"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-reciclago_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-reciclago}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-reciclagopass}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER:-guest}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASS:-guest}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - reciclago-net
+
+  ms-routes:
+    image: ${ECR_REGISTRY}/reciclago/ms-routes:${IMAGE_TAG:-latest}
+    container_name: reciclago-ms-routes
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8084:8084"
+    environment:
+      SERVER_PORT: 8084
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m -Djava.net.preferIPv4Stack=true"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-reciclago_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-reciclago}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-reciclagopass}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - reciclago-net
+
+  ms-bff:
+    image: ${ECR_REGISTRY}/reciclago/ms-bff:${IMAGE_TAG:-latest}
+    container_name: reciclago-ms-bff
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: 8080
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m -Djava.net.preferIPv4Stack=true"
+      RECICLAGO_SERVICES_CATALOG_URL: http://ms-catalog:8081
+      RECICLAGO_SERVICES_PICKUPS_URL: http://ms-pickups:8083
+      RECICLAGO_SERVICES_ROUTES_URL: http://ms-routes:8084
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID:-5625266d-cae0-4070-a7ea-b5e88273580f}
+      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID:-9a946a0b-5350-4fe1-a79e-ca332612f60d}
+    healthcheck:
+      test: [ "CMD-SHELL", "nc -z 127.0.0.1 8080 || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      - ms-catalog
+      - ms-pickups
+      - ms-routes
+    networks:
+      - reciclago-net
+
+networks:
+  reciclago-net:
+    driver: bridge
+    name: reciclago-net
+
+volumes:
+  postgres_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  zookeeper_data:
+    driver: local
+  zookeeper_log:
+    driver: local
+  kafka_data:
+    driver: local

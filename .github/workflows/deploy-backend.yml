@@ -12,6 +12,7 @@ on:
       - 'ms-reciclago-pickups/**'
       - 'ms-reciclago-routes/**'
       - 'docker-compose.yml'
+      - 'docker-compose.prod.yml'
       - '.github/workflows/deploy-backend.yml'
   workflow_dispatch: # Permite ejecución manual desde la pestaña Actions de GitHub
 
@@ -132,14 +133,14 @@ jobs:
         if: steps.check-ec2.outputs.ec2_ready == 'true'
         uses: actions/checkout@v4
 
-      - name: 📁 Transferir docker-compose.yml a la instancia EC2
+      - name: 📁 Transferir docker-compose.prod.yml a la instancia EC2
         if: steps.check-ec2.outputs.ec2_ready == 'true'
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER || 'ubuntu' }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: 'docker-compose.yml'
+          source: 'docker-compose.prod.yml'
           target: '~/reciclago/'
 
       - name: 🚀 Ejecutar Despliegue en EC2 vía SSH
@@ -244,15 +245,18 @@ jobs:
               DC="sudo docker-compose"
             fi
 
-            echo "Descargando imágenes actualizadas de ECR con $DC..."
-            $DC pull ms-bff ms-catalog ms-pickups ms-routes || true
+            # ── Usar docker-compose.prod.yml (sin build, solo image ECR) ────
+            DC_FILE="$HOME/reciclago/docker-compose.prod.yml"
+
+            echo "Descargando imágenes actualizadas de ECR..."
+            $DC -f "$DC_FILE" pull ms-bff ms-catalog ms-pickups ms-routes || true
 
             echo "Iniciando infraestructura y microservicios..."
-            $DC up -d
+            $DC -f "$DC_FILE" up -d
 
             echo "Limpiando imágenes antiguas en desuso..."
             sudo docker image prune -f || true
 
             echo "Estado actual de los contenedores:"
-            $DC ps
+            $DC -f "$DC_FILE" ps
             echo "✅ Despliegue completado con éxito en EC2."
