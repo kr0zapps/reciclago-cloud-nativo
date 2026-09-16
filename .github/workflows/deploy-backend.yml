@@ -36,9 +36,9 @@ jobs:
       - name: 🔑 Configurar credenciales de AWS Backend (DEV 2)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_BACKEND_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_BACKEND_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_BACKEND_SESSION_TOKEN }} # Requerido para cuentas AWS Academy / Learner Lab
+          aws-access-key-id: ${{ secrets.AWS_BACKEND_ACCESS_KEY_ID || secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_BACKEND_SECRET_ACCESS_KEY || secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_BACKEND_SESSION_TOKEN || secrets.AWS_SESSION_TOKEN }} # Requerido para cuentas AWS Academy / Learner Lab
           aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
 
       - name: 📦 Login en Amazon ECR
@@ -104,13 +104,16 @@ jobs:
     steps:
       - name: ℹ️ Verificar disponibilidad de credenciales EC2
         id: check-ec2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
         run: |
-          if [ -z "${{ secrets.EC2_HOST }}" ] || [ -z "${{ secrets.EC2_SSH_KEY }}" ]; then
-            echo "⚠️ Secretos EC2_HOST o EC2_SSH_KEY no definidos. Omitiendo despliegue en servidor EC2 (imágenes ya disponibles en ECR)."
-            echo "ec2_ready=false" >> $GITHUB_OUTPUT
-          else
+          if [ -n "$EC2_HOST" ] && [ -n "$EC2_SSH_KEY" ]; then
             echo "✅ Parámetros de EC2 detectados. Procediendo con el despliegue..."
             echo "ec2_ready=true" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️ Secretos EC2_HOST o EC2_SSH_KEY no definidos. Omitiendo despliegue en servidor EC2 (imágenes ya disponibles en ECR)."
+            echo "ec2_ready=false" >> $GITHUB_OUTPUT
           fi
 
       - name: 📥 Clonar repositorio
@@ -132,9 +135,9 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         env:
           REGISTRY: ${{ needs.build-and-push-ecr.outputs.registry }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_BACKEND_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_BACKEND_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_BACKEND_SESSION_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_BACKEND_ACCESS_KEY_ID || secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_BACKEND_SECRET_ACCESS_KEY || secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_BACKEND_SESSION_TOKEN || secrets.AWS_SESSION_TOKEN }}
           AWS_REGION: ${{ secrets.AWS_REGION || 'us-east-1' }}
         with:
           host: ${{ secrets.EC2_HOST }}
