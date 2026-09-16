@@ -3,11 +3,14 @@ package com.duoc.ms_reciclago_bff;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClient;
 
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +31,12 @@ public class BffController {
     private String routesUrl;
 
     public BffController(RestClient.Builder restClientBuilder) {
-        this.restClient = restClientBuilder.build();
+        HttpClient httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+        this.restClient = restClientBuilder
+                .requestFactory(new JdkClientHttpRequestFactory(httpClient))
+                .build();
     }
 
     @GetMapping("/public/status")

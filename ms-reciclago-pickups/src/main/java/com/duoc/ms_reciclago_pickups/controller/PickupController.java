@@ -13,7 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/pickups")
@@ -68,7 +70,7 @@ public class PickupController {
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevaSolicitud);
     }
 
-    @PatchMapping("/{id}/programar")
+    @RequestMapping(value = "/{id}/programar", method = {RequestMethod.PATCH, RequestMethod.POST})
     public ResponseEntity<?> programarRetiro(@PathVariable Long id,
                                               @RequestParam(required = false) Long camionId,
                                               @RequestParam(required = false) String camionPatente,
@@ -101,19 +103,19 @@ public class PickupController {
         }
     }
 
-    @PatchMapping("/{id}/en-ruta")
+    @RequestMapping(value = "/{id}/en-ruta", method = {RequestMethod.PATCH, RequestMethod.POST})
     public ResponseEntity<?> cambiarEstadoEnRuta(@PathVariable Long id) {
         try {
             Pickup actualizado = pickupService.cambiarEstadoEnRuta(id);
             return ResponseEntity.ok(actualizado);
         } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @PatchMapping("/{id}/retirado")
+    @RequestMapping(value = "/{id}/retirado", method = {RequestMethod.PATCH, RequestMethod.POST})
     public ResponseEntity<?> marcarRetirado(@PathVariable Long id) {
         try {
             Pickup actualizado = pickupService.marcarRetirado(id);
@@ -123,7 +125,7 @@ public class PickupController {
         }
     }
 
-    @PatchMapping("/{id}/pesado")
+    @RequestMapping(value = "/{id}/pesado", method = {RequestMethod.PATCH, RequestMethod.POST})
     public ResponseEntity<?> registrarPesaje(@PathVariable Long id, @RequestParam Double pesoRealKg) {
         try {
             Pickup actualizado = pickupService.registrarPesaje(id, pesoRealKg);
@@ -133,7 +135,7 @@ public class PickupController {
         }
     }
 
-    @PatchMapping("/{id}/cancelar")
+    @RequestMapping(value = "/{id}/cancelar", method = {RequestMethod.PATCH, RequestMethod.POST})
     public ResponseEntity<?> cancelarRetiro(@PathVariable Long id, @RequestParam(required = false) String motivo) {
         try {
             Pickup actualizado = pickupService.cancelarRetiro(id, motivo);
