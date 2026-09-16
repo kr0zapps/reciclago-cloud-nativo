@@ -13,11 +13,17 @@
     --color-brand-navy: #123F5B;
   }
 
-  body {
+  html, body {
+    margin: 0;
+    padding: 0;
     background-color: var(--color-bg);
     color: var(--color-text-primary);
     font-family: 'Plus Jakarta Sans', sans-serif;
     overflow-x: hidden;
+  }
+
+  app-root {
+    display: block;
   }
 }
 

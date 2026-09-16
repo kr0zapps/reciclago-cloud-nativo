@@ -6,8 +6,8 @@ import { InteractionType } from '@azure/msal-browser';
 import { of, Subject } from 'rxjs';
 
 describe('AppComponent', () => {
-  let msalServiceMock: any;
-  let msalBroadcastServiceMock: any;
+  let msalServiceMock: Partial<MsalService>;
+  let msalBroadcastServiceMock: Partial<MsalBroadcastService>;
 
   beforeEach(async () => {
     msalServiceMock = {
