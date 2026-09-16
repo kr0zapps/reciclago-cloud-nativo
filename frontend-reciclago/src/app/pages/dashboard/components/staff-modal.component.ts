@@ -84,6 +84,18 @@ import { Camion } from '../data/sectors.data';
           <input type="text" [(ngModel)]="actionMotivo" class="input-stitch w-full py-2 px-3 text-sm" placeholder="Ej: Domicilio cerrado o reprogramado">
         </div>
 
+        <!-- Banner de Error Sobrio -->
+        <div *ngIf="errorMessage" class="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5 text-left">
+          <i class="fa-solid fa-triangle-exclamation text-rose-500 text-sm mt-0.5 flex-shrink-0"></i>
+          <div class="flex-1 min-w-0">
+            <span class="font-bold block">No se pudo confirmar la operación</span>
+            <span class="text-[11px] opacity-90 leading-tight mt-0.5 block">{{ errorMessage }}</span>
+          </div>
+          <button (click)="errorMessage = ''" type="button" class="text-rose-400 hover:text-rose-700 text-xs cursor-pointer">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
         <!-- Botonera inferior -->
         <div class="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
           <button (click)="onClose()" type="button" class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer">
@@ -112,11 +124,13 @@ export class StaffModalComponent implements OnChanges, OnDestroy {
   actionCamionPatente = 'PV-RC-2026';
   actionFechaProgramada = '';
   isSubmittingAction = false;
+  errorMessage = '';
 
   constructor(private bffService: BffService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isOpen']) {
+      this.errorMessage = '';
       if (this.isOpen) {
         document.body.style.overflow = 'hidden';
       } else {
@@ -124,6 +138,7 @@ export class StaffModalComponent implements OnChanges, OnDestroy {
       }
     }
     if (changes['pickup'] && this.pickup) {
+      this.errorMessage = '';
       this.actionPesoKg = Number(this.pickup.kilosRecolectados) || 5.0;
       this.actionMotivo = '';
       if (this.camionesDisponibles && this.camionesDisponibles.length > 0) {
@@ -140,6 +155,7 @@ export class StaffModalComponent implements OnChanges, OnDestroy {
   }
 
   onClose(): void {
+    this.errorMessage = '';
     document.body.style.overflow = '';
     this.close.emit();
   }
@@ -148,6 +164,7 @@ export class StaffModalComponent implements OnChanges, OnDestroy {
     if (!this.pickup) return;
     const id = this.pickup.id;
     this.isSubmittingAction = true;
+    this.errorMessage = '';
 
     let obs;
     if (this.actionType === 'programar') {
@@ -172,12 +189,13 @@ export class StaffModalComponent implements OnChanges, OnDestroy {
       obs.subscribe({
         next: () => {
           this.isSubmittingAction = false;
+          this.errorMessage = '';
           this.actionCompleted.emit();
           this.onClose();
         },
         error: (err) => {
           this.isSubmittingAction = false;
-          alert('Error al actualizar retiro: ' + (err.error?.error || err.message || 'Error de comunicación'));
+          this.errorMessage = err.error?.error || err.error?.message || (typeof err.error === 'string' ? err.error : null) || err.message || 'Error de comunicación al actualizar retiro';
         }
       });
     } else {

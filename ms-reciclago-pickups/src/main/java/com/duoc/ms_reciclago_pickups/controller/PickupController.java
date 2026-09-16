@@ -70,14 +70,34 @@ public class PickupController {
 
     @PatchMapping("/{id}/programar")
     public ResponseEntity<?> programarRetiro(@PathVariable Long id,
-                                              @RequestParam Long camionId,
-                                              @RequestParam String camionPatente,
-                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaProgramada) {
+                                              @RequestParam(required = false) Long camionId,
+                                              @RequestParam(required = false) String camionPatente,
+                                              @RequestParam(required = false) String fechaProgramada) {
         try {
-            Pickup actualizado = pickupService.programarRetiro(id, camionId, camionPatente, fechaProgramada);
+            LocalDateTime fecha = LocalDateTime.now().plusDays(1);
+            if (fechaProgramada != null && !fechaProgramada.isBlank()) {
+                String normalized = fechaProgramada.trim();
+                if (normalized.length() == 16) {
+                    normalized += ":00";
+                }
+                try {
+                    fecha = LocalDateTime.parse(normalized);
+                } catch (Exception e1) {
+                    try {
+                        fecha = LocalDateTime.parse(normalized, DateTimeFormatter.ISO_DATE_TIME);
+                    } catch (Exception e2) {
+                        // fallback a fecha por defecto
+                    }
+                }
+            }
+            Long effectiveCamionId = camionId != null ? camionId : 1L;
+            String effectivePatente = camionPatente != null ? camionPatente : "PV-RC-2026";
+            Pickup actualizado = pickupService.programarRetiro(id, effectiveCamionId, effectivePatente, fecha);
             return ResponseEntity.ok(actualizado);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 

@@ -263,7 +263,15 @@ public class BffController {
         try {
             Long effectiveCamionId = camionId != null ? camionId : (body != null && body.get("camionId") != null ? Long.valueOf(body.get("camionId").toString()) : 1L);
             String effectivePatente = camionPatente != null ? camionPatente : (body != null && body.get("camionPatente") != null ? body.get("camionPatente").toString() : "PV-RC-2026");
-            String effectiveFecha = fechaProgramada != null ? fechaProgramada : (body != null && body.get("fechaProgramada") != null ? body.get("fechaProgramada").toString() : java.time.LocalDateTime.now().plusDays(1).toString());
+            String rawFecha = fechaProgramada != null ? fechaProgramada : (body != null && body.get("fechaProgramada") != null ? body.get("fechaProgramada").toString() : null);
+
+            String effectiveFecha;
+            if (rawFecha != null && !rawFecha.isBlank()) {
+                String trimmed = rawFecha.trim();
+                effectiveFecha = (trimmed.length() == 16) ? (trimmed + ":00") : trimmed;
+            } else {
+                effectiveFecha = java.time.LocalDateTime.now().plusDays(1).withSecond(0).withNano(0).toString();
+            }
 
             String targetUri = pickupsUrl + "/api/pickups/" + id + "/programar"
                     + "?camionId=" + effectiveCamionId
