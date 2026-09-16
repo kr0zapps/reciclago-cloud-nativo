@@ -30,8 +30,35 @@ import { RouterModule } from '@angular/router';
           </p>
         </div>
 
-        <!-- 3 Metrics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+        <!-- Mobile View: Franja compacta con 3 métricas (md:hidden) -->
+        <div class="md:hidden bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80 mb-10">
+          <div class="grid grid-cols-3 divide-x divide-slate-100 text-center">
+            <div class="px-1.5">
+              <p class="text-lg sm:text-xl font-black text-[#0a233b] font-heading leading-tight">
+                248.650
+              </p>
+              <span class="block text-[11px] font-bold text-emerald-700 mt-0.5">kg reciclados</span>
+              <span class="block text-[9px] text-slate-400">Certificados</span>
+            </div>
+            <div class="px-1.5">
+              <p class="text-lg sm:text-xl font-black text-[#0a233b] font-heading leading-tight">
+                32%
+              </p>
+              <span class="block text-[11px] font-bold text-emerald-700 mt-0.5">menos residuos</span>
+              <span class="block text-[9px] text-slate-400">En vertederos</span>
+            </div>
+            <div class="px-1.5">
+              <p class="text-lg sm:text-xl font-black text-[#0a233b] font-heading leading-tight">
+                4
+              </p>
+              <span class="block text-[11px] font-bold text-emerald-700 mt-0.5">camiones</span>
+              <span class="block text-[9px] text-slate-400">Activos en ruta</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop View: 3 Metrics Cards (hidden md:grid) -->
+        <div class="hidden md:grid md:grid-cols-3 gap-6 mb-16">
 
           <!-- Métrica 1: Kilos certificados -->
           <div class="bg-white rounded-2xl p-7 sm:p-8 text-center shadow-xs hover:shadow-md border border-slate-100 transition-all duration-300">
@@ -89,15 +116,15 @@ import { RouterModule } from '@angular/router';
 
         </div>
 
-        <!-- Panoramic Scenic Banner: Tu compromiso hace la diferencia -->
-        <div class="relative rounded-3xl overflow-hidden shadow-md border border-slate-100 min-h-[200px] sm:min-h-[220px] flex items-center">
+        <!-- Panoramic Scenic Banner: ¿Necesitas un retiro especial? -->
+        <div class="relative rounded-3xl overflow-hidden shadow-md border border-slate-100 min-h-[190px] sm:min-h-[220px] flex items-center">
           <!-- Scenic background photo: Lake, flowers, and volcano -->
           <img
             alt="Paisaje Lago Llanquihue y flores Puerto Varas"
             class="absolute inset-0 w-full h-full object-cover object-center"
             src="assets/stitch/cta_lake_flowers.png"
           />
-          <div class="absolute inset-0 bg-gradient-to-r from-white/95 via-white/85 to-transparent sm:to-white/20"></div>
+          <div class="absolute inset-0 bg-gradient-to-r from-white/95 via-white/90 to-white/40 md:to-white/20"></div>
 
           <!-- Content Box -->
           <div class="relative z-10 p-6 sm:p-10 w-full flex flex-col md:flex-row md:items-center md:justify-between gap-6">
@@ -109,21 +136,27 @@ import { RouterModule } from '@angular/router';
               </div>
               <div>
                 <h2 class="text-xl sm:text-2xl lg:text-3xl font-black text-[#0a233b] tracking-tight mb-1 font-heading">
-                  Tu compromiso hace la diferencia
+                  ¿Necesitas un retiro especial?
                 </h2>
                 <p class="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
-                  Reciclar no es solo separar, es cuidar nuestra comuna y el Lago Llanquihue.
+                  Solicita recolección programada para podas, escombros o materiales fuera de tu cuadrante semanal.
                 </p>
               </div>
             </div>
 
-            <div class="shrink-0">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+              <a
+                routerLink="/dashboard"
+                class="inline-flex items-center justify-center gap-2 bg-[#286f34] hover:bg-[#205b2a] text-white text-xs sm:text-sm font-bold py-3 px-6 rounded-xl transition-all shadow-sm hover:shadow group cursor-pointer text-center">
+                <span>Agendar retiro especial</span>
+                <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+              </a>
               <button
                 type="button"
                 (click)="openInfoModal.emit()"
-                class="inline-flex items-center gap-2 bg-[#286f34] hover:bg-[#205b2a] text-white text-xs sm:text-sm font-bold py-3 px-6 rounded-xl transition-all shadow-sm hover:shadow group cursor-pointer">
-                <span>Más información sobre el programa</span>
-                <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+                class="inline-flex items-center justify-center gap-1.5 bg-white/80 hover:bg-white text-slate-700 text-xs font-semibold py-2.5 px-4 rounded-xl border border-slate-200 transition-all cursor-pointer">
+                <i class="fa-solid fa-circle-question text-emerald-600"></i>
+                <span>Preguntas frecuentes</span>
               </button>
             </div>
           </div>
