@@ -58,7 +58,7 @@ import { environment } from '../environments/environment';
     <div class="min-h-screen flex flex-col bg-[#F8FAF7]">
 
       <!-- ==================== HEADER UNIVERSAL STITCH ==================== -->
-      <header class="bg-white/95 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b border-[#E2E9E4]">
+      <header [ngClass]="headerClass">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4 lg:gap-8">
         
         <!-- LOGO RECICLAGO OFICIAL -->
@@ -76,38 +76,40 @@ import { environment } from '../environments/environment';
           </div>
           <div>
             <div class="flex items-baseline tracking-tight">
-              <span class="font-heading font-extrabold text-2xl text-[#123F5B]">Recic</span>
-              <span class="font-heading font-extrabold text-2xl text-[#4F8A3D]">LaGo</span>
+              <span class="font-heading font-extrabold text-2xl transition-colors" [ngClass]="logoTextClass">Recic</span>
+              <span class="font-heading font-extrabold text-2xl text-[#4ade80] transition-colors">LaGo</span>
             </div>
-            <p class="text-[11px] font-bold text-[#546571] tracking-wide uppercase -mt-0.5 hidden sm:block">Puerto Varas recicla</p>
+            <p class="text-[11px] font-bold tracking-wide uppercase -mt-0.5 hidden sm:block transition-colors" [ngClass]="logoSloganClass">Puerto Varas recicla</p>
           </div>
         </a>
 
         <!-- NAVEGACIÓN -->
-        <nav class="hidden md:flex items-center gap-5 lg:gap-7 xl:gap-8 text-[14px] lg:text-[15px] font-semibold text-[#183247]">
-          <a routerLink="/" routerLinkActive="text-[#093554] font-bold" [routerLinkActiveOptions]="{exact: true}" class="relative py-2 hover:text-[#4F8A3D] transition-colors flex flex-col items-center">
+        <nav class="hidden md:flex items-center gap-5 lg:gap-7 xl:gap-8 text-[14px] lg:text-[15px] font-semibold transition-colors" [ngClass]="navTextClass">
+          <a routerLink="/" routerLinkActive="font-bold" [routerLinkActiveOptions]="{exact: true}" class="relative py-2 hover:text-[#4ade80] transition-colors flex flex-col items-center">
             <span>Inicio</span>
-            <div class="w-6 h-0.5 sm:h-1 bg-[#4F8A3D] rounded-full mt-1"></div>
+            <div class="w-6 h-0.5 sm:h-1 bg-[#4ade80] rounded-full mt-1"></div>
           </a>
-          <button (click)="showHowItWorks = true" type="button" class="hover:text-[#4F8A3D] transition-colors py-2 font-semibold text-[14px] lg:text-[15px] text-[#183247] cursor-pointer">¿Cómo funciona?</button>
-          <button (click)="showMaterials = true" type="button" class="hover:text-[#4F8A3D] transition-colors py-2 font-semibold text-[14px] lg:text-[15px] text-[#183247] cursor-pointer">Materiales</button>
-          <a routerLink="/dashboard" class="hover:text-[#4F8A3D] transition-colors py-2">Retiro especial</a>
-          <button (click)="showContact = true" type="button" class="hover:text-[#4F8A3D] transition-colors py-2 font-semibold text-[14px] lg:text-[15px] text-[#183247] cursor-pointer">Contacto</button>
+          <button (click)="showHowItWorks = true" type="button" class="hover:text-[#4ade80] transition-colors py-2 font-semibold cursor-pointer">¿Cómo funciona?</button>
+          <button (click)="showMaterials = true" type="button" class="hover:text-[#4ade80] transition-colors py-2 font-semibold cursor-pointer">Materiales</button>
+          <a routerLink="/dashboard" class="hover:text-[#4ade80] transition-colors py-2">Retiro especial</a>
+          <button (click)="showContact = true" type="button" class="hover:text-[#4ade80] transition-colors py-2 font-semibold cursor-pointer">Contacto</button>
         </nav>
 
         <!-- ACCIONES DERECHA -->
         <div class="flex items-center gap-4 sm:gap-5 lg:gap-6 flex-shrink-0">
           <!-- Sello Municipal Oficial Puerto Varas (Desktop) -->
-          <div class="hidden lg:flex items-center gap-2.5 pr-4 sm:pr-5 lg:pr-6 border-r border-[#E2E9E4]">
+          <div class="hidden lg:flex items-center gap-2.5 pr-4 sm:pr-5 lg:pr-6 border-r transition-colors" [ngClass]="sealBorderClass">
             <img src="assets/escudo-puerto-varas.svg" alt="Ilustre Municipalidad de Puerto Varas" class="h-9 w-auto object-contain">
             <div class="text-left leading-tight">
-              <div class="text-[9.5px] font-bold text-[#546571] uppercase tracking-wider">Ilustre Municipalidad</div>
-              <div class="text-[12.5px] font-extrabold text-[#123F5B] tracking-tight">Puerto Varas</div>
+              <div class="text-[9.5px] font-bold uppercase tracking-wider transition-colors" [ngClass]="sealSubtextClass">Ilustre Municipalidad</div>
+              <div class="text-[12.5px] font-extrabold tracking-tight transition-colors" [ngClass]="sealTitleClass">Puerto Varas</div>
             </div>
           </div>
 
           <!-- Botón Mi cuenta / Pill Vecinal (Desktop & Tablet) -->
-          <a *ngIf="!loginDisplay" routerLink="/login" class="hidden sm:flex items-center gap-2 bg-[#0e5584] hover:bg-[#0b476f] text-white text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-200 shadow-xs cursor-pointer">
+          <a *ngIf="!loginDisplay" routerLink="/login"
+             class="hidden sm:flex items-center gap-2 text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-200 shadow-xs cursor-pointer"
+             [ngClass]="accountBtnClass">
             <i class="fa-solid fa-circle-user text-sm"></i>
             <span>Mi cuenta</span>
           </a>
@@ -129,7 +131,8 @@ import { environment } from '../environments/environment';
           <!-- Botón Hamburger para Móviles (md:hidden) con micro-animación -->
           <button (click)="mobileMenuOpen = !mobileMenuOpen"
                   type="button"
-                  class="md:hidden relative w-10 h-10 inline-flex items-center justify-center rounded-xl bg-[#F0F5F2] hover:bg-[#E2EBE5] text-[#123F5B] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#4F8A3D]/40 cursor-pointer shadow-xs active:scale-95"
+                  class="md:hidden relative w-10 h-10 inline-flex items-center justify-center rounded-xl transition-all duration-300 focus:outline-none cursor-pointer shadow-xs active:scale-95"
+                  [ngClass]="hamburgerBtnClass"
                   aria-label="Abrir menú de navegación"
                   [attr.aria-expanded]="mobileMenuOpen">
             <i class="fa-solid fa-bars text-lg transition-transform duration-300" [class.rotate-90]="mobileMenuOpen" [class.hidden]="mobileMenuOpen"></i>
@@ -699,7 +702,17 @@ export class AppComponent implements OnInit, OnDestroy {
   showMaterials = false;
   showContact = false;
 
+  isScrolled = false;
+  isHomePage = false;
+
   private readonly _destroying$ = new Subject<void>();
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    if (typeof window !== 'undefined') {
+      this.isScrolled = window.scrollY > 30;
+    }
+  }
 
   constructor(
     @Inject(MSAL_GUARD_CONFIG) private msalGuardConfig: MsalGuardConfiguration,
@@ -708,7 +721,62 @@ export class AppComponent implements OnInit, OnDestroy {
     private router: Router
   ) { }
 
+  checkCurrentRoute(): void {
+    const url = this.router.url.split('?')[0].split('#')[0];
+    this.isHomePage = url === '/' || url === '';
+  }
+
+  get headerClass(): string {
+    if (this.isHomePage) {
+      if (this.isScrolled) {
+        return 'sticky top-0 z-50 transition-all duration-300 -mb-20 bg-[#041624]/95 backdrop-blur-md border-b border-white/10 shadow-md text-white';
+      }
+      return 'sticky top-0 z-50 transition-all duration-300 -mb-20 bg-transparent border-b border-transparent shadow-none text-white';
+    }
+    return 'sticky top-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-md border-b border-[#E2E9E4] shadow-sm text-[#183247]';
+  }
+
+  get logoTextClass(): string {
+    return this.isHomePage ? 'text-white' : 'text-[#123F5B]';
+  }
+
+  get logoSloganClass(): string {
+    return this.isHomePage ? 'text-slate-300' : 'text-[#546571]';
+  }
+
+  get navTextClass(): string {
+    return this.isHomePage ? 'text-white' : 'text-[#183247]';
+  }
+
+  get sealBorderClass(): string {
+    return this.isHomePage ? 'border-white/20' : 'border-[#E2E9E4]';
+  }
+
+  get sealSubtextClass(): string {
+    return this.isHomePage ? 'text-slate-300' : 'text-[#546571]';
+  }
+
+  get sealTitleClass(): string {
+    return this.isHomePage ? 'text-white' : 'text-[#123F5B]';
+  }
+
+  get accountBtnClass(): string {
+    return this.isHomePage
+      ? 'bg-[#22a652] hover:bg-[#1b8e45] text-white'
+      : 'bg-[#0e5584] hover:bg-[#0b476f] text-white';
+  }
+
+  get hamburgerBtnClass(): string {
+    if (this.isHomePage && !this.isScrolled) {
+      return 'bg-white/15 text-white hover:bg-white/25';
+    }
+    return 'bg-[#F0F5F2] text-[#123F5B] hover:bg-[#E2EBE5]';
+  }
+
   ngOnInit(): void {
+    this.checkCurrentRoute();
+    this.onWindowScroll();
+
     // Escuchar eventos de navegación para activar la barra de carga no intrusiva
     this.router.events
       .pipe(takeUntil(this._destroying$))
@@ -723,6 +791,7 @@ export class AppComponent implements OnInit, OnDestroy {
           setTimeout(() => {
             this.isPageLoading = false;
           }, 350);
+          this.checkCurrentRoute();
         }
       });
 
