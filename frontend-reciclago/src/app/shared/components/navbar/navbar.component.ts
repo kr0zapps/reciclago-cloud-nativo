@@ -27,7 +27,7 @@ import { RouterModule } from '@angular/router';
           <div>
             <div class="flex items-baseline tracking-tight">
               <span class="font-heading font-extrabold text-2xl transition-colors" [ngClass]="logoTextClass">Recic</span>
-              <span class="font-heading font-extrabold text-2xl text-[#4ade80] transition-colors">LaGo</span>
+              <span class="font-heading font-extrabold text-2xl transition-colors" [ngClass]="logoAccentClass">LaGo</span>
             </div>
             <p class="text-[11px] font-bold tracking-wide uppercase -mt-0.5 hidden sm:block transition-colors" [ngClass]="logoSloganClass">Puerto Varas recicla</p>
           </div>
@@ -179,6 +179,9 @@ export class NavbarComponent {
   mobileMenuOpen = false;
 
   get headerClass(): string {
+    if (this.mobileMenuOpen) {
+      return 'sticky top-0 z-50 transition-all duration-300 bg-white border-b border-[#E2E9E4] shadow-md text-[#183247]';
+    }
     if (this.isHomePage) {
       if (this.isScrolled) {
         return 'sticky top-0 z-50 transition-all duration-300 -mb-20 bg-[#041624]/95 backdrop-blur-md border-b border-white/10 shadow-md text-white';
@@ -188,14 +191,37 @@ export class NavbarComponent {
     return 'sticky top-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-md border-b border-[#E2E9E4] shadow-sm text-[#183247]';
   }
 
-  get logoTextClass(): string { return this.isHomePage ? 'text-white' : 'text-[#123F5B]'; }
-  get logoSloganClass(): string { return this.isHomePage ? 'text-slate-300' : 'text-[#546571]'; }
+  get logoTextClass(): string {
+    if (this.mobileMenuOpen) {
+      return 'text-[#123F5B]';
+    }
+    return (this.isHomePage && !this.isScrolled) ? 'text-white' : 'text-[#123F5B]';
+  }
+
+  get logoAccentClass(): string {
+    if (this.mobileMenuOpen || (!this.isHomePage || this.isScrolled)) {
+      return 'text-[#3D742F]';
+    }
+    return 'text-[#4ade80]';
+  }
+
+  get logoSloganClass(): string {
+    if (this.mobileMenuOpen) {
+      return 'text-[#546571]';
+    }
+    return (this.isHomePage && !this.isScrolled) ? 'text-slate-300' : 'text-[#546571]';
+  }
+
   get navTextClass(): string { return this.isHomePage ? 'text-white' : 'text-[#183247]'; }
   get sealBorderClass(): string { return this.isHomePage ? 'border-white/20' : 'border-[#E2E9E4]'; }
   get sealSubtextClass(): string { return this.isHomePage ? 'text-slate-300' : 'text-[#546571]'; }
   get sealTitleClass(): string { return this.isHomePage ? 'text-white' : 'text-[#123F5B]'; }
   get accountBtnClass(): string { return this.isHomePage ? 'bg-[#22a652] hover:bg-[#1b8e45] text-white' : 'bg-[#0e5584] hover:bg-[#0b476f] text-white'; }
+
   get hamburgerBtnClass(): string {
+    if (this.mobileMenuOpen) {
+      return 'bg-[#F0F5F2] text-[#123F5B] hover:bg-[#E2EBE5]';
+    }
     if (this.isHomePage && !this.isScrolled) {
       return 'bg-white/15 text-white hover:bg-white/25';
     }
