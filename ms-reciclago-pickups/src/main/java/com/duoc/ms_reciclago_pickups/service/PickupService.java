@@ -127,9 +127,9 @@ public class PickupService {
         Pickup pickup = obtenerPorId(id)
                 .orElseThrow(() -> new RuntimeException("Solicitud de retiro no encontrada con id: " + id));
 
-        if (!"SOLICITADO".equalsIgnoreCase(pickup.getEstado())) {
+        if (!"SOLICITADO".equalsIgnoreCase(pickup.getEstado()) && !"PROGRAMADO".equalsIgnoreCase(pickup.getEstado())) {
             throw new IllegalStateException(
-                    "Regla violada: No se puede programar si el retiro no está en estado SOLICITADO. Estado actual: "
+                    "Regla violada: No se puede programar o editar la programación si el retiro no está en estado SOLICITADO o PROGRAMADO. Estado actual: "
                             + pickup.getEstado());
         }
 

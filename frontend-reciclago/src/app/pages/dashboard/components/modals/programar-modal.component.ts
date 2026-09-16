@@ -43,10 +43,10 @@ interface TimeSlot {
             <div>
               <span class="text-[10px] font-black uppercase tracking-wider block"
                     [ngClass]="isRetiroEspecial ? 'text-amber-800' : 'text-[#1F6685]'">
-                {{ isRetiroEspecial ? 'Despacho de Servicio Especial' : 'Planificación Logística Comunal' }}
+                {{ isEditMode ? 'Editar Programación (Antes de Iniciar Ruta)' : (isRetiroEspecial ? 'Despacho de Servicio Especial' : 'Planificación Logística Comunal') }}
               </span>
               <h3 class="font-heading font-extrabold text-lg sm:text-xl text-[#123F5B]">
-                Programar Retiro #{{ pickup?.id }}
+                {{ isEditMode ? 'Editar Programación' : 'Programar Retiro' }} #{{ pickup?.id }}
               </h3>
             </div>
           </div>
@@ -218,7 +218,7 @@ interface TimeSlot {
                   [disabled]="isSubmitting || !!validationError"
                   type="button"
                   class="btn-stitch-primary px-5 py-2.5 text-xs font-bold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
-            <span *ngIf="!isSubmitting">Confirmar Programación</span>
+            <span *ngIf="!isSubmitting">{{ isEditMode ? 'Guardar Cambios' : 'Confirmar Programación' }}</span>
             <span *ngIf="isSubmitting"><i class="fa-solid fa-spinner fa-spin"></i> Guardando...</span>
           </button>
         </div>
@@ -336,6 +336,10 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
     return null;
   }
 
+  get isEditMode(): boolean {
+    return this.pickup?.estado === 'PROGRAMADO';
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isOpen']) {
       this.errorMessage = '';
@@ -351,6 +355,22 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
       const obs = (this.pickup.comentarios || '').toUpperCase();
       this.isRetiroEspecial = obs.includes('ESPECIAL');
       this.updateConfiguration();
+
+      // Si está en modo edición (ya programado), pre-cargar los datos existentes
+      if (this.isEditMode) {
+        if (this.pickup.camionPatente) {
+          this.actionCamionPatente = this.pickup.camionPatente;
+        }
+        if (this.pickup.fechaProgramada) {
+          const parts = String(this.pickup.fechaProgramada).split('T');
+          if (parts[0]) {
+            this.selectedFecha = parts[0];
+          }
+          if (parts[1]) {
+            this.selectedHora = parts[1].substring(0, 5);
+          }
+        }
+      }
     }
   }
 

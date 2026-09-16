@@ -86,6 +86,16 @@ import { Pickup } from '../data/sectors.data';
                 <span>Programar</span>
               </button>
 
+              <!-- Botón Editar Programación -->
+              <button *ngIf="pickup.estado === 'PROGRAMADO'"
+                      (click)="requestAction(pickup, 'programar')"
+                      type="button"
+                      class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 rounded-xl shadow-2xs transition-colors cursor-pointer"
+                      title="Editar fecha, horario o camión asignado antes de iniciar ruta">
+                <i class="fa-solid fa-pen-to-square text-[11px] text-sky-600"></i>
+                <span>Editar</span>
+              </button>
+
               <!-- Botón En Ruta -->
               <button *ngIf="pickup.estado === 'PROGRAMADO'"
                       (click)="requestAction(pickup, 'en-ruta')"

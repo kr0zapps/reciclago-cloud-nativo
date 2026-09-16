@@ -241,7 +241,17 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
                   <span>Programar en Ruta</span>
                 </button>
 
-                <!-- 2. PROGRAMADO -> Despachar a Ruta -->
+                <!-- 2. PROGRAMADO -> Editar / Re-programar antes de que el chofer inicie ruta -->
+                <button *ngIf="p.estado === 'PROGRAMADO'"
+                        (click)="requestAction(p, 'programar')"
+                        type="button"
+                        class="px-3.5 py-2 rounded-xl text-xs font-bold bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5"
+                        title="Editar fecha, horario o camión asignado antes de iniciar ruta">
+                  <i class="fa-solid fa-pen-to-square text-xs text-sky-600"></i>
+                  <span>Editar</span>
+                </button>
+
+                <!-- Despachar a Cuadrilla -->
                 <button *ngIf="p.estado === 'PROGRAMADO'"
                         (click)="requestAction(p, 'en-ruta')"
                         type="button"
