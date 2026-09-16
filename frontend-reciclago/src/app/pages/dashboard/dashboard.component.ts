@@ -14,6 +14,10 @@ import { StaffModalComponent } from './components/staff-modal.component';
 import { AdminDashboardComponent } from './components/admin-dashboard.component';
 import { CoordinadorDashboardComponent } from './components/coordinador-dashboard.component';
 import { ChoferDashboardComponent } from './components/chofer-dashboard.component';
+import { SpecialServiceCardComponent } from './components/special-service-card.component';
+import { InteractiveMapComponent } from './components/interactive-map.component';
+import { RutaModalComponent } from './components/ruta-modal.component';
+import { AuditoriaModalComponent } from './components/auditoria-modal.component';
 
 import {
   Sector,
@@ -43,7 +47,11 @@ import {
     StaffModalComponent,
     AdminDashboardComponent,
     CoordinadorDashboardComponent,
-    ChoferDashboardComponent
+    ChoferDashboardComponent,
+    SpecialServiceCardComponent,
+    InteractiveMapComponent,
+    RutaModalComponent,
+    AuditoriaModalComponent
   ],
   templateUrl: './dashboard.component.html'
 })
@@ -106,6 +114,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return this.truckWaypoints[this.currentTruckIndex] || this.truckWaypoints[0] || {
       name: 'Ruta activa', detail: 'Recorriendo cuadrante', eta: '5 min', distancia: '200 m', x: 50, y: 50, estado: 'En ruta'
     };
+  }
+
+  get activeCamionPatente(): string {
+    const activeP = this.pickups.find(p => p.estado === 'EN_RUTA');
+    return activeP?.camionPatente || this.currentSectorInfo?.patente || 'PV-RC-2026';
   }
 
   constructor(

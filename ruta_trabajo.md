@@ -513,23 +513,27 @@ $REGION = "us-east-1"
 aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com"
 ```
 
-#### 2. Crear Repositorios en ECR
+#### 2. Crear Repositorios en ECR (Los 4 Microservicios)
 ```powershell
 aws ecr create-repository --repository-name reciclago/ms-bff --region $REGION
 aws ecr create-repository --repository-name reciclago/ms-catalog --region $REGION
 aws ecr create-repository --repository-name reciclago/ms-pickups --region $REGION
+aws ecr create-repository --repository-name reciclago/ms-routes --region $REGION
 ```
 
 #### 3. Construir y Taggear las Imágenes Docker
 ```powershell
-# 1. BFF
+# 1. BFF (Edge Gateway y Seguridad)
 docker build -t "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-bff:latest" ./ms-reciclago-bff
 
-# 2. Catálogo
+# 2. Catálogo (Residuos y Camiones)
 docker build -t "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-catalog:latest" ./ms-reciclago-catalog
 
-# 3. Retiros
+# 3. Retiros (Ciclo de Vida y Pesaje)
 docker build -t "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-pickups:latest" ./ms-reciclago-pickups
+
+# 4. Rutas (Cuadrantes y Telemetría GPS)
+docker build -t "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-routes:latest" ./ms-reciclago-routes
 ```
 
 #### 4. Subir Imágenes a ECR (Push)
@@ -537,12 +541,106 @@ docker build -t "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-pickups:
 docker push "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-bff:latest"
 docker push "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-catalog:latest"
 docker push "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-pickups:latest"
+docker push "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-routes:latest"
 ```
 
-#### 5. Ejecutar en EC2 con Docker Compose
-En la instancia EC2 de AWS:
-```bash
-# Iniciar infraestructura de mensajería, BD y microservicios
-docker compose up -d
-```
-El **AWS API Gateway (HTTP API)** se configura apuntando a la IP pública o privada de la instancia EC2 en el puerto `8080` (`ms-reciclago-bff`), cumpliendo con el 100% de la arquitectura exigida en el **Caso 7**.
+---
+
+#### 5. Despliegue en Instancia AWS EC2
+
+1. **Tipo de Instancia Recomendado**:
+   - `t3.large` (2 vCPU, 8 GB RAM) o `t3.medium` (4 GB RAM + 4 GB Swap).
+   - Como la arquitectura corre Kafka, Zookeeper, RabbitMQ, PostgreSQL y 4 microservicios Spring Boot, se recomienda agregar un archivo de intercambio (swap) de 4 GB en Ubuntu:
+     ```bash
+     sudo fallocate -l 4G /swapfile
+     sudo chmod 600 /swapfile
+     sudo mkswap /swapfile
+     sudo swapon /swapfile
+     echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+     ```
+
+2. **Reglas de Seguridad (Security Group de EC2)**:
+   - **Inbound Rules**:
+     - `Puerto 22 (SSH)`: Tu IP (`My IP`).
+     - `Puerto 8080 (BFF / API Gateway)`: `0.0.0.0/0` (o restringido a la IP del API Gateway / Frontend S3).
+   - **Puertos Internos** (NO abrir a internet, solo comunicación interna entre contenedores):
+     - `Puerto 5432 / 5433`: PostgreSQL.
+     - `Puerto 5672 / 15672`: RabbitMQ.
+     - `Puerto 9092 / 2181`: Kafka / Zookeeper.
+     - `Puertos 8081, 8083, 8084`: Microservicios core.
+
+3. **Instalación de Docker y Docker Compose en EC2 (Ubuntu 22.04 / 24.04)**:
+   ```bash
+   sudo apt update && sudo apt install -y docker.io docker-compose-v2
+   sudo usermod -aG docker $USER
+   newgrp docker
+   ```
+
+4. **Login a ECR desde la instancia EC2 y Despliegue**:
+   ```bash
+   aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "$ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com"
+   
+   # Clonar repositorio o copiar docker-compose.yml
+   git clone https://github.com/kr0zapps/reciclago-cloud-nativo.git
+   cd reciclago-cloud-nativo
+   
+   # Desplegar los 8 contenedores
+   ECR_REGISTRY="$ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/reciclago" docker compose up -d
+   ```
+
+---
+
+#### 6. Tareas Pendientes para DEV 2: Consumidores Asíncronos
+
+Para completar al 100% el patrón **Event-Driven Architecture (EDA)** y la rúbrica de Cloud Native, DEV 2 debe verificar o implementar los consumidores para los eventos que ya emite `ms-reciclago-pickups`:
+
+##### A. Consumidores RabbitMQ (`@RabbitListener`)
+1. **Cola `q.cmd.email` (Notificaciones Ciudadanas)**:
+   - **Evento emisor**: `PickupService.java` publica en esta cola cuando un retiro pasa a `PROGRAMADO`, `RETIRADO` o `PESADO`.
+   - **Responsabilidad DEV 2**: Implementar el componente consumidor en un microservicio o módulo de notificaciones:
+     ```java
+     @RabbitListener(queues = "q.cmd.email")
+     public void handleEmailNotification(EmailNotificationDto dto) {
+         log.info("📧 [NOTIFICACIÓN RECICLAGO] Enviando correo a: {} | Asunto: {} | Retiro ID: {}", 
+             dto.getTo(), dto.getSubject(), dto.getPickupId());
+         // Integración con SendGrid, Amazon SES o mock de correo municipal
+     }
+     ```
+2. **Cola `q.cmd.certificate` (Emisión de Certificados Ambientales)**:
+   - **Evento emisor**: Se emite automáticamente cuando el chofer registra el pesaje en báscula (`estado === 'PESADO'`).
+   - **Responsabilidad DEV 2**: Implementar el consumidor que recibe `CertificateEventDto` y simula o genera el PDF oficial:
+     ```java
+     @RabbitListener(queues = "q.cmd.certificate")
+     public void handleCertificateGeneration(CertificateEventDto dto) {
+         log.info("📜 [CERTIFICADO DIMAO] Generando certificado oficial para: {} | Kilos: {} kg | Fecha: {}", 
+             dto.getVecinoEmail(), dto.getPesoRealKg(), dto.getFechaCompletado());
+     }
+     ```
+
+##### B. Consumidor Apache Kafka (`@KafkaListener`)
+1. **Topic `pickups.events` (Auditoría Inmutable y Huella Ecológica)**:
+   - **Evento emisor**: `ms-reciclago-pickups` publica `PickupStateChangeEventDto` cada vez que ocurre una transición de estado (`SOLICITADO` ➔ `PROGRAMADO` ➔ `EN_RUTA` ➔ `RETIRADO` ➔ `PESADO`).
+   - **Responsabilidad DEV 2**: Implementar el consumidor para auditoría y balance de huella de carbono:
+     ```java
+     @KafkaListener(topics = "pickups.events", groupId = "dimao-audit-group")
+     public void consumePickupAudit(PickupStateChangeEventDto event) {
+         log.info("⚡ [KAFKA AUDIT] Retiro ID: {} | Estado: {} -> {} | Kilos: {} | Fecha: {}",
+             event.getPickupId(), event.getEstadoAnterior(), event.getEstadoNuevo(), 
+             event.getPesoRealKg(), LocalDateTime.now());
+     }
+     ```
+
+---
+
+#### 7. Checklist de Verificación para la Defensa y Presentación Final
+
+- [x] **Frontend SPA**: Desplegado en AWS S3 con polyfill WebCrypto para MSAL y sin links rotos (`#`).
+- [x] **Doble App Entra ID**: Frontend SPA y Backend API configurados con scopes delegados (`access_as_user`).
+- [x] **BFF Gateway (8080)**: Valida Bearer JWT, extrae claims de usuario y orquestación con RestClient.
+- [x] **Consola Chofer**: Paradas filtradas por patente de camión (`PV-RC-2026`, `PV-RC-2027`, `PV-RC-2028`), botón de inicio de ruta y báscula digital táctil.
+- [x] **Seguimiento Cívico**: 3 pasos dinámicos sincronizados en tiempo real con lo que el chofer hace en terreno.
+- [x] **Docker Compose**: 8 contenedores corriendo con healthchecks nativos y `-Djava.net.preferIPv4Stack=true`.
+- [ ] **AWS ECR & EC2**: Imágenes subidas y ejecutándose en la instancia EC2 de DEV 2.
+- [ ] **AWS API Gateway**: HTTP API redirigiendo a la IP pública de EC2 en puerto 8080.
+- [ ] **RabbitMQ & Kafka Consumers**: Verificación de logs en los consumidores al registrar un pesaje de prueba.
+

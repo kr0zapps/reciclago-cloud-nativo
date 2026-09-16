@@ -284,8 +284,8 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
             <div class="w-12 h-12 mx-auto rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center text-lg mb-2">
               <i class="fa-solid fa-clipboard-check"></i>
             </div>
-            <p class="font-bold text-brand-navy text-sm">No hay paradas asignadas</p>
-            <p class="text-xs text-slate-500 mt-0.5">Comunícate con el Coordinador de Despacho si necesitas una nueva ruta.</p>
+            <p class="font-bold text-brand-navy text-sm">No hay paradas asignadas para el camión {{ selectedTruckPatente }}</p>
+            <p class="text-xs text-slate-500 mt-0.5">Comunícate con el Coordinador de Despacho si necesitas asignar paradas a esta cuadrilla.</p>
           </div>
         </div>
       </section>
@@ -395,15 +395,21 @@ export class ChoferDashboardComponent implements OnInit, OnChanges {
   }
 
   get choferPickups(): Pickup[] {
-    return this.pickups.filter(p => p.estado !== 'CANCELADO');
+    return this.pickups.filter(p => {
+      if (p.estado === 'CANCELADO') return false;
+      if (p.camionPatente) {
+        return p.camionPatente === this.selectedTruckPatente;
+      }
+      return this.selectedTruckPatente === 'PV-RC-2026';
+    });
   }
 
   get countChoferPendientes(): number {
-    return this.pickups.filter(p => p.estado === 'PROGRAMADO' || p.estado === 'EN_RUTA' || p.estado === 'SOLICITADO' || p.estado === 'RETIRADO').length;
+    return this.choferPickups.filter(p => p.estado === 'PROGRAMADO' || p.estado === 'EN_RUTA' || p.estado === 'SOLICITADO' || p.estado === 'RETIRADO').length;
   }
 
   get choferKilosTurno(): number {
-    return this.pickups
+    return this.choferPickups
       .filter(p => (p.estado === 'RETIRADO' || p.estado === 'PESADO') && p.kilosRecolectados)
       .reduce((sum, p) => sum + (Number(p.kilosRecolectados) || 0), 0);
   }
@@ -414,10 +420,10 @@ export class ChoferDashboardComponent implements OnInit, OnChanges {
   }
 
   get activeDriverStop(): Pickup | undefined {
-    return this.pickups.find(p => p.estado === 'EN_RUTA')
-      || this.pickups.find(p => p.estado === 'RETIRADO')
-      || this.pickups.find(p => p.estado === 'PROGRAMADO')
-      || this.pickups.find(p => p.estado === 'SOLICITADO');
+    return this.choferPickups.find(p => p.estado === 'EN_RUTA')
+      || this.choferPickups.find(p => p.estado === 'RETIRADO')
+      || this.choferPickups.find(p => p.estado === 'PROGRAMADO')
+      || this.choferPickups.find(p => p.estado === 'SOLICITADO');
   }
 
   requestAction(pickup: any, action: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar'): void {

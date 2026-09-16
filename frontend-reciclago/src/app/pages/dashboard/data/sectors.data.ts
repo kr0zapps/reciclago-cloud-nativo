@@ -52,6 +52,9 @@ export interface Pickup {
   direccion?: string;
   estado?: string;
   comentarios?: string;
+  camionPatente?: string;
+  camionId?: number;
+  vecinoEmail?: string;
 }
 
 export const DEFAULT_SECTORES: Sector[] = [
