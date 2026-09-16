@@ -98,6 +98,9 @@ export const appConfig: ApplicationConfig = {
           ['http://localhost:8080/api/*', environment.apiConfig.scopes],
           ['http://localhost:8080/api*', environment.apiConfig.scopes],
           ['http://localhost:8080/api', environment.apiConfig.scopes],
+          [`${environment.apiConfig.uri}/api/*`, environment.apiConfig.scopes],
+          [`${environment.apiConfig.uri}/api*`, environment.apiConfig.scopes],
+          [`${environment.apiConfig.uri}/api`, environment.apiConfig.scopes],
           ['/api/*', environment.apiConfig.scopes],
           ['/api*', environment.apiConfig.scopes],
           ['/api', environment.apiConfig.scopes]
