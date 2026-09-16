@@ -7,11 +7,11 @@ export interface SectorInfo {
 }
 
 export const ALL_HOME_SECTORS: SectorInfo[] = [
-  { id: 'braunau', name: 'Población Nueva Braunau', shortName: 'Nueva Braunau', day: 'Martes', hours: '08:00 y 17:00 hrs.' },
-  { id: 'chico', name: 'Puerto Chico / Los Colonos', shortName: 'Puerto Chico', day: 'Miércoles', hours: '08:00 y 17:00 hrs.' },
-  { id: 'centro', name: 'Centro / Costanera', shortName: 'Costanera', day: 'Lunes', hours: '08:00 y 17:00 hrs.' },
-  { id: 'ensenada', name: 'Ensenada / Ruta 225', shortName: 'Ensenada', day: 'Jueves', hours: '08:00 y 17:00 hrs.' },
-  { id: 'mirador', name: 'El Mirador / Alta Esperanza', shortName: 'El Mirador', day: 'Viernes', hours: '08:00 y 17:00 hrs.' }
+  { id: 'chico', name: 'Puerto Chico / El Mirador', shortName: 'Puerto Chico', day: 'Lunes', hours: '08:00 y 17:00 hrs.' },
+  { id: 'centro', name: 'Costanera Sur / Llanquihue Sur', shortName: 'Costanera Sur', day: 'Martes', hours: '08:00 y 17:00 hrs.' },
+  { id: 'ensenada', name: 'Ensenada / Los Colonos / Ruta 225', shortName: 'Ensenada', day: 'Miércoles', hours: '08:30 y 16:30 hrs.' },
+  { id: 'braunau', name: 'Población Nueva Braunau', shortName: 'Nueva Braunau', day: 'Jueves', hours: '08:00 y 17:00 hrs.' },
+  { id: 'mirador', name: 'El Mirador / Alta Esperanza', shortName: 'El Mirador', day: 'Lunes', hours: '08:00 y 17:00 hrs.' }
 ];
 
 export const POPULAR_HOME_SECTORS: SectorInfo[] = [

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BffService } from '../../../../services/bff.service';
 import { Camion, Pickup, Sector, DEFAULT_SECTORES } from '../../data/sectors.data';
+import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
 
 export interface DateOption {
   value: string;       // YYYY-MM-DD
@@ -254,25 +255,7 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
   }
 
   get sectorDetected(): Sector {
-    const dir = (this.pickup?.direccion || '').toLowerCase();
-    if (dir.includes('costanera') || dir.includes('llanquihue') || dir.includes('guindos') || dir.includes('vicente')) {
-      return DEFAULT_SECTORES[1]; // Cuadrante 2 (Martes - Vidrio)
-    }
-    if (dir.includes('chico') || dir.includes('mirador') || dir.includes('decher') || dir.includes('colón')) {
-      return DEFAULT_SECTORES[0]; // Cuadrante 1 (Lunes - Papel)
-    }
-    if (dir.includes('ensenada') || dir.includes('colonos') || dir.includes('225')) {
-      return DEFAULT_SECTORES[2]; // Cuadrante 3 (Miércoles - Plástico)
-    }
-    if (dir.includes('braunau') || dir.includes('klein')) {
-      return DEFAULT_SECTORES[3]; // Cuadrante 4 (Jueves - Vidrio)
-    }
-    // Fallback por tipo de residuo
-    const mat = this.materialName.toLowerCase();
-    if (mat.includes('vidrio')) return DEFAULT_SECTORES[1]; // Martes
-    if (mat.includes('cartón') || mat.includes('papel')) return DEFAULT_SECTORES[0]; // Lunes
-    if (mat.includes('plástic')) return DEFAULT_SECTORES[2]; // Miércoles
-    return DEFAULT_SECTORES[1];
+    return detectSector(this.pickup?.direccion || '', this.materialName);
   }
 
   get sectorName(): string {
@@ -290,10 +273,7 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
     if (this.isRetiroEspecial) {
       return [5, 6]; // Viernes (5) y Sábado (6)
     }
-    const map: Record<string, number> = {
-      'domingo': 0, 'lunes': 1, 'martes': 2, 'miércoles': 3, 'miercoles': 3, 'jueves': 4, 'viernes': 5, 'sábado': 6, 'sabado': 6
-    };
-    const target = map[this.sectorDetected.dia.toLowerCase()] ?? 2;
+    const target = DAY_NAME_TO_NUMBER[this.sectorDetected.dia.toLowerCase()] ?? 2;
     return [target];
   }
 

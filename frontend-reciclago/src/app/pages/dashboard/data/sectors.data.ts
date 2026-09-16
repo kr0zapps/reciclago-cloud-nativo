@@ -340,8 +340,6 @@ export const DEFAULT_SECTORES: Sector[] = [
   }
 ];
 
-export const DEFAULT_PICKUPS: Pickup[] = [];
-
 export const DEFAULT_RESIDUOS: Residuo[] = [
   { id: 1, nombre: 'Vidrio', descripcion: 'Botellas y frascos limpios', categoria: 'VIDRIO' },
   { id: 2, nombre: 'Cartón y Papel', descripcion: 'Cajas secas y aplanadas', categoria: 'CARTON' },

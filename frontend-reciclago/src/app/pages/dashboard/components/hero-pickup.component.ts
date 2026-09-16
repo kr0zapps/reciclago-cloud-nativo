@@ -71,7 +71,7 @@ import { Sector } from '../data/sectors.data';
             <div>
               <span class="text-xs font-bold uppercase tracking-wider text-amber-800 block">Indicación para los vecinos</span>
               <p class="text-[15px] sm:text-[16px] text-amber-900 mt-1 leading-snug">
-                Recuerda dejar tus botellas y frascos de vidrio limpios y secos en el frontis de tu domicilio antes de las <strong class="font-extrabold text-amber-950 underline decoration-amber-300">08:00 hrs</strong>.
+                Recuerda dejar tus materiales reciclables (<strong>{{ sector?.materialPrincipal || 'Vidrio' }}</strong>) limpios y secos en el frontis de tu domicilio antes de las <strong class="font-extrabold text-amber-950 underline decoration-amber-300">08:00 hrs</strong>.
               </p>
             </div>
           </div>
@@ -115,11 +115,11 @@ import { Sector } from '../data/sectors.data';
             <div class="space-y-2 bg-white/90 rounded-2xl p-4 border border-[#DFE8E1] text-left">
               <div class="flex items-center gap-2.5 text-[15px] font-bold text-emerald-900">
                 <i class="fa-solid fa-circle-check text-brand-green text-base"></i>
-                <span>Botellas y frascos limpios y secos</span>
+                <span>Materiales clasificados, limpios y secos</span>
               </div>
               <div class="flex items-center gap-2.5 text-[14px] font-semibold text-slate-600">
                 <i class="fa-solid fa-circle-xmark text-rose-500 text-base"></i>
-                <span>Sin tapas metálicas, plásticas ni corchos</span>
+                <span>Sin restos orgánicos ni elementos contaminantes</span>
               </div>
             </div>
           </div>
@@ -129,6 +129,6 @@ import { Sector } from '../data/sectors.data';
   `
 })
 export class HeroPickupComponent {
-  @Input() sector!: Sector | any;
+  @Input() sector!: Sector | null;
   @Input() userAddress: string = '';
 }

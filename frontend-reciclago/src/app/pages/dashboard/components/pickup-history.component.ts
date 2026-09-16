@@ -289,26 +289,26 @@ import { Pickup } from '../data/sectors.data';
   `
 })
 export class PickupHistoryComponent {
-  @Input() pickups: Pickup[] | any[] = [];
+  @Input() pickups: Pickup[] = [];
   @Input() isStaff: boolean = false;
   @Input() userEmail: string = '';
 
-  @Output() actionRequested = new EventEmitter<{ pickup: any, action: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar' }>();
+  @Output() actionRequested = new EventEmitter<{ pickup: Pickup, action: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar' }>();
 
   showHistorialModal = false;
   historialPage = 0;
   historialTotalPages = 1;
   historialTotalElements = 0;
-  historialList: any[] = [];
+  historialList: Pickup[] = [];
   isLoadingHistorial = false;
 
   constructor(private bffService: BffService) {}
 
-  isRetiradoOPesado(p: any): boolean {
+  isRetiradoOPesado(p: Pickup): boolean {
     return p.estado === 'completado' || p.estado === 'PESADO' || p.estado === 'RETIRADO';
   }
 
-  requestAction(pickup: any, action: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar'): void {
+  requestAction(pickup: Pickup, action: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar'): void {
     this.actionRequested.emit({ pickup, action });
   }
 

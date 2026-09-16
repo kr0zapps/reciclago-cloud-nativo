@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BffService } from '../../services/bff.service';
 import { MsalService } from '@azure/msal-angular';
@@ -29,18 +28,17 @@ import {
   Camion,
   Pickup,
   DEFAULT_SECTORES,
-  DEFAULT_PICKUPS,
   DEFAULT_RESIDUOS,
   DEFAULT_CAMIONES,
   getNextDateForDay
 } from './data/sectors.data';
+import { DAY_NAME_TO_NUMBER } from './utils/sector.utils';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule,
     FormsModule,
     HeroPickupComponent,
     TruckTrackingComponent,
@@ -76,42 +74,40 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   showRutaModal = false;
   showActionModal = false;
-  selectedPickupForAction: any = null;
+  selectedPickupForAction: Pickup | null = null;
   actionType: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar' = 'programar';
 
   truckSimulationRunning = true;
   truckSpeed = 1;
   currentTruckIndex = 0;
   truckWaypoints: Waypoint[] = [];
-  private truckTimer: any = null;
+  private truckTimer: ReturnType<typeof setInterval> | null = null;
 
   activeStaffRole: 'Admin' | 'Coordinador' | 'Chofer' = 'Admin';
 
   hasRole(role: string): boolean {
-    return this.userRoles.some(r => r && r.trim().toLowerCase() === role.toLowerCase());
+    return this.userRoles.some(r => r.toLowerCase() === role.toLowerCase());
   }
 
-  get isStaff(): boolean {
-    return this.hasRole('Admin') || this.hasRole('Coordinador') || this.hasRole('Chofer');
-  }
-
-  get currentSectorInfo(): Sector {
-    const sec = this.sectores.find(s => s.nombre === this.selectedSector) || this.sectores[0];
+  get currentSectorInfo(): Sector | null {
+    const sec = this.sectores.find(s => s.nombre === this.selectedSector) || this.sectores[0] || null;
+    if (!sec) return null;
     return {
       ...sec,
       fechaTexto: getNextDateForDay(sec.dia)
     };
   }
 
+  get isStaff(): boolean {
+    return this.hasRole('Admin') || this.hasRole('Coordinador') || this.hasRole('Chofer');
+  }
+
   get isCamionEnRuta(): boolean {
     const sec = this.currentSectorInfo;
     if (!sec) return false;
-    if (typeof (sec as any).enRuta === 'boolean') return (sec as any).enRuta;
-    const dayMap: Record<string, number> = {
-      'DOMINGO': 0, 'LUNES': 1, 'MARTES': 2, 'MIÉRCOLES': 3, 'MIERCOLES': 3, 'JUEVES': 4, 'VIERNES': 5, 'SÁBADO': 6, 'SABADO': 6
-    };
+    if (typeof sec.enRuta === 'boolean') return sec.enRuta;
     const today = new Date().getDay();
-    const isToday = dayMap[(sec.dia || '').toUpperCase()] === today;
+    const isToday = (DAY_NAME_TO_NUMBER[(sec.dia || '').toLowerCase()] ?? 2) === today;
     const hour = new Date().getHours();
     return isToday && (hour >= 8 && hour < 17);
   }
@@ -154,8 +150,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.userRoles = Array.from(new Set([...this.userRoles, ...profile.roles]));
           this.syncDefaultStaffRole();
         }
-        if (profile && profile.username && !this.userEmail) {
-          this.userEmail = profile.username;
+        if (profile && (profile.email || profile.username) && !this.userEmail) {
+          this.userEmail = profile.email || profile.username || '';
         }
         if (profile && profile.name && !this.userName) {
           this.userName = profile.name;
@@ -165,7 +161,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       error: () => {}
     });
 
-    this.truckWaypoints = this.currentSectorInfo.waypoints || [];
+    this.truckWaypoints = this.currentSectorInfo?.waypoints || [];
     this.loadResiduos();
     this.loadPickups();
     this.loadCuadrantes();
@@ -202,7 +198,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   onSectorSelect(sector: string): void {
     this.selectedSector = sector;
     this.userActiveAddress = `${sector}, Puerto Varas`;
-    this.truckWaypoints = this.currentSectorInfo.waypoints || [];
+    this.truckWaypoints = this.currentSectorInfo?.waypoints || [];
     this.currentTruckIndex = 0;
     this.loadLiveTracking();
   }
@@ -316,7 +312,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  openActionModal(event: { pickup: any, action: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar' }): void {
+  openActionModal(event: { pickup: Pickup, action: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar' }): void {
     this.selectedPickupForAction = event.pickup;
     this.actionType = event.action;
     this.showActionModal = true;
@@ -326,7 +322,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadPickups();
   }
 
-  onPickupCreated(nuevo: any): void {
+  onPickupCreated(nuevo: Pickup): void {
     this.pickups.unshift(nuevo);
     if (nuevo.direccion) {
       this.userActiveAddress = nuevo.direccion;
@@ -334,7 +330,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadPickups();
   }
 
-  onStaffPickupCreated(data: any): void {
+  onStaffPickupCreated(data: { direccion: string; residuoId: string | number; comentarios?: string }): void {
     const payload = {
       ciudadanoEmail: 'vecino.contacto@puertovaras.cl',
       direccion: data.direccion,

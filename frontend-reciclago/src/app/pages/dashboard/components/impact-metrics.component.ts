@@ -66,9 +66,9 @@ import { Sector, Pickup } from '../data/sectors.data';
   `
 })
 export class ImpactMetricsComponent {
-  @Input() pickups: Pickup[] | any[] = [];
+  @Input() pickups: Pickup[] = [];
   @Input() userAddress: string = '';
-  @Input() sector!: Sector | any;
+  @Input() sector!: Sector | null;
 
   getTotalKilos(): number {
     return this.pickups

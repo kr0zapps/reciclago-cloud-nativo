@@ -378,16 +378,13 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
   `
 })
 export class ChoferDashboardComponent implements OnInit, OnChanges {
-  @Input() userRoles: string[] = [];
   @Input() userName: string = '';
-  @Input() sector: Sector | any = null;
-  @Input() sectores: Sector[] = [];
+  @Input() sector: Sector | null = null;
   @Input() pickups: Pickup[] = [];
   @Input() camiones: Camion[] = [];
-  @Input() residuos: Residuo[] = [];
   @Input() activeWaypoint: Waypoint = { name: 'Costanera Sur', detail: 'Recorrido en curso', eta: '10 min', distancia: '1.2 km', x: 28, y: 72, estado: 'En recorrido' };
 
-  @Output() actionRequested = new EventEmitter<{ pickup: any; action: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar' }>();
+  @Output() actionRequested = new EventEmitter<{ pickup: Pickup; action: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar' }>();
 
   selectedTruckPatente: string = 'PV-RC-2026';
 

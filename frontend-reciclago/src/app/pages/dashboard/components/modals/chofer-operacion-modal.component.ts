@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { BffService } from '../../../../services/bff.service';
 import { Pickup, Camion, Sector, DEFAULT_SECTORES } from '../../data/sectors.data';
 import { DateOption, TimeSlot } from './programar-modal.component';
+import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
 
 @Component({
   selector: 'app-chofer-operacion-modal',
@@ -240,24 +241,7 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
   }
 
   get sectorDetected(): Sector {
-    const dir = (this.pickup?.direccion || '').toLowerCase();
-    if (dir.includes('costanera') || dir.includes('llanquihue') || dir.includes('guindos') || dir.includes('vicente')) {
-      return DEFAULT_SECTORES[1];
-    }
-    if (dir.includes('chico') || dir.includes('mirador') || dir.includes('decher') || dir.includes('colón')) {
-      return DEFAULT_SECTORES[0];
-    }
-    if (dir.includes('ensenada') || dir.includes('colonos') || dir.includes('225')) {
-      return DEFAULT_SECTORES[2];
-    }
-    if (dir.includes('braunau') || dir.includes('klein')) {
-      return DEFAULT_SECTORES[3];
-    }
-    const mat = this.materialName.toLowerCase();
-    if (mat.includes('vidrio')) return DEFAULT_SECTORES[1];
-    if (mat.includes('cartón') || mat.includes('papel')) return DEFAULT_SECTORES[0];
-    if (mat.includes('plástic')) return DEFAULT_SECTORES[2];
-    return DEFAULT_SECTORES[1];
+    return detectSector(this.pickup?.direccion || '', this.materialName);
   }
 
   get sectorName(): string {
@@ -276,10 +260,7 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
 
   get allowedDayNumbers(): number[] {
     if (this.isRetiroEspecial) return [5, 6];
-    const map: Record<string, number> = {
-      'domingo': 0, 'lunes': 1, 'martes': 2, 'miércoles': 3, 'miercoles': 3, 'jueves': 4, 'viernes': 5, 'sábado': 6, 'sabado': 6
-    };
-    return [map[this.sectorDetected.dia.toLowerCase()] ?? 2];
+    return [DAY_NAME_TO_NUMBER[this.sectorDetected.dia.toLowerCase()] ?? 2];
   }
 
   get officialHoursRange(): string {

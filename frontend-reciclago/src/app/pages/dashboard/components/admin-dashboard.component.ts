@@ -571,9 +571,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
   `
 })
 export class AdminDashboardComponent implements OnInit, OnChanges {
-  @Input() userRoles: string[] = [];
-  @Input() userName: string = '';
-  @Input() sector: Sector | any = null;
+  @Input() sector: Sector | null = null;
   @Input() sectores: Sector[] = [];
   @Input() pickups: Pickup[] = [];
   @Input() camiones: Camion[] = [];
@@ -582,10 +580,9 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
   @Input() truckSimulationRunning: boolean = true;
   @Input() truckSpeed: number = 1;
 
-  @Output() actionRequested = new EventEmitter<{ pickup: any; action: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar' }>();
+  @Output() actionRequested = new EventEmitter<{ pickup: Pickup; action: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar' }>();
   @Output() pickupCreated = new EventEmitter<any>();
   @Output() openAuditoriaModal = new EventEmitter<void>();
-  @Output() openRutaCompleta = new EventEmitter<void>();
   @Output() toggleTruckSimulation = new EventEmitter<void>();
   @Output() toggleTruckSpeed = new EventEmitter<void>();
   @Output() resetTruckSimulation = new EventEmitter<void>();

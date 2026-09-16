@@ -1,4 +1,4 @@
-# 🗺️ Hoja de Ruta y Tareas Pendientes: DEV 2 (Backend, EDA & AWS Cloud)
+﻿# 🗺️ Hoja de Ruta y Guía de Implementación: DEV 2 (Backend, EDA & AWS Cloud)
 **Proyecto: RecicLaGo — Plataforma Cloud Native de Reciclaje Municipal (Puerto Varas)**  
 *Asignatura: Cloud Nativo (Duoc UC)*  
 *Responsable: DEV 2 (Ingeniería de Backend, Mensajería Asíncrona e Infraestructura AWS)*
@@ -7,17 +7,17 @@
 
 ## 📌 1. Resumen Ejecutivo del Estado del Proyecto
 
-El desarrollo correspondiente a **DEV 1 (Frontend Angular 18, MSAL Entra ID y ms-bff Gateway en puerto 8080)** se encuentra **100% completado, modularizado y desplegado en AWS S3**. 
+El desarrollo correspondiente a **DEV 1 (Frontend Angular 19, MSAL Entra ID y ms-bff Gateway en puerto 8080)** se encuentra **100% completado, modularizado y desplegado en AWS S3**. 
 
-Los 4 microservicios backend ya están dockerizados y funcionando localmente en Docker Desktop:
-- `ms-reciclago-bff` (Puerto 8080 — Edge Gateway / Resource Server)
+Los 4 microservicios backend ya están dockerizados, compilados y funcionando en Docker Compose:
+- `ms-reciclago-bff` (Puerto 8080 — Edge Gateway / Resource Server OAuth2)
 - `ms-reciclago-catalog` (Puerto 8081 — Residuos, Camiones y Tarifas)
 - `ms-reciclago-pickups` (Puerto 8083 — Ciclo de vida de retiros, Pesaje y Productores EDA)
 - `ms-reciclago-routes` (Puerto 8084 — Cuadrantes, Telemetría y Contacto DIMAO)
 - Contenedores de soporte: PostgreSQL 15 (`5433:5432`), RabbitMQ 3 (`5672 / 15672`), Kafka (`9092 / 29092`) y Zookeeper (`2181`).
 
 > [!IMPORTANT]
-> **ESTE DOCUMENTO CONTIENE EXCLUSIVAMENTE LO QUE LE FALTA POR HACER A DEV 2**. Todo lo relativo a DEV 1 ya fue entregado y no requiere más trabajo.
+> **ESTE DOCUMENTO CONTIENE EXCLUSIVAMENTE LO QUE LE FALTA POR HACER A DEV 2**. Todo lo relativo a DEV 1 ya fue entregado, verificado y no requiere más trabajo.
 
 ---
 
@@ -25,7 +25,7 @@ Los 4 microservicios backend ya están dockerizados y funcionando localmente en 
 
 ```mermaid
 graph TD
-    subgraph "TAREA 1: Event-Driven Consumers (Falta en Código)"
+    subgraph "TAREA 1: Event-Driven Consumers (RabbitMQ y Kafka)"
         R1["🐇 Consumidor RabbitMQ: q.cmd.email"]
         R2["🐇 Consumidor RabbitMQ: q.cmd.certificate"]
         R3["🐇 Consumidor RabbitMQ: q.cmd.route"]
@@ -41,13 +41,14 @@ graph TD
     end
 
     subgraph "TAREA 3: Despliegue en AWS EC2"
-        EC2["💻 Instancia EC2 (t3.medium/t3.large + 4GB Swap)"]
+        EC2["💻 Instancia EC2 (t3.medium + 4GB Swap + LabRole)"]
         SG["🛡️ Security Group (SSH 22, HTTP 8080)"]
-        DC["🐳 Docker Compose Up (8 Contenedores)"]
+        DC["🐳 Docker Compose Pull & Up (8 Contenedores)"]
     end
 
-    subgraph "TAREA 4: AWS API Gateway (Enrutamiento Público)"
+    subgraph "TAREA 4: AWS API Gateway + JWT Authorizer (20% Rúbrica EP2)"
         APIGW["🌐 HTTP API Gateway -> EC2:8080"]
+        AUTH["🔑 JWT Authorizer (Microsoft Entra ID)"]
         CORS["🔒 CORS habilitado para S3 de DEV 1"]
     end
 
@@ -55,35 +56,41 @@ graph TD
     K1 --> DC
     ECR1 --> EC2
     EC2 --> SG --> APIGW
+    APIGW --> AUTH
+    APIGW --> CORS
 ```
 
 | # | Área de Trabajo | Descripción del Requerimiento | Estado | Prioridad |
 |---|---|---|:---:|:---:|
 | **1** | **Consumidores RabbitMQ** | Implementar listeners `@RabbitListener` para `q.cmd.email`, `q.cmd.certificate` y `q.cmd.route`. | ❌ **Pendiente** | 🔴 Crítica |
-| **2** | **Consumidor Kafka** | Implementar listener `@KafkaListener` para topic `pickups.events` y `audit.timeline` (Auditoría DIMAO). | ❌ **Pendiente** | 🔴 Crítica |
+| **2** | **Consumidores Kafka** | Implementar listeners `@KafkaListener` para topics `pickups.events` y `audit.timeline` (Auditoría DIMAO). | ❌ **Pendiente** | 🔴 Crítica |
 | **3** | **Amazon ECR** | Crear los 4 repositorios en AWS ECR con la cuenta de DEV 2 y subir las imágenes Docker taggeadas. | ❌ **Pendiente** | 🔴 Crítica |
-| **4** | **Amazon EC2** | Levantar instancia EC2 Ubuntu, configurar 4 GB de Swap, Security Group (8080/22) y levantar Docker Compose. | ❌ **Pendiente** | 🔴 Crítica |
-| **5** | **AWS API Gateway** | Configurar HTTP API Gateway apuntando al puerto 8080 de EC2 con soporte CORS para el frontend S3. | ❌ **Pendiente** | 🟡 Alta |
-| **6** | **Secretos GitHub** | Cargar las credenciales de AWS de DEV 2 en los secretos del repositorio para el despliegue continuo. | ❌ **Pendiente** | 🟢 Media |
+| **4** | **Amazon EC2** | Levantar instancia EC2 Ubuntu, asociar rol `LabRole`, configurar 4 GB Swap, SG (8080/22) y Docker Compose. | ❌ **Pendiente** | 🔴 Crítica |
+| **5** | **AWS API Gateway + JWT Authorizer** | Configurar HTTP API Gateway con JWT Authorizer de Microsoft Entra ID (20% nota EP2) y CORS. | ❌ **Pendiente** | 🔴 Crítica |
+| **6** | **Secretos GitHub** | Cargar las credenciales de AWS de DEV 2 en los secretos del repositorio para CI/CD continuo. | ❌ **Pendiente** | 🟢 Media |
 
 ---
 
-## 🛠️ 3. Tarea 1: Implementación de Consumidores Asíncronos (Falta en el Código)
+## 🛠️ 3. Tarea 1: Implementación de Consumidores Asíncronos (Código Java Listo para Copiar)
 
 ### Contexto de Negocio
-En `ms-reciclago-pickups`, el servicio `PickupService.java` ya **emite** los eventos hacia RabbitMQ y Kafka cuando un retiro cambia de estado (`PROGRAMADO`, `EN_RUTA`, `RETIRADO`, `PESADO`). **Actualmente no existen consumidores implementados** que procesen estos mensajes en segundo plano.
+En `ms-reciclago-pickups`, el servicio `PickupService.java` ya **emite** los eventos hacia RabbitMQ y Kafka cuando un retiro cambia de estado (`PROGRAMADO`, `EN_RUTA`, `RETIRADO`, `PESADO`).
 
-DEV 2 debe implementar las siguientes clases (se recomienda crearlas en el paquete `com.duoc.ms_reciclago_pickups.consumer` o en un módulo de soporte):
+Crea los siguientes archivos en el paquete:
+`ms-reciclago-pickups/src/main/java/com/duoc/ms_reciclago_pickups/consumer/`
+
+---
 
 ### A. Consumidor de Correos Ciudadanos: `EmailNotificationConsumer.java`
-- **Cola a escuchar:** `q.cmd.email`
-- **Propósito:** Simular el despacho de correos transaccionales a vecinos cuando su solicitud cambia de estado.
+- **Cola:** `q.cmd.email` (`RabbitMQConfig.QUEUE_EMAIL`)
+- **DTO:** `EmailEventDto`
+- **Propósito:** Notificar al vecino ante cada hito de su solicitud.
 
 ```java
 package com.duoc.ms_reciclago_pickups.consumer;
 
 import com.duoc.ms_reciclago_pickups.config.RabbitMQConfig;
-import com.duoc.ms_reciclago_pickups.dto.EmailNotificationDto;
+import com.duoc.ms_reciclago_pickups.dto.EmailEventDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -95,21 +102,23 @@ public class EmailNotificationConsumer {
     private static final Logger log = LoggerFactory.getLogger(EmailNotificationConsumer.class);
 
     @RabbitListener(queues = RabbitMQConfig.QUEUE_EMAIL)
-    public void receiveEmailCommand(EmailNotificationDto emailDto) {
-        log.info("📧 [NOTIFICACIÓN CIUDADANA] Correo despachado con éxito:");
-        log.info("   -> Destinatario: {}", emailDto.getTo());
-        log.info("   -> Asunto: {}", emailDto.getSubject());
-        log.info("   -> Mensaje: {}", emailDto.getBody());
-        log.info("   -> ID Retiro asociado: {}", emailDto.getPickupId());
+    public void receiveEmailCommand(EmailEventDto emailDto) {
+        log.info("📧 [NOTIFICACIÓN CIUDADANA DIMAO] Enviando correo electrónico:");
+        log.info("   -> Código Retiro: {}", emailDto.getCodigoRetiro());
+        log.info("   -> Destinatario: {}", emailDto.getDestinatarioEmail());
+        log.info("   -> Asunto: {}", emailDto.getAsunto());
+        log.info("   -> Nuevo Estado: {}", emailDto.getNuevoEstado());
+        log.info("   -> Mensaje: {}", emailDto.getMensaje());
     }
 }
 ```
 
 ---
 
-### B. Consumidor de Certificados Ambientales DIMAO: `CertificateGenerationConsumer.java`
-- **Cola a escuchar:** `q.cmd.certificate`
-- **Propósito:** Generar la certificación digital municipal cuando el chofer finaliza el pesaje en la báscula digital.
+### B. Consumidor de Certificados Ambientales: `CertificateGenerationConsumer.java`
+- **Cola:** `q.cmd.certificate` (`RabbitMQConfig.QUEUE_CERTIFICATE`)
+- **DTO:** `CertificateEventDto`
+- **Propósito:** Generar certificado ambiental municipal y cálculo de CO2 evitado tras el pesaje.
 
 ```java
 package com.duoc.ms_reciclago_pickups.consumer;
@@ -128,22 +137,57 @@ public class CertificateGenerationConsumer {
 
     @RabbitListener(queues = RabbitMQConfig.QUEUE_CERTIFICATE)
     public void generateCertificate(CertificateEventDto certDto) {
+        double co2Evitado = certDto.getPesoRealKg() != null ? certDto.getPesoRealKg() * 1.85 : 0.0;
         log.info("📜 [CERTIFICADO AMBIENTAL EMITIDO - DIMAO PUERTO VARAS]:");
-        log.info("   -> Folio Certificado: DIMAO-CERT-{}", certDto.getPickupId());
+        log.info("   -> Folio Certificado: DIMAO-CERT-{}", certDto.getCodigoRetiro());
         log.info("   -> Vecino Beneficiario: {}", certDto.getVecinoEmail());
         log.info("   -> Kilos Verificados en Báscula: {} kg", certDto.getPesoRealKg());
         log.info("   -> Fecha de Pesaje: {}", certDto.getFechaCompletado());
-        log.info("   -> Huella CO2 Evitada estimada: {} kg CO2e", certDto.getPesoRealKg() * 1.85);
+        log.info("   -> Huella CO2 Evitada estimada: {} kg CO2e", String.format("%.2f", co2Evitado));
     }
 }
 ```
 
 ---
 
-### C. Consumidor de Auditoría Inmutable Kafka: `PickupAuditKafkaConsumer.java`
-- **Topic a escuchar:** `pickups.events`
+### C. Consumidor de Hoja de Ruta Logística: `RouteDispatchConsumer.java`
+- **Cola:** `q.cmd.route` (`RabbitMQConfig.QUEUE_ROUTE`)
+- **DTO:** `RouteEventDto`
+- **Propósito:** Notificar a la central de despacho municipal y chofer sobre paradas asignadas.
+
+```java
+package com.duoc.ms_reciclago_pickups.consumer;
+
+import com.duoc.ms_reciclago_pickups.config.RabbitMQConfig;
+import com.duoc.ms_reciclago_pickups.dto.RouteEventDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class RouteDispatchConsumer {
+
+    private static final Logger log = LoggerFactory.getLogger(RouteDispatchConsumer.class);
+
+    @RabbitListener(queues = RabbitMQConfig.QUEUE_ROUTE)
+    public void receiveRouteCommand(RouteEventDto routeDto) {
+        log.info("🚛 [HOJA DE RUTA DIMAO - DESPACHO MUNICIPAL]:");
+        log.info("   -> Código Retiro: {}", routeDto.getCodigoRetiro());
+        log.info("   -> Camión Asignado: {}", routeDto.getCamionPatente());
+        log.info("   -> Sector / Cuadrante: {}", routeDto.getSector());
+        log.info("   -> Fecha Programada: {}", routeDto.getFechaProgramada());
+    }
+}
+```
+
+---
+
+### D. Consumidor de Auditoría Inmutable Kafka: `PickupAuditKafkaConsumer.java`
+- **Topics:** `pickups.events` y `audit.timeline`
+- **DTO:** `PickupStateChangeEventDto`
 - **Consumer Group:** `dimao-audit-group`
-- **Propósito:** Almacenar la traza de eventos inmutables de auditoría municipal ante transiciones de estado.
+- **Propósito:** Registro inmutable en Kafka para auditoría municipal y analítica.
 
 ```java
 package com.duoc.ms_reciclago_pickups.consumer;
@@ -160,28 +204,31 @@ public class PickupAuditKafkaConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(PickupAuditKafkaConsumer.class);
 
-    @KafkaListener(topics = KafkaConfig.TOPIC_PICKUPS_EVENTS, groupId = "dimao-audit-group")
+    @KafkaListener(topics = {KafkaConfig.TOPIC_PICKUPS_EVENTS, KafkaConfig.TOPIC_AUDIT_TIMELINE}, groupId = "dimao-audit-group")
     public void consumeStateChangeEvent(PickupStateChangeEventDto event) {
-        log.info("⚡ [KAFKA EVENT LOG - AUDITORÍA INMUTABLE]");
-        log.info("   -> Evento: {}", event.getEventType());
-        log.info("   -> Retiro ID: {}", event.getPickupId());
+        log.info("⚡ [KAFKA EVENT LOG - AUDITORÍA INMUTABLE DIMAO]:");
+        log.info("   -> ID: {} | Código: {}", event.getPickupId(), event.getCodigoRetiro());
         log.info("   -> Transición: {} ===> {}", event.getEstadoAnterior(), event.getEstadoNuevo());
-        log.info("   -> Camión Cuadrilla: {}", event.getCamionPatente());
-        log.info("   -> Kilos Recolectados: {}", event.getPesoRealKg());
+        log.info("   -> Vecino: {} | Comuna: {}", event.getVecinoEmail(), event.getComuna());
+        log.info("   -> Residuo: {} | Peso Est.: {} kg | Peso Real: {} kg",
+                event.getResiduoNombre(), event.getPesoEstimadoKg(), event.getPesoRealKg());
         log.info("   -> Timestamp: {}", event.getTimestamp());
     }
 }
 ```
+
+> [!NOTE]
+> Las propiedades de deserialización de Kafka para `dimao-audit-group` ya fueron agregadas en `ms-reciclago-pickups/src/main/resources/application.properties`.
 
 ---
 
 ## ☁️ 4. Tarea 2: Subir Imágenes a Amazon ECR (Cuenta AWS de DEV 2)
 
 > [!CAUTION]
-> **🚨 AVISO CRÍTICO DE CREDENCIALES**:
-> DEV 2 **NO DEBE USAR LAS CREDENCIALES DE DEV 1**. Debes copiar tus propias credenciales desde la consola de **AWS Learner Lab / Academy** (botón *AWS Details* ➔ *Show*) y ejecutarlas en tu terminal local.
+> **🚨 AVISO DE CREDENCIALES**:
+> DEV 2 **NO DEBE USAR LAS CREDENCIALES DE DEV 1**. Debes copiar tus propias credenciales desde la consola de **AWS Learner Lab / Academy** (botón *AWS Details* ➔ *Show*).
 
-### Paso 1: Exportar Credenciales Propias de DEV 2 (PowerShell)
+### Paso 1: Configurar Credenciales en Terminal Local
 ```powershell
 $env:AWS_ACCESS_KEY_ID="ASIA..."
 $env:AWS_SECRET_ACCESS_KEY="..."
@@ -208,7 +255,7 @@ aws ecr create-repository --repository-name reciclago/ms-pickups --region $REGIO
 aws ecr create-repository --repository-name reciclago/ms-routes --region $REGION
 ```
 
-### Paso 4: Construir, Taggear y Subir Imágenes (Push)
+### Paso 4: Construir, Taggear y Subir Imágenes
 ```powershell
 # 1. ms-bff
 docker build -t "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-bff:latest" ./ms-reciclago-bff
@@ -233,28 +280,21 @@ docker push "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/reciclago/ms-routes:lates
 
 ### Paso 1: Lanzar Instancia EC2
 - **AMI:** Ubuntu Server 22.04 LTS o 24.04 LTS (x86_64).
-- **Tipo de Instancia:** `t3.medium` (4 GB RAM) o `t3.large` (8 GB RAM).
+- **Tipo:** `t3.medium` (4 GB RAM).
 - **Almacenamiento:** Mínimo 25 GB gp3.
-- **Key Pair:** Crear y descargar archivo `.pem` (ej: `reciclago-backend-key.pem`).
+- **IAM Role:** Asignar el rol `LabRole` a la instancia (Consola EC2 ➔ Seleccionar instancia ➔ *Actions* ➔ *Security* ➔ *Modify IAM role* ➔ Elegir `LabRole`). Esto permite hacer login a ECR sin ingresar credenciales temporales.
+- **Key Pair:** Descargar llave `.pem`.
 
-### Paso 2: Configurar Security Group de EC2
+### Paso 2: Security Group de EC2
 | Tipo | Puerto | Origen | Propósito |
 |---|---|---|---|
-| **SSH** | `22` | `Mi IP` | Acceso seguro a consola por terminal |
-| **Custom TCP** | `8080` | `0.0.0.0/0` | Tráfico REST entrante al ms-bff (API Gateway / Frontend) |
-| **Custom TCP (Opcional)** | `15672` | `Mi IP` | Panel Web de RabbitMQ para monitoreo de colas |
+| **SSH** | `22` | `Mi IP` | Conexión terminal |
+| **Custom TCP** | `8080` | `0.0.0.0/0` | ms-bff (expuesto hacia API Gateway / Frontend) |
+| **Custom TCP (Opcional)** | `15672` | `Mi IP` | Panel Web RabbitMQ |
 
-> [!WARNING]
-> **NO expongas a internet los puertos internos** (`5432` Postgres, `9092` Kafka, `8081`, `8083`, `8084`). Los contenedores se comunican internamente a través de la red `reciclago-network` de Docker Compose.
-
----
-
-### Paso 3: Conectar por SSH y Crear Memoria Swap (4 GB)
-Debido a que se ejecutan 8 contenedores (Zookeeper, Kafka, RabbitMQ, PostgreSQL y 4 microservicios Spring Boot), **activar Swap es obligatorio para evitar caídas por OOM (Out Of Memory)**:
-
+### Paso 3: Conectar por SSH y Configurar 4 GB de Swap
 ```bash
-# Conectar por SSH
-ssh -i "reciclago-backend-key.pem" ubuntu@<IP_PUBLICA_EC2>
+ssh -i "tu-llave.pem" ubuntu@<IP_PUBLICA_EC2>
 
 # Configurar 4 GB de Swap
 sudo fallocate -l 4G /swapfile
@@ -262,111 +302,148 @@ sudo chmod 600 /swapfile
 sudo mkswap /swapfile
 sudo swapon /swapfile
 echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
-
-# Validar memoria disponible
 free -h
 ```
 
----
-
-### Paso 4: Instalar Docker y Docker Compose en EC2
+### Paso 4: Instalar Docker, Docker Compose y AWS CLI
 ```bash
-sudo apt update && sudo apt install -y docker.io docker-compose-v2
+sudo apt update
+sudo apt install -y docker.io docker-compose-plugin awscli
 sudo usermod -aG docker $USER
 newgrp docker
 ```
 
----
-
-### Paso 5: Login a ECR y Despliegue de los 8 Contenedores
+### Paso 5: Login a ECR y Despliegue de Contenedores
 ```bash
-# Autenticar EC2 contra ECR
+# Login a ECR usando el rol LabRole (automático sin credenciales manuales)
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "<ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com"
 
 # Clonar el proyecto
 git clone https://github.com/kr0zapps/reciclago-cloud-nativo.git
 cd reciclago-cloud-nativo
 
-# Levantar toda la infraestructura en segundo plano
-ECR_REGISTRY="<ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/reciclago" docker compose up -d
+# Descargar las imágenes desde ECR (evita compilar en la máquina para no saturar memoria)
+export ECR_REGISTRY="<ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/reciclago"
+docker compose pull ms-bff ms-catalog ms-pickups ms-routes
 
-# Verificar que los 8 contenedores estén Up y Healthy
+# Levantar los 8 contenedores
+docker compose up -d --no-build
+
+# Verificar estado
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 ```
 
 ---
 
-## 🛡️ 6. Tarea 4: Configuración de AWS API Gateway y CORS
+## 🛡️ 6. Tarea 4: AWS API Gateway + JWT Authorizer (20% Ponderación Rúbrica EP2)
 
-Para conectar el Frontend que está en AWS S3 con la IP pública de EC2:
+> [!IMPORTANT]
+> **REQUISITO EVALUADO DIRECTAMENTE POR LA RÚBRICA DE EVALUACIÓN**:
+> La pauta docente exige que el API Gateway valide tokens JWT de Azure AD, rechazando peticiones no autorizadas y aceptando las válidas.
 
-1. **Crear HTTP API en AWS API Gateway:**
-   - Nombre: `reciclago-http-api`.
-   - Integración: `HTTP` $\rightarrow$ URL: `http://<IP_PUBLICA_EC2>:8080`.
-2. **Rutas (Routes):**
-   - Ruta ANY: `/api/{proxy+}` dirigida a la integración HTTP.
-3. **CORS:**
-   - **Access-Control-Allow-Origin:**  
-     `http://reciclago-frontend-puertovaras.s3-website-us-east-1.amazonaws.com` y `http://localhost:4200`
-   - **Access-Control-Allow-Headers:** `Authorization, Content-Type, Accept`
-   - **Access-Control-Allow-Methods:** `GET, POST, PUT, PATCH, DELETE, OPTIONS`
+### Paso 1: Crear HTTP API
+1. En la consola de **AWS API Gateway**, crear una **HTTP API**.
+2. Nombre: `reciclago-api-gateway`.
+3. Integración inicial: Tipo `HTTP`, URL: `http://<IP_PUBLICA_EC2>:8080`.
+
+### Paso 2: Crear el JWT Authorizer
+1. En el menú lateral de la API, ir a **Authorization** ➔ pestaña **Manage authorizers** ➔ **Create authorizer**.
+2. **Authorizer type:** `JWT`
+3. **Name:** `EntraIdAuthorizer`
+4. **Identity source:** `$request.header.Authorization`
+5. **Issuer:** `https://login.microsoftonline.com/5625266d-cae0-4070-a7ea-b5e88273580f/v2.0`
+6. **Audience:** `api://9a946a0b-5350-4fe1-a79e-ca332612f60d`
+7. Clic en **Create**.
+
+### Paso 3: Configurar Rutas y Asociar el Authorizer
+1. Crear la ruta `ANY /api/{proxy+}` vinculada a la integración HTTP `http://<IP_PUBLICA_EC2>:8080`.
+2. Asociar el `EntraIdAuthorizer` a la ruta `ANY /api/{proxy+}`.
+3. Crear excepciones públicas (sin Authorizer) para endpoints de consulta comunitaria:
+   - `GET /public/{proxy+}` ➔ Sin Authorizer
+   - `OPTIONS /{proxy+}` ➔ Sin Authorizer (requerido para preflight CORS)
+
+### Paso 4: Habilitar CORS en API Gateway
+1. Ir a **CORS** en el menú de la API.
+2. **Access-Control-Allow-Origin:**  
+   `http://reciclago-frontend-puertovaras.s3-website-us-east-1.amazonaws.com`  
+   `https://reciclago-frontend-puertovaras.s3.us-east-1.amazonaws.com`  
+   `http://localhost:4200`
+3. **Access-Control-Allow-Headers:** `Authorization, Content-Type, Accept`
+4. **Access-Control-Allow-Methods:** `GET, POST, PUT, PATCH, DELETE, OPTIONS`
+5. **Access-Control-Allow-Credentials:** `true`
 
 ---
 
 ## 🧪 7. Guía de Pruebas de Integración para la Defensa Docente
 
-DEV 2 debe poder demostrar en vivo el ciclo de vida completo de un retiro en la terminal o mediante Swagger/cURL:
+### Opción A: Pruebas Rápidas Locales en EC2 (Directo a ms-pickups sin Token JWT)
+Permite verificar en segundos que RabbitMQ y Kafka procesan eventos sin requerir token OAuth2:
 
-### 1. Vecino crea solicitud (`SOLICITADO`):
 ```bash
-curl -X POST "http://<IP_PUBLICA_EC2>:8080/api/pickups" \
+# 1. Crear solicitud (SOLICITADO)
+curl -X POST "http://localhost:8083/api/pickups" \
   -H "Content-Type: application/json" \
   -d '{
-    "direccion": "Los Guindos 450, Puerto Varas",
-    "residuoId": 1,
-    "pesoEstimadoKg": 8.5,
-    "comentarios": "4 cajas de botellas de vidrio limpias"
+    "direccion": "Costanera Sur 567, Puerto Varas",
+    "comuna": "Puerto Varas",
+    "residuoId": 2,
+    "residuoNombre": "Vidrio",
+    "pesoEstimadoKg": 12.0,
+    "vecinoEmail": "jon.vidals@duocuc.cl",
+    "vecinoNombre": "Jonatan Vidal",
+    "comentarios": "Botellas de vidrio clasificadas"
   }'
+
+# 2. Programar retiro (SOLICITADO -> PROGRAMADO)
+curl -X PATCH "http://localhost:8083/api/pickups/1/programar?camionId=1&camionPatente=PV-RC-2026&fechaProgramada=2026-09-22T10:30:00"
+
+# 3. Chofer inicia ruta (PROGRAMADO -> EN_RUTA)
+curl -X PATCH "http://localhost:8083/api/pickups/1/en-ruta"
+
+# 4. Chofer recolecta en domicilio (EN_RUTA -> RETIRADO)
+curl -X PATCH "http://localhost:8083/api/pickups/1/retirado"
+
+# 5. Báscula digital registra pesaje (RETIRADO -> PESADO)
+curl -X PATCH "http://localhost:8083/api/pickups/1/pesado?pesoRealKg=11.8"
+
+# 6. Ver logs de RabbitMQ y Kafka en vivo:
+docker logs -f reciclago-ms-pickups
 ```
 
-### 2. Coordinador programa la fecha y camión (`PROGRAMADO`):
+### Opción B: Pruebas Completas a través del BFF (Puerto 8080 con Bearer Token)
 ```bash
-curl -X POST "http://<IP_PUBLICA_EC2>:8080/api/pickups/1/programar" \
+TOKEN="<TU_TOKEN_JWT_DE_AZURE_AD>"
+
+# Crear retiro
+curl -X POST "http://<IP_EC2>:8080/api/pickups" \
+  -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{
-    "camionId": 1,
-    "camionPatente": "PV-RC-2026",
-    "fechaProgramada": "2026-09-17T10:30:00"
-  }'
-```
-*-> Verificar en los logs de EC2 que `q.cmd.email` recibió el correo para el vecino.*
+  -d '{"direccion": "Costanera Sur 567", "residuoId": 2, "pesoEstimadoKg": 12.0}'
 
-### 3. Chofer inicia recorrido en terreno (`EN_RUTA`):
-```bash
-curl -X PATCH "http://<IP_PUBLICA_EC2>:8080/api/pickups/1/en-ruta"
-```
-*-> Verificar en los logs que Kafka `pickups.events` registró el cambio de estado a EN_RUTA.*
+# Programar
+curl -X PATCH "http://<IP_EC2>:8080/api/pickups/1/programar?camionId=1&camionPatente=PV-RC-2026&fechaProgramada=2026-09-22T10:30:00" \
+  -H "Authorization: Bearer $TOKEN"
 
-### 4. Chofer confirma recolección en puerta (`RETIRADO`):
-```bash
-curl -X PATCH "http://<IP_PUBLICA_EC2>:8080/api/pickups/1/retirado"
-```
+# En ruta
+curl -X PATCH "http://<IP_EC2>:8080/api/pickups/1/en-ruta" \
+  -H "Authorization: Bearer $TOKEN"
 
-### 5. Chofer registra pesaje certificado en báscula (`PESADO`):
-```bash
-curl -X POST "http://<IP_PUBLICA_EC2>:8080/api/pickups/1/pesaje" \
-  -H "Content-Type: application/json" \
-  -d '{"pesoRealKg": 8.4}'
+# Retirado
+curl -X PATCH "http://<IP_EC2>:8080/api/pickups/1/retirado" \
+  -H "Authorization: Bearer $TOKEN"
+
+# Pesado
+curl -X PATCH "http://<IP_EC2>:8080/api/pickups/1/pesado?pesoRealKg=11.8" \
+  -H "Authorization: Bearer $TOKEN"
 ```
-*-> Verificar en logs que `q.cmd.certificate` emitió el certificado oficial DIMAO.*
 
 ---
 
 ## 👥 8. Cuentas de Prueba Oficiales (Microsoft Entra ID)
 
-| Rol | Correo Institucional | Credencial de Prueba | Funcionalidad en Evaluación |
-|:---|:---|:---|:---|
-| **Vecino** | `jon.vidals@duocuc.cl` | Contraseña asignada | Solicita retiro, ingresa peso estimado, ve trazabilidad. |
-| **Coordinador** | `coordinador@reciclago.onmicrosoft.com` | Contraseña asignada | Programa fecha y asigna camión oficial a la orden. |
-| **Chofer** | `chofer@reciclago.onmicrosoft.com` | Contraseña asignada | Inicia ruta GPS, confirma retiro y registra báscula digital. |
-| **Admin** | `admin@reciclago.onmicrosoft.com` | Contraseña asignada | Auditoría DIMAO, balance de huella de carbono y control de flota. |
+| Rol | Correo Institucional | Funcionalidad en la Evaluación Docente |
+|:---|:---|:---|
+| **Vecino** | `jon.vidals@duocuc.cl` | Solicita retiro, ingresa peso estimado (kg), visualiza seguimiento 3 pasos. |
+| **Coordinador** | `coordinador@reciclago.onmicrosoft.com` | Calendario restrictivo por cuadrante, asigna camión oficial y fecha municipal. |
+| **Chofer** | `chofer@reciclago.onmicrosoft.com` | Filtra por patente (`PV-RC-2026`), inicia recorrido, confirma retiro y pesaje báscula. |
+| **Admin** | `admin@reciclago.onmicrosoft.com` | Métricas comunales de huella CO2, auditoría DIMAO y monitoreo de flota. |

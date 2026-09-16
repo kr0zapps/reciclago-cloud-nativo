@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BffService } from '../../../services/bff.service';
-import { Sector, Residuo } from '../data/sectors.data';
+import { Sector, Residuo, Pickup } from '../data/sectors.data';
 
 @Component({
   selector: 'app-pickup-form',
@@ -197,12 +197,12 @@ import { Sector, Residuo } from '../data/sectors.data';
   `
 })
 export class PickupFormComponent implements OnChanges {
-  @Input() sector!: Sector | any;
-  @Input() residuos: Residuo[] | any[] = [];
+  @Input() sector!: Sector | null;
+  @Input() residuos: Residuo[] = [];
   @Input() userEmail: string = '';
   @Input() userName: string = '';
 
-  @Output() pickupCreated = new EventEmitter<any>();
+  @Output() pickupCreated = new EventEmitter<Pickup>();
 
   newPickup = {
     sector: '',
@@ -344,7 +344,6 @@ export class PickupFormComponent implements OnChanges {
           return;
         }
 
-        console.error('Error creating pickup', err);
         this.isSubmitting = false;
         this.submitStatus = 'error';
         setTimeout(() => this.submitStatus = 'idle', 5000);

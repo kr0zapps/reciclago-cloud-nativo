@@ -2,7 +2,12 @@ package com.duoc.ms_reciclago_pickups.service;
 
 import com.duoc.ms_reciclago_pickups.config.KafkaConfig;
 import com.duoc.ms_reciclago_pickups.config.RabbitMQConfig;
-import com.duoc.ms_reciclago_pickups.dto.*;
+import com.duoc.ms_reciclago_pickups.dto.CertificateEventDto;
+import com.duoc.ms_reciclago_pickups.dto.EmailEventDto;
+import com.duoc.ms_reciclago_pickups.dto.PickupHistoryDto;
+import com.duoc.ms_reciclago_pickups.dto.PickupHistoryResponse;
+import com.duoc.ms_reciclago_pickups.dto.PickupStateChangeEventDto;
+import com.duoc.ms_reciclago_pickups.dto.RouteEventDto;
 import com.duoc.ms_reciclago_pickups.model.Pickup;
 import com.duoc.ms_reciclago_pickups.repository.PickupRepository;
 import org.slf4j.Logger;

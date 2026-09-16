@@ -689,7 +689,6 @@ import { environment } from '../environments/environment';
   `
 })
 export class AppComponent implements OnInit, OnDestroy {
-  isIframe = false;
   loginDisplay = false;
   currentUser = '';
 
@@ -710,8 +709,6 @@ export class AppComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.isIframe = window !== window.parent && !window.opener;
-
     // Escuchar eventos de navegación para activar la barra de carga no intrusiva
     this.router.events
       .pipe(takeUntil(this._destroying$))

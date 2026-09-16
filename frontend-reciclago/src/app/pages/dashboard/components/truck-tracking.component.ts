@@ -249,7 +249,7 @@ import { Sector, Pickup } from '../data/sectors.data';
   `
 })
 export class TruckTrackingComponent {
-  @Input() sector!: Sector | any;
+  @Input() sector!: Sector | null;
   @Input() pickups: Pickup[] = [];
   @Input() userEmail: string = '';
   @Input() isCamionEnRuta: boolean = false;
@@ -276,7 +276,7 @@ export class TruckTrackingComponent {
     if (this.activePickup && this.activePickup.estado) {
       const st = this.activePickup.estado.toUpperCase();
       if (st === 'EN_RUTA' || st === 'RETIRADO' || st === 'PESADO' || st === 'PROGRAMADO' || st === 'SOLICITADO') {
-        return st as any;
+        return st as 'SOLICITADO' | 'PROGRAMADO' | 'EN_RUTA' | 'RETIRADO' | 'PESADO';
       }
     }
     return this.isCamionEnRuta ? 'EN_RUTA' : 'SIN_SOLICITUD';

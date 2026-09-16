@@ -45,7 +45,7 @@ services:
     container_name: reciclago-zookeeper
     restart: unless-stopped
     ports:
-      - "2181:2181"
+      - "127.0.0.1:2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -68,8 +68,8 @@ services:
       zookeeper:
         condition: service_healthy
     ports:
-      - "9092:9092"
-      - "29092:29092"
+      - "127.0.0.1:9092:9092"
+      - "127.0.0.1:29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -101,7 +101,7 @@ services:
       - "127.0.0.1:8081:8081"
     environment:
       JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m -Djava.net.preferIPv4Stack=true"
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/reciclago_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-reciclago_db}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-reciclago}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-reciclagopass}
     depends_on:
@@ -122,10 +122,12 @@ services:
     environment:
       SERVER_PORT: 8083
       JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m -Djava.net.preferIPv4Stack=true"
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/reciclago_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-reciclago_db}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-reciclago}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-reciclagopass}
       SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER:-guest}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASS:-guest}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       postgres:
@@ -149,7 +151,7 @@ services:
     environment:
       SERVER_PORT: 8084
       JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m -Djava.net.preferIPv4Stack=true"
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/reciclago_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-reciclago_db}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-reciclago}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-reciclagopass}
     depends_on:
@@ -173,6 +175,8 @@ services:
       RECICLAGO_SERVICES_CATALOG_URL: http://ms-catalog:8081
       RECICLAGO_SERVICES_PICKUPS_URL: http://ms-pickups:8083
       RECICLAGO_SERVICES_ROUTES_URL: http://ms-routes:8084
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID:-5625266d-cae0-4070-a7ea-b5e88273580f}
+      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID:-9a946a0b-5350-4fe1-a79e-ca332612f60d}
     healthcheck:
       test: [ "CMD-SHELL", "nc -z 127.0.0.1 8080 || exit 1" ]
       interval: 15s

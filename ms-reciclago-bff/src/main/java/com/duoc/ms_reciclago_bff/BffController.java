@@ -189,7 +189,7 @@ public class BffController {
                 if (payload.get("vecinoEmail") != null && !payload.get("vecinoEmail").toString().isBlank()) {
                     email = payload.get("vecinoEmail").toString();
                 } else {
-                    email = "vecino@puertovaras.cl";
+                    return ResponseEntity.badRequest().body(Map.of("error", "El correo electrónico del vecino es obligatorio"));
                 }
             }
             payload.put("vecinoEmail", email);
@@ -269,17 +269,16 @@ public class BffController {
             @RequestParam(required = false) String fechaProgramada,
             @RequestBody(required = false) Map<String, Object> body) {
         try {
-            Long effectiveCamionId = camionId != null ? camionId : (body != null && body.get("camionId") != null ? Long.valueOf(body.get("camionId").toString()) : 1L);
-            String effectivePatente = camionPatente != null ? camionPatente : (body != null && body.get("camionPatente") != null ? body.get("camionPatente").toString() : "PV-RC-2026");
+            Long effectiveCamionId = camionId != null ? camionId : (body != null && body.get("camionId") != null ? Long.valueOf(body.get("camionId").toString()) : null);
+            String effectivePatente = camionPatente != null ? camionPatente : (body != null && body.get("camionPatente") != null ? body.get("camionPatente").toString() : null);
             String rawFecha = fechaProgramada != null ? fechaProgramada : (body != null && body.get("fechaProgramada") != null ? body.get("fechaProgramada").toString() : null);
 
-            String effectiveFecha;
-            if (rawFecha != null && !rawFecha.isBlank()) {
-                String trimmed = rawFecha.trim();
-                effectiveFecha = (trimmed.length() == 16) ? (trimmed + ":00") : trimmed;
-            } else {
-                effectiveFecha = java.time.LocalDateTime.now().plusDays(1).withSecond(0).withNano(0).toString();
+            if (effectiveCamionId == null || effectivePatente == null || effectivePatente.isBlank() || rawFecha == null || rawFecha.isBlank()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Los campos camionId, camionPatente y fechaProgramada son obligatorios para programar un retiro"));
             }
+
+            String trimmed = rawFecha.trim();
+            String effectiveFecha = (trimmed.length() == 16) ? (trimmed + ":00") : trimmed;
 
             String targetUri = pickupsUrl + "/api/pickups/" + id + "/programar"
                     + "?camionId=" + effectiveCamionId
@@ -327,7 +326,10 @@ public class BffController {
             @RequestParam(required = false) Double pesoRealKg,
             @RequestBody(required = false) Map<String, Object> body) {
         try {
-            Double effectivePeso = pesoRealKg != null ? pesoRealKg : (body != null && body.get("pesoRealKg") != null ? Double.valueOf(body.get("pesoRealKg").toString()) : 10.0);
+            Double effectivePeso = pesoRealKg != null ? pesoRealKg : (body != null && body.get("pesoRealKg") != null ? Double.valueOf(body.get("pesoRealKg").toString()) : null);
+            if (effectivePeso == null || effectivePeso <= 0) {
+                return ResponseEntity.badRequest().body(Map.of("error", "El campo pesoRealKg es obligatorio y debe ser mayor a 0"));
+            }
             Object response = restClient.patch()
                     .uri(pickupsUrl + "/api/pickups/" + id + "/pesado?pesoRealKg=" + effectivePeso)
                     .retrieve()

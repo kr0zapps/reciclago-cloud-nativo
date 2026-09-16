@@ -7,7 +7,7 @@ import { MsalService } from '@azure/msal-angular';
  * Si el usuario NO está logueado, lo redirige a la página interna de Login (/login)
  * en lugar de enviarlo de forma abrupta a la pantalla externa de Microsoft Entra ID.
  */
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = (_route, state) => {
   const msalService = inject(MsalService);
   const router = inject(Router);
 

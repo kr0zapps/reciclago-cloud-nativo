@@ -131,8 +131,6 @@
     <!-- 1. VISTA ADMIN: Jefatura DIMAO, Auditoría, Mantenimiento de Flota y Reportes -->
     <app-admin-dashboard
       *ngIf="activeStaffRole === 'Admin'"
-      [userRoles]="userRoles"
-      [userName]="userName"
       [sector]="currentSectorInfo"
       [sectores]="sectores"
       [pickups]="pickups"
@@ -144,7 +142,6 @@
       (actionRequested)="openActionModal($event)"
       (pickupCreated)="onStaffPickupCreated($event)"
       (openAuditoriaModal)="openAuditoriaModal()"
-      (openRutaCompleta)="openRutaModal()"
       (toggleTruckSimulation)="toggleTruckSimulation()"
       (toggleTruckSpeed)="toggleTruckSpeed()"
       (resetTruckSimulation)="resetTruckSimulation()">
@@ -153,8 +150,6 @@
     <!-- 2. VISTA COORDINADOR: Despacho Logístico, Mesa Telefónica y Telemetría -->
     <app-coordinador-dashboard
       *ngIf="activeStaffRole === 'Coordinador'"
-      [userRoles]="userRoles"
-      [userName]="userName"
       [sector]="currentSectorInfo"
       [sectores]="sectores"
       [pickups]="pickups"
@@ -165,7 +160,6 @@
       [truckSpeed]="truckSpeed"
       (actionRequested)="openActionModal($event)"
       (pickupCreated)="onStaffPickupCreated($event)"
-      (openRutaCompleta)="openRutaModal()"
       (toggleTruckSimulation)="toggleTruckSimulation()"
       (toggleTruckSpeed)="toggleTruckSpeed()"
       (resetTruckSimulation)="resetTruckSimulation()">
@@ -174,13 +168,10 @@
     <!-- 3. VISTA CHOFER: Consola de Cabina Móvil, Paradas en Terreno y Pesaje -->
     <app-chofer-dashboard
       *ngIf="activeStaffRole === 'Chofer'"
-      [userRoles]="userRoles"
       [userName]="userName"
       [sector]="currentSectorInfo"
-      [sectores]="sectores"
       [pickups]="pickups"
       [camiones]="camionesDisponibles"
-      [residuos]="residuos"
       [activeWaypoint]="activeWaypoint"
       (actionRequested)="openActionModal($event)">
     </app-chofer-dashboard>

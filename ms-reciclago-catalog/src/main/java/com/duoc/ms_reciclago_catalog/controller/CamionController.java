@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/catalog/camiones")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:4200}")
 public class CamionController {
 
     private final CamionService camionService;
@@ -52,28 +52,6 @@ public class CamionController {
     public ResponseEntity<Camion> actualizar(@PathVariable Long id, @Valid @RequestBody Camion camion) {
         try {
             Camion actualizado = camionService.actualizar(id, camion);
-            return ResponseEntity.ok(actualizado);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @PatchMapping("/{id}/reducir-capacidad")
-    public ResponseEntity<?> reducirCapacidad(@PathVariable Long id, @RequestParam Double pesoKg) {
-        try {
-            Camion actualizado = camionService.reducirCapacidad(id, pesoKg);
-            return ResponseEntity.ok(actualizado);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @PatchMapping("/{id}/liberar-capacidad")
-    public ResponseEntity<?> liberarCapacidad(@PathVariable Long id, @RequestParam Double pesoKg) {
-        try {
-            Camion actualizado = camionService.liberarCapacidad(id, pesoKg);
             return ResponseEntity.ok(actualizado);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();

@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MsalService, MSAL_GUARD_CONFIG, MsalGuardConfiguration } from '@azure/msal-angular';
-import { InteractionType, RedirectRequest } from '@azure/msal-browser';
+import { RedirectRequest } from '@azure/msal-browser';
 import { environment } from '../../../environments/environment';
 
 @Component({
