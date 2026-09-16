@@ -20,7 +20,7 @@ jobs:
     name: 🐳 Build Docker Images & Push to AWS ECR
     runs-on: ubuntu-latest
     outputs:
-      registry: ${{ steps.login-ecr.outputs.registry }}
+      registry: ${{ steps.set-registry.outputs.registry }}
 
     steps:
       - name: 📥 Clonar repositorio
@@ -45,6 +45,18 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: ⚙️ Resolver URI de Registro ECR
+        id: set-registry
+        run: |
+          REG="${{ steps.login-ecr.outputs.registry }}"
+          if [ -z "$REG" ]; then
+            ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+            REGION="${{ secrets.AWS_REGION || 'us-east-1' }}"
+            REG="$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com"
+          fi
+          echo "URI ECR detectado: $REG"
+          echo "registry=$REG" >> $GITHUB_OUTPUT
+
       - name: 🛠️ Asegurar existencia de Repositorios en ECR
         run: |
           REGION="${{ secrets.AWS_REGION || 'us-east-1' }}"
@@ -57,7 +69,7 @@ jobs:
 
       - name: 🏗️ Compilar y Publicar Microservicio BFF
         env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REGISTRY: ${{ steps.set-registry.outputs.registry }}
         run: |
           echo "Construyendo ms-bff..."
           docker build -t "$REGISTRY/reciclago/ms-bff:latest" -t "$REGISTRY/reciclago/ms-bff:${{ github.sha }}" ./ms-reciclago-bff
@@ -66,7 +78,7 @@ jobs:
 
       - name: 🏗️ Compilar y Publicar Microservicio Catálogo
         env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REGISTRY: ${{ steps.set-registry.outputs.registry }}
         run: |
           echo "Construyendo ms-catalog..."
           docker build -t "$REGISTRY/reciclago/ms-catalog:latest" -t "$REGISTRY/reciclago/ms-catalog:${{ github.sha }}" ./ms-reciclago-catalog
@@ -75,7 +87,7 @@ jobs:
 
       - name: 🏗️ Compilar y Publicar Microservicio Retiros
         env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REGISTRY: ${{ steps.set-registry.outputs.registry }}
         run: |
           echo "Construyendo ms-pickups..."
           docker build -t "$REGISTRY/reciclago/ms-pickups:latest" -t "$REGISTRY/reciclago/ms-pickups:${{ github.sha }}" ./ms-reciclago-pickups
@@ -84,7 +96,7 @@ jobs:
 
       - name: 🏗️ Compilar y Publicar Microservicio Rutas
         env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REGISTRY: ${{ steps.set-registry.outputs.registry }}
         run: |
           echo "Construyendo ms-routes..."
           docker build -t "$REGISTRY/reciclago/ms-routes:latest" -t "$REGISTRY/reciclago/ms-routes:${{ github.sha }}" ./ms-reciclago-routes
@@ -183,6 +195,27 @@ jobs:
             mkdir -p ~/reciclago
             cd ~/reciclago
 
+            # ── Autenticar Docker con Amazon ECR ──────────────────────────────
+            export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID"
+            export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY"
+            export AWS_SESSION_TOKEN="$AWS_SESSION_TOKEN"
+            export AWS_DEFAULT_REGION="${AWS_REGION:-us-east-1}"
+
+            if [ -z "$REGISTRY" ]; then
+              echo "🔍 REGISTRY no recibido por env. Obteniendo desde AWS..."
+              ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text 2>/dev/null || echo "")
+              if [ -n "$ACCOUNT_ID" ]; then
+                REGISTRY="$ACCOUNT_ID.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+              fi
+            fi
+
+            echo "🔐 Registrando en ECR: $REGISTRY (región: $AWS_DEFAULT_REGION)"
+
+            if [ -z "$REGISTRY" ]; then
+              echo "❌ REGISTRY está vacío. Verificar credenciales AWS."
+              exit 1
+            fi
+
             # ── Configurar .env para docker compose ───────────────────────────
             cat <<EOF > .env
             COMPOSE_PROFILES=apps
@@ -194,19 +227,6 @@ jobs:
             ECR_REGISTRY=$REGISTRY
             IMAGE_TAG=latest
             EOF
-
-            # ── Autenticar Docker con Amazon ECR ──────────────────────────────
-            export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID"
-            export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY"
-            export AWS_SESSION_TOKEN="$AWS_SESSION_TOKEN"
-            export AWS_DEFAULT_REGION="$AWS_REGION"
-
-            echo "🔐 Registrando en ECR: $REGISTRY (región: $AWS_REGION)"
-
-            if [ -z "$REGISTRY" ]; then
-              echo "❌ REGISTRY está vacío. Verificar output del job build-and-push-ecr."
-              exit 1
-            fi
 
             ECR_PASSWORD=$(aws ecr get-login-password --region "$AWS_REGION")
             if [ -z "$ECR_PASSWORD" ]; then
