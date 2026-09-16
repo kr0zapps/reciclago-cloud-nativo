@@ -21,7 +21,7 @@ public class CitizenService {
     }
 
     public ContactoResponseDto registrarContacto(ContactoRequestDto request) {
-        String ticketId = "DIMAO-2026-" + String.format("%04d", (System.currentTimeMillis() % 10000));
+        String ticketId = "DIMAO-2026-" + java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
         ContactoCiudadano nuevo = new ContactoCiudadano(
                 null,

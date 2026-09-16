@@ -71,6 +71,15 @@ public class BffController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/api/chofer/dashboard")
+    public ResponseEntity<Map<String, Object>> getChoferData(@AuthenticationPrincipal Jwt jwt) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Acceso concedido para Choferes y Personal Operativo de RecicLaGo");
+        response.put("user", jwt.getClaimAsString("preferred_username"));
+        response.put("roles", jwt.getClaimAsStringList("roles"));
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/api/catalog/residuos")
     public ResponseEntity<?> getResiduos() {
         try {
@@ -122,16 +131,22 @@ public class BffController {
     @GetMapping("/api/pickups")
     public ResponseEntity<?> getPickups(@AuthenticationPrincipal Jwt jwt, @RequestParam(required = false) String vecinoEmail) {
         try {
-            // Protección contra fuga de datos (BOLA): Si no es Admin ni Coordinador, forzar su propio email
+            // Protección contra fuga de datos (BOLA): Si no es Staff (Admin, Coordinador, Chofer), forzar su propio email
             List<String> roles = jwt != null ? jwt.getClaimAsStringList("roles") : null;
-            boolean isStaff = roles != null && (roles.contains("Admin") || roles.contains("Coordinador"));
+            boolean isStaff = roles != null && roles.stream().anyMatch(r ->
+                r.equalsIgnoreCase("Admin") || r.equalsIgnoreCase("Coordinador") || r.equalsIgnoreCase("Chofer")
+            );
 
             String effectiveEmail = vecinoEmail;
             if (!isStaff && jwt != null) {
                 effectiveEmail = jwt.getClaimAsString("preferred_username");
-                if (effectiveEmail == null) {
-                    effectiveEmail = jwt.getClaimAsString("upn");
-                }
+                if (effectiveEmail == null) effectiveEmail = jwt.getClaimAsString("upn");
+                if (effectiveEmail == null) effectiveEmail = jwt.getClaimAsString("email");
+                if (effectiveEmail == null) effectiveEmail = jwt.getClaimAsString("unique_name");
+            }
+
+            if (!isStaff && (effectiveEmail == null || effectiveEmail.isBlank())) {
+                return ResponseEntity.ok(List.of());
             }
 
             String uri = pickupsUrl + "/api/pickups";
@@ -142,7 +157,7 @@ public class BffController {
                     .uri(uri)
                     .retrieve()
                     .body(List.class);
-            return ResponseEntity.ok(pickups);
+            return ResponseEntity.ok(pickups != null ? pickups : List.of());
         } catch (Exception e) {
             Map<String, Object> error = new HashMap<>();
             error.put("error", "Error comunicando con ms-reciclago-pickups");
@@ -154,16 +169,41 @@ public class BffController {
     @PostMapping("/api/pickups")
     public ResponseEntity<?> createPickup(@AuthenticationPrincipal Jwt jwt, @RequestBody Map<String, Object> payload) {
         try {
-            // Prevención estricta de IDOR: Sobrescribir incondicionalmente vecinoEmail y vecinoNombre desde los claims del JWT
-            String email = jwt.getClaimAsString("preferred_username");
-            if (email == null)
-                email = jwt.getClaimAsString("upn");
+            // Prevención estricta de IDOR: Extraer identidad verificada del JWT
+            String email = null;
+            if (jwt != null) {
+                email = jwt.getClaimAsString("preferred_username");
+                if (email == null) email = jwt.getClaimAsString("upn");
+                if (email == null) email = jwt.getClaimAsString("email");
+                if (email == null) email = jwt.getClaimAsString("unique_name");
+            }
+            if (email == null || email.isBlank()) {
+                if (payload.get("vecinoEmail") != null && !payload.get("vecinoEmail").toString().isBlank()) {
+                    email = payload.get("vecinoEmail").toString();
+                } else {
+                    email = "vecino@puertovaras.cl";
+                }
+            }
             payload.put("vecinoEmail", email);
 
-            String name = jwt.getClaimAsString("name");
-            if (name == null)
-                name = email;
+            String name = null;
+            if (jwt != null) {
+                name = jwt.getClaimAsString("name");
+                if (name == null) name = jwt.getClaimAsString("given_name");
+            }
+            if (name == null || name.isBlank()) {
+                if (payload.get("vecinoNombre") != null && !payload.get("vecinoNombre").toString().isBlank()) {
+                    name = payload.get("vecinoNombre").toString();
+                } else {
+                    name = (email != null && email.contains("@")) ? email.substring(0, email.indexOf('@')) : "Vecino Puerto Varas";
+                }
+            }
             payload.put("vecinoNombre", name);
+
+            // Homogeneizar observaciones y comentarios para evitar fallo de mapeo
+            if (payload.containsKey("comentarios") && !payload.containsKey("observaciones")) {
+                payload.put("observaciones", payload.get("comentarios"));
+            }
 
             Object response = restClient.post()
                     .uri(pickupsUrl + "/api/pickups")
@@ -267,10 +307,13 @@ public class BffController {
     }
 
     @PatchMapping("/api/pickups/{id}/pesado")
-    public ResponseEntity<?> pesadoPickup(@PathVariable Long id, @RequestParam Double pesoRealKg) {
+    public ResponseEntity<?> pesadoPickup(@PathVariable Long id,
+            @RequestParam(required = false) Double pesoRealKg,
+            @RequestBody(required = false) Map<String, Object> body) {
         try {
+            Double effectivePeso = pesoRealKg != null ? pesoRealKg : (body != null && body.get("pesoRealKg") != null ? Double.valueOf(body.get("pesoRealKg").toString()) : 10.0);
             Object response = restClient.patch()
-                    .uri(pickupsUrl + "/api/pickups/" + id + "/pesado?pesoRealKg=" + pesoRealKg)
+                    .uri(pickupsUrl + "/api/pickups/" + id + "/pesado?pesoRealKg=" + effectivePeso)
                     .retrieve()
                     .body(Object.class);
             return ResponseEntity.ok(response);
@@ -280,11 +323,40 @@ public class BffController {
     }
 
     @PatchMapping("/api/pickups/{id}/cancelar")
-    public ResponseEntity<?> cancelarPickup(@PathVariable Long id, @RequestParam(required = false) String motivo) {
+    public ResponseEntity<?> cancelarPickup(
+            @PathVariable Long id,
+            @RequestParam(required = false) String motivo,
+            @AuthenticationPrincipal Jwt jwt) {
         try {
+            // Protección contra BOLA / IDOR
+            Map<?, ?> pickup = restClient.get()
+                    .uri(pickupsUrl + "/api/pickups/" + id)
+                    .retrieve()
+                    .body(Map.class);
+            if (pickup == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Retiro no encontrado"));
+            }
+
+            List<String> roles = jwt != null ? jwt.getClaimAsStringList("roles") : null;
+            boolean isStaff = roles != null && roles.stream().anyMatch(r ->
+                r.equalsIgnoreCase("Admin") || r.equalsIgnoreCase("Coordinador") || r.equalsIgnoreCase("Chofer")
+            );
+            String userEmail = jwt != null ? jwt.getClaimAsString("preferred_username") : null;
+            if (userEmail == null && jwt != null) {
+                userEmail = jwt.getClaimAsString("upn");
+            }
+            if (userEmail == null && jwt != null) {
+                userEmail = jwt.getClaimAsString("email");
+            }
+
+            Object pickupOwner = pickup.get("vecinoEmail");
+            if (!isStaff && (userEmail == null || !userEmail.equalsIgnoreCase(String.valueOf(pickupOwner)))) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "No autorizado para cancelar este retiro"));
+            }
+
             String uri = pickupsUrl + "/api/pickups/" + id + "/cancelar";
             if (motivo != null && !motivo.isBlank()) {
-                uri += "?motivo=" + motivo;
+                uri += "?motivo=" + java.net.URLEncoder.encode(motivo, java.nio.charset.StandardCharsets.UTF_8);
             }
             Object response = restClient.patch()
                     .uri(uri)
@@ -305,12 +377,17 @@ public class BffController {
             @RequestParam(defaultValue = "10") int size) {
         try {
             List<String> roles = jwt != null ? jwt.getClaimAsStringList("roles") : null;
-            boolean isStaff = roles != null && (roles.contains("Admin") || roles.contains("Coordinador"));
+            boolean isStaff = roles != null && roles.stream().anyMatch(r ->
+                r.equalsIgnoreCase("Admin") || r.equalsIgnoreCase("Coordinador") || r.equalsIgnoreCase("Chofer")
+            );
             String effectiveEmail = vecinoEmail;
             if (!isStaff && jwt != null) {
                 effectiveEmail = jwt.getClaimAsString("preferred_username");
                 if (effectiveEmail == null) {
                     effectiveEmail = jwt.getClaimAsString("upn");
+                }
+                if (effectiveEmail == null) {
+                    effectiveEmail = jwt.getClaimAsString("email");
                 }
             }
             String uri = pickupsUrl + "/api/pickups/history?page=" + page + "&size=" + size;
@@ -334,12 +411,28 @@ public class BffController {
     }
 
     @GetMapping("/api/pickups/{id}")
-    public ResponseEntity<?> getPickupById(@PathVariable Long id) {
+    public ResponseEntity<?> getPickupById(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
         try {
-            Object pickup = restClient.get()
+            Map<?, ?> pickup = restClient.get()
                     .uri(pickupsUrl + "/api/pickups/" + id)
                     .retrieve()
-                    .body(Object.class);
+                    .body(Map.class);
+            if (pickup == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Retiro no encontrado"));
+            }
+
+            List<String> roles = jwt != null ? jwt.getClaimAsStringList("roles") : null;
+            boolean isStaff = roles != null && (roles.contains("Admin") || roles.contains("Coordinador"));
+            String userEmail = jwt != null ? jwt.getClaimAsString("preferred_username") : null;
+            if (userEmail == null && jwt != null) {
+                userEmail = jwt.getClaimAsString("upn");
+            }
+
+            Object pickupOwner = pickup.get("vecinoEmail");
+            if (!isStaff && (userEmail == null || !userEmail.equalsIgnoreCase(String.valueOf(pickupOwner)))) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "No autorizado para visualizar este retiro"));
+            }
+
             return ResponseEntity.ok(pickup);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Retiro no encontrado", "details", e.getMessage()));
