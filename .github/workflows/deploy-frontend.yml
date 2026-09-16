@@ -30,6 +30,20 @@ jobs:
         working-directory: ./frontend-reciclago
         run: npm ci
 
+      - name: 🌐 Inyectar URL del Backend en environment.prod.ts
+        working-directory: ./frontend-reciclago
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          if [ -n "$EC2_HOST" ]; then
+            BACKEND_URL="http://${EC2_HOST}:8080"
+            echo "✅ Inyectando URL del backend: $BACKEND_URL"
+            sed -i "s|BACKEND_API_URL_PLACEHOLDER|${BACKEND_URL}|g" src/environments/environment.prod.ts
+          else
+            echo "⚠️ Secret EC2_HOST no definido. La URL del backend quedará como placeholder."
+            echo "   Configura el secret EC2_HOST en GitHub Settings > Secrets con la IP pública del EC2."
+          fi
+
       - name: 🏗️ Compilar Frontend Angular en modo Producción
         working-directory: ./frontend-reciclago
         run: npm run build

@@ -27,6 +27,6 @@ export const environment = {
     apiConfig: {
         backendClientId: '9a946a0b-5350-4fe1-a79e-ca332612f60d',
         scopes: ['api://9a946a0b-5350-4fe1-a79e-ca332612f60d/access_as_user'],
-        uri: 'http://localhost:8080'
+        uri: 'BACKEND_API_URL_PLACEHOLDER'
     }
 };
