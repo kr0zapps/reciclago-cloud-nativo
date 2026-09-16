@@ -1,4 +1,4 @@
-﻿# 🗺️ Hoja de Ruta y Guía de Implementación: DEV 2 (Backend, EDA & AWS Cloud)
+# 🗺️ Hoja de Ruta y Guía de Implementación: DEV 2 (Backend, EDA & AWS Cloud)
 **Proyecto: RecicLaGo — Plataforma Cloud Native de Reciclaje Municipal (Puerto Varas)**  
 *Asignatura: Cloud Nativo (Duoc UC)*  
 *Responsable: DEV 2 (Ingeniería de Backend, Mensajería Asíncrona e Infraestructura AWS)*
@@ -9,44 +9,48 @@
 
 El desarrollo correspondiente a **DEV 1 (Frontend Angular 19, MSAL Entra ID y ms-bff Gateway en puerto 8080)** se encuentra **100% completado, modularizado y desplegado en AWS S3**. 
 
-Los 4 microservicios backend ya están dockerizados, compilados y funcionando en Docker Compose:
+Respecto a **DEV 2 (Backend, EDA & AWS Cloud)**:
+- ✅ **CÓDIGO DE CONSUMIDORES EDA 100% COMPLETADO Y COMPILADO:** Los listeners de RabbitMQ (`q.cmd.email`, `q.cmd.certificate`, `q.cmd.route`) y Kafka (`pickups.events`, `audit.timeline`) ya fueron implementados en `ms-reciclago-pickups/src/main/java/com/duoc/ms_reciclago_pickups/consumer/` y validados con Maven.
+- ⏳ **PENDIENTE DEV 2:** Despliegue de infraestructura en la nube de AWS (ECR, EC2, API Gateway + JWT Authorizer).
+
+Los 4 microservicios backend están dockerizados y compilados:
 - `ms-reciclago-bff` (Puerto 8080 — Edge Gateway / Resource Server OAuth2)
 - `ms-reciclago-catalog` (Puerto 8081 — Residuos, Camiones y Tarifas)
-- `ms-reciclago-pickups` (Puerto 8083 — Ciclo de vida de retiros, Pesaje y Productores EDA)
+- `ms-reciclago-pickups` (Puerto 8083 — Ciclo de vida de retiros, Pesaje, Productores & Consumidores EDA)
 - `ms-reciclago-routes` (Puerto 8084 — Cuadrantes, Telemetría y Contacto DIMAO)
 - Contenedores de soporte: PostgreSQL 15 (`5433:5432`), RabbitMQ 3 (`5672 / 15672`), Kafka (`9092 / 29092`) y Zookeeper (`2181`).
 
 > [!IMPORTANT]
-> **ESTE DOCUMENTO CONTIENE EXCLUSIVAMENTE LO QUE LE FALTA POR HACER A DEV 2**. Todo lo relativo a DEV 1 ya fue entregado, verificado y no requiere más trabajo.
+> **ESTE DOCUMENTO SE MANTIENE ACTUALIZADO CON LO QUE LE FALTA POR HACER A DEV 2**. Todo el código Java backend y frontend ya fue entregado y verificado.
 
 ---
 
-## 📋 2. Matriz de Tareas Pendientes para DEV 2
+## 📋 2. Matriz de Tareas para DEV 2
 
 ```mermaid
 graph TD
-    subgraph "TAREA 1: Event-Driven Consumers (RabbitMQ y Kafka)"
-        R1["🐇 Consumidor RabbitMQ: q.cmd.email"]
-        R2["🐇 Consumidor RabbitMQ: q.cmd.certificate"]
-        R3["🐇 Consumidor RabbitMQ: q.cmd.route"]
-        K1["⚡ Consumidor Kafka: pickups.events"]
-        K2["⚡ Consumidor Kafka: audit.timeline"]
+    subgraph "TAREA 1: Event-Driven Consumers (RabbitMQ y Kafka) [COMPLETADO]"
+        R1["🐇 Consumidor RabbitMQ: q.cmd.email ✅"]
+        R2["🐇 Consumidor RabbitMQ: q.cmd.certificate ✅"]
+        R3["🐇 Consumidor RabbitMQ: q.cmd.route ✅"]
+        K1["⚡ Consumidor Kafka: pickups.events ✅"]
+        K2["⚡ Consumidor Kafka: audit.timeline ✅"]
     end
 
-    subgraph "TAREA 2: AWS ECR (Registro de Imágenes)"
+    subgraph "TAREA 2: AWS ECR (Registro de Imágenes) [PENDIENTE]"
         ECR1["📦 ECR: reciclago/ms-bff"]
         ECR2["📦 ECR: reciclago/ms-catalog"]
         ECR3["📦 ECR: reciclago/ms-pickups"]
         ECR4["📦 ECR: reciclago/ms-routes"]
     end
 
-    subgraph "TAREA 3: Despliegue en AWS EC2"
+    subgraph "TAREA 3: Despliegue en AWS EC2 [PENDIENTE]"
         EC2["💻 Instancia EC2 (t3.medium + 4GB Swap + LabRole)"]
         SG["🛡️ Security Group (SSH 22, HTTP 8080)"]
         DC["🐳 Docker Compose Pull & Up (8 Contenedores)"]
     end
 
-    subgraph "TAREA 4: AWS API Gateway + JWT Authorizer (20% Rúbrica EP2)"
+    subgraph "TAREA 4: AWS API Gateway + JWT Authorizer [PENDIENTE - 20% Rúbrica EP2]"
         APIGW["🌐 HTTP API Gateway -> EC2:8080"]
         AUTH["🔑 JWT Authorizer (Microsoft Entra ID)"]
         CORS["🔒 CORS habilitado para S3 de DEV 1"]
@@ -62,16 +66,20 @@ graph TD
 
 | # | Área de Trabajo | Descripción del Requerimiento | Estado | Prioridad |
 |---|---|---|:---:|:---:|
-| **1** | **Consumidores RabbitMQ** | Implementar listeners `@RabbitListener` para `q.cmd.email`, `q.cmd.certificate` y `q.cmd.route`. | ❌ **Pendiente** | 🔴 Crítica |
-| **2** | **Consumidores Kafka** | Implementar listeners `@KafkaListener` para topics `pickups.events` y `audit.timeline` (Auditoría DIMAO). | ❌ **Pendiente** | 🔴 Crítica |
-| **3** | **Amazon ECR** | Crear los 4 repositorios en AWS ECR con la cuenta de DEV 2 y subir las imágenes Docker taggeadas. | ❌ **Pendiente** | 🔴 Crítica |
-| **4** | **Amazon EC2** | Levantar instancia EC2 Ubuntu, asociar rol `LabRole`, configurar 4 GB Swap, SG (8080/22) y Docker Compose. | ❌ **Pendiente** | 🔴 Crítica |
-| **5** | **AWS API Gateway + JWT Authorizer** | Configurar HTTP API Gateway con JWT Authorizer de Microsoft Entra ID (20% nota EP2) y CORS. | ❌ **Pendiente** | 🔴 Crítica |
-| **6** | **Secretos GitHub** | Cargar las credenciales de AWS de DEV 2 en los secretos del repositorio para CI/CD continuo. | ❌ **Pendiente** | 🟢 Media |
+| **1** | **Consumidores RabbitMQ** | Listener `@RabbitListener` para `q.cmd.email`, `q.cmd.certificate` y `q.cmd.route`. | ✅ **Completado (100% Código Java)** | 🟢 Resuelto |
+| **2** | **Consumidores Kafka** | Listener `@KafkaListener` para topics `pickups.events` y `audit.timeline` (Auditoría DIMAO). | ✅ **Completado (100% Código Java)** | 🟢 Resuelto |
+| **3** | **Amazon ECR** | Crear los 4 repositorios en AWS ECR con la cuenta de DEV 2 y subir las imágenes Docker taggeadas. | ❌ **Pendiente (Nube AWS)** | 🔴 Crítica |
+| **4** | **Amazon EC2** | Levantar instancia EC2 Ubuntu, asociar rol `LabRole`, configurar 4 GB Swap, SG (8080/22) y Docker Compose. | ❌ **Pendiente (Nube AWS)** | 🔴 Crítica |
+| **5** | **AWS API Gateway + JWT Authorizer** | Configurar HTTP API Gateway con JWT Authorizer de Microsoft Entra ID (20% nota EP2) y CORS. | ❌ **Pendiente (Nube AWS)** | 🔴 Crítica |
+| **6** | **Secretos GitHub** | Cargar las credenciales de AWS de DEV 2 en los secretos del repositorio para CI/CD continuo. | ❌ **Pendiente (GitHub Repositorio)** | 🟢 Media |
 
 ---
 
-## 🛠️ 3. Tarea 1: Implementación de Consumidores Asíncronos (Código Java Listo para Copiar)
+## 🛠️ 3. Tarea 1: Consumidores Asíncronos (COMPLETADO EN CÓDIGO)
+
+> [!NOTE]
+> **ESTADO: 100% IMPLEMENTADO Y VERIFICADO EN CÓDIGO JAVA**.
+> Los 4 consumidores (`EmailNotificationConsumer`, `CertificateGenerationConsumer`, `RouteDispatchConsumer` y `PickupAuditKafkaConsumer`) fueron creados en `ms-reciclago-pickups/src/main/java/com/duoc/ms_reciclago_pickups/consumer/` y compilaron exitosamente en Maven. A continuación se mantiene la referencia de código:
 
 ### Contexto de Negocio
 En `ms-reciclago-pickups`, el servicio `PickupService.java` ya **emite** los eventos hacia RabbitMQ y Kafka cuando un retiro cambia de estado (`PROGRAMADO`, `EN_RUTA`, `RETIRADO`, `PESADO`).
