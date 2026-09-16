@@ -173,6 +173,12 @@ services:
       RECICLAGO_SERVICES_CATALOG_URL: http://ms-catalog:8081
       RECICLAGO_SERVICES_PICKUPS_URL: http://ms-pickups:8083
       RECICLAGO_SERVICES_ROUTES_URL: http://ms-routes:8084
+    healthcheck:
+      test: [ "CMD-SHELL", "nc -z 127.0.0.1 8080 || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     depends_on:
       - ms-catalog
       - ms-pickups
