@@ -10,7 +10,6 @@ import { TruckTrackingComponent } from './components/truck-tracking.component';
 import { ImpactMetricsComponent } from './components/impact-metrics.component';
 import { PickupHistoryComponent } from './components/pickup-history.component';
 import { PickupFormComponent } from './components/pickup-form.component';
-import { StaffModalComponent } from './components/staff-modal.component';
 import { AdminDashboardComponent } from './components/admin-dashboard.component';
 import { CoordinadorDashboardComponent } from './components/coordinador-dashboard.component';
 import { ChoferDashboardComponent } from './components/chofer-dashboard.component';
@@ -18,6 +17,10 @@ import { SpecialServiceCardComponent } from './components/special-service-card.c
 import { InteractiveMapComponent } from './components/interactive-map.component';
 import { RutaModalComponent } from './components/ruta-modal.component';
 import { AuditoriaModalComponent } from './components/auditoria-modal.component';
+import { ProgramarModalComponent } from './components/modals/programar-modal.component';
+import { ChoferOperacionModalComponent } from './components/modals/chofer-operacion-modal.component';
+import { PesajeModalComponent } from './components/modals/pesaje-modal.component';
+import { CancelarModalComponent } from './components/modals/cancelar-modal.component';
 
 import {
   Sector,
@@ -44,14 +47,17 @@ import {
     ImpactMetricsComponent,
     PickupHistoryComponent,
     PickupFormComponent,
-    StaffModalComponent,
     AdminDashboardComponent,
     CoordinadorDashboardComponent,
     ChoferDashboardComponent,
     SpecialServiceCardComponent,
     InteractiveMapComponent,
     RutaModalComponent,
-    AuditoriaModalComponent
+    AuditoriaModalComponent,
+    ProgramarModalComponent,
+    ChoferOperacionModalComponent,
+    PesajeModalComponent,
+    CancelarModalComponent
   ],
   templateUrl: './dashboard.component.html'
 })

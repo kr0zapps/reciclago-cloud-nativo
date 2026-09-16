@@ -259,14 +259,39 @@
     (changePage)="loadAuditoria($event)">
   </app-auditoria-modal>
 
-  <!-- ==================== MODAL OPERATIVO PARA STAFF (ADMIN / COORDINADOR) ==================== -->
-  <app-staff-modal
-    [isOpen]="showActionModal"
+  <!-- ==================== MODALES MODULARIZADOS DE OPERACIÓN STAFF ==================== -->
+  <!-- 1. MODAL COORDINADOR / ADMIN: Programación de Ruta y Camión -->
+  <app-programar-modal
+    [isOpen]="showActionModal && actionType === 'programar'"
     [pickup]="selectedPickupForAction"
-    [actionType]="actionType"
     [camionesDisponibles]="camionesDisponibles"
     (close)="showActionModal = false"
     (actionCompleted)="onActionCompleted()">
-  </app-staff-modal>
+  </app-programar-modal>
+
+  <!-- 2. MODAL CHOFER: Iniciar Ruta o Confirmar Retiro en Puerta -->
+  <app-chofer-operacion-modal
+    [isOpen]="showActionModal && (actionType === 'en-ruta' || actionType === 'retirado')"
+    [pickup]="selectedPickupForAction"
+    [actionType]="actionType === 'en-ruta' ? 'en-ruta' : 'retirado'"
+    (close)="showActionModal = false"
+    (actionCompleted)="onActionCompleted()">
+  </app-chofer-operacion-modal>
+
+  <!-- 3. MODAL CHOFER: Báscula Digital y Pesaje Certificado -->
+  <app-pesaje-modal
+    [isOpen]="showActionModal && actionType === 'pesado'"
+    [pickup]="selectedPickupForAction"
+    (close)="showActionModal = false"
+    (actionCompleted)="onActionCompleted()">
+  </app-pesaje-modal>
+
+  <!-- 4. MODAL COORDINADOR / ADMIN: Cancelar Solicitud -->
+  <app-cancelar-modal
+    [isOpen]="showActionModal && actionType === 'cancelar'"
+    [pickup]="selectedPickupForAction"
+    (close)="showActionModal = false"
+    (actionCompleted)="onActionCompleted()">
+  </app-cancelar-modal>
 
 </main>
