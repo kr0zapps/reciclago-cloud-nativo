@@ -39,12 +39,17 @@ export interface Residuo {
   semanal?: boolean;
 }
 
+export type EstadoCamion = 'DISPONIBLE' | 'EN_RUTA' | 'MANTENIMIENTO';
+
 export interface Camion {
   id: number;
   patente: string;
   capacidadKilos?: number;
   capacidadMaximaKg?: number;
-  estado?: string;
+  capacidadTotalKg?: number;
+  capacidadDisponibleKg?: number;
+  modelo?: string;
+  estado?: EstadoCamion | string;
 }
 
 export interface Pickup {

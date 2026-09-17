@@ -1,10 +1,12 @@
 package com.duoc.ms_reciclago_catalog.service;
 
 import com.duoc.ms_reciclago_catalog.model.Camion;
+import com.duoc.ms_reciclago_catalog.model.EstadoCamion;
 import com.duoc.ms_reciclago_catalog.repository.CamionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,8 +24,17 @@ public class CamionService {
         return camionRepository.findAll();
     }
 
-    public List<Camion> obtenerPorEstado(String estado) {
+    public List<Camion> obtenerPorEstado(EstadoCamion estado) {
         return camionRepository.findByEstado(estado);
+    }
+
+    public List<Camion> obtenerPorEstado(String estado) {
+        try {
+            EstadoCamion enumVal = Camion.parseEstado(estado);
+            return camionRepository.findByEstado(enumVal);
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 
     public Optional<Camion> obtenerPorId(Long id) {
@@ -52,6 +63,17 @@ public class CamionService {
         }).orElseThrow(() -> new RuntimeException("Camión no encontrado con id: " + id));
     }
 
+    public Camion actualizarEstado(Long id, EstadoCamion nuevoEstado) {
+        return camionRepository.findById(id).map(c -> {
+            c.setEstado(nuevoEstado);
+            return camionRepository.save(c);
+        }).orElseThrow(() -> new RuntimeException("Camión no encontrado con id: " + id));
+    }
+
+    public Camion actualizarEstado(Long id, String nuevoEstado) {
+        return actualizarEstado(id, Camion.parseEstado(nuevoEstado));
+    }
+
     public Camion reducirCapacidad(Long id, Double pesoKg) {
         return camionRepository.findById(id).map(c -> {
             double actual = c.getCapacidadDisponibleKg() != null ? c.getCapacidadDisponibleKg() : c.getCapacidadTotalKg();
@@ -65,3 +87,4 @@ public class CamionService {
         camionRepository.deleteById(id);
     }
 }
+

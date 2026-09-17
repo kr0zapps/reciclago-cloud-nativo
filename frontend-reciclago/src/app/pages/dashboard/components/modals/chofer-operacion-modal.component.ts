@@ -158,8 +158,10 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
                 Camión Asignado
               </label>
               <select [(ngModel)]="actionCamionPatente" (ngModelChange)="hasScheduleChanges = true" class="select-stitch w-full py-1.5 px-2.5 text-xs font-medium bg-white">
-                <option *ngFor="let c of camionesDisponibles" [value]="c.patente">
-                  {{ c.patente }} ({{ (c.estado === 'ACTIVO' || !c.estado) ? 'Operativo' : c.estado }})
+                <option *ngFor="let c of camionesDisponibles"
+                        [value]="c.patente"
+                        [disabled]="c.estado === 'MANTENIMIENTO'">
+                  {{ c.patente }} — Cap: {{ c.capacidadKilos || 1500 }} kg ({{ c.estado === 'MANTENIMIENTO' ? 'EN TALLER - Inoperable' : (c.estado === 'EN_RUTA' ? 'En ruta' : 'Disponible') }})
                 </option>
               </select>
             </div>
@@ -290,6 +292,9 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
         document.body.style.overflow = '';
       }
     }
+    if (changes['camionesDisponibles']) {
+      this.actionCamionPatente = this.getValidCamionPatente(this.actionCamionPatente);
+    }
     if (changes['pickup'] && this.pickup) {
       this.errorMessage = '';
       this.hasScheduleChanges = false;
@@ -297,9 +302,9 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
       this.computeDateAndHourOptions();
 
       if (this.pickup.camionPatente) {
-        this.actionCamionPatente = this.pickup.camionPatente;
+        this.actionCamionPatente = this.getValidCamionPatente(this.pickup.camionPatente);
       } else {
-        this.actionCamionPatente = this.sectorDetected.patente || 'PV-RC-2026';
+        this.actionCamionPatente = this.getValidCamionPatente(this.sectorDetected.patente || 'PV-RC-2026');
       }
 
       if (this.pickup.fechaProgramada) {
@@ -317,6 +322,16 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
         this.selectedFecha = this.nextDateOptions[0].value;
       }
     }
+  }
+
+  getValidCamionPatente(desiredPatente: string): string {
+    const list = this.camionesDisponibles || [];
+    const desired = list.find(c => c.patente === desiredPatente);
+    if (desired && desired.estado !== 'MANTENIMIENTO') {
+      return desired.patente;
+    }
+    const primerDisponible = list.find(c => c.estado !== 'MANTENIMIENTO');
+    return primerDisponible ? primerDisponible.patente : desiredPatente;
   }
 
   ngOnDestroy(): void {
@@ -432,6 +447,15 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
     if (!this.pickup) return;
     this.isSubmitting = true;
     this.errorMessage = '';
+
+    if (this.actionType === 'en-ruta') {
+      const camionSeleccionado = (this.camionesDisponibles || []).find(c => c.patente === this.actionCamionPatente);
+      if (camionSeleccionado && camionSeleccionado.estado === 'MANTENIMIENTO') {
+        this.errorMessage = `El camión ${camionSeleccionado.patente} se encuentra en taller/mantenimiento y no puede iniciar ruta.`;
+        this.isSubmitting = false;
+        return;
+      }
+    }
 
     // Si se modificó la programación antes de despachar a cuadrilla, guardar primero
     if (this.actionType === 'en-ruta' && this.hasScheduleChanges && this.selectedFecha && this.selectedHora) {

@@ -180,8 +180,10 @@ export interface TimeSlot {
             3. Camión Recolector Municipal Asignado
           </label>
           <select [(ngModel)]="actionCamionPatente" class="select-stitch w-full py-2 px-3 text-xs font-medium">
-            <option *ngFor="let c of camionesDisponibles" [value]="c.patente">
-              {{ c.patente }} — Cap: {{ c.capacidadKilos || c.capacidadMaximaKg || 1500 }} kg ({{ (c.estado === 'ACTIVO' || !c.estado) ? 'Operativo' : c.estado }})
+            <option *ngFor="let c of camionesDisponibles"
+                    [value]="c.patente"
+                    [disabled]="c.estado === 'MANTENIMIENTO'">
+              {{ c.patente }} — Cap: {{ c.capacidadKilos || c.capacidadMaximaKg || 1500 }} kg ({{ c.estado === 'MANTENIMIENTO' ? 'EN TALLER - Inoperable' : (c.estado === 'EN_RUTA' ? 'En ruta' : 'Disponible') }})
             </option>
           </select>
         </div>
@@ -306,6 +308,9 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
         document.body.style.overflow = '';
       }
     }
+    if (changes['camionesDisponibles']) {
+      this.actionCamionPatente = this.getValidCamionPatente(this.actionCamionPatente);
+    }
     if (changes['pickup'] && this.pickup) {
       this.errorMessage = '';
       // Detectar si el vecino pidió retiro especial en observaciones
@@ -316,7 +321,7 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
       // Si está en modo edición (ya programado), pre-cargar los datos existentes
       if (this.isEditMode) {
         if (this.pickup.camionPatente) {
-          this.actionCamionPatente = this.pickup.camionPatente;
+          this.actionCamionPatente = this.getValidCamionPatente(this.pickup.camionPatente);
         }
         if (this.pickup.fechaProgramada) {
           const parts = String(this.pickup.fechaProgramada).split('T');
@@ -333,6 +338,16 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
         }
       }
     }
+  }
+
+  getValidCamionPatente(desiredPatente: string): string {
+    const list = this.camionesDisponibles || [];
+    const desired = list.find(c => c.patente === desiredPatente);
+    if (desired && desired.estado !== 'MANTENIMIENTO') {
+      return desired.patente;
+    }
+    const primerDisponible = list.find(c => c.estado !== 'MANTENIMIENTO');
+    return primerDisponible ? primerDisponible.patente : desiredPatente;
   }
 
   ngOnDestroy(): void {
@@ -354,10 +369,10 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
 
     if (this.isRetiroEspecial) {
       this.selectedHora = '10:00';
-      this.actionCamionPatente = 'PV-RC-2026';
+      this.actionCamionPatente = this.getValidCamionPatente('PV-RC-2026');
     } else {
       this.selectedHora = '09:30';
-      this.actionCamionPatente = this.sectorDetected.patente || 'PV-RC-2026';
+      this.actionCamionPatente = this.getValidCamionPatente(this.sectorDetected.patente || 'PV-RC-2026');
     }
   }
 
@@ -471,6 +486,11 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
     this.errorMessage = '';
 
     const camionSeleccionado = this.camionesDisponibles.find(c => c.patente === this.actionCamionPatente) || this.camionesDisponibles[0];
+    if (camionSeleccionado && camionSeleccionado.estado === 'MANTENIMIENTO') {
+      this.errorMessage = `El camión ${camionSeleccionado.patente} se encuentra en taller/mantenimiento. Seleccione una unidad disponible.`;
+      this.isSubmitting = false;
+      return;
+    }
     const camionId = camionSeleccionado ? camionSeleccionado.id : 1;
     const isoDateTime = `${this.selectedFecha}T${this.selectedHora}:00`;
 

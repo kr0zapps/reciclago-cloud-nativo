@@ -137,6 +137,22 @@ public class BffController {
         }
     }
 
+    @PatchMapping("/api/catalog/camiones/{id}/estado")
+    public ResponseEntity<?> actualizarEstadoCamion(@PathVariable Long id, @RequestParam String estado) {
+        try {
+            var actualizado = restClient.patch()
+                    .uri(catalogUrl + "/api/catalog/camiones/" + id + "/estado?estado=" + estado)
+                    .retrieve()
+                    .body(Map.class);
+            return ResponseEntity.ok(actualizado);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Error actualizando estado del camión en ms-reciclago-catalog");
+            error.put("details", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+    }
+
     @GetMapping("/api/pickups")
     public ResponseEntity<?> getPickups(@AuthenticationPrincipal Jwt jwt, @RequestParam(required = false) String vecinoEmail) {
         try {

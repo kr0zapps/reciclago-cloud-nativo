@@ -43,6 +43,10 @@ export class BffService {
     return this.http.get<Camion[]>(`${this.baseUrl}/api/catalog/camiones`);
   }
 
+  actualizarEstadoCamion(id: number, estado: string): Observable<Camion> {
+    return this.http.patch<Camion>(`${this.baseUrl}/api/catalog/camiones/${id}/estado?estado=${encodeURIComponent(estado)}`, {});
+  }
+
   getTarifas(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/api/catalog/tarifas`);
   }

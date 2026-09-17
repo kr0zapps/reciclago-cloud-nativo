@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChange
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data';
+import { BffService } from '../../../../services/bff.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -142,9 +143,12 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
                   {{ c.patente }}
                 </span>
                 <span class="px-2.5 py-1 rounded-md text-xs font-bold"
-                      [ngClass]="c.estado === 'MANTENIMIENTO' ? 'bg-rose-100 text-rose-800 border border-rose-300' : 'bg-[#EBF5E7] text-emerald-900 border border-[#CDE8C7]'">
-                  <i class="fa-solid mr-1" [class.fa-triangle-exclamation]="c.estado === 'MANTENIMIENTO'" [class.fa-check]="c.estado !== 'MANTENIMIENTO'"></i>
-                  {{ c.estado === 'MANTENIMIENTO' ? 'En taller' : 'Disponible' }}
+                      [ngClass]="c.estado === 'MANTENIMIENTO' ? 'bg-rose-100 text-rose-800 border border-rose-300' : (c.estado === 'EN_RUTA' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-[#EBF5E7] text-emerald-900 border border-[#CDE8C7]')">
+                  <i class="fa-solid mr-1"
+                     [class.fa-triangle-exclamation]="c.estado === 'MANTENIMIENTO'"
+                     [class.fa-truck-fast]="c.estado === 'EN_RUTA'"
+                     [class.fa-check]="c.estado !== 'MANTENIMIENTO' && c.estado !== 'EN_RUTA'"></i>
+                  {{ c.estado === 'MANTENIMIENTO' ? 'En taller' : (c.estado === 'EN_RUTA' ? 'En ruta' : 'Disponible') }}
                 </span>
               </div>
               <h4 class="font-bold text-sm text-brand-navy">Camión Tolva Compactador</h4>
@@ -161,7 +165,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
                 <i class="fa-solid" [class.fa-circle-check]="c.estado === 'MANTENIMIENTO'" [class.fa-wrench]="c.estado !== 'MANTENIMIENTO'"></i>
                 <span>{{ c.estado === 'MANTENIMIENTO' ? 'Dar de Alta a Servicio' : 'Enviar a Taller' }}</span>
               </button>
-              <span class="text-[11px] font-semibold text-slate-500">{{ c.estado === 'MANTENIMIENTO' ? 'Inoperable' : 'Operable' }}</span>
+              <span class="text-[11px] font-semibold text-slate-500">{{ c.estado === 'MANTENIMIENTO' ? 'Inoperable' : (c.estado === 'EN_RUTA' ? 'En servicio' : 'Operable') }}</span>
             </div>
           </div>
         </div>
@@ -586,6 +590,7 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
   @Output() toggleTruckSimulation = new EventEmitter<void>();
   @Output() toggleTruckSpeed = new EventEmitter<void>();
   @Output() resetTruckSimulation = new EventEmitter<void>();
+  @Output() camionEstadoCambiado = new EventEmitter<Camion>();
 
   Math = Math;
   selectedTruckPatente: string = 'PV-RC-2026';
@@ -609,6 +614,8 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
     'PV-RC-2028': { name: 'Camino a Ensenada Km 2', detail: 'Traslado a centro de acopio comunal', eta: '18 min', distancia: '3.1 km', x: 75, y: 60, estado: 'En traslado' }
   };
 
+  constructor(private bffService: BffService) {}
+
   ngOnInit(): void {}
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -630,7 +637,22 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
   }
 
   toggleMantenimiento(camion: Camion): void {
-    camion.estado = camion.estado === 'MANTENIMIENTO' ? 'DISPONIBLE' : 'MANTENIMIENTO';
+    const nuevoEstado: string = camion.estado === 'MANTENIMIENTO' ? 'DISPONIBLE' : 'MANTENIMIENTO';
+    camion.estado = nuevoEstado;
+    this.camionEstadoCambiado.emit(camion);
+    if (camion.id) {
+      this.bffService.actualizarEstadoCamion(camion.id, nuevoEstado).subscribe({
+        next: (res) => {
+          if (res && res.estado) {
+            camion.estado = res.estado;
+            this.camionEstadoCambiado.emit(camion);
+          }
+        },
+        error: (err) => {
+          console.error('Error al persistir estado del camión en catálogo:', err);
+        }
+      });
+    }
   }
 
   exportarPlanillaCsv(): void {

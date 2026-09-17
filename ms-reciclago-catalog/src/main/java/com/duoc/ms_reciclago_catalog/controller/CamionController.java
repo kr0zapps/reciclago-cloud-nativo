@@ -68,6 +68,17 @@ public class CamionController {
         }
     }
 
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<Camion> actualizarEstado(@PathVariable Long id, @RequestParam String estado) {
+        try {
+            com.duoc.ms_reciclago_catalog.model.EstadoCamion estadoEnum = com.duoc.ms_reciclago_catalog.model.Camion.parseEstado(estado);
+            Camion actualizado = camionService.actualizarEstado(id, estadoEnum);
+            return ResponseEntity.ok(actualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         camionService.eliminar(id);

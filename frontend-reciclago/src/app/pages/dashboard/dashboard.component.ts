@@ -291,6 +291,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  onCamionEstadoCambiado(camionActualizado: Camion): void {
+    const index = this.camionesDisponibles.findIndex(c => c.id === camionActualizado.id || c.patente === camionActualizado.patente);
+    if (index !== -1) {
+      this.camionesDisponibles[index] = { ...this.camionesDisponibles[index], ...camionActualizado };
+      this.camionesDisponibles = [...this.camionesDisponibles];
+    }
+  }
+
   loadLiveTracking(): void {
     const activeSec = this.sectores.find(s => s.nombre === this.selectedSector);
     const cuadranteId = activeSec?.id || 2;

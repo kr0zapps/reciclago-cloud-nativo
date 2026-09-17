@@ -45,9 +45,9 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         if (camionRepository.count() == 0) {
-            camionRepository.save(new Camion(null, "PV-RC-2026", "Mercedes Benz Sprinter 516 - Cuadrante Costanera", 1500.0, 1500.0, "DISPONIBLE"));
-            camionRepository.save(new Camion(null, "PV-RC-2027", "Volvo FL250 Recolector - Cuadrante Puerto Chico", 3000.0, 3000.0, "DISPONIBLE"));
-            camionRepository.save(new Camion(null, "PV-RC-2028", "Isuzu NPR 75 Tolva - Cuadrante Ensenada", 2000.0, 2000.0, "DISPONIBLE"));
+            camionRepository.save(new Camion(null, "PV-RC-2026", "Mercedes Benz Sprinter 516 - Cuadrante Costanera", 1500.0, 1500.0, com.duoc.ms_reciclago_catalog.model.EstadoCamion.DISPONIBLE));
+            camionRepository.save(new Camion(null, "PV-RC-2027", "Volvo FL250 Recolector - Cuadrante Puerto Chico", 3000.0, 3000.0, com.duoc.ms_reciclago_catalog.model.EstadoCamion.DISPONIBLE));
+            camionRepository.save(new Camion(null, "PV-RC-2028", "Isuzu NPR 75 Tolva - Cuadrante Ensenada", 2000.0, 2000.0, com.duoc.ms_reciclago_catalog.model.EstadoCamion.DISPONIBLE));
         }
 
         if (tarifaRepository.count() == 0) {

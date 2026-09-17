@@ -89,4 +89,17 @@ public class CamionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.capacidadDisponibleKg").value(1300.0));
     }
+
+    @Test
+    @DisplayName("PATCH /api/catalog/camiones/{id}/estado - Debe cambiar estado a MANTENIMIENTO")
+    void testActualizarEstado() throws Exception {
+        Camion actualizado = new Camion(2L, "PV-RC-2027", "Volvo FL250", 3000.0, 3000.0, com.duoc.ms_reciclago_catalog.model.EstadoCamion.MANTENIMIENTO);
+
+        when(camionService.actualizarEstado(eq(2L), eq(com.duoc.ms_reciclago_catalog.model.EstadoCamion.MANTENIMIENTO))).thenReturn(actualizado);
+
+        mockMvc.perform(patch("/api/catalog/camiones/2/estado")
+                        .param("estado", "MANTENIMIENTO"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.estado").value("MANTENIMIENTO"));
+    }
 }
