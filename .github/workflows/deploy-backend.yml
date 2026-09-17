@@ -238,18 +238,30 @@ jobs:
             echo "$ECR_PASSWORD" | sudo docker login --username AWS --password-stdin "$REGISTRY"
             echo "✅ Login en ECR exitoso."
 
-            # ── Detectar comando Docker Compose disponible (v1 ó v2) ───────────
-            if sudo docker compose version &>/dev/null; then
-              DC="sudo docker compose"
-            else
+            # ── Asegurar Docker Compose v2 moderno (resuelve bug KeyError: 'ContainerConfig' de compose v1.29) ──
+            if ! sudo docker compose version &>/dev/null; then
+              echo "⬇️ Instalando Docker Compose v2 oficial..."
+              sudo curl -SL "https://github.com/docker/compose/releases/download/v2.29.1/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+              sudo ln -sf /usr/local/bin/docker-compose /usr/bin/docker-compose
+              sudo mkdir -p /usr/local/lib/docker/cli-plugins
+              sudo cp /usr/local/bin/docker-compose /usr/local/lib/docker/cli-plugins/docker-compose
+            fi
+
+            DC="sudo docker compose"
+            if ! $DC version &>/dev/null; then
               DC="sudo docker-compose"
             fi
+            echo "✅ Usando: $($DC version)"
 
             # ── Usar docker-compose.prod.yml (sin build, solo image ECR) ────
             DC_FILE="$HOME/reciclago/docker-compose.prod.yml"
 
             echo "Descargando imágenes actualizadas de ECR..."
             $DC -f "$DC_FILE" pull ms-bff ms-catalog ms-pickups ms-routes || true
+
+            # Limpiar contenedores huérfanos o con metadata antigua que causan conflicto
+            sudo docker rm -f reciclago-ms-catalog reciclago-ms-routes reciclago-ms-pickups 2>/dev/null || true
 
             echo "Iniciando infraestructura y microservicios..."
             $DC -f "$DC_FILE" up -d
