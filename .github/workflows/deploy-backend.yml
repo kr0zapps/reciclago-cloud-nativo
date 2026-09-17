@@ -260,8 +260,17 @@ jobs:
             echo "Descargando imágenes actualizadas de ECR..."
             $DC -f "$DC_FILE" pull ms-bff ms-catalog ms-pickups ms-routes || true
 
-            # Limpiar contenedores huérfanos o con metadata antigua que causan conflicto
-            sudo docker rm -f reciclago-ms-catalog reciclago-ms-routes reciclago-ms-pickups 2>/dev/null || true
+            # Limpiar contenedores zombies / huérfanos con conflicto de nombres del fallo anterior
+            echo "🧹 Limpiando contenedores zombies y nombres en conflicto..."
+            ZOMBIES=$(sudo docker ps -a --filter "name=reciclago-ms" -q 2>/dev/null || true)
+            if [ -n "$ZOMBIES" ]; then
+              sudo docker rm -f $ZOMBIES 2>/dev/null || true
+            fi
+            ZOMBIES_ALL=$(sudo docker ps -a --filter "name=ms-" -q 2>/dev/null || true)
+            if [ -n "$ZOMBIES_ALL" ]; then
+              sudo docker rm -f $ZOMBIES_ALL 2>/dev/null || true
+            fi
+            $DC -f "$DC_FILE" down --remove-orphans 2>/dev/null || true
 
             echo "Iniciando infraestructura y microservicios..."
             $DC -f "$DC_FILE" up -d
