@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChange
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data';
-import { BffService } from '../../../../services/bff.service';
+import { BffService } from '../../../services/bff.service';
 
 @Component({
   selector: 'app-admin-dashboard',
