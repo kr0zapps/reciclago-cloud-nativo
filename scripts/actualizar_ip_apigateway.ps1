@@ -73,7 +73,7 @@ $intId = $ints.items[0].integrationId
 Write-Host "Integración encontrada: $intId" -ForegroundColor DarkGray
 Write-Host "URI anterior: $($ints.items[0].integrationUri)" -ForegroundColor DarkGray
 
-$newUri = "http://$NewIp`:8080/{proxy}"
+$newUri = "http://$NewIp`:8080/api/{proxy}"
 Write-Host "Actualizando a: $newUri ..." -ForegroundColor Yellow
 
 $res = Invoke-AwsApiGW -Method PATCH -Path "/v2/apis/$ApiId/integrations/$intId" -Body @{ IntegrationUri = $newUri }

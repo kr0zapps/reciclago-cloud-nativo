@@ -129,7 +129,7 @@ Write-Host "`n🔗 Paso 2/5: Creando integración → http://$EC2_IP`:$EC2_PORT.
 $intBody = @{
     IntegrationType   = "HTTP_PROXY"
     IntegrationMethod = "ANY"
-    IntegrationUri    = "http://$EC2_IP`:$EC2_PORT/{proxy}"
+    IntegrationUri    = "http://$EC2_IP`:$EC2_PORT/api/{proxy}"
     PayloadFormatVersion = "1.0"
 }
 $intResult = Invoke-AwsRequest -Method POST -Service apigateway -Path "/v2/apis/$API_ID/integrations" -Body $intBody
