@@ -18,7 +18,7 @@
 set -e
 
 # ── VARIABLES ────────────────────────────────────────────────
-EC2_IP="54.226.18.43"
+EC2_IP="100.62.97.86"
 EC2_PORT="8080"
 EC2_URL="http://${EC2_IP}:${EC2_PORT}"
 REGION="${AWS_DEFAULT_REGION:-us-east-1}"

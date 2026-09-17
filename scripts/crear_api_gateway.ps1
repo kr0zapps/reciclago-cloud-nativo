@@ -11,7 +11,7 @@ param(
 )
 
 # ── VARIABLES DEL PROYECTO ─────────────────────────────────
-$EC2_IP       = "54.226.18.43"
+$EC2_IP       = "100.62.97.86"
 $EC2_PORT     = "8080"
 $API_NAME     = "reciclago-api-gateway"
 $ENTRA_TENANT = "5625266d-cae0-4070-a7ea-b5e88273580f"
