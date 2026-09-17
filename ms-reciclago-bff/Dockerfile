@@ -8,7 +8,7 @@ FROM maven:3.9-eclipse-temurin-17-alpine AS builder
 WORKDIR /build
 
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
+RUN mvn dependency:go-offline -B || true
 
 COPY src src
 RUN mvn clean package -Dmaven.test.skip=true
