@@ -330,23 +330,30 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadPickups();
   }
 
-  onStaffPickupCreated(data: { direccion: string; residuoId: string | number; comentarios?: string }): void {
+  onStaffPickupCreated(data: any): void {
+    const resObj = this.residuos.find(r => r.id === Number(data.residuoId));
     const payload = {
-      ciudadanoEmail: 'vecino.contacto@puertovaras.cl',
+      vecinoEmail: data.vecinoEmail || 'vecino.contacto@puertovaras.cl',
+      vecinoNombre: data.vecinoNombre || 'Vecino Puerto Varas',
       direccion: data.direccion,
-      residuoId: Number(data.residuoId),
-      comentarios: data.comentarios || ''
+      comuna: data.comuna || 'Puerto Varas',
+      residuoId: Number(data.residuoId || 1),
+      residuoNombre: data.residuoNombre || (resObj ? resObj.nombre : 'Vidrio'),
+      pesoEstimadoKg: Number(data.pesoEstimadoKg) || 5.0,
+      comentarios: data.comentarios || '',
+      observaciones: data.observaciones || data.comentarios || ''
     };
     this.bffService.createPickup(payload).subscribe({
       next: (created) => {
         this.pickups.unshift(created);
         this.loadPickups();
       },
-      error: () => {
+      error: (err) => {
+        console.error('Error al crear retiro por staff:', err);
         const fallback: Pickup = {
           id: Math.floor(Math.random() * 9000) + 1000,
           direccion: data.direccion,
-          residuoNombre: this.residuos.find(r => r.id === Number(data.residuoId))?.nombre || 'Reciclaje',
+          residuoNombre: resObj ? resObj.nombre : 'Reciclaje',
           estado: 'SOLICITADO',
           comentarios: data.comentarios,
           fechaTexto: 'Por confirmar',

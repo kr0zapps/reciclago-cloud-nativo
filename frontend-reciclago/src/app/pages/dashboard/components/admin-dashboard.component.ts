@@ -750,10 +750,17 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
   submitRetiroVecinal(): void {
     if (!this.nuevaDireccion) return;
     this.isSubmittingRetiro = true;
+    const resObj = this.residuos.find(r => r.id === Number(this.nuevoResiduoId));
     const item = {
+      vecinoNombre: this.nuevoVecinoNombre || 'Vecino Puerto Varas',
+      vecinoEmail: 'vecino.contacto@puertovaras.cl',
       direccion: this.nuevaDireccion,
-      residuoId: Number(this.nuevoResiduoId),
-      comentarios: `[Ingreso Mesa Central DIMAO - ${this.nuevoVecinoNombre}] ${this.nuevosComentarios}`
+      comuna: 'Puerto Varas',
+      residuoId: Number(this.nuevoResiduoId || 1),
+      residuoNombre: resObj ? resObj.nombre : 'Vidrio',
+      pesoEstimadoKg: 5.0,
+      comentarios: `[Ingreso Mesa Central DIMAO - ${this.nuevoVecinoNombre || 'Atención Ciudadana'}] ${this.nuevosComentarios || ''}`,
+      observaciones: `[Ingreso Mesa Central DIMAO - ${this.nuevoVecinoNombre || 'Atención Ciudadana'}] ${this.nuevosComentarios || ''}`
     };
     this.pickupCreated.emit(item);
     setTimeout(() => {

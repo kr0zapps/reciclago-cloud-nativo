@@ -113,6 +113,18 @@ public class PickupService {
         if (pickup.getCodigoRetiro() == null || pickup.getCodigoRetiro().isBlank()) {
             pickup.setCodigoRetiro("RET-PV-" + java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         }
+        if (pickup.getComuna() == null || pickup.getComuna().isBlank()) {
+            pickup.setComuna("Puerto Varas");
+        }
+        if (pickup.getPesoEstimadoKg() == null || pickup.getPesoEstimadoKg() <= 0) {
+            pickup.setPesoEstimadoKg(5.0);
+        }
+        if (pickup.getResiduoId() == null) {
+            pickup.setResiduoId(1L);
+        }
+        if (pickup.getResiduoNombre() == null || pickup.getResiduoNombre().isBlank()) {
+            pickup.setResiduoNombre("Residuo Reciclable");
+        }
         pickup.setEstado("SOLICITADO");
         pickup.setFechaSolicitud(LocalDateTime.now());
 

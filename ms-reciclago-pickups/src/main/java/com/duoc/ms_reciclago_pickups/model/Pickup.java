@@ -36,13 +36,13 @@ public class Pickup {
 
     @NotBlank(message = "La comuna es obligatoria")
     @Column(nullable = false)
-    private String comuna;
+    private String comuna = "Puerto Varas";
 
     @NotNull(message = "El ID del residuo es obligatorio")
     @Column(nullable = false)
-    private Long residuoId;
+    private Long residuoId = 1L;
 
-    private String residuoNombre;
+    private String residuoNombre = "Residuo Reciclable";
 
     private Long camionId;
     private String camionPatente;
@@ -50,7 +50,7 @@ public class Pickup {
     @NotNull(message = "El peso estimado es obligatorio")
     @PositiveOrZero(message = "El peso estimado debe ser mayor o igual a 0")
     @Column(nullable = false)
-    private Double pesoEstimadoKg;
+    private Double pesoEstimadoKg = 5.0;
 
     private Double pesoRealKg;
 

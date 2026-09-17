@@ -178,36 +178,61 @@ public class BffController {
     @PostMapping("/api/pickups")
     public ResponseEntity<?> createPickup(@AuthenticationPrincipal Jwt jwt, @RequestBody Map<String, Object> payload) {
         try {
-            // Prevención estricta de IDOR: Extraer identidad verificada del JWT
-            String email = null;
-            if (jwt != null) {
-                email = jwt.getClaimAsString("preferred_username");
-                if (email == null) email = jwt.getClaimAsString("upn");
-                if (email == null) email = jwt.getClaimAsString("email");
-                if (email == null) email = jwt.getClaimAsString("unique_name");
+            List<String> roles = jwt != null ? jwt.getClaimAsStringList("roles") : null;
+            boolean isStaff = roles != null && roles.stream().anyMatch(r ->
+                r.equalsIgnoreCase("Admin") || r.equalsIgnoreCase("Coordinador") || r.equalsIgnoreCase("Chofer")
+            );
+
+            // Identidad del vecino
+            String email = (payload.get("vecinoEmail") != null && !payload.get("vecinoEmail").toString().isBlank())
+                    ? payload.get("vecinoEmail").toString()
+                    : (payload.get("ciudadanoEmail") != null ? payload.get("ciudadanoEmail").toString() : null);
+
+            // Si es un vecino común (no staff), su email DEBE ser el del token (prevención IDOR)
+            if (!isStaff) {
+                if (jwt != null) {
+                    String tokenEmail = jwt.getClaimAsString("preferred_username");
+                    if (tokenEmail == null) tokenEmail = jwt.getClaimAsString("upn");
+                    if (tokenEmail == null) tokenEmail = jwt.getClaimAsString("email");
+                    if (tokenEmail == null) tokenEmail = jwt.getClaimAsString("unique_name");
+                    if (tokenEmail != null && !tokenEmail.isBlank()) {
+                        email = tokenEmail;
+                    }
+                }
             }
             if (email == null || email.isBlank()) {
-                if (payload.get("vecinoEmail") != null && !payload.get("vecinoEmail").toString().isBlank()) {
-                    email = payload.get("vecinoEmail").toString();
-                } else {
-                    return ResponseEntity.badRequest().body(Map.of("error", "El correo electrónico del vecino es obligatorio"));
-                }
+                email = "vecino.contacto@puertovaras.cl";
             }
             payload.put("vecinoEmail", email);
 
-            String name = null;
-            if (jwt != null) {
-                name = jwt.getClaimAsString("name");
-                if (name == null) name = jwt.getClaimAsString("given_name");
-            }
-            if (name == null || name.isBlank()) {
-                if (payload.get("vecinoNombre") != null && !payload.get("vecinoNombre").toString().isBlank()) {
-                    name = payload.get("vecinoNombre").toString();
-                } else {
-                    name = (email != null && email.contains("@")) ? email.substring(0, email.indexOf('@')) : "Vecino Puerto Varas";
+            String name = (payload.get("vecinoNombre") != null && !payload.get("vecinoNombre").toString().isBlank())
+                    ? payload.get("vecinoNombre").toString()
+                    : null;
+            if (!isStaff && jwt != null) {
+                String tokenName = jwt.getClaimAsString("name");
+                if (tokenName == null) tokenName = jwt.getClaimAsString("given_name");
+                if (tokenName != null && !tokenName.isBlank()) {
+                    name = tokenName;
                 }
             }
+            if (name == null || name.isBlank()) {
+                name = (email.contains("@")) ? email.substring(0, email.indexOf('@')) : "Vecino Puerto Varas";
+            }
             payload.put("vecinoNombre", name);
+
+            // Defaults requeridos por ms-pickups
+            if (!payload.containsKey("comuna") || payload.get("comuna") == null || payload.get("comuna").toString().isBlank()) {
+                payload.put("comuna", "Puerto Varas");
+            }
+            if (!payload.containsKey("pesoEstimadoKg") || payload.get("pesoEstimadoKg") == null) {
+                payload.put("pesoEstimadoKg", 5.0);
+            }
+            if (!payload.containsKey("residuoId") || payload.get("residuoId") == null) {
+                payload.put("residuoId", 1L);
+            }
+            if (!payload.containsKey("residuoNombre") || payload.get("residuoNombre") == null || payload.get("residuoNombre").toString().isBlank()) {
+                payload.put("residuoNombre", "Residuo Reciclable");
+            }
 
             // Homogeneizar observaciones y comentarios para evitar fallo de mapeo
             if (payload.containsKey("comentarios") && !payload.containsKey("observaciones")) {
@@ -216,12 +241,17 @@ public class BffController {
 
             Object response = restClient.post()
                     .uri(pickupsUrl + "/api/pickups")
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
                     .body(payload)
                     .retrieve()
                     .body(Object.class);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (org.springframework.web.client.HttpStatusCodeException e) {
+            log.error("Error HTTP al crear retiro: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
         } catch (Exception e) {
+            log.error("Error al crear retiro: {}", e.getMessage(), e);
             Map<String, Object> error = new HashMap<>();
             error.put("error", "Error al crear solicitud en ms-reciclago-pickups");
             error.put("message", e.getMessage());
