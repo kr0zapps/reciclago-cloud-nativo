@@ -484,9 +484,10 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
         this.actionCompleted.emit();
         this.onClose();
       },
-      error: () => {
+      error: (err: any) => {
         this.isSubmitting = false;
-        this.errorMessage = 'No se pudo registrar la programación en el microservicio.';
+        const detail = err?.error?.error || err?.error?.message || (typeof err?.error === 'string' ? err.error : null);
+        this.errorMessage = detail || 'No se pudo registrar la programación en el microservicio.';
       }
     });
   }

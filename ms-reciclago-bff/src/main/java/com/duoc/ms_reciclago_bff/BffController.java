@@ -19,6 +19,7 @@ import java.util.Map;
 @RequestMapping
 public class BffController {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BffController.class);
     private final RestClient restClient;
 
     @Value("${reciclago.services.catalog-url:http://localhost:8081}")
@@ -280,18 +281,26 @@ public class BffController {
             String trimmed = rawFecha.trim();
             String effectiveFecha = (trimmed.length() == 16) ? (trimmed + ":00") : trimmed;
 
-            String targetUri = pickupsUrl + "/api/pickups/" + id + "/programar"
-                    + "?camionId=" + effectiveCamionId
-                    + "&camionPatente=" + java.net.URLEncoder.encode(effectivePatente, java.nio.charset.StandardCharsets.UTF_8)
-                    + "&fechaProgramada=" + java.net.URLEncoder.encode(effectiveFecha, java.nio.charset.StandardCharsets.UTF_8);
+            Map<String, Object> forwardBody = Map.of(
+                    "camionId", effectiveCamionId,
+                    "camionPatente", effectivePatente,
+                    "fechaProgramada", effectiveFecha
+            );
 
             Object response = restClient.patch()
-                    .uri(targetUri)
+                    .uri(pickupsUrl + "/api/pickups/{id}/programar?camionId={camionId}&camionPatente={camionPatente}&fechaProgramada={fechaProgramada}",
+                            id, effectiveCamionId, effectivePatente, effectiveFecha)
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                    .body(forwardBody)
                     .retrieve()
                     .body(Object.class);
             return ResponseEntity.ok(response);
+        } catch (org.springframework.web.client.HttpStatusCodeException e) {
+            log.error("Error HTTP al programar retiro {}: {} - {}", id, e.getStatusCode(), e.getResponseBodyAsString());
+            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+            log.error("Error al programar retiro {}: {}", id, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage() != null ? e.getMessage() : "Error al programar retiro"));
         }
     }
 
@@ -303,6 +312,8 @@ public class BffController {
                     .retrieve()
                     .body(Object.class);
             return ResponseEntity.ok(response);
+        } catch (org.springframework.web.client.HttpStatusCodeException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         }
@@ -316,6 +327,8 @@ public class BffController {
                     .retrieve()
                     .body(Object.class);
             return ResponseEntity.ok(response);
+        } catch (org.springframework.web.client.HttpStatusCodeException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         }
@@ -331,10 +344,14 @@ public class BffController {
                 return ResponseEntity.badRequest().body(Map.of("error", "El campo pesoRealKg es obligatorio y debe ser mayor a 0"));
             }
             Object response = restClient.patch()
-                    .uri(pickupsUrl + "/api/pickups/" + id + "/pesado?pesoRealKg=" + effectivePeso)
+                    .uri(pickupsUrl + "/api/pickups/{id}/pesado?pesoRealKg={pesoRealKg}", id, effectivePeso)
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                    .body(Map.of("pesoRealKg", effectivePeso))
                     .retrieve()
                     .body(Object.class);
             return ResponseEntity.ok(response);
+        } catch (org.springframework.web.client.HttpStatusCodeException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         }
@@ -372,15 +389,16 @@ public class BffController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "No autorizado para cancelar este retiro"));
             }
 
-            String uri = pickupsUrl + "/api/pickups/" + id + "/cancelar";
-            if (motivo != null && !motivo.isBlank()) {
-                uri += "?motivo=" + java.net.URLEncoder.encode(motivo, java.nio.charset.StandardCharsets.UTF_8);
-            }
             Object response = restClient.patch()
-                    .uri(uri)
+                    .uri(pickupsUrl + "/api/pickups/{id}/cancelar" + (motivo != null && !motivo.isBlank() ? "?motivo={motivo}" : ""),
+                            (motivo != null && !motivo.isBlank() ? new Object[]{id, motivo} : new Object[]{id}))
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                    .body(motivo != null ? Map.of("motivo", motivo) : Map.of())
                     .retrieve()
                     .body(Object.class);
             return ResponseEntity.ok(response);
+        } catch (org.springframework.web.client.HttpStatusCodeException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         }

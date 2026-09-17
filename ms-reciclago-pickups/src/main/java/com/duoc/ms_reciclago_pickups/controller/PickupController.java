@@ -85,15 +85,24 @@ public class PickupController {
 
     /**
      * Transición SOLICITADO/PROGRAMADO → PROGRAMADO.
-     * Requiere camionId, camionPatente y fechaProgramada del coordinador.
+     * Requiere camionId, camionPatente y fechaProgramada del coordinador (vía params o body JSON).
      */
     @RequestMapping(value = "/{id}/programar", method = {RequestMethod.PATCH, RequestMethod.POST})
     public ResponseEntity<?> programarRetiro(@PathVariable Long id,
-                                              @RequestParam Long camionId,
-                                              @RequestParam String camionPatente,
-                                              @RequestParam String fechaProgramada) {
-        LocalDateTime fecha = parseFechaProgramada(fechaProgramada);
-        Pickup actualizado = pickupService.programarRetiro(id, camionId, camionPatente, fecha);
+                                              @RequestParam(required = false) Long camionId,
+                                              @RequestParam(required = false) String camionPatente,
+                                              @RequestParam(required = false) String fechaProgramada,
+                                              @RequestBody(required = false) Map<String, Object> body) {
+        Long effCamionId = camionId != null ? camionId : (body != null && body.get("camionId") != null ? Long.valueOf(body.get("camionId").toString()) : null);
+        String effPatente = camionPatente != null ? camionPatente : (body != null && body.get("camionPatente") != null ? body.get("camionPatente").toString() : null);
+        String effFecha = fechaProgramada != null ? fechaProgramada : (body != null && body.get("fechaProgramada") != null ? body.get("fechaProgramada").toString() : null);
+
+        if (effCamionId == null || effPatente == null || effPatente.isBlank() || effFecha == null || effFecha.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Los campos camionId, camionPatente y fechaProgramada son obligatorios para programar un retiro"));
+        }
+
+        LocalDateTime fecha = parseFechaProgramada(effFecha);
+        Pickup actualizado = pickupService.programarRetiro(id, effCamionId, effPatente, fecha);
         return ResponseEntity.ok(actualizado);
     }
 
@@ -113,15 +122,24 @@ public class PickupController {
 
     /** Transición RETIRADO → PESADO con registro del peso real en kg. */
     @RequestMapping(value = "/{id}/pesado", method = {RequestMethod.PATCH, RequestMethod.POST})
-    public ResponseEntity<?> registrarPesaje(@PathVariable Long id, @RequestParam Double pesoRealKg) {
-        Pickup actualizado = pickupService.registrarPesaje(id, pesoRealKg);
+    public ResponseEntity<?> registrarPesaje(@PathVariable Long id,
+                                              @RequestParam(required = false) Double pesoRealKg,
+                                              @RequestBody(required = false) Map<String, Object> body) {
+        Double effPeso = pesoRealKg != null ? pesoRealKg : (body != null && body.get("pesoRealKg") != null ? Double.valueOf(body.get("pesoRealKg").toString()) : null);
+        if (effPeso == null || effPeso <= 0) {
+            return ResponseEntity.badRequest().body(Map.of("error", "El campo pesoRealKg es obligatorio y debe ser mayor a 0"));
+        }
+        Pickup actualizado = pickupService.registrarPesaje(id, effPeso);
         return ResponseEntity.ok(actualizado);
     }
 
     /** Cancela un retiro (solo si no está en PESADO o ya CANCELADO). */
     @RequestMapping(value = "/{id}/cancelar", method = {RequestMethod.PATCH, RequestMethod.POST})
-    public ResponseEntity<?> cancelarRetiro(@PathVariable Long id, @RequestParam(required = false) String motivo) {
-        Pickup actualizado = pickupService.cancelarRetiro(id, motivo);
+    public ResponseEntity<?> cancelarRetiro(@PathVariable Long id,
+                                            @RequestParam(required = false) String motivo,
+                                            @RequestBody(required = false) Map<String, Object> body) {
+        String effMotivo = motivo != null ? motivo : (body != null && body.get("motivo") != null ? body.get("motivo").toString() : null);
+        Pickup actualizado = pickupService.cancelarRetiro(id, effMotivo);
         return ResponseEntity.ok(actualizado);
     }
 
@@ -129,13 +147,17 @@ public class PickupController {
 
     /**
      * Parsea la fecha programada desde el formato ISO 8601.
-     * Soporta tanto "2026-09-17T10:30" (16 chars) como "2026-09-17T10:30:00".
+     * Soporta tanto "2026-09-17T10:30" (16 chars) como "2026-09-17T10:30:00",
+     * tolerando además valores decodificados con URL encoding (%3A, %20, etc.).
      */
     private LocalDateTime parseFechaProgramada(String fechaProgramada) {
         if (fechaProgramada == null || fechaProgramada.isBlank()) {
             throw new IllegalArgumentException("La fecha programada es obligatoria");
         }
         String normalized = fechaProgramada.trim();
+        try {
+            normalized = java.net.URLDecoder.decode(normalized, java.nio.charset.StandardCharsets.UTF_8);
+        } catch (Exception ignored) {}
         if (normalized.length() == 16) {
             normalized += ":00";
         }

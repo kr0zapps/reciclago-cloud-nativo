@@ -447,9 +447,10 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
         next: () => {
           this.procederConDespacho();
         },
-        error: () => {
+        error: (err: any) => {
           this.isSubmitting = false;
-          this.errorMessage = 'No se pudo actualizar la programación antes de despachar.';
+          const detail = err?.error?.error || err?.error?.message || (typeof err?.error === 'string' ? err.error : null);
+          this.errorMessage = detail || 'No se pudo actualizar la programación antes de despachar.';
         }
       });
     } else {
