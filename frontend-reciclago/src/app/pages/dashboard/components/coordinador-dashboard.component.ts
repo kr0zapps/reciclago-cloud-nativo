@@ -485,23 +485,63 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
               <input id="coordNuevaDireccion" type="text" [(ngModel)]="nuevaDireccion" name="nuevaDireccion" required class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: San Francisco 320, Puerto Varas">
             </div>
 
-            <!-- Selector de Material -->
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1.5">Tipo de Residuo / Material</label>
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                <button *ngFor="let r of residuos"
-                        type="button"
-                        (click)="nuevoResiduoId = r.id"
-                        class="py-2 px-2 rounded-xl text-center border-2 transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5"
-                        [ngClass]="nuevoResiduoId === r.id ? 'bg-[#EEF5EB] border-[#4F8A3D] text-[#123F5B] ring-2 ring-emerald-300 shadow-2xs font-extrabold' : 'bg-white border-[#E2E9E4] text-slate-700 hover:bg-slate-50'">
-                  <span class="text-xs font-bold truncate max-w-full">{{ r.nombre }}</span>
+            <!-- Fila: Material y Peso Estimado -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <!-- Selector de Material Personalizado -->
+              <div class="relative material-dropdown-container">
+                <label id="coordResiduoLabel" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Tipo de Residuo / Material</label>
+                <button
+                  type="button"
+                  (click)="toggleMaterialDropdown($event)"
+                  aria-labelledby="coordResiduoLabel"
+                  aria-haspopup="listbox"
+                  [attr.aria-expanded]="isMaterialDropdownOpen"
+                  class="w-full flex items-center justify-between py-2 px-3 rounded-xl border border-[#D5E2D9] bg-white hover:border-[#4F8A3D] text-left shadow-2xs transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#4F8A3D]/30 min-h-[42px]">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-7 h-7 rounded-lg bg-[#EEF5EB] text-[#4F8A3D] flex items-center justify-center text-xs flex-shrink-0">
+                      <i [class]="getMaterialIcon(selectedResiduoNombre)"></i>
+                    </div>
+                    <span class="text-xs font-bold text-[#123F5B] truncate">{{ selectedResiduoNombre }}</span>
+                  </div>
+                  <i class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-200"
+                     [class.rotate-180]="isMaterialDropdownOpen"></i>
                 </button>
-              </div>
-            </div>
 
-            <div>
-              <label for="coordNuevoPeso" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Peso Estimado (kg)</label>
-              <input id="coordNuevoPeso" type="number" step="0.5" min="0.5" max="500" [(ngModel)]="nuevoPesoEstimadoKg" name="nuevoPesoEstimadoKg" class="input-stitch w-full py-2 px-3 text-sm font-medium text-center" placeholder="5.0">
+                <!-- Menú Desplegable Flotante Moderno -->
+                <div *ngIf="isMaterialDropdownOpen"
+                     role="listbox"
+                     class="absolute left-0 right-0 top-full mt-1.5 bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] p-2 z-[100] anim-modal-backdrop space-y-1">
+                  <button
+                    *ngFor="let r of residuos"
+                    type="button"
+                    role="option"
+                    [attr.aria-selected]="nuevoResiduoId === r.id"
+                    (click)="selectResiduo(r.id)"
+                    class="w-full text-left p-2 rounded-xl transition-all flex items-center justify-between group cursor-pointer"
+                    [ngClass]="nuevoResiduoId === r.id ? 'bg-[#EEF5EB] border border-[#CCE4C8]' : 'hover:bg-slate-50 border border-transparent'">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <div class="w-7 h-7 rounded-lg flex items-center justify-center text-xs flex-shrink-0 transition-colors"
+                           [ngClass]="nuevoResiduoId === r.id ? 'bg-[#4F8A3D] text-white' : 'bg-slate-100 text-slate-600 group-hover:bg-[#EEF5EB] group-hover:text-[#4F8A3D]'">
+                        <i [class]="getMaterialIcon(r.nombre)"></i>
+                      </div>
+                      <div class="min-w-0">
+                        <span class="text-xs font-bold text-[#123F5B] block truncate">{{ r.nombre }}</span>
+                        <span class="text-[10px] text-slate-400 block truncate">{{ r.descripcion || 'Reciclaje clasificado' }}</span>
+                      </div>
+                    </div>
+                    <i *ngIf="nuevoResiduoId === r.id" class="fa-solid fa-circle-check text-[#4F8A3D] text-sm flex-shrink-0 ml-2"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Peso Estimado -->
+              <div>
+                <label for="coordNuevoPeso" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Peso Estimado (kg)</label>
+                <div class="relative">
+                  <input id="coordNuevoPeso" type="number" step="0.5" min="0.5" max="500" [(ngModel)]="nuevoPesoEstimadoKg" name="nuevoPesoEstimadoKg" class="input-stitch w-full py-2 px-3 text-sm font-medium text-center min-h-[42px]" placeholder="5.0">
+                  <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">kg</span>
+                </div>
+              </div>
             </div>
 
             <div>
@@ -551,6 +591,7 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges, OnDestr
 
   showNuevoRetiroModal = false;
   isSubmittingRetiro = false;
+  isMaterialDropdownOpen = false;
   nuevoVecinoNombre = '';
   nuevoVecinoRut = '';
   nuevoVecinoTelefono = '';
@@ -561,6 +602,33 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges, OnDestr
   mesaRutError = '';
   mesaPhoneError = '';
   mesaError = '';
+
+  toggleMaterialDropdown(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isMaterialDropdownOpen = !this.isMaterialDropdownOpen;
+  }
+
+  selectResiduo(id: number): void {
+    this.nuevoResiduoId = id;
+    this.isMaterialDropdownOpen = false;
+  }
+
+  get selectedResiduoNombre(): string {
+    const found = this.residuos.find(r => r.id === Number(this.nuevoResiduoId));
+    return found ? found.nombre : (this.residuos[0]?.nombre || 'Vidrio');
+  }
+
+  getMaterialIcon(name?: string): string {
+    if (!name) return 'fa-solid fa-recycle';
+    const n = name.toLowerCase();
+    if (n.includes('vidrio')) return 'fa-solid fa-wine-bottle';
+    if (n.includes('cartón') || n.includes('carton') || n.includes('papel')) return 'fa-solid fa-box-archive';
+    if (n.includes('plástico') || n.includes('plastico') || n.includes('pet')) return 'fa-solid fa-bottle-water';
+    if (n.includes('lata') || n.includes('metal')) return 'fa-solid fa-can-food';
+    return 'fa-solid fa-recycle';
+  }
 
   truckWaypointsMap: Record<string, Waypoint> = {
     'PV-RC-2026': { name: 'Costanera Sur / San Francisco', detail: 'Recorriendo cuadrante urbano', eta: '6 min', distancia: '850 m', x: 28, y: 72, estado: 'En recorrido' },
@@ -656,8 +724,20 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges, OnDestr
     this.actionRequested.emit({ pickup, action });
   }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.material-dropdown-container')) {
+      this.isMaterialDropdownOpen = false;
+    }
+  }
+
   @HostListener('document:keydown.escape')
   onEscapePress(): void {
+    if (this.isMaterialDropdownOpen) {
+      this.isMaterialDropdownOpen = false;
+      return;
+    }
     if (this.showNuevoRetiroModal) {
       this.closeNuevoRetiroModal();
     }
@@ -695,12 +775,14 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges, OnDestr
     this.mesaError = '';
     this.mesaRutError = '';
     this.mesaPhoneError = '';
+    this.isMaterialDropdownOpen = false;
     this.showNuevoRetiroModal = true;
     document.body.style.overflow = 'hidden';
   }
 
   closeNuevoRetiroModal(): void {
     this.showNuevoRetiroModal = false;
+    this.isMaterialDropdownOpen = false;
     document.body.style.overflow = '';
   }
 
