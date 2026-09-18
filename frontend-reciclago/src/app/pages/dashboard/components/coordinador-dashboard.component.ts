@@ -11,36 +11,20 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
   imports: [CommonModule, FormsModule],
   template: `
     <div class="space-y-6 sm:space-y-8">
-      <!-- ==================== 1. ENCABEZADO DE DESPACHO Y MESA DE AYUDA ==================== -->
-      <section class="bg-white rounded-2xl p-5 sm:p-6 border border-[#E2E9E4] shadow-xs">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          <div>
-            <div class="flex items-center gap-2 text-xs font-bold text-[#1F6685] mb-1">
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#1F6685]/10 text-[#1F6685] uppercase tracking-wider text-[10px] font-black">
-                <i class="fa-solid fa-headset text-xs"></i> Despacho Logístico
-              </span>
-              <span class="text-slate-300">•</span>
-              <span class="text-slate-500">Sector de Planificación: <strong class="text-brand-navy">{{ sector?.cuadrante || sector?.nombre || 'Puerto Varas' }}</strong></span>
-            </div>
-            <h2 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy">
-              Consola de Programación, Asignación y Atención Vecinal
-            </h2>
-            <p class="text-xs text-slate-500 mt-0.5">
-              Recepción telefónica ciudadana, asignación de cuadrillas y despacho de camiones en ruta.
-            </p>
-          </div>
-
-          <!-- Botón de Atención Primaria -->
-          <div class="flex items-center gap-3 flex-shrink-0">
-            <button (click)="openNuevoRetiroModal()"
-                    type="button"
-                    class="inline-flex items-center gap-2.5 px-5 py-3 rounded-xl bg-[#1F6685] hover:bg-[#164E66] text-white text-sm font-bold shadow-xs transition-all cursor-pointer">
-              <i class="fa-solid fa-phone-volume text-sm"></i>
-              <span>+ Ingresar Solicitud Telefónica</span>
-            </button>
-          </div>
+      <!-- Barra de Acciones de Coordinación -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs text-slate-500 font-medium">
+            Sector activo: <strong class="text-[#123F5B] font-bold">{{ sector?.nombre || 'Puerto Varas' }}</strong>
+          </span>
         </div>
-      </section>
+        <button (click)="openNuevoRetiroModal()"
+                type="button"
+                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#123F5B] hover:bg-[#0E2E42] text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer">
+          <i class="fa-solid fa-plus text-xs"></i>
+          <span>Ingresar Solicitud</span>
+        </button>
+      </div>
 
       <!-- ==================== 2. PIPELINE DE DESPACHO EN TIEMPO REAL ==================== -->
       <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
@@ -460,14 +444,14 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-2.5">
               <div class="w-9 h-9 rounded-xl bg-sky-50 text-[#1F6685] flex items-center justify-center text-sm font-bold border border-sky-200">
-                <i class="fa-solid fa-headset"></i>
+                <i class="fa-solid fa-file-circle-plus"></i>
               </div>
               <div>
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Despacho Logístico</span>
-                <h3 id="coord-mesa-title" class="font-heading font-extrabold text-lg text-brand-navy">Mesa de Entrada de Solicitud Telefónica</h3>
+                <h3 id="coord-mesa-title" class="font-heading font-extrabold text-lg text-brand-navy">Ingresar Solicitud de Retiro</h3>
+                <p class="text-xs text-slate-400">Registro de solicitud vecinal para recolección</p>
               </div>
             </div>
-            <button (click)="closeNuevoRetiroModal()" type="button" aria-label="Cerrar modal de despacho" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-colors cursor-pointer">
+            <button (click)="closeNuevoRetiroModal()" type="button" aria-label="Cerrar modal" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-colors cursor-pointer">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
@@ -501,17 +485,23 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
               <input id="coordNuevaDireccion" type="text" [(ngModel)]="nuevaDireccion" name="nuevaDireccion" required class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: San Francisco 320, Puerto Varas">
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label for="coordNuevoResiduoId" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Tipo de Residuo / Material</label>
-                <select id="coordNuevoResiduoId" [(ngModel)]="nuevoResiduoId" name="nuevoResiduoId" class="select-stitch w-full py-2 px-3 text-sm font-medium">
-                  <option *ngFor="let r of residuos" [value]="r.id">{{ r.nombre }}</option>
-                </select>
+            <!-- Selector de Material -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1.5">Tipo de Residuo / Material</label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button *ngFor="let r of residuos"
+                        type="button"
+                        (click)="nuevoResiduoId = r.id"
+                        class="py-2 px-2 rounded-xl text-center border-2 transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5"
+                        [ngClass]="nuevoResiduoId === r.id ? 'bg-[#EEF5EB] border-[#4F8A3D] text-[#123F5B] ring-2 ring-emerald-300 shadow-2xs font-extrabold' : 'bg-white border-[#E2E9E4] text-slate-700 hover:bg-slate-50'">
+                  <span class="text-xs font-bold truncate max-w-full">{{ r.nombre }}</span>
+                </button>
               </div>
-              <div>
-                <label for="coordNuevoPeso" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Peso Estimado (kg)</label>
-                <input id="coordNuevoPeso" type="number" step="0.5" min="0.5" max="500" [(ngModel)]="nuevoPesoEstimadoKg" name="nuevoPesoEstimadoKg" class="input-stitch w-full py-2 px-3 text-sm font-medium text-center" placeholder="5.0">
-              </div>
+            </div>
+
+            <div>
+              <label for="coordNuevoPeso" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Peso Estimado (kg)</label>
+              <input id="coordNuevoPeso" type="number" step="0.5" min="0.5" max="500" [(ngModel)]="nuevoPesoEstimadoKg" name="nuevoPesoEstimadoKg" class="input-stitch w-full py-2 px-3 text-sm font-medium text-center" placeholder="5.0">
             </div>
 
             <div>
@@ -524,7 +514,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                 Cancelar
               </button>
               <button type="submit" [disabled]="isSubmittingRetiro" class="px-5 py-2.5 rounded-xl bg-[#1F6685] hover:bg-[#164E66] text-white text-xs font-bold cursor-pointer">
-                <span *ngIf="!isSubmittingRetiro">Agendar para Despacho</span>
+                <span *ngIf="!isSubmittingRetiro">Guardar Solicitud</span>
                 <span *ngIf="isSubmittingRetiro"><i class="fa-solid fa-spinner fa-spin"></i> Guardando...</span>
               </button>
             </div>

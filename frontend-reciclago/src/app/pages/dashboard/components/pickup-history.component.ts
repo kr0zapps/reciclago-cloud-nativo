@@ -17,20 +17,20 @@ import { Pickup } from '../data/sectors.data';
           <!-- Badge de Modo Staff para Admin / Coordinador -->
           <div *ngIf="isStaff" class="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-[#123F5B] text-white text-xs font-bold tracking-wide uppercase mb-2 shadow-2xs">
             <i class="fa-solid fa-clipboard-user text-sky-400"></i>
-            <span>Consola de Despacho • DIMAO Puerto Varas</span>
+            <span>Trazabilidad Comunal • Puerto Varas</span>
           </div>
 
           <h3 class="font-heading font-extrabold text-2xl sm:text-3xl text-brand-navy">
-            {{ isStaff ? 'Gestión y Trazabilidad de Retiros Comunales' : 'Mis retiros anteriores' }}
+            {{ isStaff ? 'Gestión de Retiros Comunales' : 'Mis retiros anteriores' }}
           </h3>
           <p class="text-base text-brand-muted mt-0.5">
-            {{ isStaff ? 'Supervisión en tiempo real de cuadrillas y avance del ciclo de vida en la comuna.' : 'Historial transparente de aportes reciclables en tu domicilio.' }}
+            {{ isStaff ? 'Supervisión de solicitudes y estado del retiro en la comuna.' : 'Historial de aportes reciclables en tu domicilio.' }}
           </p>
         </div>
 
         <button (click)="openHistorialModal()" type="button" class="btn-action text-sm font-bold text-brand-lake hover:text-brand-navy flex items-center gap-2 transition-colors self-start sm:self-auto cursor-pointer px-4 py-2 rounded-xl bg-[#F0F6F9] hover:bg-[#E2EFF5] border border-[#CCE1EC]">
           <i class="fa-solid fa-clock-rotate-left text-xs"></i>
-          <span>{{ isStaff ? 'Auditoría Completa de la Comuna' : 'Ver todos los retiros' }}</span>
+          <span>Ver todos los retiros</span>
           <i class="fa-solid fa-chevron-right text-xs btn-arrow ml-1"></i>
         </button>
       </div>

@@ -12,50 +12,38 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
   imports: [CommonModule, FormsModule],
   template: `
     <div class="space-y-6 sm:space-y-8">
-      <!-- ==================== 1. ENCABEZADO EJECUTIVO JEFATURA DIMAO ==================== -->
-      <section class="bg-white rounded-2xl p-5 sm:p-6 border border-[#E2E9E4] shadow-xs">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          <div>
-            <div class="flex items-center gap-2 text-xs font-bold text-[#123F5B] mb-1">
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#123F5B]/10 text-[#123F5B] uppercase tracking-wider text-[10px] font-black">
-                <i class="fa-solid fa-shield-halved text-xs"></i> Jefatura DIMAO
-              </span>
-              <span class="text-slate-300">•</span>
-              <span class="text-slate-500">Supervisión Comunal: <strong class="text-brand-navy">{{ sector?.cuadrante || sector?.nombre || 'Puerto Varas Urbano' }}</strong></span>
-            </div>
-            <h2 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy">
-              Panel Maestro de Operaciones, Flota y Fiscalización
-            </h2>
-            <p class="text-xs text-slate-500 mt-0.5">
-              Control de disponibilidad técnica de camiones, auditoría de eventos y reporte oficial de trazabilidad.
-            </p>
-          </div>
-
-          <!-- Acciones de Gobernanza y Reportabilidad -->
-          <div class="flex items-center gap-2.5 flex-wrap flex-shrink-0">
-            <button (click)="exportarPlanillaCsv()"
-                    type="button"
-                    class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold border border-slate-200 transition-all cursor-pointer">
-              <i class="fa-solid fa-file-csv text-slate-500 text-sm"></i>
-              <span>Descargar CSV Oficial</span>
-            </button>
-
-            <button (click)="openAuditoriaModal.emit()"
-                    type="button"
-                    class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-[#123F5B] hover:bg-[#0D3549] text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer">
-              <i class="fa-solid fa-clock-rotate-left text-xs"></i>
-              <span>Auditoría Comunal</span>
-            </button>
-
-            <button (click)="openNuevoRetiroModal()"
-                    type="button"
-                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer">
-              <i class="fa-solid fa-plus text-xs"></i>
-              <span>Ingreso Telefónico</span>
-            </button>
-          </div>
+      <!-- Barra de Acciones de Administración -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs text-slate-500 font-medium">
+            Supervisión: <strong class="text-[#123F5B] font-bold">{{ sector?.nombre || 'Puerto Varas' }}</strong>
+          </span>
         </div>
-      </section>
+
+        <!-- Acciones -->
+        <div class="flex items-center gap-2.5 flex-wrap flex-shrink-0">
+          <button (click)="exportarPlanillaCsv()"
+                  type="button"
+                  class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold border border-slate-200 transition-all cursor-pointer">
+            <i class="fa-solid fa-file-csv text-slate-500 text-sm"></i>
+            <span>Exportar CSV</span>
+          </button>
+
+          <button (click)="openAuditoriaModal.emit()"
+                  type="button"
+                  class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-[#123F5B] hover:bg-[#0D3549] text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer">
+            <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+            <span>Auditoría</span>
+          </button>
+
+          <button (click)="openNuevoRetiroModal()"
+                  type="button"
+                  class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer">
+            <i class="fa-solid fa-plus text-xs"></i>
+            <span>Ingresar Solicitud</span>
+          </button>
+        </div>
+      </div>
 
       <!-- ==================== 2. TARJETAS DE KPIS EJECUTIVOS ==================== -->
       <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
@@ -529,14 +517,14 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-2.5">
               <div class="w-9 h-9 rounded-xl bg-[#EEF5EB] text-[#4F8A3D] flex items-center justify-center text-sm font-bold border border-[#CCE4C8]">
-                <i class="fa-solid fa-phone-volume"></i>
+                <i class="fa-solid fa-file-circle-plus"></i>
               </div>
               <div>
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Jefatura DIMAO</span>
-                <h3 id="admin-mesa-title" class="font-heading font-extrabold text-lg text-[#123F5B]">Ingreso de Retiro por Mesa de Ayuda</h3>
+                <h3 id="admin-mesa-title" class="font-heading font-extrabold text-lg text-[#123F5B]">Ingresar Solicitud de Retiro</h3>
+                <p class="text-xs text-slate-400">Registro de solicitud vecinal para recolección</p>
               </div>
             </div>
-            <button (click)="closeNuevoRetiroModal()" type="button" aria-label="Cerrar modal de mesa de ayuda" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-colors cursor-pointer">
+            <button (click)="closeNuevoRetiroModal()" type="button" aria-label="Cerrar modal" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-colors cursor-pointer">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
@@ -570,17 +558,23 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
               <input id="adminNuevaDireccion" type="text" [(ngModel)]="nuevaDireccion" name="nuevaDireccion" required class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: San Francisco 320, Puerto Varas">
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label for="adminNuevoResiduoId" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Tipo de Residuo / Material</label>
-                <select id="adminNuevoResiduoId" [(ngModel)]="nuevoResiduoId" name="nuevoResiduoId" class="select-stitch w-full py-2 px-3 text-sm font-medium">
-                  <option *ngFor="let r of residuos" [value]="r.id">{{ r.nombre }}</option>
-                </select>
+            <!-- Selector de Material -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1.5">Tipo de Residuo / Material</label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button *ngFor="let r of residuos"
+                        type="button"
+                        (click)="nuevoResiduoId = r.id"
+                        class="py-2 px-2 rounded-xl text-center border-2 transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5"
+                        [ngClass]="nuevoResiduoId === r.id ? 'bg-[#EEF5EB] border-[#4F8A3D] text-[#123F5B] ring-2 ring-emerald-300 shadow-2xs font-extrabold' : 'bg-white border-[#E2E9E4] text-slate-700 hover:bg-slate-50'">
+                  <span class="text-xs font-bold truncate max-w-full">{{ r.nombre }}</span>
+                </button>
               </div>
-              <div>
-                <label for="adminNuevoPeso" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Peso Estimado (kg)</label>
-                <input id="adminNuevoPeso" type="number" step="0.5" min="0.5" max="500" [(ngModel)]="nuevoPesoEstimadoKg" name="nuevoPesoEstimadoKg" class="input-stitch w-full py-2 px-3 text-sm font-medium text-center" placeholder="5.0">
-              </div>
+            </div>
+
+            <div>
+              <label for="adminNuevoPeso" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Peso Estimado (kg)</label>
+              <input id="adminNuevoPeso" type="number" step="0.5" min="0.5" max="500" [(ngModel)]="nuevoPesoEstimadoKg" name="nuevoPesoEstimadoKg" class="input-stitch w-full py-2 px-3 text-sm font-medium text-center" placeholder="5.0">
             </div>
 
             <div>
@@ -593,7 +587,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                 Cancelar
               </button>
               <button type="submit" [disabled]="isSubmittingRetiro" class="btn-stitch-primary px-5 py-2.5 text-xs font-bold cursor-pointer">
-                <span *ngIf="!isSubmittingRetiro">Crear Solicitud en Sistema</span>
+                <span *ngIf="!isSubmittingRetiro">Guardar Solicitud</span>
                 <span *ngIf="isSubmittingRetiro"><i class="fa-solid fa-spinner fa-spin"></i> Guardando...</span>
               </button>
             </div>

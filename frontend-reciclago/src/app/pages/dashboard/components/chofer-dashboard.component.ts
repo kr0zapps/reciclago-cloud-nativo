@@ -9,41 +9,29 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
   imports: [CommonModule, FormsModule],
   template: `
     <div class="space-y-6 sm:space-y-8">
-      <!-- ==================== 1. CONSOLA DE CABINA MÓVIL DEL CONDUCTOR ==================== -->
-      <section class="bg-white rounded-2xl p-5 sm:p-6 border border-[#E2E9E4] shadow-xs">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          <div>
-            <div class="flex items-center gap-2 text-xs font-bold text-[#4F8A3D] mb-1">
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#4F8A3D]/10 text-[#4F8A3D] uppercase tracking-wider text-[10px] font-black">
-                <i class="fa-solid fa-truck mr-1"></i> Cuadrilla de Terreno
-              </span>
-              <span class="text-slate-300">•</span>
-              <span class="text-slate-500">Conductor: <strong class="text-brand-navy">{{ userName || 'Chofer Municipal DIMAO' }}</strong></span>
-            </div>
-            <h2 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy">
-              Consola de Cabina — Unidad {{ selectedCamion.patente }}
-            </h2>
-            <p class="text-xs text-slate-500 mt-0.5">
-              Hoja de paradas en calle, confirmación táctil de retiro y certificación en báscula digital.
-            </p>
-          </div>
+      <!-- Barra de Chofer -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
+          <span>Conductor: <strong class="text-[#123F5B] font-bold">{{ userName || 'Chofer' }}</strong></span>
+          <span class="text-slate-300">•</span>
+          <span>Unidad: <strong class="text-[#4F8A3D] font-mono font-bold">{{ selectedCamion.patente }}</strong></span>
+        </div>
 
-          <!-- Selector de Camión Conducido Hoy -->
-          <div class="flex items-center gap-2 flex-wrap flex-shrink-0">
-            <span class="text-xs font-bold text-slate-500">Tu Camión:</span>
-            <div class="inline-flex rounded-xl p-1 bg-slate-100 border border-slate-200">
-              <button *ngFor="let c of camiones"
-                      (click)="selectTruck(c.patente)"
-                      type="button"
-                      class="px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all cursor-pointer"
-                      [ngClass]="selectedTruckPatente === c.patente ? 'bg-[#4F8A3D] text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'">
-                <i class="fa-solid fa-truck text-[10px] mr-1"></i>
-                {{ c.patente }}
-              </button>
-            </div>
+        <!-- Selector de Camión Asignado -->
+        <div class="flex items-center gap-2 flex-wrap flex-shrink-0">
+          <span class="text-xs font-bold text-slate-500">Camión:</span>
+          <div class="inline-flex rounded-xl p-1 bg-slate-100 border border-slate-200">
+            <button *ngFor="let c of camiones"
+                    (click)="selectTruck(c.patente)"
+                    type="button"
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all cursor-pointer"
+                    [ngClass]="selectedTruckPatente === c.patente ? 'bg-[#4F8A3D] text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'">
+              <i class="fa-solid fa-truck text-[10px] mr-1"></i>
+              {{ c.patente }}
+            </button>
           </div>
         </div>
-      </section>
+      </div>
 
       <!-- ==================== 2. KPIS Y MEDIDOR DE CAPACIDAD DE TOLVA ==================== -->
       <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
