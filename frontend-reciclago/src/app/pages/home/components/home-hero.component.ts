@@ -36,9 +36,9 @@ import { RouterModule } from '@angular/router';
 
           <!-- Columna Izquierda: Mensaje Central Comunal -->
           <div class="lg:col-span-7 xl:col-span-8 max-w-2xl">
-            <!-- Eyebrow: PORTAL AMBIENTAL CIUDADANO · RECICLAGOO -->
+            <!-- Eyebrow: PORTAL AMBIENTAL CIUDADANO · RECICLAGO -->
             <div class="text-xs sm:text-sm font-bold text-[#22c55e] tracking-widest uppercase mb-3.5 drop-shadow-sm">
-              PORTAL AMBIENTAL CIUDADANO · RECICLAGOO
+              PORTAL AMBIENTAL CIUDADANO · RECICLAGO
             </div>
 
             <!-- Título Principal con Tipografía de Impacto Condensada: JUNTOS CUIDAMOS PUERTO VARAS -->

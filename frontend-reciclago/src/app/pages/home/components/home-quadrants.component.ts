@@ -345,7 +345,7 @@ export class HomeQuadrantsComponent implements OnInit {
       if (cat.includes('VIDRIO')) residuosMap.set('VIDRIO', r);
       else if (cat.includes('CARTON')) residuosMap.set('CARTON', r);
       else if (cat.includes('PLASTICO')) residuosMap.set('PLASTICO', r);
-      else if (cat.includes('LATA')) residuosMap.set('LATAS', r);
+      else if (cat.includes('LATA') || cat.includes('METAL')) residuosMap.set('LATAS', r);
     });
 
     this.quadrants = this.quadrants.map(q => {

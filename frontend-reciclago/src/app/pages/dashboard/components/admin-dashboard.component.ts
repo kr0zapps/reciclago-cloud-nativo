@@ -1,8 +1,10 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, SimpleChanges, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data';
+import { Sector, Camion, Residuo, Pickup, Waypoint, EstadoCamion } from '../data/sectors.data';
 import { BffService } from '../../../services/bff.service';
+import { formatRut, validateRut } from '../../../shared/utils/rut.utils';
+import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/phone.utils';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -515,6 +517,9 @@ import { BffService } from '../../../services/bff.service';
       <!-- ==================== MODAL TELEFÓNICO ==================== -->
       <div *ngIf="showNuevoRetiroModal"
            (click)="closeNuevoRetiroModal()"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="admin-mesa-title"
            class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
         <div (click)="$event.stopPropagation()"
              class="relative w-full max-w-lg bg-white rounded-[2rem] shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto p-6 sm:p-8">
@@ -528,35 +533,59 @@ import { BffService } from '../../../services/bff.service';
               </div>
               <div>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Jefatura DIMAO</span>
-                <h3 class="font-heading font-extrabold text-lg text-brand-navy">Ingreso de Retiro por Mesa de Ayuda</h3>
+                <h3 id="admin-mesa-title" class="font-heading font-extrabold text-lg text-[#123F5B]">Ingreso de Retiro por Mesa de Ayuda</h3>
               </div>
             </div>
-            <button (click)="closeNuevoRetiroModal()" type="button" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-colors cursor-pointer">
+            <button (click)="closeNuevoRetiroModal()" type="button" aria-label="Cerrar modal de mesa de ayuda" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-colors cursor-pointer">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
 
-          <form (ngSubmit)="submitRetiroVecinal()" class="space-y-4 text-left">
+          <div *ngIf="mesaError" role="alert" aria-live="polite" class="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+            <i class="fa-solid fa-circle-exclamation text-rose-600"></i>
+            <span>{{ mesaError }}</span>
+          </div>
+
+          <form (ngSubmit)="submitRetiroVecinal()" class="space-y-3.5 text-left">
             <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Nombre o Teléfono del Vecino</label>
-              <input type="text" [(ngModel)]="nuevoVecinoNombre" name="nuevoVecinoNombre" required class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: Juan Pérez (+56 9 8765 4321)">
+              <label for="adminVecinoNombre" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Nombre Completo del Vecino</label>
+              <input id="adminVecinoNombre" type="text" [(ngModel)]="nuevoVecinoNombre" name="nuevoVecinoNombre" required class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: Juan Pérez González">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="adminVecinoRut" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">RUT Vecino (Opcional)</label>
+                <input id="adminVecinoRut" type="text" [value]="nuevoVecinoRut" (input)="onMesaRutInput($event)" name="nuevoVecinoRut" class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: 12.345.678-K">
+                <span *ngIf="mesaRutError" class="text-[10px] text-rose-600 font-bold mt-0.5 block">{{ mesaRutError }}</span>
+              </div>
+              <div>
+                <label for="adminVecinoTelefono" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Teléfono Móvil (Opcional)</label>
+                <input id="adminVecinoTelefono" type="text" [value]="nuevoVecinoTelefono" (input)="onMesaPhoneInput($event)" name="nuevoVecinoTelefono" class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: +56 9 8765 4321">
+                <span *ngIf="mesaPhoneError" class="text-[10px] text-rose-600 font-bold mt-0.5 block">{{ mesaPhoneError }}</span>
+              </div>
             </div>
 
             <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Dirección Exacta</label>
-              <input type="text" [(ngModel)]="nuevaDireccion" name="nuevaDireccion" required class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: San Francisco 320, Puerto Varas">
+              <label for="adminNuevaDireccion" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Dirección Exacta</label>
+              <input id="adminNuevaDireccion" type="text" [(ngModel)]="nuevaDireccion" name="nuevaDireccion" required class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: San Francisco 320, Puerto Varas">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="adminNuevoResiduoId" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Tipo de Residuo / Material</label>
+                <select id="adminNuevoResiduoId" [(ngModel)]="nuevoResiduoId" name="nuevoResiduoId" class="select-stitch w-full py-2 px-3 text-sm font-medium">
+                  <option *ngFor="let r of residuos" [value]="r.id">{{ r.nombre }}</option>
+                </select>
+              </div>
+              <div>
+                <label for="adminNuevoPeso" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Peso Estimado (kg)</label>
+                <input id="adminNuevoPeso" type="number" step="0.5" min="0.5" max="500" [(ngModel)]="nuevoPesoEstimadoKg" name="nuevoPesoEstimadoKg" class="input-stitch w-full py-2 px-3 text-sm font-medium text-center" placeholder="5.0">
+              </div>
             </div>
 
             <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Tipo de Residuo / Material</label>
-              <select [(ngModel)]="nuevoResiduoId" name="nuevoResiduoId" class="select-stitch w-full py-2 px-3 text-sm font-medium">
-                <option *ngFor="let r of residuos" [value]="r.id">{{ r.nombre }}</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Observaciones / Detalle</label>
-              <textarea [(ngModel)]="nuevosComentarios" name="nuevosComentarios" rows="2" class="input-stitch w-full py-2 px-3 text-sm" placeholder="Ej: Solicita retiro de colchón de 2 plazas"></textarea>
+              <label for="adminNuevosComentarios" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Observaciones / Detalle</label>
+              <textarea id="adminNuevosComentarios" [(ngModel)]="nuevosComentarios" name="nuevosComentarios" rows="2" class="input-stitch w-full py-2 px-3 text-sm" placeholder="Ej: Solicita retiro de colchón de 2 plazas"></textarea>
             </div>
 
             <div class="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
@@ -604,9 +633,15 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
   showNuevoRetiroModal = false;
   isSubmittingRetiro = false;
   nuevoVecinoNombre = '';
+  nuevoVecinoRut = '';
+  nuevoVecinoTelefono = '';
   nuevaDireccion = '';
   nuevoResiduoId = 1;
+  nuevoPesoEstimadoKg = 5.0;
   nuevosComentarios = '';
+  mesaRutError = '';
+  mesaPhoneError = '';
+  mesaError = '';
 
   truckWaypointsMap: Record<string, Waypoint> = {
     'PV-RC-2026': { name: 'Costanera Sur / San Francisco', detail: 'Recorriendo cuadrante costero', eta: '6 min', distancia: '850 m', x: 28, y: 72, estado: 'En recorrido' },
@@ -615,6 +650,17 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
   };
 
   constructor(private bffService: BffService) {}
+
+  @HostListener('document:keydown.escape')
+  handleEscape(): void {
+    if (this.showNuevoRetiroModal && !this.isSubmittingRetiro) {
+      this.closeNuevoRetiroModal();
+    }
+  }
+
+  ngOnDestroy(): void {
+    document.body.style.overflow = '';
+  }
 
   ngOnInit(): void {}
 
@@ -637,7 +683,7 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
   }
 
   toggleMantenimiento(camion: Camion): void {
-    const nuevoEstado: string = camion.estado === 'MANTENIMIENTO' ? 'DISPONIBLE' : 'MANTENIMIENTO';
+    const nuevoEstado: EstadoCamion = camion.estado === 'MANTENIMIENTO' ? 'DISPONIBLE' : 'MANTENIMIENTO';
     camion.estado = nuevoEstado;
     this.camionEstadoCambiado.emit(camion);
     if (camion.id) {
@@ -656,24 +702,34 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
   }
 
   exportarPlanillaCsv(): void {
+    const sanitizeCsvField = (val: any): string => {
+      let s = String(val ?? '').replace(/"/g, '""').replace(/[\r\n]+/g, ' ');
+      if (/^[=+\-@\t]/.test(s)) {
+        s = "'" + s;
+      }
+      return `"${s}"`;
+    };
+
     const headers = ['ID', 'Direccion', 'Material', 'Estado', 'Fecha', 'Kilos Recolectados', 'Comentarios'];
     const rows = this.filteredPickups.map(p => [
       p.id,
-      `"${(p.direccion || '').replace(/"/g, '""')}"`,
-      `"${(p.residuoNombre || '').replace(/"/g, '""')}"`,
+      sanitizeCsvField(p.direccion),
+      sanitizeCsvField(p.residuoNombre),
       p.estado,
-      p.fecha || p.fechaTexto || '',
+      sanitizeCsvField(p.fecha || p.fechaTexto || ''),
       p.kilosRecolectados || 0,
-      `"${(p.comentarios || '').replace(/"/g, '""')}"`
+      sanitizeCsvField(p.comentarios)
     ]);
-    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(';'), ...rows.map(e => e.join(';'))].join('\n');
-    const encodedUri = encodeURI(csvContent);
+    const csvContent = '\uFEFF' + [headers.join(';'), ...rows.map(e => e.join(';'))].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
+    link.setAttribute('href', url);
     link.setAttribute('download', `planilla_oficial_dimao_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 
   get countPendientes(): number {
@@ -759,30 +815,79 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
     this.actionRequested.emit({ pickup, action });
   }
 
+  onMesaRutInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.nuevoVecinoRut = formatRut(input.value);
+    if (this.nuevoVecinoRut.length > 3) {
+      this.mesaRutError = validateRut(this.nuevoVecinoRut) ? '' : 'RUT inválido (ej: 12.345.678-K)';
+    } else {
+      this.mesaRutError = '';
+    }
+  }
+
+  onMesaPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.nuevoVecinoTelefono = formatChileanPhone(input.value);
+    if (this.nuevoVecinoTelefono.length > 6) {
+      this.mesaPhoneError = validateChileanPhone(this.nuevoVecinoTelefono) ? '' : 'Formato inválido (ej: +56 9 8765 4321)';
+    } else {
+      this.mesaPhoneError = '';
+    }
+  }
+
   openNuevoRetiroModal(): void {
     this.showNuevoRetiroModal = true;
+    this.mesaError = '';
+    this.mesaRutError = '';
+    this.mesaPhoneError = '';
     document.body.style.overflow = 'hidden';
   }
 
   closeNuevoRetiroModal(): void {
     this.showNuevoRetiroModal = false;
+    this.mesaError = '';
+    this.mesaRutError = '';
+    this.mesaPhoneError = '';
     document.body.style.overflow = '';
   }
 
   submitRetiroVecinal(): void {
-    if (!this.nuevaDireccion) return;
+    this.mesaError = '';
+    if (!this.nuevaDireccion || !this.nuevaDireccion.trim()) {
+      this.mesaError = 'Por favor ingresa la dirección exacta del domicilio.';
+      return;
+    }
+    if (this.nuevoVecinoRut && !validateRut(this.nuevoVecinoRut)) {
+      this.mesaRutError = 'RUT inválido (ej: 12.345.678-K).';
+      this.mesaError = 'Corrige el RUT ingresado.';
+      return;
+    }
+    if (this.nuevoVecinoTelefono && !validateChileanPhone(this.nuevoVecinoTelefono)) {
+      this.mesaPhoneError = 'Teléfono celular inválido (+56 9 XXXX XXXX).';
+      this.mesaError = 'Corrige el teléfono ingresado.';
+      return;
+    }
+    const pesoNum = Number(this.nuevoPesoEstimadoKg) > 0 ? Number(this.nuevoPesoEstimadoKg) : 5.0;
+
     this.isSubmittingRetiro = true;
     const resObj = this.residuos.find(r => r.id === Number(this.nuevoResiduoId));
+    const contactoInfo = [
+      this.nuevoVecinoRut ? `RUT: ${this.nuevoVecinoRut}` : '',
+      this.nuevoVecinoTelefono ? `Tel: ${this.nuevoVecinoTelefono}` : ''
+    ].filter(Boolean).join(' • ');
+
+    const comentariosCompletos = `[Ingreso Mesa Central DIMAO - ${this.nuevoVecinoNombre || 'Atención Ciudadana'}${contactoInfo ? ' - ' + contactoInfo : ''}] ${this.nuevosComentarios || ''}`.trim();
+
     const item = {
       vecinoNombre: this.nuevoVecinoNombre || 'Vecino Puerto Varas',
       vecinoEmail: 'vecino.contacto@puertovaras.cl',
-      direccion: this.nuevaDireccion,
+      direccion: this.nuevaDireccion.trim(),
       comuna: 'Puerto Varas',
       residuoId: Number(this.nuevoResiduoId || 1),
       residuoNombre: resObj ? resObj.nombre : 'Vidrio',
-      pesoEstimadoKg: 5.0,
-      comentarios: `[Ingreso Mesa Central DIMAO - ${this.nuevoVecinoNombre || 'Atención Ciudadana'}] ${this.nuevosComentarios || ''}`,
-      observaciones: `[Ingreso Mesa Central DIMAO - ${this.nuevoVecinoNombre || 'Atención Ciudadana'}] ${this.nuevosComentarios || ''}`
+      pesoEstimadoKg: pesoNum,
+      comentarios: comentariosCompletos,
+      observaciones: comentariosCompletos
     };
     this.pickupCreated.emit(item);
     setTimeout(() => {
@@ -790,7 +895,10 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
       this.closeNuevoRetiroModal();
       this.nuevaDireccion = '';
       this.nuevoVecinoNombre = '';
+      this.nuevoVecinoRut = '';
+      this.nuevoVecinoTelefono = '';
       this.nuevosComentarios = '';
+      this.nuevoPesoEstimadoKg = 5.0;
     }, 500);
   }
 

@@ -1,8 +1,8 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BffService } from '../../../../services/bff.service';
-import { Pickup, Camion, Sector, DEFAULT_SECTORES } from '../../data/sectors.data';
+import { Pickup, Camion, Sector } from '../../data/sectors.data';
 import { DateOption, TimeSlot } from './programar-modal.component';
 import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
 
@@ -13,6 +13,9 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
   template: `
     <div *ngIf="isOpen"
          (click)="onClose()"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="modal-chofer-title"
          class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
       
       <div (click)="$event.stopPropagation()"
@@ -33,12 +36,12 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
               <span class="text-[10px] font-black uppercase tracking-wider text-slate-500 block">
                 {{ actionType === 'en-ruta' ? 'Despacho y Salida a Ruta' : 'Operación de Cabina' }}
               </span>
-              <h3 class="font-heading font-extrabold text-lg sm:text-xl text-[#123F5B]">
+              <h3 id="modal-chofer-title" class="font-heading font-extrabold text-lg sm:text-xl text-[#123F5B]">
                 {{ actionType === 'en-ruta' ? 'Despachar a Ruta' : 'Confirmar Retiro' }} #{{ pickup?.id }}
               </h3>
             </div>
           </div>
-          <button (click)="onClose()" type="button" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-colors cursor-pointer">
+          <button (click)="onClose()" type="button" aria-label="Cerrar modal de cabina" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-colors cursor-pointer">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -154,16 +157,44 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
 
             <!-- 3. Camión si hay disponibles -->
             <div *ngIf="camionesDisponibles && camionesDisponibles.length > 0">
-              <label class="block text-[11px] font-bold uppercase tracking-wider text-[#123F5B] mb-1">
-                Camión Asignado
-              </label>
-              <select [(ngModel)]="actionCamionPatente" (ngModelChange)="hasScheduleChanges = true" class="select-stitch w-full py-1.5 px-2.5 text-xs font-medium bg-white">
-                <option *ngFor="let c of camionesDisponibles"
-                        [value]="c.patente"
-                        [disabled]="c.estado === 'MANTENIMIENTO'">
-                  {{ c.patente }} — Cap: {{ c.capacidadKilos || 1500 }} kg ({{ c.estado === 'MANTENIMIENTO' ? 'EN TALLER - Inoperable' : (c.estado === 'EN_RUTA' ? 'En ruta' : 'Disponible') }})
-                </option>
-              </select>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-[#123F5B]">
+                  Camión Asignado
+                </label>
+                <span class="text-[9.5px] font-semibold text-slate-500">
+                  {{ activeCamionesCount }} disponibles de {{ camionesDisponibles.length }}
+                </span>
+              </div>
+
+              <!-- Grilla de Tarjetas de Camión -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <button *ngFor="let c of camionesDisponibles"
+                        (click)="seleccionarCamion(c)"
+                        [disabled]="c.estado === 'MANTENIMIENTO'"
+                        type="button"
+                        class="p-2 rounded-xl text-left border transition-all flex flex-col justify-between gap-1 relative cursor-pointer"
+                        [ngClass]="c.estado === 'MANTENIMIENTO'
+                          ? 'bg-slate-50 border-slate-200 opacity-50 cursor-not-allowed text-slate-400'
+                          : (actionCamionPatente === c.patente
+                            ? 'bg-[#EEF5EB] border-[#4F8A3D] ring-2 ring-emerald-300 text-emerald-950 shadow-2xs'
+                            : 'bg-white border-[#E2E9E4] hover:border-slate-300 hover:bg-slate-50/80 text-slate-700')">
+                  <div class="flex items-center justify-between gap-1">
+                    <div class="flex items-center gap-1.5">
+                      <i class="fa-solid fa-truck-front text-xs"
+                         [ngClass]="actionCamionPatente === c.patente ? 'text-[#4F8A3D]' : 'text-slate-400'"></i>
+                      <span class="text-xs font-black tracking-tight font-mono">{{ c.patente }}</span>
+                    </div>
+                    <i *ngIf="actionCamionPatente === c.patente" class="fa-solid fa-circle-check text-xs text-[#4F8A3D]"></i>
+                  </div>
+                  <div class="flex items-center justify-between text-[9px] pt-1 border-t border-slate-100">
+                    <span class="font-medium text-slate-500">{{ c.capacidadKilos || 1500 }} kg</span>
+                    <span class="px-1.5 py-0.5 rounded-full font-bold"
+                          [ngClass]="c.estado === 'MANTENIMIENTO' ? 'bg-rose-100 text-rose-700' : (c.estado === 'EN_RUTA' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800')">
+                      {{ c.estado === 'MANTENIMIENTO' ? 'En Taller' : (c.estado === 'EN_RUTA' ? 'En Ruta' : 'Disponible') }}
+                    </span>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -181,13 +212,13 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
         </div>
 
         <!-- Banner de Error Sobrio -->
-        <div *ngIf="errorMessage" class="mt-4 p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 text-xs flex items-start gap-2.5 text-left">
+        <div *ngIf="errorMessage" role="alert" aria-live="polite" class="mt-4 p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 text-xs flex items-start gap-2.5 text-left">
           <i class="fa-solid fa-circle-exclamation text-amber-600 text-base mt-0.5 flex-shrink-0"></i>
           <div class="flex-1 min-w-0">
             <span class="font-bold block text-sm text-amber-950">{{ errorTitle }}</span>
             <span class="text-xs text-amber-900 leading-relaxed mt-0.5 block">{{ errorMessage }}</span>
           </div>
-          <button (click)="errorMessage = ''" type="button" class="text-amber-500 hover:text-amber-800 text-xs cursor-pointer">
+          <button (click)="errorMessage = ''" type="button" aria-label="Cerrar aviso" class="text-amber-500 hover:text-amber-800 text-xs cursor-pointer">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -212,9 +243,9 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
 })
 export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
   @Input() isOpen: boolean = false;
-  @Input() pickup: Pickup | any = null;
+  @Input() pickup: Pickup | null = null;
   @Input() actionType: 'en-ruta' | 'retirado' = 'en-ruta';
-  @Input() camionesDisponibles: Camion[] | any[] = [];
+  @Input() camionesDisponibles: Camion[] = [];
 
   @Output() close = new EventEmitter<void>();
   @Output() actionCompleted = new EventEmitter<void>();
@@ -324,6 +355,23 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
     }
   }
 
+  get activeCamionesCount(): number {
+    return (this.camionesDisponibles || []).filter(c => c.estado !== 'MANTENIMIENTO').length;
+  }
+
+  seleccionarCamion(c: Camion): void {
+    if (c.estado === 'MANTENIMIENTO') return;
+    this.actionCamionPatente = c.patente;
+    this.hasScheduleChanges = true;
+  }
+
+  @HostListener('document:keydown.escape')
+  handleEscape(): void {
+    if (this.isOpen && !this.isSubmitting) {
+      this.onClose();
+    }
+  }
+
   getValidCamionPatente(desiredPatente: string): string {
     const list = this.camionesDisponibles || [];
     const desired = list.find(c => c.patente === desiredPatente);
@@ -356,14 +404,19 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
     const dates: DateOption[] = [];
     const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     const now = new Date();
-    const targetDays = this.allowedDayNumbers;
+
+    let targetDays = this.allowedDayNumbers;
+    if (!targetDays || targetDays.length === 0) {
+      targetDays = [1, 2, 3, 4, 5]; // Días hábiles por defecto
+    }
     let checkDate = new Date(now);
     checkDate.setDate(checkDate.getDate() + 1);
 
     const sublabels = ['Próximo recorrido', 'Semana siguiente', 'En 2 semanas', 'En 3 semanas'];
     let count = 0;
+    let maxIterations = 60; // Protección contra bucle infinito
 
-    while (dates.length < 4) {
+    while (dates.length < 4 && maxIterations-- > 0) {
       if (targetDays.includes(checkDate.getDay())) {
         const y = checkDate.getFullYear();
         const m = String(checkDate.getMonth() + 1).padStart(2, '0');
@@ -483,6 +536,7 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
   }
 
   private procederConDespacho(): void {
+    if (!this.pickup) return;
     const obs = this.actionType === 'en-ruta'
       ? this.bffService.enRutaPickup(this.pickup.id)
       : this.bffService.retiradoPickup(this.pickup.id);

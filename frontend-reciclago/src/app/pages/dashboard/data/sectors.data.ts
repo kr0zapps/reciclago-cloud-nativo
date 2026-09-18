@@ -49,13 +49,15 @@ export interface Camion {
   capacidadTotalKg?: number;
   capacidadDisponibleKg?: number;
   modelo?: string;
-  estado?: EstadoCamion | string;
+  estado?: EstadoCamion;
 }
 
 export interface Pickup {
   id: number;
   fecha?: string;
   fechaTexto?: string;
+  fechaProgramada?: string;
+  codigoRetiro?: string;
   residuoNombre?: string;
   kilosRecolectados?: number;
   pesoRealKg?: number;
@@ -63,8 +65,11 @@ export interface Pickup {
   direccion?: string;
   estado?: string;
   comentarios?: string;
+  observaciones?: string;
+  motivoCancelacion?: string;
   camionPatente?: string;
   camionId?: number;
+  vecinoNombre?: string;
   vecinoEmail?: string;
 }
 
@@ -361,7 +366,7 @@ export const DEFAULT_RESIDUOS: Residuo[] = [
 export const DEFAULT_CAMIONES: Camion[] = [
   { id: 1, patente: 'PV-RC-2026', capacidadKilos: 1500, estado: 'DISPONIBLE' },
   { id: 2, patente: 'PV-RC-2027', capacidadKilos: 3000, estado: 'DISPONIBLE' },
-  { id: 3, patente: 'PV-RC-2028', capacidadKilos: 2000, estado: 'EN_BASE' }
+  { id: 3, patente: 'PV-RC-2028', capacidadKilos: 2000, estado: 'DISPONIBLE' }
 ];
 
 export function getNextDateForDay(dayName: string): string {
@@ -376,7 +381,8 @@ export function getNextDateForDay(dayName: string): string {
     return `¡Hoy (${dayName})! Recorrido en curso`;
   }
   if (diff < 0) diff += 7;
-  const nextDate = new Date(now.getTime() + diff * 24 * 60 * 60 * 1000);
+  const nextDate = new Date(now);
+  nextDate.setDate(now.getDate() + diff);
   const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   return `${dayName} ${String(nextDate.getDate()).padStart(2, '0')} ${months[nextDate.getMonth()]}`;
 }

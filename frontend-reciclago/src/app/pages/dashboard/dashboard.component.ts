@@ -134,7 +134,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.userName = account.name || account.username || '';
       const claims = account.idTokenClaims as Record<string, any> | undefined;
       if (claims) {
-        if (claims['roles']) this.userRoles = [...claims['roles']];
+        if (Array.isArray(claims['roles'])) {
+          this.userRoles = [...claims['roles']];
+        } else if (typeof claims['roles'] === 'string') {
+          this.userRoles = [claims['roles']];
+        }
         this.userEmail = (claims['preferred_username'] || claims['upn'] || account.username || '') as string;
       } else {
         this.userEmail = account.username || '';
@@ -146,17 +150,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
     // Sincronizar roles desde el Access Token a través de /api/me
     this.bffService.getProfile().subscribe({
       next: (profile) => {
+        let changed = false;
         if (profile && Array.isArray(profile.roles) && profile.roles.length > 0) {
           this.userRoles = Array.from(new Set([...this.userRoles, ...profile.roles]));
           this.syncDefaultStaffRole();
+          changed = true;
         }
         if (profile && (profile.email || profile.username) && !this.userEmail) {
           this.userEmail = profile.email || profile.username || '';
+          changed = true;
         }
         if (profile && profile.name && !this.userName) {
           this.userName = profile.name;
         }
-        this.loadPickups();
+        if (changed) {
+          this.loadPickups();
+        }
       },
       error: () => {}
     });
@@ -175,6 +184,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       clearInterval(this.truckTimer);
       this.truckTimer = null;
     }
+    document.body.style.overflow = '';
   }
 
   syncDefaultStaffRole(): void {
@@ -357,17 +367,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.loadPickups();
       },
       error: (err) => {
-        console.error('Error al crear retiro por staff:', err);
-        const fallback: Pickup = {
-          id: Math.floor(Math.random() * 9000) + 1000,
-          direccion: data.direccion,
-          residuoNombre: resObj ? resObj.nombre : 'Reciclaje',
-          estado: 'SOLICITADO',
-          comentarios: data.comentarios,
-          fechaTexto: 'Por confirmar',
-          fecha: new Date().toISOString()
-        };
-        this.pickups.unshift(fallback);
+        console.error('Error al registrar solicitud en microservicio:', err);
       }
     });
   }

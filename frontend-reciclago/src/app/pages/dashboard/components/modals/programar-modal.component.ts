@@ -1,8 +1,8 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BffService } from '../../../../services/bff.service';
-import { Camion, Pickup, Sector, DEFAULT_SECTORES } from '../../data/sectors.data';
+import { Camion, Pickup, Sector } from '../../data/sectors.data';
 import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
 
 export interface DateOption {
@@ -26,6 +26,9 @@ export interface TimeSlot {
   template: `
     <div *ngIf="isOpen"
          (click)="onClose()"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="modal-programar-title"
          class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
       
       <div (click)="$event.stopPropagation()"
@@ -47,12 +50,12 @@ export interface TimeSlot {
                     [ngClass]="isRetiroEspecial ? 'text-amber-800' : 'text-[#1F6685]'">
                 {{ isEditMode ? 'Modificación de Agenda (Antes de Iniciar Ruta)' : (isRetiroEspecial ? 'Despacho de Servicio Especial' : 'Planificación Logística Comunal') }}
               </span>
-              <h3 class="font-heading font-extrabold text-lg sm:text-xl text-[#123F5B]">
+              <h3 id="modal-programar-title" class="font-heading font-extrabold text-lg sm:text-xl text-[#123F5B]">
                 {{ isEditMode ? 'Editar Programación' : 'Despachar / Programar Retiro' }} #{{ pickup?.id }}
               </h3>
             </div>
           </div>
-          <button (click)="onClose()" type="button" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-colors cursor-pointer">
+          <button (click)="onClose()" type="button" aria-label="Cerrar modal de programación" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-colors cursor-pointer">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -174,18 +177,53 @@ export interface TimeSlot {
           </div>
         </div>
 
-        <!-- 5. SELECTOR DE CAMIÓN -->
+        <!-- 5. SELECTOR INTUITIVO DE CAMIÓN (GRID DE TARJETAS TÁCTILES) -->
         <div class="mb-4 text-left">
-          <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">
-            3. Camión Recolector Municipal Asignado
-          </label>
-          <select [(ngModel)]="actionCamionPatente" class="select-stitch w-full py-2 px-3 text-xs font-medium">
-            <option *ngFor="let c of camionesDisponibles"
-                    [value]="c.patente"
-                    [disabled]="c.estado === 'MANTENIMIENTO'">
-              {{ c.patente }} — Cap: {{ c.capacidadKilos || c.capacidadMaximaKg || 1500 }} kg ({{ c.estado === 'MANTENIMIENTO' ? 'EN TALLER - Inoperable' : (c.estado === 'EN_RUTA' ? 'En ruta' : 'Disponible') }})
-            </option>
-          </select>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B]">
+              3. Camión Recolector Municipal Asignado
+            </label>
+            <span class="text-[10px] font-semibold text-slate-500">
+              {{ activeCamionesCount }} disponibles de {{ camionesDisponibles.length }}
+            </span>
+          </div>
+
+          <!-- Grilla de Tarjetas de Camión -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <button *ngFor="let c of camionesDisponibles"
+                    (click)="seleccionarCamion(c)"
+                    [disabled]="c.estado === 'MANTENIMIENTO'"
+                    type="button"
+                    class="p-2.5 rounded-xl text-left border-2 transition-all flex flex-col justify-between gap-1.5 relative"
+                    [ngClass]="c.estado === 'MANTENIMIENTO'
+                      ? 'bg-slate-50 border-slate-200 opacity-50 cursor-not-allowed text-slate-400'
+                      : (actionCamionPatente === c.patente
+                        ? (isRetiroEspecial ? 'bg-amber-50/90 border-amber-600 ring-2 ring-amber-300 text-amber-950 shadow-xs cursor-pointer' : 'bg-[#EEF5EB] border-[#4F8A3D] ring-2 ring-emerald-300 text-emerald-950 shadow-xs cursor-pointer')
+                        : 'bg-white border-[#E2E9E4] hover:border-slate-300 hover:bg-slate-50/80 text-slate-700 cursor-pointer')">
+              <div class="flex items-center justify-between gap-1">
+                <div class="flex items-center gap-1.5">
+                  <i class="fa-solid fa-truck-front text-xs"
+                     [ngClass]="actionCamionPatente === c.patente ? (isRetiroEspecial ? 'text-amber-700' : 'text-[#4F8A3D]') : 'text-slate-400'"></i>
+                  <span class="text-xs font-black tracking-tight font-mono">{{ c.patente }}</span>
+                </div>
+                <i *ngIf="actionCamionPatente === c.patente"
+                   class="fa-solid fa-circle-check text-xs"
+                   [ngClass]="isRetiroEspecial ? 'text-amber-600' : 'text-[#4F8A3D]'"></i>
+              </div>
+
+              <div class="flex items-center justify-between text-[10px] pt-1 border-t border-slate-100/80">
+                <span class="font-medium text-slate-500">
+                  {{ c.capacidadKilos || c.capacidadMaximaKg || 1500 }} kg
+                </span>
+                <span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold"
+                      [ngClass]="c.estado === 'MANTENIMIENTO'
+                        ? 'bg-rose-100 text-rose-700'
+                        : (c.estado === 'EN_RUTA' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800')">
+                  {{ c.estado === 'MANTENIMIENTO' ? 'En Taller' : (c.estado === 'EN_RUTA' ? 'En Ruta' : 'Disponible') }}
+                </span>
+              </div>
+            </button>
+          </div>
         </div>
 
         <!-- 6. RESUMEN RECONFIRMATIVO EN VIVO -->
@@ -207,7 +245,7 @@ export interface TimeSlot {
         </div>
 
         <!-- Banner de Error si fallara el guardado -->
-        <div *ngIf="errorMessage" class="mb-4 p-3 rounded-2xl bg-rose-50 border border-rose-300 text-rose-900 text-xs flex items-start gap-2 text-left anim-fade-up">
+        <div *ngIf="errorMessage" role="alert" aria-live="polite" class="mb-4 p-3 rounded-2xl bg-rose-50 border border-rose-300 text-rose-900 text-xs flex items-start gap-2 text-left anim-fade-up">
           <i class="fa-solid fa-triangle-exclamation text-rose-500 text-sm mt-0.5 flex-shrink-0"></i>
           <div>
             <span class="font-bold block">Error al Guardar</span>
@@ -234,8 +272,8 @@ export interface TimeSlot {
 })
 export class ProgramarModalComponent implements OnChanges, OnDestroy {
   @Input() isOpen: boolean = false;
-  @Input() pickup: Pickup | any = null;
-  @Input() camionesDisponibles: Camion[] | any[] = [];
+  @Input() pickup: Pickup | null = null;
+  @Input() camionesDisponibles: Camion[] = [];
 
   @Output() close = new EventEmitter<void>();
   @Output() actionCompleted = new EventEmitter<void>();
@@ -340,6 +378,22 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
     }
   }
 
+  get activeCamionesCount(): number {
+    return (this.camionesDisponibles || []).filter(c => c.estado !== 'MANTENIMIENTO').length;
+  }
+
+  seleccionarCamion(c: Camion): void {
+    if (c.estado === 'MANTENIMIENTO') return;
+    this.actionCamionPatente = c.patente;
+  }
+
+  @HostListener('document:keydown.escape')
+  handleEscape(): void {
+    if (this.isOpen && !this.isSubmitting) {
+      this.onClose();
+    }
+  }
+
   getValidCamionPatente(desiredPatente: string): string {
     const list = this.camionesDisponibles || [];
     const desired = list.find(c => c.patente === desiredPatente);
@@ -381,14 +435,18 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
     const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     const now = new Date();
 
-    const targetDays = this.allowedDayNumbers;
+    let targetDays = this.allowedDayNumbers;
+    if (!targetDays || targetDays.length === 0) {
+      targetDays = [1, 2, 3, 4, 5]; // Días hábiles por defecto si no mapea cuadrante
+    }
     let checkDate = new Date(now);
     checkDate.setDate(checkDate.getDate() + 1); // Empezar desde mañana
 
     const sublabels = ['Próximo recorrido', 'Semana siguiente', 'En 2 semanas', 'En 3 semanas'];
     let count = 0;
+    let maxIterations = 60; // Guardia estricto contra bucle infinito
 
-    while (dates.length < 4) {
+    while (dates.length < 4 && maxIterations-- > 0) {
       if (targetDays.includes(checkDate.getDay())) {
         const y = checkDate.getFullYear();
         const m = String(checkDate.getMonth() + 1).padStart(2, '0');

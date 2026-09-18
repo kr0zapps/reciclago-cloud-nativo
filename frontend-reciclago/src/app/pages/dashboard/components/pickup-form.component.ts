@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BffService } from '../../../services/bff.service';
 import { Sector, Residuo, Pickup } from '../data/sectors.data';
+import { formatRut, validateRut } from '../../../shared/utils/rut.utils';
+import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/phone.utils';
 
 @Component({
   selector: 'app-pickup-form',
@@ -27,19 +29,82 @@ import { Sector, Residuo, Pickup } from '../data/sectors.data';
       <!-- Formulario interactivo -->
       <form (ngSubmit)="onSubmit()" class="space-y-6">
         <!-- Mensajes de estado -->
-        <div *ngIf="submitStatus === 'success'" class="bg-[#EEF5EB] border border-[#CDE5C8] text-[#3B6E2C] px-4 py-3 rounded-2xl flex items-center gap-3 mb-6">
+        <div *ngIf="submitStatus === 'success'" role="alert" aria-live="polite" class="bg-[#EEF5EB] border border-[#CDE5C8] text-[#3B6E2C] px-4 py-3 rounded-2xl flex items-center gap-3 mb-6">
           <i class="fa-solid fa-circle-check text-xl"></i>
           <div>
             <span class="block font-bold text-sm">¡Solicitud recibida con éxito!</span>
-            <span class="text-xs">Hemos registrado tu solicitud para el próximo recorrido municipal.</span>
+            <span class="text-xs">Hemos registrado tu solicitud en el sistema para el próximo recorrido municipal.</span>
           </div>
         </div>
         
-        <div *ngIf="submitStatus === 'error'" class="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-2xl flex items-center gap-3 mb-6">
+        <div *ngIf="submitStatus === 'error'" role="alert" aria-live="polite" class="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-2xl flex items-center gap-3 mb-6">
           <i class="fa-solid fa-circle-exclamation text-xl"></i>
           <div>
             <span class="block font-bold text-sm">Error al solicitar</span>
-            <span class="text-xs">Hubo un problema al procesar tu solicitud. Por favor intenta de nuevo más tarde.</span>
+            <span class="text-xs">{{ errorMessage || 'Hubo un problema al procesar tu solicitud con el microservicio. Por favor intenta de nuevo.' }}</span>
+          </div>
+        </div>
+
+        <div *ngIf="generalError" role="alert" aria-live="polite" class="bg-amber-50 border border-amber-300 text-amber-900 px-4 py-3 rounded-2xl flex items-center gap-3 mb-6">
+          <i class="fa-solid fa-circle-exclamation text-xl text-amber-600"></i>
+          <div>
+            <span class="block font-bold text-sm">Verifica los datos requeridos</span>
+            <span class="text-xs">{{ generalError }}</span>
+          </div>
+        </div>
+
+        <!-- Datos de Identificación y Contacto (RUT y Teléfono) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-[#F8FAF7] border border-[#E2E9E4] rounded-2xl">
+          <div class="space-y-1.5 text-left">
+            <div class="flex items-center justify-between">
+              <label for="vecinoRutInput" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] ml-1">
+                RUT del Vecino (Opcional)
+              </label>
+              <span class="text-[10px] text-slate-400 font-medium">Validación Módulo 11</span>
+            </div>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <i class="fa-solid fa-id-card text-xs"></i>
+              </div>
+              <input id="vecinoRutInput"
+                     type="text"
+                     [value]="vecinoRut"
+                     (input)="onRutInput($event)"
+                     placeholder="Ej: 12.345.678-K"
+                     maxlength="12"
+                     class="input-stitch has-icon !pl-10 text-xs font-semibold"
+                     [ngClass]="rutError ? '!border-rose-400 !bg-rose-50/50' : ''"
+                     aria-describedby="rut-error-desc">
+            </div>
+            <p id="rut-error-desc" *ngIf="rutError" class="text-[10px] text-rose-600 font-bold ml-1 flex items-center gap-1">
+              <i class="fa-solid fa-circle-exclamation text-[10px]"></i> {{ rutError }}
+            </p>
+          </div>
+
+          <div class="space-y-1.5 text-left">
+            <div class="flex items-center justify-between">
+              <label for="vecinoTelefonoInput" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] ml-1">
+                Teléfono Celular (Opcional)
+              </label>
+              <span class="text-[10px] text-slate-400 font-medium">+56 9 XXXX XXXX</span>
+            </div>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <i class="fa-solid fa-phone text-xs"></i>
+              </div>
+              <input id="vecinoTelefonoInput"
+                     type="text"
+                     [value]="vecinoTelefono"
+                     (input)="onPhoneInput($event)"
+                     placeholder="Ej: +56 9 8765 4321"
+                     maxlength="16"
+                     class="input-stitch has-icon !pl-10 text-xs font-semibold"
+                     [ngClass]="phoneError ? '!border-rose-400 !bg-rose-50/50' : ''"
+                     aria-describedby="phone-error-desc">
+            </div>
+            <p id="phone-error-desc" *ngIf="phoneError" class="text-[10px] text-rose-600 font-bold ml-1 flex items-center gap-1">
+              <i class="fa-solid fa-circle-exclamation text-[10px]"></i> {{ phoneError }}
+            </p>
           </div>
         </div>
 
@@ -218,8 +283,35 @@ export class PickupFormComponent implements OnChanges {
 
   isSubmitting = false;
   submitStatus: 'idle' | 'success' | 'error' = 'idle';
+  errorMessage = '';
+  generalError = '';
+
+  vecinoRut = '';
+  vecinoTelefono = '';
+  rutError = '';
+  phoneError = '';
 
   constructor(private bffService: BffService) {}
+
+  onRutInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.vecinoRut = formatRut(input.value);
+    if (this.vecinoRut.length > 3) {
+      this.rutError = validateRut(this.vecinoRut) ? '' : 'RUT inválido (ej: 12.345.678-K)';
+    } else {
+      this.rutError = '';
+    }
+  }
+
+  onPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.vecinoTelefono = formatChileanPhone(input.value);
+    if (this.vecinoTelefono.length > 6) {
+      this.phoneError = validateChileanPhone(this.vecinoTelefono) ? '' : 'Formato inválido (ej: +56 9 8765 4321)';
+    } else {
+      this.phoneError = '';
+    }
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['sector'] && this.sector) {
@@ -269,7 +361,29 @@ export class PickupFormComponent implements OnChanges {
   }
 
   onSubmit(): void {
-    if (!this.newPickup.direccion) return;
+    this.generalError = '';
+    if (!this.newPickup.direccion || !this.newPickup.direccion.trim()) {
+      this.generalError = 'Por favor ingresa la calle y número de tu domicilio.';
+      return;
+    }
+
+    if (this.vecinoRut && !validateRut(this.vecinoRut)) {
+      this.rutError = 'El RUT ingresado no es válido (ej: 12.345.678-K).';
+      this.generalError = 'Corrige el RUT ingresado antes de enviar.';
+      return;
+    }
+
+    if (this.vecinoTelefono && !validateChileanPhone(this.vecinoTelefono)) {
+      this.phoneError = 'El teléfono celular debe tener formato +56 9 XXXX XXXX.';
+      this.generalError = 'Corrige el teléfono de contacto antes de enviar.';
+      return;
+    }
+
+    const pesoNum = Number(this.newPickup.pesoEstimadoKg);
+    if (isNaN(pesoNum) || pesoNum <= 0) {
+      this.generalError = 'Por favor ingresa un peso estimado válido mayor a 0 kg.';
+      return;
+    }
 
     if (!this.newPickup.residuoNombre) {
       this.syncOfficialMaterialForSector();
@@ -277,24 +391,28 @@ export class PickupFormComponent implements OnChanges {
 
     this.isSubmitting = true;
     this.submitStatus = 'idle';
+    this.errorMessage = '';
 
     const currentSectorName = this.sector?.nombre || this.newPickup.sector || 'Puerto Varas';
     const fullDireccion = this.newPickup.direccion.includes(currentSectorName)
-      ? this.newPickup.direccion
-      : `${this.newPickup.direccion}, ${currentSectorName}`;
+      ? this.newPickup.direccion.trim()
+      : `${this.newPickup.direccion.trim()}, ${currentSectorName}`;
 
     const matchingRes = this.residuos.find(r => r.nombre === this.newPickup.residuoNombre);
     const residuoId = matchingRes && matchingRes.id ? matchingRes.id : 1;
     const residuoNombre = matchingRes ? matchingRes.nombre : (this.newPickup.residuoNombre || 'Vidrio');
 
     const tipoPrefijo = this.isRetiroEspecial ? '[RETIRO ESPECIAL DIMAO]' : '[AVISO RECORRIDO REGULAR]';
-    const comentarioCompleto = this.newPickup.comentarios 
-      ? `${tipoPrefijo} ${this.newPickup.comentarios}` 
-      : `${tipoPrefijo} Notificación vecinal para el cuadrante`;
+    const contactoInfo = [
+      this.vecinoRut ? `RUT: ${this.vecinoRut}` : '',
+      this.vecinoTelefono ? `Tel: ${this.vecinoTelefono}` : ''
+    ].filter(Boolean).join(' • ');
 
-    const pesoFinal = Number(this.newPickup.pesoEstimadoKg) > 0 
-      ? Number(this.newPickup.pesoEstimadoKg) 
-      : (this.isRetiroEspecial ? 10.0 : 5.0);
+    const comentarioCompleto = [
+      tipoPrefijo,
+      contactoInfo ? `[${contactoInfo}]` : '',
+      this.newPickup.comentarios?.trim() || 'Notificación vecinal para el cuadrante'
+    ].filter(Boolean).join(' ');
 
     const payload = {
       vecinoEmail: this.userEmail || 'vecino@puertovaras.cl',
@@ -303,7 +421,7 @@ export class PickupFormComponent implements OnChanges {
       comuna: 'Puerto Varas',
       residuoId: Number(residuoId),
       residuoNombre: residuoNombre,
-      pesoEstimadoKg: pesoFinal,
+      pesoEstimadoKg: pesoNum,
       observaciones: comentarioCompleto,
       comentarios: comentarioCompleto
     };
@@ -315,38 +433,27 @@ export class PickupFormComponent implements OnChanges {
         this.newPickup.direccion = '';
         this.newPickup.comentarios = '';
         this.newPickup.pesoEstimadoKg = 5.0;
+        this.vecinoRut = '';
+        this.vecinoTelefono = '';
+        this.rutError = '';
+        this.phoneError = '';
         this.isRetiroEspecial = false;
         this.syncOfficialMaterialForSector();
         this.pickupCreated.emit(res || payload);
         setTimeout(() => this.submitStatus = 'idle', 5000);
       },
       error: (err) => {
-        if (err.status === 0) {
-          // Fallback resiliente
-          const nuevo = {
-            id: Date.now(),
-            fecha: new Date().toISOString().split('T')[0],
-            fechaTexto: 'Programado para próximo recorrido',
-            residuoNombre: residuoNombre,
-            kilosRecolectados: 0,
-            direccion: fullDireccion,
-            estado: 'SOLICITADO',
-            comentarios: comentarioCompleto
-          };
-          this.isSubmitting = false;
-          this.submitStatus = 'success';
-          this.newPickup.direccion = '';
-          this.newPickup.comentarios = '';
-          this.isRetiroEspecial = false;
-          this.syncOfficialMaterialForSector();
-          this.pickupCreated.emit(nuevo);
-          setTimeout(() => this.submitStatus = 'idle', 5000);
-          return;
-        }
-
         this.isSubmitting = false;
         this.submitStatus = 'error';
-        setTimeout(() => this.submitStatus = 'idle', 5000);
+        const rawDetail = err?.error?.error || err?.error?.message || (typeof err?.error === 'string' ? err.error : null);
+        if (err.status === 0) {
+          this.errorMessage = 'No fue posible contactar al microservicio de retiros (BFF fuera de línea o sin conexión).';
+        } else {
+          this.errorMessage = rawDetail || 'Ocurrió un error al registrar la solicitud. Por favor intenta más tarde.';
+        }
+        setTimeout(() => {
+          if (this.submitStatus === 'error') this.submitStatus = 'idle';
+        }, 7000);
       }
     });
   }

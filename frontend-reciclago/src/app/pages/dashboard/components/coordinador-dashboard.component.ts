@@ -1,7 +1,9 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, SimpleChanges, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data';
+import { formatRut, validateRut } from '../../../shared/utils/rut.utils';
+import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/phone.utils';
 
 @Component({
   selector: 'app-coordinador-dashboard',
@@ -446,6 +448,9 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
       <!-- ==================== MODAL TELEFÓNICO ==================== -->
       <div *ngIf="showNuevoRetiroModal"
            (click)="closeNuevoRetiroModal()"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="coord-mesa-title"
            class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
         <div (click)="$event.stopPropagation()"
              class="relative w-full max-w-lg bg-white rounded-[2rem] shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto p-6 sm:p-8">
@@ -459,35 +464,59 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
               </div>
               <div>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Despacho Logístico</span>
-                <h3 class="font-heading font-extrabold text-lg text-brand-navy">Mesa de Entrada de Solicitud Telefónica</h3>
+                <h3 id="coord-mesa-title" class="font-heading font-extrabold text-lg text-brand-navy">Mesa de Entrada de Solicitud Telefónica</h3>
               </div>
             </div>
-            <button (click)="closeNuevoRetiroModal()" type="button" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-colors cursor-pointer">
+            <button (click)="closeNuevoRetiroModal()" type="button" aria-label="Cerrar modal de despacho" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-colors cursor-pointer">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
 
-          <form (ngSubmit)="submitRetiroVecinal()" class="space-y-4 text-left">
+          <div *ngIf="mesaError" role="alert" aria-live="polite" class="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+            <i class="fa-solid fa-circle-exclamation text-rose-600"></i>
+            <span>{{ mesaError }}</span>
+          </div>
+
+          <form (ngSubmit)="submitRetiroVecinal()" class="space-y-3.5 text-left">
             <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Nombre o Teléfono del Vecino</label>
-              <input type="text" [(ngModel)]="nuevoVecinoNombre" name="nuevoVecinoNombre" required class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: Juan Pérez (+56 9 8765 4321)">
+              <label for="coordVecinoNombre" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Nombre Completo del Vecino</label>
+              <input id="coordVecinoNombre" type="text" [(ngModel)]="nuevoVecinoNombre" name="nuevoVecinoNombre" required class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: Juan Pérez González">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="coordVecinoRut" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">RUT Vecino (Opcional)</label>
+                <input id="coordVecinoRut" type="text" [value]="nuevoVecinoRut" (input)="onMesaRutInput($event)" name="nuevoVecinoRut" class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: 12.345.678-K">
+                <span *ngIf="mesaRutError" class="text-[10px] text-rose-600 font-bold mt-0.5 block">{{ mesaRutError }}</span>
+              </div>
+              <div>
+                <label for="coordVecinoTelefono" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Teléfono Móvil (Opcional)</label>
+                <input id="coordVecinoTelefono" type="text" [value]="nuevoVecinoTelefono" (input)="onMesaPhoneInput($event)" name="nuevoVecinoTelefono" class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: +56 9 8765 4321">
+                <span *ngIf="mesaPhoneError" class="text-[10px] text-rose-600 font-bold mt-0.5 block">{{ mesaPhoneError }}</span>
+              </div>
             </div>
 
             <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Dirección Exacta</label>
-              <input type="text" [(ngModel)]="nuevaDireccion" name="nuevaDireccion" required class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: San Francisco 320, Puerto Varas">
+              <label for="coordNuevaDireccion" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Dirección Exacta</label>
+              <input id="coordNuevaDireccion" type="text" [(ngModel)]="nuevaDireccion" name="nuevaDireccion" required class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: San Francisco 320, Puerto Varas">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="coordNuevoResiduoId" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Tipo de Residuo / Material</label>
+                <select id="coordNuevoResiduoId" [(ngModel)]="nuevoResiduoId" name="nuevoResiduoId" class="select-stitch w-full py-2 px-3 text-sm font-medium">
+                  <option *ngFor="let r of residuos" [value]="r.id">{{ r.nombre }}</option>
+                </select>
+              </div>
+              <div>
+                <label for="coordNuevoPeso" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Peso Estimado (kg)</label>
+                <input id="coordNuevoPeso" type="number" step="0.5" min="0.5" max="500" [(ngModel)]="nuevoPesoEstimadoKg" name="nuevoPesoEstimadoKg" class="input-stitch w-full py-2 px-3 text-sm font-medium text-center" placeholder="5.0">
+              </div>
             </div>
 
             <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Tipo de Residuo / Material</label>
-              <select [(ngModel)]="nuevoResiduoId" name="nuevoResiduoId" class="select-stitch w-full py-2 px-3 text-sm font-medium">
-                <option *ngFor="let r of residuos" [value]="r.id">{{ r.nombre }}</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Observaciones para el Chofer</label>
-              <textarea [(ngModel)]="nuevosComentarios" name="nuevosComentarios" rows="2" class="input-stitch w-full py-2 px-3 text-sm" placeholder="Ej: Dejar cajas amarradas en el portón"></textarea>
+              <label for="coordNuevosComentarios" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Observaciones para el Chofer</label>
+              <textarea id="coordNuevosComentarios" [(ngModel)]="nuevosComentarios" name="nuevosComentarios" rows="2" class="input-stitch w-full py-2 px-3 text-sm" placeholder="Ej: Dejar cajas amarradas en el portón"></textarea>
             </div>
 
             <div class="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
@@ -505,7 +534,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
     </div>
   `
 })
-export class CoordinadorDashboardComponent implements OnInit, OnChanges {
+export class CoordinadorDashboardComponent implements OnInit, OnChanges, OnDestroy {
   @Input() sector: Sector | null = null;
   @Input() sectores: Sector[] = [];
   @Input() pickups: Pickup[] = [];
@@ -533,9 +562,15 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges {
   showNuevoRetiroModal = false;
   isSubmittingRetiro = false;
   nuevoVecinoNombre = '';
+  nuevoVecinoRut = '';
+  nuevoVecinoTelefono = '';
   nuevaDireccion = '';
   nuevoResiduoId = 1;
+  nuevoPesoEstimadoKg: number = 5.0;
   nuevosComentarios = '';
+  mesaRutError = '';
+  mesaPhoneError = '';
+  mesaError = '';
 
   truckWaypointsMap: Record<string, Waypoint> = {
     'PV-RC-2026': { name: 'Costanera Sur / San Francisco', detail: 'Recorriendo cuadrante urbano', eta: '6 min', distancia: '850 m', x: 28, y: 72, estado: 'En recorrido' },
@@ -631,7 +666,45 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges {
     this.actionRequested.emit({ pickup, action });
   }
 
+  @HostListener('document:keydown.escape')
+  onEscapePress(): void {
+    if (this.showNuevoRetiroModal) {
+      this.closeNuevoRetiroModal();
+    }
+  }
+
+  ngOnDestroy(): void {
+    document.body.style.overflow = '';
+  }
+
+  onMesaRutInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const formatted = formatRut(input.value);
+    this.nuevoVecinoRut = formatted;
+    input.value = formatted;
+    if (this.nuevoVecinoRut && !validateRut(this.nuevoVecinoRut)) {
+      this.mesaRutError = 'RUT inválido (ej: 12.345.678-5)';
+    } else {
+      this.mesaRutError = '';
+    }
+  }
+
+  onMesaPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const formatted = formatChileanPhone(input.value);
+    this.nuevoVecinoTelefono = formatted;
+    input.value = formatted;
+    if (this.nuevoVecinoTelefono && !validateChileanPhone(this.nuevoVecinoTelefono)) {
+      this.mesaPhoneError = 'Formato celular: +56 9 XXXX XXXX';
+    } else {
+      this.mesaPhoneError = '';
+    }
+  }
+
   openNuevoRetiroModal(): void {
+    this.mesaError = '';
+    this.mesaRutError = '';
+    this.mesaPhoneError = '';
     this.showNuevoRetiroModal = true;
     document.body.style.overflow = 'hidden';
   }
@@ -642,19 +715,41 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges {
   }
 
   submitRetiroVecinal(): void {
-    if (!this.nuevaDireccion) return;
+    this.mesaError = '';
+    if (!this.nuevaDireccion || !this.nuevaDireccion.trim()) {
+      this.mesaError = 'Debe indicar una dirección válida para la coordinación.';
+      return;
+    }
+    if (this.nuevoVecinoRut && !validateRut(this.nuevoVecinoRut)) {
+      this.mesaError = 'El RUT ingresado no es válido.';
+      return;
+    }
+    if (this.nuevoVecinoTelefono && !validateChileanPhone(this.nuevoVecinoTelefono)) {
+      this.mesaError = 'El número de teléfono móvil no es válido.';
+      return;
+    }
+
+    const pesoNum = Number(this.nuevoPesoEstimadoKg) > 0 ? Number(this.nuevoPesoEstimadoKg) : 5.0;
+
     this.isSubmittingRetiro = true;
     const resObj = this.residuos.find(r => r.id === Number(this.nuevoResiduoId));
+    const contactoInfo = [
+      this.nuevoVecinoRut ? `RUT: ${this.nuevoVecinoRut}` : '',
+      this.nuevoVecinoTelefono ? `Tel: ${this.nuevoVecinoTelefono}` : ''
+    ].filter(Boolean).join(' • ');
+
+    const comentariosCompletos = `[Ingreso Mesa Despacho - ${this.nuevoVecinoNombre || 'Atención Telefónica'}${contactoInfo ? ' - ' + contactoInfo : ''}] ${this.nuevosComentarios || ''}`.trim();
+
     const item = {
       vecinoNombre: this.nuevoVecinoNombre || 'Vecino Telefónico',
       vecinoEmail: 'vecino.contacto@puertovaras.cl',
-      direccion: this.nuevaDireccion,
+      direccion: this.nuevaDireccion.trim(),
       comuna: 'Puerto Varas',
       residuoId: Number(this.nuevoResiduoId || 1),
       residuoNombre: resObj ? resObj.nombre : 'Vidrio',
-      pesoEstimadoKg: 5.0,
-      comentarios: `[Ingreso Mesa Despacho - ${this.nuevoVecinoNombre || 'Atención Telefónica'}] ${this.nuevosComentarios || ''}`,
-      observaciones: `[Ingreso Mesa Despacho - ${this.nuevoVecinoNombre || 'Atención Telefónica'}] ${this.nuevosComentarios || ''}`
+      pesoEstimadoKg: pesoNum,
+      comentarios: comentariosCompletos,
+      observaciones: comentariosCompletos
     };
     this.pickupCreated.emit(item);
     setTimeout(() => {
@@ -662,7 +757,10 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges {
       this.closeNuevoRetiroModal();
       this.nuevaDireccion = '';
       this.nuevoVecinoNombre = '';
+      this.nuevoVecinoRut = '';
+      this.nuevoVecinoTelefono = '';
       this.nuevosComentarios = '';
+      this.nuevoPesoEstimadoKg = 5.0;
     }, 500);
   }
 
