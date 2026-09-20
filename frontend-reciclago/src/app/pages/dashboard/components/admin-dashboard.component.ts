@@ -13,16 +13,8 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
   template: `
     <div class="space-y-6 sm:space-y-8">
       <!-- Barra de Acciones de Administración -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <span class="text-xs text-slate-500 font-medium">
-            Supervisión: <strong class="text-[#123F5B] font-bold">{{ sector?.nombre || 'Puerto Varas' }}</strong>
-          </span>
-        </div>
-
-        <!-- Acciones -->
-        <div class="flex items-center gap-2.5 flex-wrap flex-shrink-0">
-          <button (click)="exportarPlanillaCsv()"
+      <div class="flex items-center justify-end gap-2.5 flex-wrap">
+        <button (click)="exportarPlanillaCsv()"
                   type="button"
                   class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold border border-slate-200 transition-all cursor-pointer">
             <i class="fa-solid fa-file-csv text-slate-500 text-sm"></i>
@@ -42,7 +34,6 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
             <i class="fa-solid fa-plus text-xs"></i>
             <span>Ingresar Solicitud</span>
           </button>
-        </div>
       </div>
 
       <!-- ==================== 2. TARJETAS DE KPIS EJECUTIVOS ==================== -->
@@ -107,7 +98,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
       </section>
 
       <!-- ==================== 3. GESTIÓN Y DISPONIBILIDAD DE FLOTA (EXCLUSIVO ADMIN) ==================== -->
-      <section class="bg-white rounded-3xl border border-[#E2E9E4] p-6 sm:p-8 shadow-xs">
+      <section class="bg-white rounded-2xl border border-[#E2E9E4] p-6 sm:p-8 shadow-xs">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-6 border-b border-[#EAEFE8]">
           <div>
             <div class="flex items-center gap-2">
@@ -162,7 +153,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
       </section>
 
       <!-- ==================== 4. PLANILLA MAESTRA DE DESPACHO CON PAGINACIÓN ==================== -->
-      <section class="bg-white rounded-3xl border border-[#E2E9E4] shadow-xs overflow-hidden">
+      <section class="bg-white rounded-2xl border border-[#E2E9E4] shadow-xs overflow-hidden">
         <div class="p-6 border-b border-[#EAEFE8] space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -197,48 +188,60 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
             </div>
           </div>
 
-          <!-- Pestañas de Estado con Contadores Vivos -->
-          <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-bold">
+          <!-- Pestañas de Estado Logísticas Unificadas (Segmented Control) -->
+          <div class="bg-slate-100/90 p-1 rounded-xl inline-flex items-center gap-1 border border-slate-200/80 overflow-x-auto no-scrollbar max-w-full">
             <button (click)="onFilterStatusChange('ALL')"
                     type="button"
-                    class="px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
-                    [ngClass]="filterStatus === 'ALL' ? 'bg-[#123F5B] text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'">
-              Todos ({{ pickups.length }})
+                    class="px-3 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                    [ngClass]="filterStatus === 'ALL' ? 'bg-white text-[#123F5B] font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900 font-medium'">
+              <span>Todos</span>
+              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded"
+                    [ngClass]="filterStatus === 'ALL' ? 'bg-[#123F5B] text-white' : 'bg-slate-200/70 text-slate-700'">{{ pickups.length }}</span>
             </button>
 
             <button (click)="onFilterStatusChange('SOLICITADO')"
                     type="button"
-                    class="px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
-                    [ngClass]="filterStatus === 'SOLICITADO' ? 'bg-amber-600 text-white shadow-xs' : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200/60'">
-              Por Programar ({{ countPendientes }})
+                    class="px-3 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                    [ngClass]="filterStatus === 'SOLICITADO' ? 'bg-white text-[#123F5B] font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900 font-medium'">
+              <span>Por Programar</span>
+              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded"
+                    [ngClass]="filterStatus === 'SOLICITADO' ? 'bg-amber-600 text-white' : 'bg-slate-200/70 text-slate-700'">{{ countPendientes }}</span>
             </button>
 
             <button (click)="onFilterStatusChange('PROGRAMADO')"
                     type="button"
-                    class="px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
-                    [ngClass]="filterStatus === 'PROGRAMADO' ? 'bg-sky-700 text-white shadow-xs' : 'bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200/60'">
-              Programados ({{ countProgramados }})
+                    class="px-3 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                    [ngClass]="filterStatus === 'PROGRAMADO' ? 'bg-white text-[#123F5B] font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900 font-medium'">
+              <span>Programados</span>
+              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded"
+                    [ngClass]="filterStatus === 'PROGRAMADO' ? 'bg-sky-600 text-white' : 'bg-slate-200/70 text-slate-700'">{{ countProgramados }}</span>
             </button>
 
             <button (click)="onFilterStatusChange('EN_RUTA')"
                     type="button"
-                    class="px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
-                    [ngClass]="filterStatus === 'EN_RUTA' ? 'bg-indigo-700 text-white shadow-xs' : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200/60'">
-              En Ruta ({{ countEnRuta }})
+                    class="px-3 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                    [ngClass]="filterStatus === 'EN_RUTA' ? 'bg-white text-[#123F5B] font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900 font-medium'">
+              <span>En Ruta</span>
+              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded"
+                    [ngClass]="filterStatus === 'EN_RUTA' ? 'bg-indigo-600 text-white' : 'bg-slate-200/70 text-slate-700'">{{ countEnRuta }}</span>
             </button>
 
             <button (click)="onFilterStatusChange('RETIRADO')"
                     type="button"
-                    class="px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
-                    [ngClass]="filterStatus === 'RETIRADO' ? 'bg-emerald-700 text-white shadow-xs' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200/60'">
-              Por Pesar ({{ countRetirados }})
+                    class="px-3 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                    [ngClass]="filterStatus === 'RETIRADO' ? 'bg-white text-[#123F5B] font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900 font-medium'">
+              <span>Por Pesar</span>
+              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded"
+                    [ngClass]="filterStatus === 'RETIRADO' ? 'bg-emerald-600 text-white' : 'bg-slate-200/70 text-slate-700'">{{ countRetirados }}</span>
             </button>
 
             <button (click)="onFilterStatusChange('PESADO')"
                     type="button"
-                    class="px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
-                    [ngClass]="filterStatus === 'PESADO' ? 'bg-slate-700 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'">
-              Pesados / Certificados ({{ countPesados }})
+                    class="px-3 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                    [ngClass]="filterStatus === 'PESADO' ? 'bg-white text-[#123F5B] font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900 font-medium'">
+              <span>Pesados</span>
+              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded"
+                    [ngClass]="filterStatus === 'PESADO' ? 'bg-slate-800 text-white' : 'bg-slate-200/70 text-slate-700'">{{ countPesados }}</span>
             </button>
           </div>
         </div>
@@ -392,7 +395,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
       </section>
 
       <!-- ==================== 5. SUPERVISIÓN SATELITAL GPS DE TODA LA FLOTA ==================== -->
-      <section class="bg-white rounded-3xl border border-[#E2E9E4] p-6 sm:p-8 shadow-xs">
+      <section class="bg-white rounded-2xl border border-[#E2E9E4] p-6 sm:p-8 shadow-xs">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-[#EAEFE8]">
           <div>
             <span class="text-xs font-bold uppercase tracking-wider text-[#123F5B]">Telemetría Satelital de Flota</span>
@@ -429,7 +432,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           </div>
 
           <div class="h-48 sm:h-56 w-full bg-white rounded-xl relative p-2 overflow-hidden border border-[#E1EDF2] select-none">
-            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-3xl flex flex-col items-center justify-center text-[10px] font-extrabold text-[#1F6685] border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
+            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-2xl flex flex-col items-center justify-center text-[10px] font-extrabold text-[#1F6685] border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
               <div class="flex items-center gap-1.5 opacity-90">
                 <i class="fa-solid fa-water text-xs text-sky-500"></i>
                 <span>Lago Llanquihue</span>
@@ -510,7 +513,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
            aria-labelledby="admin-mesa-title"
            class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
         <div (click)="$event.stopPropagation()"
-             class="relative w-full max-w-lg bg-white rounded-[2rem] shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto p-6 sm:p-8">
+             class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto p-6 sm:p-8">
           
           <div class="h-1.5 -mx-8 -mt-8 mb-6 bg-gradient-to-r from-[#123F5B] via-[#38BDF8] to-[#4F8A3D]"></div>
 

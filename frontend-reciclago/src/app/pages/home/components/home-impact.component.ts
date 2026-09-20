@@ -98,7 +98,7 @@ import { RouterModule } from '@angular/router';
         </div>
 
         <!-- Panoramic Scenic Banner con Zoom Sutil y Hover-Lift: ¿Necesitas un retiro especial? -->
-        <div class="group relative rounded-3xl overflow-hidden shadow-lg hover:shadow-xl border border-slate-200/90 min-h-[200px] sm:min-h-[230px] flex items-center reveal-init"
+        <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-xl border border-slate-200/90 min-h-[200px] sm:min-h-[230px] flex items-center reveal-init"
              [class.reveal-active]="isVisible"
              style="transition-delay: 300ms">
           <!-- Scenic background photo: Lake, flowers, and volcano -->

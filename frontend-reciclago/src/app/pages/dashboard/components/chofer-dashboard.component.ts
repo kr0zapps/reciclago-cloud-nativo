@@ -103,7 +103,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
       </section>
 
       <!-- ==================== 3. PRÓXIMA PARADA DESTACADA (EN CABINA) ==================== -->
-      <section class="p-6 rounded-3xl bg-[#F0F6F9] border-2 border-[#D4E6EF] shadow-xs">
+      <section class="p-6 rounded-2xl bg-[#F0F6F9] border-2 border-[#D4E6EF] shadow-xs">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-5">
           <div class="flex items-start gap-4">
             <div class="w-14 h-14 rounded-2xl bg-[#123F5B] text-white flex items-center justify-center text-2xl flex-shrink-0 shadow-xs">
@@ -180,7 +180,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
       </section>
 
       <!-- ==================== 4. HOJA DE RECORRIDO TÁCTIL PARA EL CHOFER ==================== -->
-      <section class="bg-white rounded-3xl border border-[#E2E9E4] shadow-xs overflow-hidden">
+      <section class="bg-white rounded-2xl border border-[#E2E9E4] shadow-xs overflow-hidden">
         <div class="p-6 border-b border-[#EAEFE8] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <span class="text-xs font-bold uppercase tracking-wider text-[#4F8A3D]">Hoja de Trabajo en Terreno</span>
@@ -298,7 +298,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
       </section>
 
       <!-- ==================== 5. NAVEGADOR GPS DE CABINA ==================== -->
-      <section class="bg-white rounded-3xl border border-[#E2E9E4] p-6 sm:p-8 shadow-xs">
+      <section class="bg-white rounded-2xl border border-[#E2E9E4] p-6 sm:p-8 shadow-xs">
         <div class="flex items-center justify-between pb-4 mb-4 border-b border-[#EAEFE8]">
           <div>
             <span class="text-xs font-bold uppercase tracking-wider text-[#4F8A3D]">Navegación GPS de Cabina</span>
@@ -313,7 +313,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
 
         <div class="rounded-2xl bg-[#F0F6F9] border-2 border-[#D4E6EF] p-4 sm:p-5 relative overflow-hidden">
           <div class="h-44 sm:h-52 w-full bg-white rounded-xl relative p-2 overflow-hidden border border-[#E1EDF2] select-none">
-            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-3xl flex flex-col items-center justify-center text-[10px] font-extrabold text-[#1F6685] border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
+            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-2xl flex flex-col items-center justify-center text-[10px] font-extrabold text-[#1F6685] border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
               <div class="flex items-center gap-1.5 opacity-90">
                 <i class="fa-solid fa-water text-xs text-sky-500"></i>
                 <span>Lago Llanquihue</span>

@@ -11,13 +11,13 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <section id="solicitud-retiro" class="bg-white rounded-3xl sm:rounded-[2.2rem] border border-[#E2E9E4] p-6 sm:p-10 shadow-xs card-hover anim-fade-up anim-delay-5 mt-8">
+    <section id="solicitud-retiro" class="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-9 shadow-xs card-hover anim-fade-up anim-delay-5 mt-8">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-[#EAEFE8] gap-2">
         <div>
           <h3 class="font-heading font-extrabold text-2xl sm:text-3xl text-[#123F5B]">
             {{ isRetiroEspecial ? 'Solicitud de Retiro Especial a Domicilio' : 'Aviso de Retiro Domiciliario' }}
           </h3>
-          <p class="text-sm sm:text-base text-[#61717A] mt-1">
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">
             {{ isRetiroEspecial ? 'Coordina la recolección de residuos fuera del calendario regular o de gran volumen.' : 'Informa a la cuadrilla municipal si dejarás material en tu puerta para el recorrido de este ' + (sector?.fechaTexto || sector?.dia) + '.' }}
           </p>
         </div>

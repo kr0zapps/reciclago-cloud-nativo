@@ -100,7 +100,7 @@ export class HomeCycleComponent implements OnInit, OnDestroy {
       stepNumber: 1,
       title: 'Solicitas',
       role: 'Vecino',
-      description: 'El vecino agenda su retiro desde la web o en el portal vecinal.',
+      description: 'Agenda tu retiro desde el portal vecinal o llamando directamente al 65 236 1200.',
       iconClass: 'fa-solid fa-file-lines'
     },
     {

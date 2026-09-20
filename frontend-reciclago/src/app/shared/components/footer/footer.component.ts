@@ -17,16 +17,16 @@ import { RouterModule } from '@angular/router';
           <polygon points="1040,38 1010,58 1025,62 1040,56 1055,62 1070,58" fill="#FFFFFF" opacity="0.9"></polygon>
 
           <path d="M0 78 C 300 58, 400 98, 720 78 C 1040 58, 1140 98, 1440 78"
-                fill="transparent" stroke="#38bdf8" stroke-width="2.5" opacity="0.8"></path>
+                fill="transparent" stroke="#1F6685" stroke-width="2.5" opacity="0.6"></path>
           <path d="M0 86 C 250 100, 550 70, 800 86 C 1050 100, 1250 70, 1440 86"
-                fill="transparent" stroke="#0ea5e9" stroke-width="2" opacity="0.7"></path>
+                fill="transparent" stroke="#123F5B" stroke-width="2" opacity="0.5"></path>
           <path d="M0 70 C 400 52, 600 88, 900 70 C 1200 52, 1300 88, 1440 70"
-                fill="transparent" stroke="#7dd3fc" stroke-width="1.5" opacity="0.4"></path>
+                fill="transparent" stroke="#22A652" stroke-width="1.5" opacity="0.3"></path>
 
           <defs>
             <linearGradient id="mountainGradVibrant" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#0284c7" stop-opacity="0.9"></stop>
-              <stop offset="60%" stop-color="#0c4a6e" stop-opacity="0.6"></stop>
+              <stop offset="0%" stop-color="#123F5B" stop-opacity="0.9"></stop>
+              <stop offset="60%" stop-color="#0c2d42" stop-opacity="0.6"></stop>
               <stop offset="100%" stop-color="#041D2D" stop-opacity="0.1"></stop>
             </linearGradient>
           </defs>
@@ -41,7 +41,7 @@ import { RouterModule } from '@angular/router';
           <a class="flex items-center gap-4 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22a652] rounded-xl p-1" routerLink="/" aria-label="Ir al inicio de RecicLaGo">
             <div class="w-14 h-14 flex-shrink-0 group-hover:scale-105 transition-transform" aria-hidden="true">
               <svg class="w-full h-full" fill="none" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 56L34 24L52 50L60 38L78 56H12Z" fill="#0ea5e9"></path>
+                <path d="M12 56L34 24L52 50L60 38L78 56H12Z" fill="#1F6685"></path>
                 <path d="M34 24L41 34L34 38L27 34L34 24Z" fill="#FFFFFF"></path>
                 <path d="M60 38L66 46L60 50L55 45L60 38Z" fill="#FFFFFF"></path>
                 <path d="M48 56C48 40 64 26 84 26C84 42 68 56 48 56Z" fill="#22a652"></path>

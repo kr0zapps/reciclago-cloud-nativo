@@ -8,21 +8,21 @@ import { Pickup } from '../data/sectors.data';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <section class="bg-white rounded-3xl sm:rounded-[2.2rem] border border-[#E2E9E4] p-6 sm:p-10 shadow-xs card-hover anim-fade-up anim-delay-5"
+    <section class="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 shadow-xs card-hover anim-fade-up anim-delay-5"
              [ngClass]="{'ring-2 ring-[#123F5B]/20 bg-gradient-to-b from-[#FAFDF9] to-white': isStaff}">
       
       <!-- ENCABEZADO DIFERENCIADO: VECINO VS CONSOLA STAFF MUNICIPAL -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-4 border-b border-[#EAEFE8] gap-3">
         <div>
-          <h3 class="font-heading font-extrabold text-2xl sm:text-3xl text-brand-navy">
+          <h3 class="font-heading font-extrabold text-2xl sm:text-3xl text-[#123F5B]">
             {{ isStaff ? 'Gestión de Retiros Comunales' : 'Mis retiros anteriores' }}
           </h3>
-          <p class="text-sm sm:text-base text-brand-muted mt-0.5">
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
             {{ isStaff ? 'Supervisión de solicitudes y estado del retiro en la comuna.' : 'Historial de aportes reciclables en tu domicilio.' }}
           </p>
         </div>
 
-        <button (click)="openHistorialModal()" type="button" class="btn-action text-sm font-bold text-brand-lake hover:text-brand-navy flex items-center gap-2 transition-colors self-start sm:self-auto cursor-pointer px-4 py-2 rounded-xl bg-[#F0F6F9] hover:bg-[#E2EFF5] border border-[#CCE1EC]">
+        <button (click)="openHistorialModal()" type="button" class="btn-action text-xs sm:text-sm font-bold text-[#1F6685] hover:text-[#123F5B] flex items-center gap-2 transition-colors self-start sm:self-auto cursor-pointer px-4 py-2 rounded-xl bg-[#F0F6F9] hover:bg-[#E2EFF5] border border-[#CCE1EC]">
           <i class="fa-solid fa-clock-rotate-left text-xs"></i>
           <span>Ver todos los retiros</span>
           <i class="fa-solid fa-chevron-right text-xs btn-arrow ml-1"></i>
@@ -32,15 +32,15 @@ import { Pickup } from '../data/sectors.data';
       <!-- LISTA EDITORIAL ESPACIOSA Y CLARA -->
       <div class="divide-y divide-[#EEF3EF]">
         <div *ngFor="let pickup of pickups"
-             class="py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-[#F9FAF8] px-3 rounded-2xl transition-all duration-200 group">
+             class="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-[#F9FAF8] px-3 rounded-xl transition-all duration-200 group">
           
           <div class="flex items-center gap-4 min-w-0">
-            <div class="w-11 h-11 rounded-2xl bg-[#EEF7EC] text-brand-green flex items-center justify-center text-lg flex-shrink-0 border border-[#CCE4C8]">
+            <div class="w-10 h-10 rounded-xl bg-[#ecf7e6] text-[#22a652] flex items-center justify-center text-base flex-shrink-0 border border-[#cde8c7]">
               <i class="fa-solid fa-recycle"></i>
             </div>
             <div class="min-w-0">
-              <div class="flex items-center gap-2.5 flex-wrap">
-                <span class="font-heading font-bold text-base sm:text-lg text-brand-navy">{{ pickup.fechaTexto || pickup.fecha || 'Fecha programada' }}</span>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-heading font-bold text-base text-[#123F5B]">{{ pickup.fechaTexto || pickup.fecha || 'Fecha programada' }}</span>
                 <span class="text-xs font-medium text-slate-700 px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 truncate">
                   {{ pickup.residuoNombre || 'Reciclaje' }}
                 </span>
@@ -157,7 +157,7 @@ import { Pickup } from '../data/sectors.data';
          class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
       
       <div (click)="$event.stopPropagation()"
-           class="relative w-full max-w-3xl bg-white rounded-[2rem] shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto">
+           class="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto">
         
         <!-- Franja de acento superior -->
         <div class="h-1.5 w-full bg-gradient-to-r from-[#4F8A3D] via-[#38BDF8] to-[#123F5B]"></div>

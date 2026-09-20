@@ -70,10 +70,10 @@ import { RouterModule, Router } from '@angular/router';
 
           <!-- Botón / Cuadro de Usuario Logeado con Integración Armónica -->
           <div *ngIf="loginDisplay"
-               class="btn-interactive hidden sm:flex items-center gap-3 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full transition-all duration-300"
+               class="btn-interactive hidden sm:flex items-center gap-3 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl transition-all duration-300"
                [ngClass]="userPillClass">
             <a routerLink="/dashboard" class="flex items-center gap-2.5 sm:gap-3 cursor-pointer group">
-              <div class="w-8 h-8 rounded-full text-xs sm:text-sm font-black flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-105 shadow-xs"
+              <div class="w-8 h-8 rounded-lg text-xs sm:text-sm font-black flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-105 shadow-xs"
                    [ngClass]="userAvatarClass">
                 {{ currentUser ? currentUser.charAt(0).toUpperCase() : 'V' }}
               </div>
@@ -112,7 +112,7 @@ import { RouterModule, Router } from '@angular/router';
           <div class="text-xs text-[#546571] leading-tight">
             Ilustre Municipalidad de <strong class="text-[#123F5B] block font-bold">Puerto Varas</strong>
           </div>
-          <span class="ml-auto px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E8F3E6] text-[#3D742F] border border-[#CCE4C8]">Portal 2026</span>
+          <span class="ml-auto px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#E8F3E6] text-[#3D742F] border border-[#CCE4C8]">Portal 2026</span>
         </div>
 
         <nav class="flex flex-col space-y-1 text-[15px] font-semibold text-[#183247]">

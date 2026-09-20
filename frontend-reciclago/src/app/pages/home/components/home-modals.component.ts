@@ -13,12 +13,12 @@ import { QuadrantCardInfo } from '../data/home-sectors.data';
          class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
       
       <div (click)="$event.stopPropagation()"
-           class="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto">
+           class="relative w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto">
         <div class="h-2 w-full bg-gradient-to-r from-[#206935] via-[#38BDF8] to-[#093554]"></div>
 
         <div class="px-6 sm:px-8 pt-6 pb-4 border-b border-slate-100 flex items-center justify-between bg-[#F8FAF7]">
           <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-2xl bg-[#EEF5EB] border border-[#D5E6D2] flex items-center justify-center text-[#206935] text-xl flex-shrink-0 shadow-xs">
+            <div class="w-12 h-12 rounded-xl bg-[#EEF5EB] border border-[#D5E6D2] flex items-center justify-center text-[#206935] text-xl flex-shrink-0 shadow-xs">
               <i [class]="selectedQuadrant.iconClass"></i>
             </div>
             <div>
@@ -32,7 +32,7 @@ import { QuadrantCardInfo } from '../data/home-sectors.data';
           </div>
           <button (click)="closeQuadrantModal()"
                   type="button"
-                  class="w-9 h-9 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-sm transition-colors shadow-xs cursor-pointer"
+                  class="w-9 h-9 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-sm transition-colors shadow-xs cursor-pointer"
                   aria-label="Cerrar">
             <i class="fa-solid fa-xmark"></i>
           </button>
@@ -94,12 +94,12 @@ import { QuadrantCardInfo } from '../data/home-sectors.data';
          class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
       
       <div (click)="$event.stopPropagation()"
-           class="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto">
+           class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto">
         <div class="h-1.5 w-full bg-gradient-to-r from-[#437d32] via-[#38BDF8] to-[#093554]"></div>
 
         <div class="px-6 sm:px-8 pt-6 pb-4 border-b border-[#E2E9E4] flex items-center justify-between bg-[#F8FAF7]">
           <div class="flex items-center gap-3.5">
-            <div class="w-11 h-11 rounded-2xl bg-[#EEF5EB] border border-[#D5E6D2] flex items-center justify-center text-[#437d32] text-lg flex-shrink-0 shadow-xs">
+            <div class="w-11 h-11 rounded-xl bg-[#EEF5EB] border border-[#D5E6D2] flex items-center justify-center text-[#437d32] text-lg flex-shrink-0 shadow-xs">
               <i class="fa-solid fa-leaf"></i>
             </div>
             <div>
@@ -113,7 +113,7 @@ import { QuadrantCardInfo } from '../data/home-sectors.data';
           </div>
           <button (click)="closeMaterialsModal()"
                   type="button"
-                  class="w-9 h-9 rounded-full bg-white border border-[#DFE8E1] hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-sm transition-colors shadow-xs cursor-pointer"
+                  class="w-9 h-9 rounded-lg bg-white border border-[#DFE8E1] hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-sm transition-colors shadow-xs cursor-pointer"
                   aria-label="Cerrar">
             <i class="fa-solid fa-xmark"></i>
           </button>
@@ -125,19 +125,19 @@ import { QuadrantCardInfo } from '../data/home-sectors.data';
           </p>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div class="p-3.5 rounded-2xl bg-[#edf8ed] border border-[#d6ebd0]">
+            <div class="p-3.5 rounded-xl bg-[#edf8ed] border border-[#d6ebd0]">
               <span class="font-bold text-xs uppercase tracking-wider text-[#238038] block mb-1">1. Vidrio</span>
               <p class="text-xs text-slate-600">Botellas y frascos de conservas sin tapas metálicas. Limpios y secos.</p>
             </div>
-            <div class="p-3.5 rounded-2xl bg-[#edf4fb] border border-[#d0e5f5]">
+            <div class="p-3.5 rounded-xl bg-[#edf4fb] border border-[#d0e5f5]">
               <span class="font-bold text-xs uppercase tracking-wider text-[#176fa9] block mb-1">2. Cartón y Papel</span>
               <p class="text-xs text-slate-600">Cajas aplanadas, diarios, revistas y papel blanco seco.</p>
             </div>
-            <div class="p-3.5 rounded-2xl bg-[#fef8ed] border border-[#fbe9c8]">
+            <div class="p-3.5 rounded-xl bg-[#fef8ed] border border-[#fbe9c8]">
               <span class="font-bold text-xs uppercase tracking-wider text-[#c4871d] block mb-1">3. Plásticos</span>
               <p class="text-xs text-slate-600">Botellas de líquidos y envases limpios, aplastados y con tapa puesta.</p>
             </div>
-            <div class="p-3.5 rounded-2xl bg-[#fdf0ef] border border-[#fad5d3]">
+            <div class="p-3.5 rounded-xl bg-[#fdf0ef] border border-[#fad5d3]">
               <span class="font-bold text-xs uppercase tracking-wider text-[#c94b43] block mb-1">4. Latas</span>
               <p class="text-xs text-slate-600">Latas de aluminio y conservas metálicas enjuagadas y aplastadas.</p>
             </div>
@@ -160,12 +160,12 @@ import { QuadrantCardInfo } from '../data/home-sectors.data';
          (click)="closeFaqModal()"
          class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
       <div (click)="$event.stopPropagation()"
-           class="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto">
+           class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto">
         <div class="h-1.5 w-full bg-gradient-to-r from-[#437d32] via-[#38BDF8] to-[#093554]"></div>
 
         <div class="px-6 sm:px-8 pt-6 pb-4 border-b border-[#E2E9E4] flex items-center justify-between bg-[#F8FAF7]">
           <div class="flex items-center gap-3.5">
-            <div class="w-11 h-11 rounded-2xl bg-[#EEF5EB] border border-[#D5E6D2] flex items-center justify-center text-[#093554] text-lg flex-shrink-0 shadow-xs">
+            <div class="w-11 h-11 rounded-xl bg-[#EEF5EB] border border-[#D5E6D2] flex items-center justify-center text-[#093554] text-lg flex-shrink-0 shadow-xs">
               <i class="fa-solid fa-circle-question"></i>
             </div>
             <div>
@@ -179,7 +179,7 @@ import { QuadrantCardInfo } from '../data/home-sectors.data';
           </div>
           <button (click)="closeFaqModal()"
                   type="button"
-                  class="w-9 h-9 rounded-full bg-white border border-[#DFE8E1] hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-sm transition-colors shadow-xs cursor-pointer"
+                  class="w-9 h-9 rounded-lg bg-white border border-[#DFE8E1] hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-sm transition-colors shadow-xs cursor-pointer"
                   aria-label="Cerrar">
             <i class="fa-solid fa-xmark"></i>
           </button>

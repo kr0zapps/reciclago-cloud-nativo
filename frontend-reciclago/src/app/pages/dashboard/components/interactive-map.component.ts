@@ -7,9 +7,9 @@ import { Sector, Waypoint } from '../data/sectors.data';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="bg-white rounded-3xl border border-[#E2E9E4] p-7 sm:p-9 flex flex-col justify-between shadow-xs card-hover h-full">
+    <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 flex flex-col justify-between shadow-xs card-hover h-full">
       <div class="space-y-4">
-        <div class="w-12 h-12 rounded-2xl bg-[#E8F3F7] text-brand-lake flex items-center justify-center text-2xl interactive-icon">
+        <div class="w-12 h-12 rounded-xl bg-[#E8F3F7] text-brand-lake flex items-center justify-center text-2xl interactive-icon">
           <i class="fa-solid fa-map-location-dot"></i>
         </div>
         <div>
@@ -20,7 +20,7 @@ import { Sector, Waypoint } from '../data/sectors.data';
         </p>
 
         <!-- Lienzo de Calles y Simulación -->
-        <div class="rounded-2xl bg-[#F0F6F9] border border-[#D4E6EF] p-4 sm:p-5 relative overflow-hidden shadow-xs">
+        <div class="rounded-xl bg-[#F0F6F9] border border-[#D4E6EF] p-4 sm:p-5 relative overflow-hidden shadow-xs">
           <div class="flex items-center justify-between gap-2 mb-3">
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-compass text-brand-lake text-base"></i>
@@ -35,7 +35,7 @@ import { Sector, Waypoint } from '../data/sectors.data';
           <!-- Mapa Vectorial de Calles -->
           <div class="h-44 sm:h-48 w-full bg-white rounded-xl relative p-2 overflow-hidden border border-[#E1EDF2] select-none">
             <!-- Lago Llanquihue -->
-            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-3xl flex flex-col items-center justify-center text-[10px] font-extrabold text-brand-lake border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
+            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-2xl flex flex-col items-center justify-center text-[10px] font-extrabold text-brand-lake border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
               <div class="flex items-center gap-1.5 opacity-90">
                 <i class="fa-solid fa-water text-xs text-sky-500"></i>
                 <span>Lago Llanquihue</span>

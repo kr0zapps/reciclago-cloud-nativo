@@ -70,8 +70,8 @@
         
         <!-- BARRA SUPERIOR DE CONTEXTO / ROL -->
         <div class="flex items-center gap-2.5 flex-wrap">
-          <!-- Selector Cívico de Sector -->
-          <div class="relative sector-dropdown-container">
+          <!-- Selector Cívico de Sector (Exclusivo Vecinos/Ciudadanos) -->
+          <div *ngIf="!isStaff" class="relative sector-dropdown-container">
             <button
               (click)="toggleSectorDropdown($event)"
               type="button"
@@ -101,43 +101,40 @@
                  class="absolute left-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] p-2.5 z-[100] anim-modal-backdrop">
               
               <div class="px-3 py-2 border-b border-[#EAEFE8] mb-1.5 flex items-center justify-between">
-                <span class="text-xs font-bold text-[#123F5B]">
-                  Cuadrantes de Puerto Varas
-                </span>
-                <span class="text-[11px] text-slate-400 font-medium">
-                  {{ sectores.length }} sectores
-                </span>
+                <span class="text-xs font-bold text-[#123F5B] uppercase tracking-wider">Selecciona tu Cuadrante</span>
+                <span class="text-[10px] bg-[#EEF5EB] text-[#4F8A3D] font-bold px-2 py-0.5 rounded-md">4 Cuadrantes</span>
               </div>
 
-              <div class="space-y-1">
+              <div class="max-h-64 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
                 <button
-                  *ngFor="let s of sectores; let idx = index"
+                  *ngFor="let s of sectores"
                   (click)="selectSectorFromDropdown(s.nombre)"
                   type="button"
                   role="option"
-                  [attr.aria-selected]="s.nombre === selectedSector"
-                  class="w-full text-left p-2.5 rounded-xl transition-all flex items-center justify-between group cursor-pointer"
-                  [ngClass]="s.nombre === selectedSector ? 'bg-[#EEF5EB] border border-[#CCE4C8]' : 'hover:bg-slate-50 border border-transparent'">
+                  [attr.aria-selected]="selectedSector === s.nombre"
+                  class="w-full text-left px-3 py-2.5 rounded-xl transition-all flex items-center justify-between group cursor-pointer"
+                  [ngClass]="selectedSector === s.nombre ? 'bg-[#EEF5EB] border border-[#CCE4C8]' : 'hover:bg-slate-50 border border-transparent'">
                   
-                  <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs flex-shrink-0 transition-colors"
-                         [ngClass]="s.nombre === selectedSector ? 'bg-[#4F8A3D] text-white shadow-xs' : 'bg-slate-100 text-slate-600 group-hover:bg-[#EEF5EB] group-hover:text-[#4F8A3D]'">
-                      C{{ s.numero || (idx + 1) }}
+                  <div class="min-w-0 pr-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-[#123F5B] group-hover:text-[#4F8A3D] transition-colors truncate">
+                        {{ s.nombre }}
+                      </span>
+                      <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white border border-slate-200 text-slate-500">
+                        {{ s.cuadrante }}
+                      </span>
                     </div>
-                    <div class="min-w-0">
-                      <div class="font-bold text-xs text-[#123F5B] truncate flex items-center gap-1.5">
-                        <span>{{ s.nombre }}</span>
-                      </div>
-                      <div class="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5">
-                        <span class="font-medium text-[#4F8A3D]">{{ s.dia }}</span>
-                        <span class="text-slate-300">•</span>
-                        <span>{{ s.horario }}</span>
-                      </div>
-                    </div>
+                    <p class="text-[11px] text-slate-500 truncate mt-0.5">
+                      {{ s.direccionEjemplo }}
+                    </p>
                   </div>
 
-                  <div *ngIf="s.nombre === selectedSector" class="text-[#4F8A3D] flex-shrink-0 ml-2">
-                    <i class="fa-solid fa-circle-check text-base"></i>
+                  <div class="flex items-center gap-2 flex-shrink-0 text-right">
+                    <span class="text-[11px] font-bold px-2 py-0.5 rounded-md"
+                          [ngClass]="selectedSector === s.nombre ? 'bg-[#4F8A3D] text-white' : 'bg-slate-100 text-slate-600'">
+                      {{ s.dia }}
+                    </span>
+                    <i *ngIf="selectedSector === s.nombre" class="fa-solid fa-check text-xs text-[#4F8A3D]"></i>
                   </div>
                 </button>
               </div>
@@ -154,13 +151,6 @@
             </div>
           </div>
 
-          <!-- Distinción de Rol Oficial -->
-          <div *ngIf="isStaff"
-               class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold border shadow-2xs"
-               [ngClass]="activeStaffRole === 'Admin' ? 'bg-[#123F5B] text-white border-[#123F5B]' : (activeStaffRole === 'Coordinador' ? 'bg-[#1F6685] text-white border-[#1F6685]' : 'bg-[#4F8A3D] text-white border-[#4F8A3D]')">
-            <i class="fa-solid" [class.fa-user-shield]="activeStaffRole === 'Admin'" [class.fa-headset]="activeStaffRole === 'Coordinador'" [class.fa-truck]="activeStaffRole === 'Chofer'"></i>
-            <span>{{ activeStaffRole === 'Admin' ? 'Administrador' : (activeStaffRole === 'Coordinador' ? 'Coordinador' : 'Chofer') }}</span>
-          </div>
         </div>
 
         <div class="pt-1">

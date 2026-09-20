@@ -7,16 +7,16 @@ import { Sector, Pickup } from '../data/sectors.data';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <section class="bg-[#F8FAF7] border border-[#DFE8E1] rounded-3xl p-6 sm:p-9 shadow-xs card-hover anim-fade-up anim-delay-4" id="impacto-section">
-      <div class="pb-6 mb-6 border-b border-[#DFEAE0]">
+    <section class="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-xs card-hover anim-fade-up anim-delay-4" id="impacto-section">
+      <div class="pb-6 mb-6 border-b border-[#E2E8F0]">
         <h3 class="font-heading font-extrabold text-2xl text-brand-navy">Tu aporte al reciclaje comunal</h3>
         <p class="text-sm sm:text-base text-brand-muted mt-0.5">Resumen de materiales recolectados y certificados en tu domicilio</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#D8E6D9] gap-6 md:gap-0">
+      <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#E2E8F0] gap-6 md:gap-0">
         <!-- Métrica 1: Retiros -->
         <div class="pt-4 md:pt-0 md:px-6 first:pl-0 flex items-center gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-white text-brand-green flex items-center justify-center text-xl flex-shrink-0 shadow-xs border border-[#D5E6D2]">
+          <div class="w-12 h-12 rounded-xl bg-[#F4F9F5] text-brand-green flex items-center justify-center text-xl flex-shrink-0 shadow-xs border border-[#D5E6D2]">
             <i class="fa-solid fa-arrows-rotate"></i>
           </div>
           <div>
@@ -30,7 +30,7 @@ import { Sector, Pickup } from '../data/sectors.data';
 
         <!-- Métrica 2: Kilogramos -->
         <div class="pt-4 md:pt-0 md:px-6 flex items-center gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-white text-brand-green flex items-center justify-center text-xl flex-shrink-0 shadow-xs border border-[#D5E6D2]">
+          <div class="w-12 h-12 rounded-xl bg-[#F4F9F5] text-brand-green flex items-center justify-center text-xl flex-shrink-0 shadow-xs border border-[#D5E6D2]">
             <i class="fa-solid fa-weight-hanging"></i>
           </div>
           <div>
@@ -44,7 +44,7 @@ import { Sector, Pickup } from '../data/sectors.data';
 
         <!-- Métrica 3: CO2 Mitigado Real -->
         <div class="pt-4 md:pt-0 md:px-6 last:pr-0 flex items-center gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-white text-brand-lake flex items-center justify-center text-xl flex-shrink-0 shadow-xs border border-[#CFE4ED]">
+          <div class="w-12 h-12 rounded-xl bg-[#F0F6F9] text-brand-lake flex items-center justify-center text-xl flex-shrink-0 shadow-xs border border-[#CFE4ED]">
             <i class="fa-solid fa-leaf"></i>
           </div>
           <div>

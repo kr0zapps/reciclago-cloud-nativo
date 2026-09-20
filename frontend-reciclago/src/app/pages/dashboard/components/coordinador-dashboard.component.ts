@@ -11,112 +11,108 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
   imports: [CommonModule, FormsModule],
   template: `
     <div class="space-y-6 sm:space-y-8">
-      <!-- Barra de Acciones de Coordinación -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <span class="text-xs text-slate-500 font-medium">
-            Sector activo: <strong class="text-[#123F5B] font-bold">{{ sector?.nombre || 'Puerto Varas' }}</strong>
-          </span>
-        </div>
+      <!-- Barra de Acciones y Despacho -->
+      <div class="flex justify-end">
         <button (click)="openNuevoRetiroModal()"
                 type="button"
-                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#123F5B] hover:bg-[#0E2E42] text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer">
+                class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#123F5B] hover:bg-[#0E2E42] text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer w-full sm:w-auto">
           <i class="fa-solid fa-plus text-xs"></i>
           <span>Ingresar Solicitud</span>
         </button>
       </div>
 
       <!-- ==================== 2. PIPELINE DE DESPACHO EN TIEMPO REAL ==================== -->
-      <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+      <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         <!-- Tarjeta 1: Solicitudes Entrantes (Por Asignar) -->
-        <div class="bg-white rounded-2xl p-5 border shadow-xs flex flex-col justify-between"
-             [ngClass]="countPendientes > 0 ? 'border-amber-300 bg-amber-50/20' : 'border-[#E2E9E4]'">
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border shadow-xs flex flex-col justify-between"
+             [ngClass]="countPendientes > 0 ? 'border-amber-200 bg-amber-50/20' : 'border-[#E2E9E4]'">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-amber-900">Por programar</span>
-            <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-xs font-bold">
+            <span class="text-xs font-semibold text-slate-600">Por programar</span>
+            <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-800 flex items-center justify-center text-xs font-bold border border-amber-200">
               <i class="fa-solid fa-inbox"></i>
             </div>
           </div>
           <div class="mt-3">
-            <div class="text-3xl sm:text-4xl font-black font-heading text-amber-900">{{ countPendientes }}</div>
-            <p class="text-xs text-amber-800 mt-1 font-medium">
+            <div class="text-2xl sm:text-3xl lg:text-4xl font-black font-heading text-slate-900">{{ countPendientes }}</div>
+            <p class="text-[11px] sm:text-xs text-slate-500 mt-1">
               {{ countPendientes > 0 ? 'Esperando asignación a camión' : 'Bandeja al día' }}
             </p>
           </div>
         </div>
 
         <!-- Tarjeta 2: Listos para Despacho (Programados) -->
-        <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-500">Programados</span>
+            <span class="text-xs font-semibold text-slate-600">Programados</span>
             <div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center text-xs font-bold border border-sky-200">
               <i class="fa-solid fa-calendar-check"></i>
             </div>
           </div>
           <div class="mt-3">
-            <div class="text-3xl sm:text-4xl font-black font-heading text-brand-navy">{{ countProgramados }}</div>
-            <p class="text-xs text-slate-500 mt-1">Con fecha y sector asignado</p>
+            <div class="text-2xl sm:text-3xl lg:text-4xl font-black font-heading text-slate-900">{{ countProgramados }}</div>
+            <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Con fecha y cuadrilla</p>
           </div>
         </div>
 
         <!-- Tarjeta 3: Cuadrillas en Ruta -->
-        <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-500">En ruta</span>
+            <span class="text-xs font-semibold text-slate-600">En ruta</span>
             <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center text-xs font-bold border border-indigo-200">
               <i class="fa-solid fa-truck-fast"></i>
             </div>
           </div>
           <div class="mt-3">
-            <div class="text-3xl sm:text-4xl font-black font-heading text-[#1F6685]">{{ countEnRuta }}</div>
-            <p class="text-xs text-slate-500 mt-1">Recorriendo direcciones</p>
+            <div class="text-2xl sm:text-3xl lg:text-4xl font-black font-heading text-slate-900">{{ countEnRuta }}</div>
+            <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Recorriendo direcciones</p>
           </div>
         </div>
 
         <!-- Tarjeta 4: Camiones Operables -->
-        <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-500">Flota activa</span>
+            <span class="text-xs font-semibold text-slate-600">Flota activa</span>
             <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs font-bold border border-emerald-200">
               <i class="fa-solid fa-truck"></i>
             </div>
           </div>
           <div class="mt-3">
-            <div class="text-3xl sm:text-4xl font-black font-heading text-emerald-800">
+            <div class="text-2xl sm:text-3xl lg:text-4xl font-black font-heading text-slate-900">
               {{ camionesDisponiblesCount }} / {{ camiones.length }}
             </div>
-            <p class="text-xs text-slate-500 mt-1">Unidades operativas hoy</p>
+            <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Unidades operativas hoy</p>
           </div>
         </div>
       </section>
 
       <!-- ==================== 3. PLANILLA DE DESPACHO Y ASIGNACIÓN DE RUTAS ==================== -->
-      <section class="bg-white rounded-3xl border border-[#E2E9E4] shadow-xs overflow-hidden">
-        <div class="p-6 border-b border-[#EAEFE8] space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <section class="bg-white rounded-2xl border border-[#E2E9E4] shadow-xs overflow-hidden">
+        <div class="p-4 sm:p-6 border-b border-[#EAEFE8] space-y-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
             <div>
-              <h3 class="font-heading font-extrabold text-2xl text-brand-navy">
+              <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy">
                 Planilla de Despacho y Gestión de Rutas
               </h3>
+              <p class="text-xs text-slate-500 mt-0.5">Control de solicitudes domiciliarias, cuadrillas y báscula municipal.</p>
             </div>
 
             <!-- Filtros de Sector y Tamaño de Página -->
-            <div class="flex items-center gap-3 flex-wrap">
+            <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
               <div class="flex items-center gap-1.5">
-                <span class="text-xs font-bold text-slate-500">Sector:</span>
+                <span class="text-xs font-semibold text-slate-500">Sector:</span>
                 <select [(ngModel)]="filterSector"
                         (ngModelChange)="onFilterSectorChange()"
-                        class="select-stitch py-1.5 px-3 text-xs font-bold text-[#1F6685] bg-[#F8FAF7]">
+                        class="select-stitch py-1.5 px-3 text-xs font-bold text-[#1F6685] bg-[#F8FAF7] border border-slate-200 rounded-xl">
                   <option value="ALL">Todos los Sectores</option>
                   <option *ngFor="let s of sectores" [value]="s.nombre">{{ s.nombre }}</option>
                 </select>
               </div>
 
               <div class="flex items-center gap-1.5">
-                <span class="text-xs font-bold text-slate-500">Filas:</span>
+                <span class="text-xs font-semibold text-slate-500">Filas:</span>
                 <select [(ngModel)]="pageSize"
                         (ngModelChange)="onPageSizeChange()"
-                        class="select-stitch py-1.5 px-2 text-xs font-bold text-[#1F6685] bg-[#F8FAF7]">
+                        class="select-stitch py-1.5 px-2 text-xs font-bold text-[#1F6685] bg-[#F8FAF7] border border-slate-200 rounded-xl">
                   <option [value]="5">5</option>
                   <option [value]="10">10</option>
                   <option [value]="20">20</option>
@@ -125,41 +121,51 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
             </div>
           </div>
 
-          <!-- Pestañas de Estado Logísticas -->
-          <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-bold">
+          <!-- Pestañas de Estado Logísticas Unificadas (Segmented Control) -->
+          <div class="bg-slate-100/90 p-1 rounded-xl inline-flex items-center gap-1 border border-slate-200/80 overflow-x-auto no-scrollbar max-w-full">
             <button (click)="onFilterStatusChange('ALL')"
                     type="button"
-                    class="px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
-                    [ngClass]="filterStatus === 'ALL' ? 'bg-[#1F6685] text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'">
-              Todos ({{ pickups.length }})
+                    class="px-3 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                    [ngClass]="filterStatus === 'ALL' ? 'bg-white text-[#123F5B] font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900 font-medium'">
+              <span>Todos</span>
+              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded"
+                    [ngClass]="filterStatus === 'ALL' ? 'bg-[#123F5B] text-white' : 'bg-slate-200/70 text-slate-700'">{{ pickups.length }}</span>
             </button>
 
             <button (click)="onFilterStatusChange('SOLICITADO')"
                     type="button"
-                    class="px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
-                    [ngClass]="filterStatus === 'SOLICITADO' ? 'bg-amber-600 text-white shadow-xs' : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200/60'">
-              Por Programar ({{ countPendientes }})
+                    class="px-3 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                    [ngClass]="filterStatus === 'SOLICITADO' ? 'bg-white text-[#123F5B] font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900 font-medium'">
+              <span>Por Programar</span>
+              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded"
+                    [ngClass]="filterStatus === 'SOLICITADO' ? 'bg-amber-600 text-white' : 'bg-slate-200/70 text-slate-700'">{{ countPendientes }}</span>
             </button>
 
             <button (click)="onFilterStatusChange('PROGRAMADO')"
                     type="button"
-                    class="px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
-                    [ngClass]="filterStatus === 'PROGRAMADO' ? 'bg-sky-700 text-white shadow-xs' : 'bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200/60'">
-              Programados ({{ countProgramados }})
+                    class="px-3 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                    [ngClass]="filterStatus === 'PROGRAMADO' ? 'bg-white text-[#123F5B] font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900 font-medium'">
+              <span>Programados</span>
+              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded"
+                    [ngClass]="filterStatus === 'PROGRAMADO' ? 'bg-sky-600 text-white' : 'bg-slate-200/70 text-slate-700'">{{ countProgramados }}</span>
             </button>
 
             <button (click)="onFilterStatusChange('EN_RUTA')"
                     type="button"
-                    class="px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
-                    [ngClass]="filterStatus === 'EN_RUTA' ? 'bg-indigo-700 text-white shadow-xs' : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200/60'">
-              En Ruta ({{ countEnRuta }})
+                    class="px-3 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                    [ngClass]="filterStatus === 'EN_RUTA' ? 'bg-white text-[#123F5B] font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900 font-medium'">
+              <span>En Ruta</span>
+              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded"
+                    [ngClass]="filterStatus === 'EN_RUTA' ? 'bg-indigo-600 text-white' : 'bg-slate-200/70 text-slate-700'">{{ countEnRuta }}</span>
             </button>
 
             <button (click)="onFilterStatusChange('RETIRADO')"
                     type="button"
-                    class="px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
-                    [ngClass]="filterStatus === 'RETIRADO' ? 'bg-emerald-700 text-white shadow-xs' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200/60'">
-              Retirados ({{ countRetirados }})
+                    class="px-3 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                    [ngClass]="filterStatus === 'RETIRADO' ? 'bg-white text-[#123F5B] font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900 font-medium'">
+              <span>Retirados</span>
+              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded"
+                    [ngClass]="filterStatus === 'RETIRADO' ? 'bg-emerald-600 text-white' : 'bg-slate-200/70 text-slate-700'">{{ countRetirados }}</span>
             </button>
           </div>
         </div>
@@ -167,38 +173,42 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
         <!-- Lista de Despacho -->
         <div class="divide-y divide-[#EEF3EF]">
           <div *ngFor="let p of paginatedPickups"
-               class="p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:bg-[#F9FAF8] transition-colors">
+               class="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-[#F9FAF8] transition-colors">
             
-            <div class="flex items-start sm:items-center gap-4 min-w-0 flex-1">
-              <div class="w-12 h-12 rounded-2xl bg-sky-50 text-[#1F6685] flex items-center justify-center text-xl flex-shrink-0 border border-sky-200 shadow-2xs">
+            <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0 flex-1">
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-sky-50 text-[#1F6685] flex items-center justify-center text-lg sm:text-xl flex-shrink-0 border border-sky-100">
                 <i class="fa-solid fa-route"></i>
               </div>
 
               <div class="min-w-0 flex-1">
-                <div class="flex items-center gap-2.5 flex-wrap">
+                <div class="flex items-center gap-2 flex-wrap">
                   <span class="text-xs font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
                     #{{ p.id }}
                   </span>
-                  <h4 class="font-heading font-bold text-base sm:text-lg text-brand-navy">
+                  <h4 class="font-heading font-bold text-base sm:text-lg text-brand-navy truncate">
                     {{ p.direccion }}
                   </h4>
-                  <span class="text-xs font-bold text-[#1F6685] px-2.5 py-0.5 rounded-lg bg-sky-50 border border-sky-200">
+                  <span class="text-xs font-medium text-[#1F6685] px-2.5 py-0.5 rounded-lg bg-sky-50 border border-sky-200/70">
                     {{ p.residuoNombre || 'Reciclaje Domiciliario' }}
                   </span>
                 </div>
 
-                <div class="text-xs text-slate-500 mt-1 flex items-center gap-2 flex-wrap">
+                <div class="text-xs text-slate-500 mt-1.5 flex items-center gap-2 flex-wrap">
                   <span><i class="fa-regular fa-calendar text-slate-400 mr-1"></i>{{ p.fechaTexto || p.fecha || 'Sin fecha' }}</span>
-                  <span class="text-slate-300" *ngIf="p.pesoEstimadoKg">•</span>
-                  <span *ngIf="p.pesoEstimadoKg" class="font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                    <i class="fa-solid fa-weight-hanging mr-1 text-slate-400"></i>Est: {{ p.pesoEstimadoKg }} kg
-                  </span>
-                  <span class="text-slate-300" *ngIf="p.kilosRecolectados">•</span>
-                  <span *ngIf="p.kilosRecolectados" class="font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                    <i class="fa-solid fa-scale-balanced mr-1"></i>{{ p.kilosRecolectados }} kg pesados
-                  </span>
+                  <ng-container *ngIf="p.pesoEstimadoKg">
+                    <span class="text-slate-300">•</span>
+                    <span class="font-medium text-slate-600">
+                      Est: {{ p.pesoEstimadoKg }} kg
+                    </span>
+                  </ng-container>
+                  <ng-container *ngIf="p.kilosRecolectados">
+                    <span class="text-slate-300">•</span>
+                    <span class="font-bold text-emerald-800">
+                      <i class="fa-solid fa-scale-balanced mr-1"></i>{{ p.kilosRecolectados }} kg pesados
+                    </span>
+                  </ng-container>
                   <span class="text-slate-300">•</span>
-                  <span *ngIf="p.comentarios" class="text-slate-600 font-medium">
+                  <span *ngIf="p.comentarios" class="text-slate-600 italic">
                     "{{ p.comentarios }}"
                   </span>
                   <span *ngIf="!p.comentarios" class="text-slate-400 italic">
@@ -208,41 +218,40 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
               </div>
             </div>
 
-            <!-- Botones de Coordinación -->
-            <div class="flex items-center gap-3 flex-wrap self-start lg:self-center flex-shrink-0">
+            <!-- Botones y Acciones de Coordinación -->
+            <div class="flex items-center gap-2.5 flex-wrap self-start md:self-center flex-shrink-0 w-full md:w-auto justify-between md:justify-end pt-2 md:pt-0 border-t md:border-t-0 border-slate-100">
               <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold border shadow-2xs"
                     [ngClass]="getStatusBadgeClass(p.estado)">
                 <i [ngClass]="getStatusIconClass(p.estado)"></i>
                 <span>{{ p.estado }}</span>
               </span>
 
-              <div class="flex items-center gap-1.5">
+              <div class="flex items-center gap-1.5 flex-wrap">
                 <!-- 1. SOLICITADO -> Programar -->
                 <button *ngIf="p.estado === 'SOLICITADO'"
                         (click)="requestAction(p, 'programar')"
                         type="button"
-                        class="px-4 py-2 rounded-xl text-xs font-bold bg-[#1F6685] hover:bg-[#164E66] text-white transition-all cursor-pointer shadow-xs flex items-center gap-1.5">
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#1F6685] hover:bg-[#164E66] text-white transition-all cursor-pointer shadow-xs flex items-center gap-1.5">
                   <i class="fa-regular fa-calendar-check text-xs"></i>
-                  <span>Programar en Ruta</span>
+                  <span>Programar</span>
                 </button>
 
-                <!-- 2. PROGRAMADO -> Editar / Re-programar antes de que el chofer inicie ruta -->
+                <!-- 2. PROGRAMADO -> Editar y Despachar -->
                 <button *ngIf="p.estado === 'PROGRAMADO'"
                         (click)="requestAction(p, 'programar')"
                         type="button"
-                        class="px-3.5 py-2 rounded-xl text-xs font-bold bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5"
-                        title="Editar fecha, horario o camión asignado antes de iniciar ruta">
-                  <i class="fa-solid fa-pen-to-square text-xs text-sky-600"></i>
+                        class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5"
+                        title="Editar fecha, horario o cuadrilla asignada">
+                  <i class="fa-solid fa-pen-to-square text-xs text-slate-500"></i>
                   <span>Editar</span>
                 </button>
 
-                <!-- Despachar a Cuadrilla -->
                 <button *ngIf="p.estado === 'PROGRAMADO'"
                         (click)="requestAction(p, 'en-ruta')"
                         type="button"
-                        class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white transition-all cursor-pointer shadow-xs flex items-center gap-1.5">
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white transition-all cursor-pointer shadow-xs flex items-center gap-1.5">
                   <i class="fa-solid fa-truck-fast text-xs"></i>
-                  <span>Despachar a Cuadrilla</span>
+                  <span>Despachar</span>
                 </button>
 
                 <!-- 3. EN_RUTA -> Retirado -->
@@ -262,12 +271,6 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                   <i class="fa-solid fa-scale-balanced text-xs"></i>
                   <span>Registrar Báscula</span>
                 </button>
-
-                <div *ngIf="p.estado === 'PESADO'"
-                     class="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#EBF5E7] text-emerald-900 border border-[#CDE8C7] flex items-center gap-1">
-                  <i class="fa-solid fa-check text-emerald-600 text-xs"></i>
-                  <span>{{ p.kilosRecolectados ? p.kilosRecolectados + ' kg' : 'Pesado' }}</span>
-                </div>
               </div>
             </div>
           </div>
@@ -318,17 +321,17 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
       </section>
 
       <!-- ==================== 4. TELEMETRÍA MULTICAMIÓN PARA DESPACHO ==================== -->
-      <section class="bg-white rounded-3xl border border-[#E2E9E4] p-6 sm:p-8 shadow-xs">
+      <section class="bg-white rounded-2xl border border-[#E2E9E4] p-5 sm:p-8 shadow-xs">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-[#EAEFE8]">
           <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-[#1F6685]">Monitoreo de Cuadrillas en Terreno</span>
-            <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy mt-0.5">
-              Rastreo Satelital y Estimación de Tiempos (ETA)
+            <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy">
+              Monitoreo de Cuadrillas en Terreno
             </h3>
+            <p class="text-xs text-slate-500 mt-0.5">Seguimiento satelital y tiempos estimados de llegada (ETA) por cuadrante.</p>
           </div>
 
           <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-xs font-bold text-slate-500">Seleccionar Camión:</span>
+            <span class="text-xs font-semibold text-slate-500">Unidad:</span>
             <div class="inline-flex rounded-xl p-1 bg-slate-100 border border-slate-200">
               <button *ngFor="let c of camiones"
                       (click)="selectTruck(c.patente)"
@@ -355,7 +358,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           </div>
 
           <div class="h-48 sm:h-56 w-full bg-white rounded-xl relative p-2 overflow-hidden border border-[#E1EDF2] select-none">
-            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-3xl flex flex-col items-center justify-center text-[10px] font-extrabold text-[#1F6685] border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
+            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-2xl flex flex-col items-center justify-center text-[10px] font-extrabold text-[#1F6685] border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
               <div class="flex items-center gap-1.5 opacity-90">
                 <i class="fa-solid fa-water text-xs text-sky-500"></i>
                 <span>Lago Llanquihue</span>
@@ -397,18 +400,13 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           <div class="mt-3 bg-white/95 rounded-xl p-3 border border-[#D0E2EC] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-50 text-[#1F6685] border border-sky-200">
-                  <i class="fa-solid fa-location-dot text-[10px]"></i>
-                  <span>Cuadrante en Atención</span>
-                </span>
-                <span class="text-xs font-bold text-[#123F5B] truncate">{{ currentWaypoint.name }}</span>
+                <span class="text-xs font-bold text-[#123F5B]">{{ currentWaypoint.name }}</span>
+                <span class="text-xs text-slate-400 font-medium">({{ currentWaypoint.detail }})</span>
               </div>
               <p class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-2 flex-wrap">
-                <span>{{ currentWaypoint.detail }}</span>
+                <span class="font-bold text-[#4F8A3D]"><i class="fa-regular fa-clock mr-1"></i>ETA: {{ currentWaypoint.eta }}</span>
                 <span class="text-slate-300">•</span>
-                <span class="font-bold text-[#4F8A3D]">Llegada aprox: {{ currentWaypoint.eta }}</span>
-                <span class="text-slate-300">•</span>
-                <span class="font-semibold text-slate-600">{{ currentWaypoint.distancia }}</span>
+                <span class="font-semibold text-slate-600"><i class="fa-solid fa-route mr-1 text-slate-400"></i>{{ currentWaypoint.distancia }}</span>
               </p>
             </div>
 
@@ -436,7 +434,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
            aria-labelledby="coord-mesa-title"
            class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
         <div (click)="$event.stopPropagation()"
-             class="relative w-full max-w-lg bg-white rounded-[2rem] shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto p-6 sm:p-8">
+             class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto p-6 sm:p-8">
           
           <div class="h-1.5 -mx-8 -mt-8 mb-6 bg-gradient-to-r from-[#1F6685] via-[#38BDF8] to-[#4F8A3D]"></div>
 

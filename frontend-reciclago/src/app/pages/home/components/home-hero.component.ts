@@ -59,7 +59,7 @@ import { RouterModule } from '@angular/router';
               <!-- Botón Primario: Verde Institucional RecicLaGo con Elevación y Presión -->
               <a
                 routerLink="/dashboard"
-                class="group btn-interactive w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-12 px-6 sm:px-7 rounded-lg bg-[#22a652] hover:bg-[#1b8e45] text-white font-bold text-xs sm:text-[13px] uppercase tracking-wider cursor-pointer text-center shadow-md hover:shadow-lg hover:shadow-emerald-950/40">
+                class="group btn-interactive w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-12 px-6 sm:px-7 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white font-bold text-xs sm:text-[13px] uppercase tracking-wider cursor-pointer text-center shadow-md hover:shadow-lg hover:shadow-emerald-950/40">
                 <i class="fa-solid fa-recycle text-sm group-hover:rotate-45 transition-transform duration-300 ease-out"></i>
                 <span>Ingresar al Portal Vecinal</span>
               </a>
@@ -68,37 +68,20 @@ import { RouterModule } from '@angular/router';
               <a
                 href="#cuadrantes"
                 (click)="scrollToSection($event, 'cuadrantes')"
-                class="group btn-interactive w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-12 px-6 sm:px-7 rounded-lg bg-[#041624]/60 sm:bg-white/5 hover:bg-white/15 active:bg-white/25 text-white font-bold text-xs sm:text-[13px] uppercase tracking-wider border border-white/40 hover:border-white/80 cursor-pointer text-center backdrop-blur-sm sm:backdrop-blur-none shadow-sm">
+                class="group btn-interactive w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-12 px-6 sm:px-7 rounded-xl bg-[#041624]/60 sm:bg-white/10 hover:bg-white/15 active:bg-white/25 text-white font-bold text-xs sm:text-[13px] uppercase tracking-wider border border-white/40 hover:border-white/80 cursor-pointer text-center backdrop-blur-sm sm:backdrop-blur-none shadow-sm">
                 <i class="fa-solid fa-location-dot text-sm text-emerald-400 group-hover:-translate-y-0.5 transition-transform duration-300 ease-out"></i>
                 <span>Ver Cuadrantes de Reciclaje</span>
               </a>
             </div>
 
-            <!-- Canal de Asistencia Telefónica: Inclusión y Agendamiento Asistido DIMAO -->
-            <div class="anim-fade-up anim-delay-3 mt-7 pt-5 border-t border-white/15">
-              <a
-                href="tel:+56652361200"
-                class="group inline-flex items-start sm:items-center gap-3.5 p-3 sm:px-4 sm:py-2.5 rounded-xl bg-[#041624]/65 sm:bg-white/10 hover:bg-[#041624]/85 sm:hover:bg-white/15 border border-white/20 hover:border-white/35 backdrop-blur-md transition-all duration-200 cursor-pointer shadow-xs max-w-xl">
-                <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-sm flex-shrink-0 group-hover:scale-105 transition-transform mt-0.5 sm:mt-0">
-                  <i class="fa-solid fa-phone"></i>
-                </div>
-                <div class="text-left min-w-0">
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <span class="text-xs sm:text-[13px] font-bold text-white group-hover:text-emerald-300 transition-colors">
-                      ¿Prefieres agendar por teléfono?
-                    </span>
-                    <span class="text-[11px] font-semibold text-emerald-300 flex items-center gap-1">
-                      <span>Llama al 65 236 1200</span>
-                      <i class="fa-solid fa-arrow-up-right-from-square text-[9px] opacity-75"></i>
-                    </span>
-                  </div>
-                  <p class="text-[11.5px] sm:text-xs text-slate-300/90 font-normal leading-tight mt-0.5">
-                    El coordinador de cuadrilla puede registrar tu retiro directamente en el sistema comunal.
-                  </p>
-                </div>
+            <!-- Agendamiento Telefónico (Línea sobria integrada, sin tarjeta ni estética de IA) -->
+            <p class="anim-fade-up anim-delay-3 mt-4 text-xs sm:text-[13px] text-slate-300 font-medium flex items-center gap-2 flex-wrap">
+              <i class="fa-solid fa-phone text-emerald-400 text-xs"></i>
+              <span>¿Prefieres agendar por teléfono?</span>
+              <a href="tel:+56652361200" class="text-white font-bold hover:text-emerald-300 underline underline-offset-2 transition-colors">
+                Llama al 65 236 1200
               </a>
-            </div>
-
+            </p>
           </div>
 
           <!-- Columna Derecha: Lema en Cursiva Cálido / Humano que Rellena y Da Equilibrio en Desktop -->

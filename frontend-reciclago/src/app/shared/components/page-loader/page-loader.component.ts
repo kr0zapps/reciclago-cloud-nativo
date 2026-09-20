@@ -15,7 +15,7 @@ import { CommonModule } from '@angular/common';
     <!-- Loader con identidad visual RecicLaGo -->
     <div *ngIf="isLoading"
          class="fixed inset-0 z-[100] flex items-center justify-center bg-[#041D2D]/20 backdrop-blur-[4px] transition-all duration-300 pointer-events-none">
-      <div class="bg-white/95 backdrop-blur-md rounded-3xl p-7 shadow-2xl border border-white/90 flex flex-col items-center text-center max-w-xs mx-4 anim-page-deploy pointer-events-auto">
+      <div class="bg-white/95 backdrop-blur-md rounded-2xl p-7 shadow-2xl border border-slate-200/80 flex flex-col items-center text-center max-w-xs mx-4 anim-page-deploy pointer-events-auto">
         
         <!-- Logo RecicLaGo Oficial -->
         <div class="relative w-16 h-16 mb-2.5 flex items-center justify-center">
