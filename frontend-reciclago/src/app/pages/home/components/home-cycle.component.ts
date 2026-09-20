@@ -17,14 +17,9 @@ interface CycleStep {
     <!-- BEGIN: HowItWorks -->
     <section class="py-14 sm:py-20 bg-[#f7faf7] border-b border-emerald-50 relative overflow-hidden" id="como-funciona">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <!-- Section Tag -->
-        <span class="inline-block px-3.5 py-1 rounded-full bg-emerald-100 text-[#256c38] font-bold text-xs mb-2.5 shadow-2xs">
-          ¿Cómo funciona?
-        </span>
-
-        <!-- Title & Subtitle con Revelación Suave -->
+        <!-- Title & Subtitle con Revelación Suave (Etiqueta única y limpia) -->
         <div class="reveal-init" [class.reveal-active]="isVisible">
-          <span class="inline-block px-3.5 py-1 rounded-full bg-emerald-100 text-[#256c38] font-bold text-xs mb-2.5 shadow-2xs">
+          <span class="inline-block px-3.5 py-1 rounded-full bg-emerald-100 text-[#256c38] font-bold text-xs mb-3 shadow-2xs">
             ¿Cómo funciona?
           </span>
           <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a233b] tracking-tight mb-2.5 font-heading">
@@ -49,14 +44,9 @@ interface CycleStep {
               </span>
             </div>
 
-            <!-- Contenido del Paso con Elevación Suave -->
+            <!-- Contenido del Paso con Elevación Suave (Sin Spans Redundantes) -->
             <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow duration-300">
-              <div class="flex items-baseline justify-between gap-2 mb-1">
-                <h3 class="font-extrabold text-sm text-[#0a233b] font-heading">{{ step.title }}</h3>
-                <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">
-                  {{ step.role }}
-                </span>
-              </div>
+              <h3 class="font-extrabold text-sm text-[#0a233b] font-heading mb-1">{{ step.title }}</h3>
               <p class="text-xs text-slate-600 leading-relaxed">{{ step.description }}</p>
             </div>
           </div>
@@ -80,12 +70,9 @@ interface CycleStep {
               </span>
             </div>
 
-            <h3 class="font-extrabold text-[#0a233b] text-sm lg:text-base mb-0.5 font-heading group-hover:text-[#22a652] transition-colors duration-200">
+            <h3 class="font-extrabold text-[#0a233b] text-sm lg:text-base mb-1.5 font-heading group-hover:text-[#22a652] transition-colors duration-200">
               {{ step.title }}
             </h3>
-            <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full mb-2 border border-emerald-100/60">
-              {{ step.role }}
-            </span>
             <p class="text-xs text-slate-600 leading-relaxed max-w-[170px]">
               {{ step.description }}
             </p>
