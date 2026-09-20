@@ -68,16 +68,26 @@ import { RouterModule, Router } from '@angular/router';
             <span>Iniciar sesión</span>
           </a>
 
-          <div *ngIf="loginDisplay" class="hidden sm:flex items-center gap-3 bg-white border border-[#DFE8E1] hover:border-[#4F8A3D]/40 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full shadow-sm transition-all">
-            <a routerLink="/dashboard" class="flex items-center gap-2.5 sm:gap-3 cursor-pointer">
-              <div class="w-8 h-8 rounded-full bg-[#123F5B] text-white text-xs sm:text-sm font-bold flex items-center justify-center flex-shrink-0 shadow-xs">
+          <!-- Botón / Cuadro de Usuario Logeado con Integración Armónica -->
+          <div *ngIf="loginDisplay"
+               class="btn-interactive hidden sm:flex items-center gap-3 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full transition-all duration-300"
+               [ngClass]="userPillClass">
+            <a routerLink="/dashboard" class="flex items-center gap-2.5 sm:gap-3 cursor-pointer group">
+              <div class="w-8 h-8 rounded-full text-xs sm:text-sm font-black flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-105 shadow-xs"
+                   [ngClass]="userAvatarClass">
                 {{ currentUser ? currentUser.charAt(0).toUpperCase() : 'V' }}
               </div>
               <div class="text-left hidden sm:block">
-                <span class="text-[13px] sm:text-[14px] font-bold text-[#123F5B] block max-w-[150px] lg:max-w-[200px] truncate">{{ currentUser }}</span>
+                <span class="text-[13px] sm:text-[13.5px] block max-w-[150px] lg:max-w-[200px] truncate transition-colors"
+                      [ngClass]="userNameClass">
+                  {{ currentUser }}
+                </span>
               </div>
             </a>
-            <button (click)="logoutClicked.emit()" class="ml-1 sm:ml-2 text-[11.5px] font-bold text-red-500 hover:text-red-700 hover:underline transition-colors border-l border-[#DFE8E1] pl-2.5 sm:pl-3 cursor-pointer">
+            <button (click)="logoutClicked.emit()"
+                    class="ml-1 sm:ml-2 text-[11.5px] font-bold transition-colors border-l pl-2.5 sm:pl-3 cursor-pointer hover:underline"
+                    [ngClass]="[userLogoutClass, userDividerClass]"
+                    aria-label="Cerrar sesión">
               Salir
             </button>
           </div>
@@ -236,6 +246,41 @@ export class NavbarComponent {
       return 'border-white/35 hover:border-white text-white hover:bg-white/10 active:bg-white/15';
     }
     return 'border-slate-300 hover:border-slate-400 text-slate-700 hover:bg-slate-50 active:bg-slate-100';
+  }
+
+  get userPillClass(): string {
+    if (this.isHomePage && !this.isScrolled) {
+      return 'bg-[#041624]/65 hover:bg-[#041624]/85 border border-white/25 backdrop-blur-md text-white shadow-sm';
+    }
+    return 'bg-white border border-[#DFE8E1] hover:border-[#4F8A3D]/40 text-[#123F5B] shadow-xs';
+  }
+
+  get userAvatarClass(): string {
+    if (this.isHomePage && !this.isScrolled) {
+      return 'bg-emerald-600 text-white';
+    }
+    return 'bg-[#123F5B] text-white';
+  }
+
+  get userNameClass(): string {
+    if (this.isHomePage && !this.isScrolled) {
+      return 'text-white font-bold';
+    }
+    return 'text-[#123F5B] font-bold';
+  }
+
+  get userDividerClass(): string {
+    if (this.isHomePage && !this.isScrolled) {
+      return 'border-white/25';
+    }
+    return 'border-[#DFE8E1]';
+  }
+
+  get userLogoutClass(): string {
+    if (this.isHomePage && !this.isScrolled) {
+      return 'text-rose-300 hover:text-rose-100';
+    }
+    return 'text-red-500 hover:text-red-700';
   }
 
   get hamburgerBtnClass(): string {
