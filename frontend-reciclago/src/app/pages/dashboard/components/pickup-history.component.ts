@@ -14,16 +14,10 @@ import { Pickup } from '../data/sectors.data';
       <!-- ENCABEZADO DIFERENCIADO: VECINO VS CONSOLA STAFF MUNICIPAL -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-4 border-b border-[#EAEFE8] gap-3">
         <div>
-          <!-- Badge de Modo Staff para Admin / Coordinador -->
-          <div *ngIf="isStaff" class="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-[#123F5B] text-white text-xs font-bold tracking-wide uppercase mb-2 shadow-2xs">
-            <i class="fa-solid fa-clipboard-user text-sky-400"></i>
-            <span>Trazabilidad Comunal • Puerto Varas</span>
-          </div>
-
           <h3 class="font-heading font-extrabold text-2xl sm:text-3xl text-brand-navy">
             {{ isStaff ? 'Gestión de Retiros Comunales' : 'Mis retiros anteriores' }}
           </h3>
-          <p class="text-base text-brand-muted mt-0.5">
+          <p class="text-sm sm:text-base text-brand-muted mt-0.5">
             {{ isStaff ? 'Supervisión de solicitudes y estado del retiro en la comuna.' : 'Historial de aportes reciclables en tu domicilio.' }}
           </p>
         </div>
@@ -41,25 +35,25 @@ import { Pickup } from '../data/sectors.data';
              class="py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-[#F9FAF8] px-3 rounded-2xl transition-all duration-200 group">
           
           <div class="flex items-center gap-4 min-w-0">
-            <div class="w-12 h-12 rounded-2xl bg-[#EEF7EC] text-brand-green flex items-center justify-center text-xl flex-shrink-0 group-hover:scale-105 transition-transform shadow-2xs border border-[#CCE4C8]">
+            <div class="w-11 h-11 rounded-2xl bg-[#EEF7EC] text-brand-green flex items-center justify-center text-lg flex-shrink-0 border border-[#CCE4C8]">
               <i class="fa-solid fa-recycle"></i>
             </div>
             <div class="min-w-0">
-              <div class="flex items-center gap-3 flex-wrap">
-                <span class="font-heading font-bold text-lg sm:text-xl text-brand-navy">{{ pickup.fechaTexto || pickup.fecha || 'Fecha programada' }}</span>
-                <span class="text-xs sm:text-sm font-bold text-brand-green px-2.5 py-0.5 rounded-lg bg-[#EBF5E7] border border-[#CDE8C7] truncate">
+              <div class="flex items-center gap-2.5 flex-wrap">
+                <span class="font-heading font-bold text-base sm:text-lg text-brand-navy">{{ pickup.fechaTexto || pickup.fecha || 'Fecha programada' }}</span>
+                <span class="text-xs font-medium text-slate-700 px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 truncate">
                   {{ pickup.residuoNombre || 'Reciclaje' }}
                 </span>
-                <span *ngIf="isStaff && pickup.id" class="text-[10px] font-mono font-bold text-slate-400 bg-slate-100 px-1.5 py-0.2 rounded">
+                <span *ngIf="isStaff && pickup.id" class="text-[10px] font-mono font-medium text-slate-400 bg-slate-100 px-1.5 py-0.2 rounded">
                   #{{ pickup.id }}
                 </span>
               </div>
-              <p class="text-sm sm:text-base text-brand-muted mt-0.5 truncate">
+              <p class="text-xs sm:text-sm text-brand-muted mt-0.5 truncate">
                 {{ pickup.direccion }}
-                <span *ngIf="pickup.pesoEstimadoKg && !pickup.kilosRecolectados" class="text-xs font-semibold text-slate-500">
+                <span *ngIf="pickup.pesoEstimadoKg && !pickup.kilosRecolectados" class="text-xs text-slate-500">
                   • Est: {{ pickup.pesoEstimadoKg }} kg
                 </span>
-                • <strong class="text-brand-charcoal font-semibold">{{ (isRetiradoOPesado(pickup) && pickup.kilosRecolectados) ? (pickup.kilosRecolectados + ' kg certificados') : (pickup.estado || 'En proceso') }}</strong>
+                • <strong class="text-slate-700 font-semibold">{{ (isRetiradoOPesado(pickup) && pickup.kilosRecolectados) ? (pickup.kilosRecolectados + ' kg certificados') : (pickup.estado || 'En proceso') }}</strong>
               </p>
             </div>
           </div>
@@ -67,10 +61,10 @@ import { Pickup } from '../data/sectors.data';
           <!-- ESTADOS Y BOTONERA DE ACCIÓN MUNICIPAL -->
           <div class="self-start sm:self-center flex items-center gap-2 flex-wrap flex-shrink-0">
             <!-- Badge de Estado -->
-            <span *ngIf="isRetiradoOPesado(pickup)" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs sm:text-sm font-bold bg-[#EAF5E6] text-brand-green border border-[#CDE9C6] transition-colors">
-              <i class="fa-solid fa-check text-xs"></i> {{ pickup.kilosRecolectados ? (pickup.kilosRecolectados + ' kg pesados') : 'Retirado (pendiente pesaje)' }}
+            <span *ngIf="isRetiradoOPesado(pickup)" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#EAF5E6] text-emerald-800 border border-[#CDE9C6]">
+              <i class="fa-solid fa-check text-xs"></i> {{ pickup.kilosRecolectados ? (pickup.kilosRecolectados + ' kg pesados') : 'Retirado' }}
             </span>
-            <span *ngIf="!isRetiradoOPesado(pickup)" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs sm:text-sm font-bold bg-slate-100 text-slate-600 border border-slate-200 transition-colors">
+            <span *ngIf="!isRetiradoOPesado(pickup)" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
               <i class="fa-regular fa-clock text-xs"></i> {{ pickup.estado }}
             </span>
 

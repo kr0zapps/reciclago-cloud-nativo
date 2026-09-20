@@ -13,22 +13,21 @@ import { Sector, Waypoint } from '../data/sectors.data';
           <i class="fa-solid fa-map-location-dot"></i>
         </div>
         <div>
-          <span class="text-xs font-bold uppercase tracking-wider text-brand-lake">Mapa barrial interactivo</span>
-          <h3 class="font-heading font-extrabold text-2xl text-brand-navy mt-1">Mapa de recorrido vecinal</h3>
+          <h3 class="font-heading font-extrabold text-2xl text-brand-navy">Mapa de recorrido vecinal</h3>
         </div>
-        <p class="text-[16px] text-brand-muted leading-relaxed">
+        <p class="text-sm sm:text-base text-brand-muted leading-relaxed">
           Consulta cuándo pasa el camión por tu calle y revisa el cuadrante comunal por días y tipos de materiales en toda la comuna.
         </p>
 
         <!-- Lienzo de Calles y Simulación -->
-        <div class="rounded-2xl bg-[#F0F6F9] border-2 border-[#D4E6EF] p-4 sm:p-5 relative overflow-hidden shadow-xs">
+        <div class="rounded-2xl bg-[#F0F6F9] border border-[#D4E6EF] p-4 sm:p-5 relative overflow-hidden shadow-xs">
           <div class="flex items-center justify-between gap-2 mb-3">
             <div class="flex items-center gap-2">
-              <i class="fa-solid fa-compass text-brand-lake text-lg"></i>
+              <i class="fa-solid fa-compass text-brand-lake text-base"></i>
               <span class="font-bold text-sm text-brand-navy">{{ sector?.cuadrante }}</span>
             </div>
-            <span class="inline-flex items-center gap-1.5 text-xs bg-white px-2.5 py-1 rounded-md text-brand-lake font-bold border border-[#CCE1EC] shadow-xs">
-              <i class="fa-solid text-[10px]" [ngClass]="truckSimulationRunning ? 'fa-route text-[#4F8A3D]' : 'fa-circle-pause text-slate-400'"></i>
+            <span class="inline-flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+              <i class="fa-solid text-[9px]" [ngClass]="truckSimulationRunning ? 'fa-circle text-[#4F8A3D]' : 'fa-circle text-slate-400'"></i>
               <span>{{ truckSimulationRunning ? 'En circulación' : 'Pausado' }}</span>
             </span>
           </div>
@@ -96,18 +95,14 @@ import { Sector, Waypoint } from '../data/sectors.data';
           <div class="mt-3 bg-white/95 rounded-xl p-3 border border-[#D0E2EC] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#E6F4EA] text-[#2C6E25] border border-[#C6E6C0]">
-                  <i class="fa-solid fa-satellite-dish text-[10px] text-[#4F8A3D]"></i>
-                  <span>GPS Puerto Varas</span>
-                </span>
                 <span class="text-xs font-bold text-[#123F5B] truncate">{{ activeWaypoint.name }}</span>
               </div>
               <p class="text-[11px] text-[#546571] mt-0.5 flex items-center gap-2 flex-wrap">
                 <span>{{ activeWaypoint.detail }}</span>
                 <span class="text-slate-300">•</span>
-                <span class="font-bold text-[#4F8A3D]"><i class="fa-solid fa-clock text-[10px] mr-0.5"></i> ETA: {{ activeWaypoint.eta }}</span>
+                <span class="font-medium text-slate-600"><i class="fa-regular fa-clock text-[10px] mr-0.5"></i> ETA: {{ activeWaypoint.eta }}</span>
                 <span class="text-slate-300">•</span>
-                <span class="font-semibold text-slate-600"><i class="fa-solid fa-route text-[10px] mr-0.5"></i> {{ activeWaypoint.distancia }}</span>
+                <span class="font-medium text-slate-600"><i class="fa-solid fa-route text-[10px] mr-0.5"></i> {{ activeWaypoint.distancia }}</span>
               </p>
             </div>
 

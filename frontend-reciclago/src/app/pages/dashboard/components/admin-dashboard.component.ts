@@ -49,7 +49,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
       <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Por Asignar</span>
+            <span class="text-xs font-semibold text-slate-500">Por asignar</span>
             <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-xs font-bold border border-amber-200/80">
               <i class="fa-solid fa-bell"></i>
             </div>
@@ -66,7 +66,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
 
         <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">En Recorrido</span>
+            <span class="text-xs font-semibold text-slate-500">En recorrido</span>
             <div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center text-xs font-bold border border-sky-200/80">
               <i class="fa-solid fa-truck-moving"></i>
             </div>
@@ -79,7 +79,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
 
         <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Kilos Certificados</span>
+            <span class="text-xs font-semibold text-slate-500">Kilos certificados</span>
             <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs font-bold border border-emerald-200/80">
               <i class="fa-solid fa-scale-balanced"></i>
             </div>
@@ -94,7 +94,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
 
         <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Cumplimiento Comunal</span>
+            <span class="text-xs font-semibold text-slate-500">Cumplimiento comunal</span>
             <div class="w-8 h-8 rounded-xl bg-slate-100 text-[#123F5B] flex items-center justify-center text-xs font-bold border border-slate-200">
               <i class="fa-solid fa-chart-pie"></i>
             </div>

@@ -14,13 +14,10 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
     <section id="solicitud-retiro" class="bg-white rounded-3xl sm:rounded-[2.2rem] border border-[#E2E9E4] p-6 sm:p-10 shadow-xs card-hover anim-fade-up anim-delay-5 mt-8">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-[#EAEFE8] gap-2">
         <div>
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-bold uppercase tracking-wider mb-2">
-            <i class="fa-solid fa-truck-pickup text-[#4F8A3D]"></i> Servicio Vecinal DIMAO Puerto Varas
-          </div>
           <h3 class="font-heading font-extrabold text-2xl sm:text-3xl text-[#123F5B]">
             {{ isRetiroEspecial ? 'Solicitud de Retiro Especial a Domicilio' : 'Aviso de Retiro Domiciliario' }}
           </h3>
-          <p class="text-base text-[#61717A] mt-1">
+          <p class="text-sm sm:text-base text-[#61717A] mt-1">
             {{ isRetiroEspecial ? 'Coordina la recolección de residuos fuera del calendario regular o de gran volumen.' : 'Informa a la cuadrilla municipal si dejarás material en tu puerta para el recorrido de este ' + (sector?.fechaTexto || sector?.dia) + '.' }}
           </p>
         </div>
@@ -113,7 +110,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           <div class="space-y-2">
             <div class="flex items-center justify-between">
               <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] ml-1">Sector y Cuadrante</label>
-              <span class="text-[11px] font-bold text-[#4F8A3D] bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">
+              <span class="text-xs text-slate-500 font-medium">
                 Pasa el {{ sector?.dia }}
               </span>
             </div>

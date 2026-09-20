@@ -29,17 +29,17 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
       <!-- ==================== 2. PIPELINE DE DESPACHO EN TIEMPO REAL ==================== -->
       <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         <!-- Tarjeta 1: Solicitudes Entrantes (Por Asignar) -->
-        <div class="bg-white rounded-2xl p-5 border-2 shadow-xs flex flex-col justify-between"
-             [ngClass]="countPendientes > 0 ? 'border-amber-300/80 bg-amber-50/20' : 'border-[#E2E9E4]'">
+        <div class="bg-white rounded-2xl p-5 border shadow-xs flex flex-col justify-between"
+             [ngClass]="countPendientes > 0 ? 'border-amber-300 bg-amber-50/20' : 'border-[#E2E9E4]'">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-900">Por Programar</span>
+            <span class="text-xs font-semibold text-amber-900">Por programar</span>
             <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-xs font-bold">
               <i class="fa-solid fa-inbox"></i>
             </div>
           </div>
           <div class="mt-3">
             <div class="text-3xl sm:text-4xl font-black font-heading text-amber-900">{{ countPendientes }}</div>
-            <p class="text-xs text-amber-800 mt-1 font-semibold">
+            <p class="text-xs text-amber-800 mt-1 font-medium">
               {{ countPendientes > 0 ? 'Esperando asignación a camión' : 'Bandeja al día' }}
             </p>
           </div>
@@ -48,7 +48,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
         <!-- Tarjeta 2: Listos para Despacho (Programados) -->
         <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Programados</span>
+            <span class="text-xs font-semibold text-slate-500">Programados</span>
             <div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center text-xs font-bold border border-sky-200">
               <i class="fa-solid fa-calendar-check"></i>
             </div>
@@ -62,7 +62,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
         <!-- Tarjeta 3: Cuadrillas en Ruta -->
         <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">En Ruta</span>
+            <span class="text-xs font-semibold text-slate-500">En ruta</span>
             <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center text-xs font-bold border border-indigo-200">
               <i class="fa-solid fa-truck-fast"></i>
             </div>
@@ -76,7 +76,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
         <!-- Tarjeta 4: Camiones Operables -->
         <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Flota Activa</span>
+            <span class="text-xs font-semibold text-slate-500">Flota activa</span>
             <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs font-bold border border-emerald-200">
               <i class="fa-solid fa-truck"></i>
             </div>
@@ -95,8 +95,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
         <div class="p-6 border-b border-[#EAEFE8] space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <span class="text-xs font-bold uppercase tracking-wider text-[#1F6685]">Control Operativo de Calle</span>
-              <h3 class="font-heading font-extrabold text-2xl text-brand-navy mt-0.5">
+              <h3 class="font-heading font-extrabold text-2xl text-brand-navy">
                 Planilla de Despacho y Gestión de Rutas
               </h3>
             </div>

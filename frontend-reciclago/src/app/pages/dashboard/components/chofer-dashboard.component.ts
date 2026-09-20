@@ -38,7 +38,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
         <!-- KPI 1: Unidad y Estado -->
         <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Unidad Operativa</span>
+            <span class="text-xs font-semibold text-slate-500">Unidad operativa</span>
             <div class="w-8 h-8 rounded-xl bg-[#EEF5EB] text-[#4F8A3D] flex items-center justify-center text-xs font-bold border border-[#CCE4C8]">
               <i class="fa-solid fa-id-card"></i>
             </div>
@@ -55,7 +55,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
         <!-- KPI 2: Paradas Pendientes del Turno -->
         <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Paradas Pendientes</span>
+            <span class="text-xs font-semibold text-slate-500">Paradas pendientes</span>
             <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-xs font-bold border border-amber-200">
               <i class="fa-solid fa-location-dot"></i>
             </div>
@@ -69,7 +69,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
         <!-- KPI 3: Kilos en Tolva -->
         <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Kilos en Tolva</span>
+            <span class="text-xs font-semibold text-slate-500">Kilos en tolva</span>
             <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs font-bold border border-emerald-200">
               <i class="fa-solid fa-scale-balanced"></i>
             </div>
@@ -85,7 +85,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
         <!-- KPI 4: Capacidad y Barra de Llenado -->
         <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Llenado de Tolva</span>
+            <span class="text-xs font-semibold text-slate-500">Capacidad de tolva</span>
             <div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center text-xs font-bold border border-sky-200">
               <i class="fa-solid fa-gauge-high"></i>
             </div>
