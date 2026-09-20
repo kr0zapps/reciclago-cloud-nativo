@@ -13,11 +13,13 @@ import com.duoc.ms_reciclago_pickups.repository.PickupRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,6 +37,10 @@ public class PickupService {
     private final PickupRepository pickupRepository;
     private final RabbitTemplate rabbitTemplate;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final RestClient restClient;
+
+    @Value("${reciclago.services.catalog-url:http://localhost:8081}")
+    private String catalogUrl;
 
     public PickupService(PickupRepository pickupRepository,
             RabbitTemplate rabbitTemplate,
@@ -42,6 +48,7 @@ public class PickupService {
         this.pickupRepository = pickupRepository;
         this.rabbitTemplate = rabbitTemplate;
         this.kafkaTemplate = kafkaTemplate;
+        this.restClient = RestClient.create();
     }
 
     public List<Pickup> obtenerTodos() {
@@ -186,6 +193,9 @@ public class PickupService {
 
         Pickup actualizado = pickupRepository.save(pickup);
 
+        // Sincronizar estado del camión con el catálogo (best-effort)
+        sincronizarEstadoCamionEnCatalogo(actualizado.getCamionPatente(), "EN_RUTA");
+
         // Publicar eventos (Kafka + RabbitMQ)
         notificarCambioEstadoKafka(actualizado, estadoAnterior, "EN_RUTA");
 
@@ -242,6 +252,9 @@ public class PickupService {
 
         Pickup actualizado = pickupRepository.save(pickup);
 
+        // Sincronizar estado del camión: retiro completado -> vuelve a DISPONIBLE (best-effort)
+        sincronizarEstadoCamionEnCatalogo(actualizado.getCamionPatente(), "DISPONIBLE");
+
         notificarCambioEstadoKafka(actualizado, estadoAnterior, "PESADO");
 
         // Emitir DTO a q.cmd.certificate en RabbitMQ para generación de certificado PDF
@@ -274,6 +287,37 @@ public class PickupService {
                 "Tu solicitud de retiro ha sido cancelada. Motivo: " + (motivo != null ? motivo : "Sin especificar"));
 
         return actualizado;
+    }
+
+    // ==========================================
+    // SINCRONIZACIÓN CON MS-RECICLAGO-CATALOG
+    // ==========================================
+
+    /**
+     * Sincroniza el estado del camión en ms-reciclago-catalog por su patente.
+     * Operación best-effort: si el catálogo no está disponible, se loguea el
+     * error pero el flujo del pickup continúa sin interrupción.
+     *
+     * @param camionPatente Patente del camión (puede ser null si no fue asignado)
+     * @param nuevoEstado   Estado destino: "EN_RUTA" | "DISPONIBLE" | "MANTENIMIENTO"
+     */
+    private void sincronizarEstadoCamionEnCatalogo(String camionPatente, String nuevoEstado) {
+        if (camionPatente == null || camionPatente.isBlank()) {
+            log.warn("Sincronización ignorada: camionPatente es nulo o vacío");
+            return;
+        }
+        try {
+            String uri = catalogUrl + "/api/catalog/camiones/patente/"
+                    + camionPatente + "/estado?estado=" + nuevoEstado;
+            restClient.patch()
+                    .uri(uri)
+                    .retrieve()
+                    .toBodilessEntity();
+            log.info("Camión {} sincronizado a estado {} en ms-reciclago-catalog", camionPatente, nuevoEstado);
+        } catch (Exception e) {
+            log.warn("No se pudo sincronizar estado del camión {} con el catálogo (best-effort): {}",
+                    camionPatente, e.getMessage());
+        }
     }
 
     // ==========================================

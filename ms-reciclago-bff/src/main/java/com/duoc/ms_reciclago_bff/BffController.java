@@ -137,6 +137,33 @@ public class BffController {
         }
     }
 
+    /**
+     * Retorna la rotación semanal de residuos domiciliarios calculada por ms-reciclago-catalog.
+     * El frontend consume este endpoint para mostrar el material de la semana actual
+     * sin depender de constantes hardcodeadas.
+     *
+     * @param fecha Opcional. Fecha ISO yyyy-MM-dd para consulta histórica o futura.
+     */
+    @GetMapping("/api/catalog/rotacion/semanal")
+    public ResponseEntity<?> getRotacionSemanal(@RequestParam(required = false) String fecha) {
+        try {
+            String uri = catalogUrl + "/api/catalog/rotacion/semanal";
+            if (fecha != null && !fecha.isBlank()) {
+                uri += "?fecha=" + java.net.URLEncoder.encode(fecha, java.nio.charset.StandardCharsets.UTF_8);
+            }
+            Object rotacion = restClient.get()
+                    .uri(uri)
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(rotacion);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "ms-reciclago-catalog no disponible para consultar rotación semanal");
+            error.put("details", e.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+        }
+    }
+
     @PatchMapping("/api/catalog/camiones/{id}/estado")
     public ResponseEntity<?> actualizarEstadoCamion(@PathVariable Long id, @RequestParam String estado) {
         try {

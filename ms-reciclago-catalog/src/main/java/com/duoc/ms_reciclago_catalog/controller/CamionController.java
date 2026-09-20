@@ -79,6 +79,26 @@ public class CamionController {
         }
     }
 
+    /**
+     * Actualiza el estado de un camión por su patente.
+     * Endpoint de sincronización usado por ms-reciclago-pickups cuando
+     * el camión transita entre estados operativos (EN_RUTA, DISPONIBLE, etc.).
+     *
+     * PATCH /api/catalog/camiones/patente/PV-RC-2026/estado?estado=EN_RUTA
+     */
+    @PatchMapping("/patente/{patente}/estado")
+    public ResponseEntity<Camion> actualizarEstadoPorPatente(
+            @PathVariable String patente,
+            @RequestParam String estado) {
+        try {
+            com.duoc.ms_reciclago_catalog.model.EstadoCamion estadoEnum = com.duoc.ms_reciclago_catalog.model.Camion.parseEstado(estado);
+            Camion actualizado = camionService.actualizarEstadoPorPatente(patente, estadoEnum);
+            return ResponseEntity.ok(actualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         camionService.eliminar(id);

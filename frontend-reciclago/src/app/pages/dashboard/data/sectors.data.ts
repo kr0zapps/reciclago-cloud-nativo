@@ -369,6 +369,79 @@ export const DEFAULT_CAMIONES: Camion[] = [
   { id: 3, patente: 'PV-RC-2028', capacidadKilos: 2000, estado: 'DISPONIBLE' }
 ];
 
+/**
+ * Interfaz que modela la respuesta del endpoint
+ * GET /api/catalog/rotacion/semanal del BFF/Catálogo.
+ */
+export interface RotacionSemanal {
+  numSemanaISO: number;
+  slotSemana: number;           // 1=Vidrio, 2=Cartón, 3=Plástico, 4=Latas
+  residuoCodigo: string;        // ej: 'VIDRIO', 'CARTON_PAPEL', 'PLASTICO_PET', 'LATAS_METALES'
+  residuoNombre: string;        // ej: 'Plásticos (PET y PEAD)'
+  descripcion: string | null;
+  instrucciones: string | null;
+  categoria: string | null;     // ej: 'PLASTICO'
+  precioPorKg: number | null;
+  vigenciaDesde: string;        // ISO date: '2026-09-21'
+  vigenciaHasta: string;        // ISO date: '2026-09-27'
+  residuoId?: number | null;
+}
+
+/**
+ * Catálogo local de los 4 residuos rotativos.
+ * Espeja la lógica de RotacionSemanalService.java.
+ * Sólo se usa como fallback offline cuando el catálogo no responde.
+ */
+const ROTACION_FALLBACK: Pick<RotacionSemanal, 'slotSemana' | 'residuoCodigo' | 'residuoNombre' | 'categoria'>[] = [
+  { slotSemana: 1, residuoCodigo: 'VIDRIO',        residuoNombre: 'Vidrio',                categoria: 'VIDRIO'   },
+  { slotSemana: 2, residuoCodigo: 'CARTON_PAPEL',  residuoNombre: 'Cartón y Papel',         categoria: 'CARTON'   },
+  { slotSemana: 3, residuoCodigo: 'PLASTICO_PET',  residuoNombre: 'Plásticos (PET y PEAD)', categoria: 'PLASTICO' },
+  { slotSemana: 4, residuoCodigo: 'LATAS_METALES', residuoNombre: 'Latas y Metales',        categoria: 'LATAS'    },
+];
+
+/**
+ * Calcula la rotación semanal local (fallback offline).
+ * Usa el número de semana ISO del año actual, igual que el backend.
+ * @returns RotacionSemanal con datos mínimos para que el UI no muestre vacío.
+ */
+export function calcularRotacionLocal(): RotacionSemanal {
+  const now = new Date();
+  // Cálculo de semana ISO: similar a Java WeekFields.ISO.weekOfYear()
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((now.getTime() - startOfYear.getTime()) / 86_400_000) + 1;
+  const numSemanaISO = Math.ceil(dayOfYear / 7);
+  const mod = numSemanaISO % 4;
+  const slot = mod === 0 ? 4 : mod;
+  const entry = ROTACION_FALLBACK[slot - 1];
+
+  // Calcular inicio y fin de la semana actual (lunes a domingo)
+  const diaSemana = now.getDay(); // 0=Dom, 1=Lun...
+  const diffLunes = (diaSemana === 0 ? -6 : 1 - diaSemana);
+  const lunes = new Date(now);
+  lunes.setDate(now.getDate() + diffLunes);
+  const domingo = new Date(lunes);
+  domingo.setDate(lunes.getDate() + 6);
+
+  const toISO = (d: Date) => d.toISOString().split('T')[0];
+
+  return {
+    numSemanaISO,
+    slotSemana: slot,
+    residuoCodigo: entry.residuoCodigo,
+    residuoNombre: entry.residuoNombre,
+    descripcion: null,
+    instrucciones: null,
+    categoria: entry.categoria,
+    precioPorKg: null,
+    vigenciaDesde: toISO(lunes),
+    vigenciaHasta: toISO(domingo),
+    residuoId: null,
+  };
+}
+
+/** Fallback estático para demo offline. Se genera una vez al importar el módulo. */
+export const DEFAULT_ROTACION_SEMANAL: RotacionSemanal = calcularRotacionLocal();
+
 export function getNextDateForDay(dayName: string): string {
   const daysMap: Record<string, number> = {
     'domingo': 0, 'lunes': 1, 'martes': 2, 'miércoles': 3, 'miercoles': 3, 'jueves': 4, 'viernes': 5, 'sábado': 6, 'sabado': 6
@@ -386,3 +459,4 @@ export function getNextDateForDay(dayName: string): string {
   const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   return `${dayName} ${String(nextDate.getDate()).padStart(2, '0')} ${months[nextDate.getMonth()]}`;
 }
+

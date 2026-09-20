@@ -30,6 +30,8 @@ import {
   DEFAULT_SECTORES,
   DEFAULT_RESIDUOS,
   DEFAULT_CAMIONES,
+  DEFAULT_ROTACION_SEMANAL,
+  RotacionSemanal,
   getNextDateForDay
 } from './data/sectors.data';
 import { DAY_NAME_TO_NUMBER } from './utils/sector.utils';
@@ -70,7 +72,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   residuos: Residuo[] = [...DEFAULT_RESIDUOS];
   pickups: Pickup[] = [];
-  camionesDisponibles: Camion[] = [...DEFAULT_CAMIONES];
+  /**
+   * Inicializado vacío: si el catálogo responde, se reemplaza con datos reales de PostgreSQL.
+   * Si falla, loadCamiones() carga DEFAULT_CAMIONES como fallback offline explícito.
+   */
+  camionesDisponibles: Camion[] = [];
+
+  /**
+   * Rotación semanal de residuos desde ms-reciclago-catalog.
+   * Inicializado con el fallback calculado localmente (misma lógica que el backend).
+   * Se reemplaza con datos reales cuando el catálogo responde.
+   */
+  rotacionSemanal: RotacionSemanal = DEFAULT_ROTACION_SEMANAL;
 
   showRutaModal = false;
   showActionModal = false;
@@ -121,6 +134,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
   get activeCamionPatente(): string {
     const activeP = this.pickups.find(p => p.estado === 'EN_RUTA');
     return activeP?.camionPatente || this.currentSectorInfo?.patente || 'PV-RC-2026';
+  }
+
+  /**
+   * Nombre del residuo que se recolecta esta semana según la rotación municipal.
+   * Usa el dato real del catálogo; si no está disponible, usa el fallback local.
+   */
+  get materialSemanalNombre(): string {
+    return this.rotacionSemanal?.residuoNombre || DEFAULT_ROTACION_SEMANAL.residuoNombre;
+  }
+
+  /**
+   * Código del residuo semanal (ej: 'PLASTICO_PET').
+   * Útil para lógica condicional en subcomponentes.
+   */
+  get materialSemanalCodigo(): string {
+    return this.rotacionSemanal?.residuoCodigo || DEFAULT_ROTACION_SEMANAL.residuoCodigo;
   }
 
   constructor(
@@ -175,6 +204,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadPickups();
     this.loadCuadrantes();
     this.loadCamiones();
+    this.loadRotacionSemanal();
     this.loadLiveTracking();
     this.startTruckSimulation();
   }
@@ -296,8 +326,38 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   loadCamiones(): void {
     this.bffService.getCamiones().subscribe({
-      next: (data) => { if (data && data.length > 0) this.camionesDisponibles = data; },
-      error: () => {}
+      next: (data) => {
+        if (data && data.length > 0) {
+          // Mapear capacidadTotalKg -> capacidadKilos para compatibilidad con el template
+          this.camionesDisponibles = data.map((c: any) => ({
+            ...c,
+            capacidadKilos: c.capacidadKilos ?? c.capacidadTotalKg ?? c.capacidadMaximaKg ?? 0
+          }));
+        } else {
+          this.camionesDisponibles = [...DEFAULT_CAMIONES];
+        }
+      },
+      // Fallback offline explícito: si el catálogo no responde, usar datos de demostración
+      error: () => this.camionesDisponibles = [...DEFAULT_CAMIONES]
+    });
+  }
+
+  /**
+   * Carga la rotación semanal de residuos desde ms-reciclago-catalog vía BFF.
+   * Si el catálogo no está disponible, mantiene el fallback calculado localmente
+   * (DEFAULT_ROTACION_SEMANAL) que usa la misma lógica modular que el backend.
+   */
+  loadRotacionSemanal(): void {
+    this.bffService.getRotacionSemanal().subscribe({
+      next: (data) => {
+        if (data && data.residuoCodigo && !data.error) {
+          this.rotacionSemanal = data as RotacionSemanal;
+        }
+        // Si viene un objeto de error (503 del BFF), se mantiene el fallback local
+      },
+      error: () => {
+        // Mantener rotacionSemanal = DEFAULT_ROTACION_SEMANAL (ya inicializado)
+      }
     });
   }
 

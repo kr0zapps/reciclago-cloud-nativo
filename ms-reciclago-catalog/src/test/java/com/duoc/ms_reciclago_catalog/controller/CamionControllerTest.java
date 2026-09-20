@@ -102,4 +102,34 @@ public class CamionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.estado").value("MANTENIMIENTO"));
     }
+
+    @Test
+    @DisplayName("PATCH /api/catalog/camiones/patente/{patente}/estado - Debe cambiar estado a EN_RUTA por patente")
+    void testActualizarEstadoPorPatente() throws Exception {
+        Camion enRuta = new Camion(1L, "PV-RC-2026", "Mercedes Sprinter", 1500.0, 1500.0, com.duoc.ms_reciclago_catalog.model.EstadoCamion.EN_RUTA);
+
+        when(camionService.actualizarEstadoPorPatente(
+                eq("PV-RC-2026"),
+                eq(com.duoc.ms_reciclago_catalog.model.EstadoCamion.EN_RUTA)))
+                .thenReturn(enRuta);
+
+        mockMvc.perform(patch("/api/catalog/camiones/patente/PV-RC-2026/estado")
+                        .param("estado", "EN_RUTA"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.patente").value("PV-RC-2026"))
+                .andExpect(jsonPath("$.estado").value("EN_RUTA"));
+    }
+
+    @Test
+    @DisplayName("PATCH /api/catalog/camiones/patente/{patente}/estado - Debe retornar 404 si patente no existe")
+    void testActualizarEstadoPorPatenteNoEncontrada() throws Exception {
+        when(camionService.actualizarEstadoPorPatente(
+                eq("PV-RC-9999"),
+                eq(com.duoc.ms_reciclago_catalog.model.EstadoCamion.EN_RUTA)))
+                .thenThrow(new RuntimeException("Camión no encontrado con patente: PV-RC-9999"));
+
+        mockMvc.perform(patch("/api/catalog/camiones/patente/PV-RC-9999/estado")
+                        .param("estado", "EN_RUTA"))
+                .andExpect(status().isNotFound());
+    }
 }

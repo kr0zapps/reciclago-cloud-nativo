@@ -134,4 +134,19 @@ export class BffService {
   getPublicStatus(): Observable<any> {
     return this.http.get(`${this.baseUrl}/public/status`);
   }
+
+  /**
+   * Retorna la rotación semanal de residuos domiciliarios desde ms-reciclago-catalog.
+   * Respuesta incluye: residuoCodigo, residuoNombre, descripcion, instrucciones,
+   * slotSemana, numSemanaISO, vigenciaDesde, vigenciaHasta, categoria, precioPorKg.
+   *
+   * @param fecha Opcional. Fecha ISO yyyy-MM-dd para consulta de semanas pasadas o futuras.
+   */
+  getRotacionSemanal(fecha?: string): Observable<any> {
+    const url = fecha
+      ? `${this.baseUrl}/api/catalog/rotacion/semanal?fecha=${encodeURIComponent(fecha)}`
+      : `${this.baseUrl}/api/catalog/rotacion/semanal`;
+    return this.http.get(url);
+  }
 }
+

@@ -74,6 +74,29 @@ public class CamionService {
         return actualizarEstado(id, Camion.parseEstado(nuevoEstado));
     }
 
+    /**
+     * Actualiza el estado de un camión buscando por patente.
+     * Útil para sincronización desde ms-reciclago-pickups, que conoce la
+     * patente del camión pero no su ID interno del catálogo.
+     *
+     * @param patente      Patente del camión (ej: "PV-RC-2026")
+     * @param nuevoEstado  Nuevo estado a asignar
+     * @return Camión actualizado
+     * @throws RuntimeException si no se encuentra un camión con esa patente
+     */
+    public Camion actualizarEstadoPorPatente(String patente, EstadoCamion nuevoEstado) {
+        return camionRepository.findByPatente(patente)
+                .map(c -> {
+                    c.setEstado(nuevoEstado);
+                    return camionRepository.save(c);
+                })
+                .orElseThrow(() -> new RuntimeException("Camión no encontrado con patente: " + patente));
+    }
+
+    public Camion actualizarEstadoPorPatente(String patente, String nuevoEstado) {
+        return actualizarEstadoPorPatente(patente, Camion.parseEstado(nuevoEstado));
+    }
+
     public Camion reducirCapacidad(Long id, Double pesoKg) {
         return camionRepository.findById(id).map(c -> {
             double actual = c.getCapacidadDisponibleKg() != null ? c.getCapacidadDisponibleKg() : c.getCapacidadTotalKg();
