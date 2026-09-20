@@ -84,60 +84,29 @@
         </div>
       </div>
 
-      <!-- Columna Derecha: Selector de Cuadrante para Vecinos (Elegante, Moderno y Personalizado) -->
-      <div *ngIf="!isStaff" class="relative sector-dropdown-container flex-shrink-0 w-full sm:w-auto">
-        <button
-          type="button"
-          (click)="toggleSectorDropdown($event)"
-          [attr.aria-expanded]="isSectorDropdownOpen"
-          aria-haspopup="listbox"
-          class="w-full sm:w-80 bg-white rounded-xl border border-[#D5E2D9] hover:border-[#123F5B]/40 focus:outline-none focus:ring-2 focus:ring-[#123F5B]/15 px-3.5 py-2.5 shadow-xs transition-all flex items-center justify-between gap-3 text-left cursor-pointer">
-          <div class="flex items-center gap-3 min-w-0">
-            <div class="w-8 h-8 rounded-lg bg-[#EEF5EB] text-[#4F8A3D] flex items-center justify-center text-sm flex-shrink-0">
-              <i class="fa-solid fa-location-dot"></i>
-            </div>
-            <div class="min-w-0">
-              <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1">
-                Sector de Recolección
-              </span>
-              <span class="block text-xs sm:text-sm font-bold text-[#123F5B] truncate">
-                {{ currentSectorInfo?.nombre || selectedSector }}
-              </span>
+      <!-- Columna Derecha: Selector de Cuadrante para Vecinos (Nativo, Intuitivo y Sobrio) -->
+      <div *ngIf="!isStaff" class="flex-shrink-0 w-full sm:w-auto">
+        <div class="bg-white rounded-xl border border-[#D5E2D9] hover:border-slate-400 focus-within:border-[#123F5B] focus-within:ring-2 focus-within:ring-[#123F5B]/10 px-3.5 py-2 shadow-xs transition-all flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-[#EEF5EB] text-[#4F8A3D] flex items-center justify-center text-sm flex-shrink-0">
+            <i class="fa-solid fa-location-dot"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <label for="sectorSelect" class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1">
+              Sector de Recolección
+            </label>
+            <div class="relative flex items-center">
+              <select
+                id="sectorSelect"
+                [(ngModel)]="selectedSector"
+                (ngModelChange)="onHeaderSectorChange()"
+                class="w-full bg-transparent font-bold text-xs sm:text-sm text-[#123F5B] pr-6 py-0 border-none focus:ring-0 focus:outline-none cursor-pointer appearance-none truncate">
+                <option *ngFor="let s of sectores" [value]="s.nombre">
+                  {{ s.nombre }} ({{ s.dia }})
+                </option>
+              </select>
+              <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 pointer-events-none absolute right-0"></i>
             </div>
           </div>
-          <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform duration-200 flex-shrink-0"
-             [class.rotate-180]="isSectorDropdownOpen"></i>
-        </button>
-
-        <!-- Menú Desplegable Moderno y Pulido -->
-        <div *ngIf="isSectorDropdownOpen"
-             role="listbox"
-             class="absolute right-0 top-full mt-1.5 w-full sm:w-88 bg-white rounded-xl shadow-xl border border-[#D5E2D9] py-1.5 z-50 anim-fade-in overflow-hidden">
-          <button
-            *ngFor="let s of sectores"
-            (click)="selectSector(s.nombre)"
-            type="button"
-            role="option"
-            [attr.aria-selected]="selectedSector === s.nombre"
-            class="w-full px-4 py-2.5 text-left flex items-center justify-between gap-3 transition-colors cursor-pointer"
-            [ngClass]="selectedSector === s.nombre ? 'bg-[#EEF5EB] text-[#123F5B]' : 'hover:bg-slate-50 text-slate-700'">
-            <div class="min-w-0">
-              <div class="text-xs sm:text-sm font-semibold truncate"
-                   [ngClass]="selectedSector === s.nombre ? 'font-extrabold text-[#123F5B]' : 'text-slate-800'">
-                {{ s.nombre }}
-              </div>
-              <div class="text-[11px] text-slate-400 mt-0.5">
-                {{ s.horario }}
-              </div>
-            </div>
-            <div class="flex items-center gap-2 flex-shrink-0">
-              <span class="text-[11px] font-bold px-2 py-0.5 rounded-md"
-                    [ngClass]="selectedSector === s.nombre ? 'bg-[#4F8A3D] text-white' : 'bg-slate-100 text-slate-600'">
-                {{ s.dia }}
-              </span>
-              <i *ngIf="selectedSector === s.nombre" class="fa-solid fa-check text-xs text-[#4F8A3D]"></i>
-            </div>
-          </button>
         </div>
       </div>
     </div>

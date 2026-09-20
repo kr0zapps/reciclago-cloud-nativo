@@ -21,7 +21,8 @@ Los 4 microservicios backend están dockerizados y compilados:
 - Contenedores de soporte: PostgreSQL 15 (`5433:5432`), RabbitMQ 3 (`5672 / 15672`), Kafka (`9092 / 29092`) y Zookeeper (`2181`).
 
 > [!IMPORTANT]
-> **ESTE DOCUMENTO SE MANTIENE ACTUALIZADO CON LO QUE LE FALTA POR HACER A DEV 2**. Todo el código Java backend y frontend ya fue entregado y verificado.
+> **ESTE DOCUMENTO SE MANTIENE ACTUALIZADO CON LO QUE LE FALTA POR HACER A DEV 2**.
+> Consulta también la guía complementaria: [DEV2_TAREAS_MICROSERVICIOS.md](file:///c:/Users/krosa/Desktop/Universidad/semestre%206/cloud%20nativo/reciclago/DEV2_TAREAS_MICROSERVICIOS.md) para la implementación del catálogo rotativo semanal y la gestión real de flota de camiones en los microservicios.
 
 ---
 
