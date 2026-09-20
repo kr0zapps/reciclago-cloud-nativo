@@ -201,32 +201,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.activeStaffRole = role;
   }
 
-  isSectorDropdownOpen = false;
-
-  toggleSectorDropdown(event?: Event): void {
-    if (event) event.stopPropagation();
-    this.isSectorDropdownOpen = !this.isSectorDropdownOpen;
-  }
-
-  selectSectorFromDropdown(sectorNombre: string): void {
-    this.selectedSector = sectorNombre;
-    this.isSectorDropdownOpen = false;
-    this.onHeaderSectorChange();
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    if (!target || !target.closest('.sector-dropdown-container')) {
-      this.isSectorDropdownOpen = false;
-    }
-  }
-
-  @HostListener('document:keydown.escape')
-  onEscapeKey(): void {
-    this.isSectorDropdownOpen = false;
-  }
-
   onHeaderSectorChange(): void {
     this.onSectorSelect(this.selectedSector);
   }
