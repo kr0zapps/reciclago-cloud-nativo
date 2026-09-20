@@ -207,12 +207,8 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
               <div class="pt-3 flex items-center justify-between">
                 <div>
                   <span class="block text-[10px] text-slate-500 font-medium">{{ activeWeek === 1 ? 'Material esta semana' : 'Material próxima semana' }}</span>
-                  <div class="flex items-center gap-1.5 mt-0.5">
+                  <div class="mt-0.5">
                     <span class="text-sm font-extrabold text-[#11324d]">{{ q.materialNombre }}</span>
-                    <!-- Badge cromático por tipo de material -->
-                    <span [class]="'text-[10px] font-bold px-2 py-0.5 rounded-full border ' + getMaterialBadgeClass(q.categoryKey)">
-                      {{ q.categoryKey }}
-                    </span>
                   </div>
                   <span *ngIf="q.materialDescripcion" class="block text-[11px] text-slate-500 mt-1 line-clamp-1 max-w-[200px]">
                     {{ q.materialDescripcion }}
@@ -327,13 +323,9 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                 <div class="pt-4 flex items-center justify-between">
                   <div>
                     <span class="block text-[11px] text-slate-500 font-medium">{{ activeWeek === 1 ? 'Material esta semana' : 'Material próxima semana' }}</span>
-                    <div class="flex items-center gap-2 mt-0.5">
+                    <div class="mt-0.5">
                       <span class="block text-base sm:text-lg font-extrabold text-[#11324d]">
                         {{ q.materialNombre }}
-                      </span>
-                      <!-- Badge cromático por tipo de material -->
-                      <span [class]="'text-[11px] font-bold px-2.5 py-0.5 rounded-full border ' + getMaterialBadgeClass(q.categoryKey)">
-                        {{ q.categoryKey }}
                       </span>
                     </div>
                     <span *ngIf="q.materialDescripcion" class="block text-[11px] text-slate-500 mt-1 line-clamp-1 max-w-xs">
@@ -402,15 +394,6 @@ export class HomeQuadrantsComponent implements OnInit {
 
   toggleAccordion(id: string): void {
     this.expandedAccordionId = this.expandedAccordionId === id ? null : id;
-  }
-
-  getMaterialBadgeClass(categoryKey: string): string {
-    const key = (categoryKey || '').toUpperCase();
-    if (key.includes('VIDRIO')) return 'bg-teal-50 text-teal-800 border-teal-200';
-    if (key.includes('CARTON') || key.includes('PAPEL')) return 'bg-amber-50 text-amber-900 border-amber-200';
-    if (key.includes('PLASTICO') || key.includes('PET')) return 'bg-sky-50 text-sky-800 border-sky-200';
-    if (key.includes('LATA') || key.includes('METAL')) return 'bg-slate-100 text-slate-800 border-slate-300';
-    return 'bg-emerald-50 text-emerald-800 border-emerald-200';
   }
 
   setMobileQuadrant(index: number): void {
