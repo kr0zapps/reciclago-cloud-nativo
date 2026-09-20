@@ -40,17 +40,11 @@ import { RouterModule } from '@angular/router';
       <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 w-full my-auto">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          <!-- Columna Izquierda: Titular, Subtítulo, Métrica y CTAs -->
-          <div class="lg:col-span-8 xl:col-span-8 max-w-2xl xl:max-w-3xl">
-
-            <!-- Elemento de Confianza: Chip pequeño con métrica de impacto -->
-            <div class="anim-fade-up inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm text-xs font-semibold text-white/95 mb-5 select-none font-heading shadow-xs">
-              <span class="w-2 h-2 rounded-full bg-[#2E9E4F]"></span>
-              <span>+12.000 vecinos ya reciclan en la comuna</span>
-            </div>
+          <!-- Columna Izquierda: Titular, Subtítulo y CTAs Limpios (Sin pills, sin pings, sin spans redundantes) -->
+          <div class="lg:col-span-7 xl:col-span-8 max-w-2xl xl:max-w-3xl">
 
             <!-- Titular Principal (Izquierda): Blanco puro, bold sans-serif grande con leve text-shadow -->
-            <h1 class="anim-fade-up text-3xl sm:text-4xl md:text-5xl lg:text-[54px] xl:text-[62px] font-extrabold text-white tracking-tight uppercase leading-[1.08] mb-4 font-heading break-words hero-text-shadow">
+            <h1 class="anim-fade-up text-3xl sm:text-4xl md:text-5xl lg:text-[54px] xl:text-[62px] font-extrabold text-white tracking-tight uppercase leading-[1.08] mb-5 font-heading break-words hero-text-shadow">
               JUNTOS CUIDAMOS<br class="hidden sm:block" /> PUERTO VARAS
             </h1>
 
@@ -66,7 +60,7 @@ import { RouterModule } from '@angular/router';
                 routerLink="/dashboard"
                 class="group btn-interactive w-full sm:w-auto inline-flex items-center justify-center gap-2.5 min-h-[48px] h-12 sm:h-[50px] px-7 rounded-xl bg-[#2E9E4F] hover:bg-[#258241] active:bg-[#1e6c36] text-white font-bold text-sm uppercase tracking-wider cursor-pointer text-center shadow-lg shadow-emerald-950/30 transition-all font-heading">
                 <i class="fa-solid fa-arrow-right-to-bracket text-sm group-hover:translate-x-0.5 transition-transform duration-200"></i>
-                <span>Ingresar al Portal Vecinal</span>
+                Ingresar al Portal Vecinal
               </a>
 
               <!-- CTA Secundario: Botón outline con fondo blanco/10%, mismo tamaño pero menor jerarquía -->
@@ -75,26 +69,32 @@ import { RouterModule } from '@angular/router';
                 (click)="scrollToSection($event, 'cuadrantes')"
                 class="group btn-interactive w-full sm:w-auto inline-flex items-center justify-center gap-2.5 min-h-[48px] h-12 sm:h-[50px] px-7 rounded-xl bg-white/10 hover:bg-white/20 active:bg-white/25 text-white font-bold text-sm uppercase tracking-wider border border-white/30 hover:border-white/60 cursor-pointer text-center backdrop-blur-sm shadow-sm transition-all font-heading">
                 <i class="fa-solid fa-map-location-dot text-sm text-[#4ade80] group-hover:-translate-y-0.5 transition-transform duration-200"></i>
-                <span>Ver Cuadrantes de Reciclaje</span>
+                Ver Cuadrantes de Reciclaje
               </a>
             </div>
 
             <!-- Línea de Contacto Alternativo Pequeña debajo de los botones -->
             <p class="anim-fade-up anim-delay-3 mt-4 text-xs sm:text-[13px] text-slate-300 font-medium flex items-center gap-2 flex-wrap font-heading">
               <i class="fa-solid fa-phone text-[#4ade80] text-xs"></i>
-              <span>¿Necesitas asistencia o agendamiento telefónico?</span>
+              ¿Necesitas asistencia o agendamiento telefónico?
               <a href="tel:+56652361200" class="text-white font-bold hover:text-[#4ade80] underline underline-offset-2 transition-colors">
                 Llama al 65 236 1200
               </a>
             </p>
           </div>
 
-          <!-- Lado Derecho: Sin frases que compitan con el titular; solo un tag pequeño tipo badge discreto -->
-          <div class="hidden lg:flex flex-col items-end justify-center pointer-events-none lg:col-span-4 xl:col-span-4 anim-fade-up anim-delay-2">
-            <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#041624]/65 backdrop-blur-md border border-white/20 text-slate-200 text-xs font-bold tracking-wide shadow-xl select-none font-heading">
-              <span class="text-sm">🌊</span>
-              <span class="text-white font-bold">Cuenca Llanquihue</span>
-              <span class="text-slate-400 font-normal">· Puerto Varas</span>
+          <!-- Columna Derecha: Lema en Cursiva Cálido / Humano que Rellena y Da Identidad Local Única en Desktop -->
+          <div class="lg:col-span-5 xl:col-span-4 hidden lg:flex justify-end items-center pointer-events-none pr-2 xl:pr-6 anim-fade-up anim-delay-2">
+            <div class="text-right rotate-[-4deg] select-none anim-float-subtle">
+              <p class="font-script text-white text-4xl xl:text-[48px] font-bold leading-[1.25] tracking-wide drop-shadow-[0_4px_18px_rgba(0,0,0,0.85)]">
+                Reciclar también es<br />
+                cuidar nuestro<br />
+                <span class="text-[#4ade80]">lago</span>
+              </p>
+              <div class="mt-3.5 flex items-center justify-end gap-2 text-emerald-300 drop-shadow-md">
+                <i class="fa-solid fa-water text-xs"></i>
+                <p class="font-script text-slate-200 text-xl font-bold tracking-wide m-0">Cuenca Llanquihue</p>
+              </div>
             </div>
           </div>
 
@@ -108,9 +108,9 @@ import { RouterModule } from '@angular/router';
           (click)="scrollToSection($event, 'como-funciona')"
           class="inline-flex flex-col items-center gap-1.5 text-white/70 hover:text-white transition-colors duration-300 group cursor-pointer font-heading"
           aria-label="Conoce el ciclo de reciclaje municipal">
-          <span class="text-[11px] font-bold tracking-[0.2em] uppercase opacity-80 group-hover:opacity-100 transition-opacity">
+          <p class="text-[11px] font-bold tracking-[0.2em] uppercase opacity-80 group-hover:opacity-100 transition-opacity m-0">
             Conoce el ciclo
-          </span>
+          </p>
           <div class="anim-float-subtle">
             <i class="fa-solid fa-chevron-down text-xs text-white/80 group-hover:text-white transition-colors"></i>
           </div>
