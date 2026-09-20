@@ -7,9 +7,9 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <footer class="bg-[#041D2D] text-white pt-8 pb-8 relative overflow-hidden border-t-2 border-[#0E5177]">
+    <footer class="bg-[#041D2D] text-white pt-10 pb-8 relative overflow-hidden border-t-2 border-[#0E5177]" role="contentinfo">
       <!-- SILUETAS VECTORIALES: VOLCÁN OSORNO Y OLAS DEL LAGO LLANQUIHUE -->
-      <div class="w-full h-24 sm:h-28 overflow-hidden relative pointer-events-none mb-4 opacity-100 z-0">
+      <div class="w-full h-24 sm:h-28 overflow-hidden relative pointer-events-none mb-6 opacity-90 z-0" aria-hidden="true">
         <svg class="w-full h-full" fill="none" preserveAspectRatio="none" viewBox="0 0 1440 100" xmlns="http://www.w3.org/2000/svg">
           <path d="M0 90 L120 70 L240 78 L380 50 L520 68 L680 15 L760 45 L900 65 L1040 38 L1180 62 L1320 48 L1440 75 L1440 100 L0 100 Z"
                 fill="url(#mountainGradVibrant)" opacity="0.95"></path>
@@ -35,58 +35,77 @@ import { RouterModule } from '@angular/router';
 
       <!-- Contenido Principal del Footer -->
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div class="flex flex-col lg:flex-row items-center justify-between gap-8 pb-8 border-b border-white/15">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-8 pb-8 border-b border-white/20">
+          
           <!-- Logo RecicLaGo Oficial -->
-          <a class="flex items-center gap-4 group cursor-pointer" routerLink="/">
-            <div class="w-14 h-14 flex-shrink-0 group-hover:scale-105 transition-transform">
+          <a class="flex items-center gap-4 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22a652] rounded-xl p-1" routerLink="/" aria-label="Ir al inicio de RecicLaGo">
+            <div class="w-14 h-14 flex-shrink-0 group-hover:scale-105 transition-transform" aria-hidden="true">
               <svg class="w-full h-full" fill="none" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 56L34 24L52 50L60 38L78 56H12Z" fill="#0ea5e9"></path>
                 <path d="M34 24L41 34L34 38L27 34L34 24Z" fill="#FFFFFF"></path>
                 <path d="M60 38L66 46L60 50L55 45L60 38Z" fill="#FFFFFF"></path>
-                <path d="M48 56C48 40 64 26 84 26C84 42 68 56 48 56Z" fill="#72be36"></path>
+                <path d="M48 56C48 40 64 26 84 26C84 42 68 56 48 56Z" fill="#22a652"></path>
                 <path d="M52 56C58 48 68 40 84 26" stroke="#041D2D" stroke-linecap="round" stroke-width="2.2"></path>
               </svg>
             </div>
             <div class="flex flex-col text-left">
               <div class="flex items-baseline text-2xl sm:text-3xl font-black tracking-tight font-heading">
                 <span class="text-white">Recic</span>
-                <span class="text-[#72be36]">LaGo</span>
+                <span class="text-[#22a652]">LaGo</span>
               </div>
-              <span class="text-xs font-bold uppercase tracking-wider text-slate-300">
-                Puerto Varas recicla • Cuenca Protegida
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-200">
+                Puerto Varas · Cuenca Lago Llanquihue
               </span>
             </div>
           </a>
 
           <!-- Enlaces de Navegación del Footer -->
-          <nav class="flex flex-wrap justify-center items-center gap-x-3 sm:gap-x-4 gap-y-2 text-xs sm:text-sm text-slate-200 font-medium">
-            <a class="hover:text-[#72be36] transition-colors" routerLink="/">Inicio</a>
-            <span class="text-white/40">|</span>
-            <button (click)="openHowItWorks.emit()" type="button" class="hover:text-[#72be36] transition-colors cursor-pointer">¿Cómo funciona?</button>
-            <span class="text-white/40">|</span>
-            <button (click)="openMaterials.emit()" type="button" class="hover:text-[#72be36] transition-colors cursor-pointer">Materiales</button>
-            <span class="text-white/40">|</span>
-            <a class="hover:text-[#72be36] transition-colors" routerLink="/dashboard">Retiro especial</a>
-            <span class="text-white/40">|</span>
-            <button (click)="openContact.emit()" type="button" class="hover:text-[#72be36] transition-colors cursor-pointer">Contacto</button>
+          <nav aria-label="Navegación del pie de página" class="flex flex-wrap justify-center items-center gap-x-3 sm:gap-x-4 gap-y-2 text-xs sm:text-sm text-slate-200 font-medium">
+            <a class="hover:text-[#22a652] focus-visible:outline-none focus-visible:text-[#22a652] focus-visible:underline transition-colors py-1 px-1.5" routerLink="/">Inicio</a>
+            <span class="text-white/40" aria-hidden="true">|</span>
+            <button (click)="openHowItWorks.emit()" type="button" class="hover:text-[#22a652] focus-visible:outline-none focus-visible:text-[#22a652] focus-visible:underline transition-colors cursor-pointer py-1 px-1.5">¿Cómo funciona?</button>
+            <span class="text-white/40" aria-hidden="true">|</span>
+            <button (click)="openMaterials.emit()" type="button" class="hover:text-[#22a652] focus-visible:outline-none focus-visible:text-[#22a652] focus-visible:underline transition-colors cursor-pointer py-1 px-1.5">Materiales</button>
+            <span class="text-white/40" aria-hidden="true">|</span>
+            <a class="hover:text-[#22a652] focus-visible:outline-none focus-visible:text-[#22a652] focus-visible:underline transition-colors py-1 px-1.5" routerLink="/dashboard">Retiro especial</a>
+            <span class="text-white/40" aria-hidden="true">|</span>
+            <button (click)="openContact.emit()" type="button" class="hover:text-[#22a652] focus-visible:outline-none focus-visible:text-[#22a652] focus-visible:underline transition-colors cursor-pointer py-1 px-1.5">Contacto</button>
           </nav>
 
           <!-- Sello Municipal y Redes Sociales -->
           <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2.5 text-white text-sm">
-              <a aria-label="Facebook Municipalidad de Puerto Varas" class="w-8 h-8 rounded-full bg-white/10 hover:bg-[#4F8A3D] flex items-center justify-center transition-all" href="https://www.facebook.com/munipuertovaras" target="_blank" rel="noopener noreferrer">
-                <i class="fa-brands fa-facebook-f text-xs"></i>
+            <div class="flex items-center gap-2.5 text-white">
+              <a
+                title="Visitar página oficial de Facebook de la Municipalidad de Puerto Varas"
+                aria-label="Facebook Municipalidad de Puerto Varas"
+                class="w-9 h-9 rounded-full bg-white/10 hover:bg-[#22a652] flex items-center justify-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22a652] focus-visible:ring-offset-2 focus-visible:ring-offset-[#041D2D]"
+                href="https://www.facebook.com/munipuertovaras"
+                target="_blank"
+                rel="noopener noreferrer">
+                <i class="fa-brands fa-facebook-f text-sm"></i>
               </a>
-              <a aria-label="Instagram Municipalidad de Puerto Varas" class="w-8 h-8 rounded-full bg-white/10 hover:bg-[#4F8A3D] flex items-center justify-center transition-all" href="https://www.instagram.com/munipuertovaras" target="_blank" rel="noopener noreferrer">
-                <i class="fa-brands fa-instagram text-xs"></i>
+              <a
+                title="Visitar cuenta de Instagram de la Municipalidad de Puerto Varas"
+                aria-label="Instagram Municipalidad de Puerto Varas"
+                class="w-9 h-9 rounded-full bg-white/10 hover:bg-[#22a652] flex items-center justify-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22a652] focus-visible:ring-offset-2 focus-visible:ring-offset-[#041D2D]"
+                href="https://www.instagram.com/munipuertovaras"
+                target="_blank"
+                rel="noopener noreferrer">
+                <i class="fa-brands fa-instagram text-sm"></i>
               </a>
-              <a aria-label="YouTube Municipalidad de Puerto Varas" class="w-8 h-8 rounded-full bg-white/10 hover:bg-[#4F8A3D] flex items-center justify-center transition-all" href="https://www.youtube.com/@MunicipalidadPuertoVaras" target="_blank" rel="noopener noreferrer">
-                <i class="fa-brands fa-youtube text-xs"></i>
+              <a
+                title="Visitar canal de YouTube de la Municipalidad de Puerto Varas"
+                aria-label="YouTube Municipalidad de Puerto Varas"
+                class="w-9 h-9 rounded-full bg-white/10 hover:bg-[#22a652] flex items-center justify-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22a652] focus-visible:ring-offset-2 focus-visible:ring-offset-[#041D2D]"
+                href="https://www.youtube.com/@MunicipalidadPuertoVaras"
+                target="_blank"
+                rel="noopener noreferrer">
+                <i class="fa-brands fa-youtube text-sm"></i>
               </a>
             </div>
 
             <div class="flex items-center gap-2.5 border-l border-white/20 pl-3">
-              <img src="assets/escudo-puerto-varas.svg" alt="Ilustre Municipalidad de Puerto Varas" class="h-9 w-auto object-contain drop-shadow">
+              <img src="assets/escudo-puerto-varas.svg" alt="Escudo de la Ilustre Municipalidad de Puerto Varas" class="h-9 w-auto object-contain drop-shadow">
               <div class="text-left leading-tight hidden sm:block">
                 <div class="text-[9.5px] font-medium text-slate-300 uppercase tracking-wider">Ilustre Municipalidad</div>
                 <div class="text-[12.5px] font-bold text-white tracking-tight">Puerto Varas</div>
@@ -95,9 +114,9 @@ import { RouterModule } from '@angular/router';
           </div>
         </div>
 
-        <!-- Fila Inferior con Lema Manuscrito Destacado -->
-        <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <p class="text-xs text-slate-400">
+        <!-- Fila Inferior con Lema Destacado -->
+        <div class="pt-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+          <p class="text-xs text-slate-300">
             © 2026 Municipalidad de Puerto Varas. Todos los derechos reservados.
           </p>
 
@@ -105,7 +124,7 @@ import { RouterModule } from '@angular/router';
             <span class="font-script text-white text-2xl sm:text-3xl font-bold tracking-wide">
               Puerto Varas, más limpia, es posible
             </span>
-            <span class="text-[#72be36] text-sm"><i class="fa-solid fa-leaf"></i></span>
+            <span class="text-[#22a652] text-sm" aria-hidden="true"><i class="fa-solid fa-leaf"></i></span>
           </div>
         </div>
       </div>

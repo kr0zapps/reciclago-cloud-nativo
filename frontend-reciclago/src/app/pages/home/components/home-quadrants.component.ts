@@ -1,8 +1,47 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BffService } from '../../../services/bff.service';
 import { QuadrantCardInfo, INITIAL_QUADRANTS } from '../data/home-sectors.data';
 import { Residuo } from '../../dashboard/data/sectors.data';
+
+interface MaterialDefinition {
+  categoryKey: string;
+  materialNombre: string;
+  materialDescripcion: string;
+  materialInstrucciones: string;
+  binImage: string;
+}
+
+const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
+  {
+    categoryKey: 'VIDRIO',
+    materialNombre: 'Vidrio',
+    materialDescripcion: 'Botellas, frascos conserveros y envases de vidrio transparente o color',
+    materialInstrucciones: 'Enjuagar botellas y frascos, retirar tapas y corchos. No incluir cerámica, ampolletas ni espejos.',
+    binImage: 'assets/bin_vidrio_clean.png'
+  },
+  {
+    categoryKey: 'CARTON',
+    materialNombre: 'Cartón',
+    materialDescripcion: 'Cajas de cartón corrugado, papel kraft, diarios y revistas limpias',
+    materialInstrucciones: 'Aplanar cajas para reducir volumen. Mantener seco y libre de restos de grasa, comida o cintas adhesivas excesivas.',
+    binImage: 'assets/bin_carton_clean.png'
+  },
+  {
+    categoryKey: 'PLASTICO',
+    materialNombre: 'Plásticos PET/PEAD',
+    materialDescripcion: 'Botellas plásticas de bebidas (PET 1) y envases de detergente/lácteos (PEAD 2)',
+    materialInstrucciones: 'Lavar, escurrir, aplastar para reducir volumen y volver a colocar la tapa plástica.',
+    binImage: 'assets/bin_plasticos_clean.png'
+  },
+  {
+    categoryKey: 'LATAS',
+    materialNombre: 'Latas',
+    materialDescripcion: 'Latas de bebidas de aluminio y tarros de conserva de hojalata',
+    materialInstrucciones: 'Enjuagar para evitar olores y vectores sanitarios. Aplastar si es posible.',
+    binImage: 'assets/bin_latas_clean.png'
+  }
+];
 
 @Component({
   selector: 'app-home-quadrants',
@@ -10,7 +49,7 @@ import { Residuo } from '../../dashboard/data/sectors.data';
   imports: [CommonModule],
   template: `
     <!-- BEGIN: QuadrantsSection -->
-    <section class="py-16 sm:py-20 bg-white" id="cuadrantes">
+    <section class="py-14 sm:py-20 bg-white relative overflow-hidden" id="cuadrantes">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <!-- Section Tag & Heading -->
@@ -28,55 +67,64 @@ import { Residuo } from '../../dashboard/data/sectors.data';
           </div>
 
           <!-- Selector / Indicador Reactivo de Rotación Municipal -->
-          <div class="inline-flex items-center gap-2 bg-[#f0f7f2] p-1.5 rounded-xl border border-emerald-200/80 self-start md:self-auto">
+          <div class="inline-flex items-center gap-1 bg-[#edf5ef] p-1.5 rounded-2xl border border-emerald-200/80 self-start md:self-auto shadow-xs">
             <button
               type="button"
               (click)="selectWeek(1)"
               [class.bg-white]="activeWeek === 1"
-              [class.text-[#206935]]="activeWeek === 1"
-              [class.shadow-xs]="activeWeek === 1"
+              [class.text-[#1b5e20]]="activeWeek === 1"
+              [class.shadow-sm]="activeWeek === 1"
               [class.font-bold]="activeWeek === 1"
-              class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 transition-all cursor-pointer">
-              <i class="fa-solid fa-calendar-check mr-1.5 text-emerald-600"></i>Semana Actual
+              [class.text-slate-600]="activeWeek !== 1"
+              class="px-4 py-2 rounded-xl text-xs font-medium transition-all duration-200 cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-calendar-check text-xs" [class.text-emerald-600]="activeWeek === 1" [class.text-slate-400]="activeWeek !== 1"></i>
+              <span>Semana Actual</span>
             </button>
             <button
               type="button"
               (click)="selectWeek(2)"
               [class.bg-white]="activeWeek === 2"
-              [class.text-[#206935]]="activeWeek === 2"
-              [class.shadow-xs]="activeWeek === 2"
+              [class.text-[#1b5e20]]="activeWeek === 2"
+              [class.shadow-sm]="activeWeek === 2"
               [class.font-bold]="activeWeek === 2"
-              class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 transition-all cursor-pointer">
-              <i class="fa-solid fa-calendar-plus mr-1.5 text-emerald-600"></i>Próxima Semana
+              [class.text-slate-600]="activeWeek !== 2"
+              class="px-4 py-2 rounded-xl text-xs font-medium transition-all duration-200 cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-calendar-plus text-xs" [class.text-emerald-600]="activeWeek === 2" [class.text-slate-400]="activeWeek !== 2"></i>
+              <span>Próxima Semana</span>
             </button>
           </div>
         </div>
 
-        <!-- Mobile View: 1 sola tarjeta interactiva compacta (md:hidden) -->
+        <!-- Mobile View: Selector con Scroll Horizontal + Indicadores Degradados + Tarjeta con Acordeón (md:hidden) -->
         <div class="md:hidden">
-          <!-- Selector Pills Cuadrantes -->
-          <div class="flex items-center gap-1.5 overflow-x-auto pb-2 mb-3.5 no-scrollbar">
-            <button
-              *ngFor="let q of quadrants; let i = index"
-              type="button"
-              (click)="setMobileQuadrant(i)"
-              [class.bg-[#236836]]="selectedMobileIndex === i"
-              [class.text-white]="selectedMobileIndex === i"
-              [class.border-[#236836]]="selectedMobileIndex === i"
-              [class.shadow-2xs]="selectedMobileIndex === i"
-              [class.bg-white]="selectedMobileIndex !== i"
-              [class.text-slate-700]="selectedMobileIndex !== i"
-              [class.border-slate-200]="selectedMobileIndex !== i"
-              class="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer">
-              {{ q.name }}
-            </button>
+          <!-- Contenedor con Scroll Horizontal e Indicadores Degradados laterales -->
+          <div class="relative mb-3.5">
+            <div class="pointer-events-none absolute left-0 top-0 bottom-2 w-5 bg-gradient-to-r from-white to-transparent z-10"></div>
+            <div class="pointer-events-none absolute right-0 top-0 bottom-2 w-5 bg-gradient-to-l from-white to-transparent z-10"></div>
+
+            <div class="flex items-center gap-2 overflow-x-auto pb-2 px-1 no-scrollbar scroll-smooth">
+              <button
+                *ngFor="let q of quadrants; let i = index"
+                type="button"
+                (click)="setMobileQuadrant(i)"
+                [class.bg-[#236836]]="selectedMobileIndex === i"
+                [class.text-white]="selectedMobileIndex === i"
+                [class.border-[#236836]]="selectedMobileIndex === i"
+                [class.shadow-2xs]="selectedMobileIndex === i"
+                [class.bg-white]="selectedMobileIndex !== i"
+                [class.text-slate-700]="selectedMobileIndex !== i"
+                [class.border-slate-200]="selectedMobileIndex !== i"
+                class="shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer">
+                {{ q.name }}
+              </button>
+            </div>
           </div>
 
-          <!-- Single Interactive Card -->
+          <!-- Single Interactive Card con Transición Suave de Semana -->
           <article
             *ngIf="quadrants[selectedMobileIndex] as q"
-            (click)="onSelectQuadrant(q)"
-            class="bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-xs hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col">
+            class="bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col"
+            [ngClass]="{ 'opacity-0 translate-y-3 scale-[0.98] pointer-events-none': isFadingOut, 'anim-week-switch': !isFadingOut }">
             
             <!-- Imagen Paisajística del Sector con Badge Cuadrante y Controles Flechas -->
             <div class="relative h-44 w-full overflow-hidden bg-slate-100">
@@ -86,7 +134,7 @@ import { Residuo } from '../../dashboard/data/sectors.data';
                 class="w-full h-full object-cover"
                 loading="lazy"
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent pointer-events-none"></div>
 
               <span
                 class="absolute bottom-3 left-3 bg-[#236836] text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-md tracking-wide">
@@ -99,7 +147,7 @@ import { Residuo } from '../../dashboard/data/sectors.data';
               </span>
 
               <!-- Controles Flechas ← 1 / 4 → flotantes -->
-              <div class="absolute bottom-3 right-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full text-white text-xs font-bold" (click)="$event.stopPropagation()">
+              <div class="absolute bottom-3 right-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full text-white text-xs font-bold">
                 <button
                   type="button"
                   (click)="prevMobileQuadrant()"
@@ -155,14 +203,18 @@ import { Residuo } from '../../dashboard/data/sectors.data';
                 </div>
               </div>
 
-              <!-- Fila Inferior: Material Asignado + Ilustración -->
+              <!-- Fila Inferior: Material Asignado con Badge de Color según Material + Ilustración -->
               <div class="pt-3 flex items-center justify-between">
                 <div>
-                  <span class="block text-[10px] text-slate-500 font-medium">Material esta semana</span>
-                  <span class="block text-base font-extrabold text-[#11324d]">
-                    {{ q.materialNombre }}
-                  </span>
-                  <span *ngIf="q.materialDescripcion" class="block text-[11px] text-slate-500 mt-0.5 line-clamp-1 max-w-[200px]">
+                  <span class="block text-[10px] text-slate-500 font-medium">{{ activeWeek === 1 ? 'Material esta semana' : 'Material próxima semana' }}</span>
+                  <div class="flex items-center gap-1.5 mt-0.5">
+                    <span class="text-sm font-extrabold text-[#11324d]">{{ q.materialNombre }}</span>
+                    <!-- Badge cromático por tipo de material -->
+                    <span [class]="'text-[10px] font-bold px-2 py-0.5 rounded-full border ' + getMaterialBadgeClass(q.categoryKey)">
+                      {{ q.categoryKey }}
+                    </span>
+                  </div>
+                  <span *ngIf="q.materialDescripcion" class="block text-[11px] text-slate-500 mt-1 line-clamp-1 max-w-[200px]">
                     {{ q.materialDescripcion }}
                   </span>
                 </div>
@@ -177,23 +229,42 @@ import { Residuo } from '../../dashboard/data/sectors.data';
               </div>
             </div>
 
-            <!-- Botón de detalle accesible al tap -->
-            <div class="px-4 pb-3.5 pt-1 flex items-center justify-between text-xs text-emerald-700 font-bold border-t border-slate-50">
+            <!-- Acordeón interactivo inline: Ver preparación para la entrega -->
+            <button
+              type="button"
+              (click)="toggleAccordion(q.id)"
+              class="w-full px-4 py-3 flex items-center justify-between text-xs text-emerald-700 font-bold border-t border-slate-100 hover:bg-emerald-50/40 transition-colors cursor-pointer"
+              [attr.aria-expanded]="expandedAccordionId === q.id">
               <span class="inline-flex items-center gap-1.5">
                 <i class="fa-solid fa-circle-info text-emerald-600"></i>
-                Ver preparación para la entrega
+                <span>{{ expandedAccordionId === q.id ? 'Ocultar preparación' : 'Ver preparación para la entrega' }}</span>
               </span>
-              <span class="text-slate-400">→</span>
+              <i class="fa-solid fa-chevron-down text-xs transition-transform duration-200" [class.rotate-180]="expandedAccordionId === q.id"></i>
+            </button>
+
+            <!-- Panel Expandido del Acordeón -->
+            <div *ngIf="expandedAccordionId === q.id" class="p-4 bg-emerald-50/60 border-t border-emerald-100 anim-fade-in text-xs text-slate-700 leading-relaxed">
+              <div class="font-bold text-[#206935] mb-1 flex items-center gap-1.5">
+                <i class="fa-solid fa-list-check"></i>
+                <span>Instrucciones de preparación comunal:</span>
+              </div>
+              <p class="mb-2">{{ q.materialInstrucciones || 'Enjuagar y secar botellas y envases antes de depositar. Aplanar cajas de cartón.' }}</p>
+              <div class="text-[11px] font-semibold text-slate-600 flex items-center gap-1">
+                <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                <span>Entrega: {{ q.requisitos }} · Frente a frontis domiciliario</span>
+              </div>
             </div>
+
           </article>
         </div>
 
-        <!-- Desktop View: 4 Quadrants Grid (Fiel al diseño Stitch y a la imagen) -->
+        <!-- Desktop View: 4 Quadrants Grid con Acordeón y Badges de Color -->
         <div class="hidden md:grid md:grid-cols-2 gap-8">
           <article
-            *ngFor="let q of quadrants"
-            (click)="onSelectQuadrant(q)"
-            class="bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-300 group cursor-pointer flex flex-col justify-between">
+            *ngFor="let q of quadrants; let i = index"
+            class="bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+            [ngClass]="{ 'opacity-0 translate-y-3 scale-[0.98] pointer-events-none': isFadingOut, 'anim-week-switch': !isFadingOut }"
+            [style.animation-delay]="!isFadingOut ? (i * 0.07) + 's' : '0s'">
             
             <div>
               <!-- Imagen Paisajística del Sector con Badge Cuadrante -->
@@ -252,14 +323,20 @@ import { Residuo } from '../../dashboard/data/sectors.data';
                   </div>
                 </div>
 
-                <!-- Fila Inferior: Material Asignado + Ilustración -->
+                <!-- Fila Inferior: Material Asignado con Badge de Color + Bin -->
                 <div class="pt-4 flex items-center justify-between">
                   <div>
-                    <span class="block text-[11px] text-slate-500 font-medium">Material esta semana</span>
-                    <span class="block text-base sm:text-lg font-extrabold text-[#11324d]">
-                      {{ q.materialNombre }}
-                    </span>
-                    <span *ngIf="q.materialDescripcion" class="block text-[11px] text-slate-500 mt-0.5 line-clamp-1 max-w-xs">
+                    <span class="block text-[11px] text-slate-500 font-medium">{{ activeWeek === 1 ? 'Material esta semana' : 'Material próxima semana' }}</span>
+                    <div class="flex items-center gap-2 mt-0.5">
+                      <span class="block text-base sm:text-lg font-extrabold text-[#11324d]">
+                        {{ q.materialNombre }}
+                      </span>
+                      <!-- Badge cromático por tipo de material -->
+                      <span [class]="'text-[11px] font-bold px-2.5 py-0.5 rounded-full border ' + getMaterialBadgeClass(q.categoryKey)">
+                        {{ q.categoryKey }}
+                      </span>
+                    </div>
+                    <span *ngIf="q.materialDescripcion" class="block text-[11px] text-slate-500 mt-1 line-clamp-1 max-w-xs">
                       {{ q.materialDescripcion }}
                     </span>
                   </div>
@@ -269,20 +346,37 @@ import { Residuo } from '../../dashboard/data/sectors.data';
                     <img
                       [src]="q.binImage"
                       [alt]="q.materialNombre"
-                      class="h-16 w-auto object-contain drop-shadow-sm group-hover:scale-110 transition-transform duration-300"
+                      class="h-16 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Botón de detalle accesible al hover -->
-            <div class="px-5 sm:px-6 pb-4 pt-1 flex items-center justify-between text-xs text-emerald-700 font-bold border-t border-slate-50">
-              <span class="inline-flex items-center gap-1.5 group-hover:underline">
+            <!-- Acordeón interactivo inline: Ver preparación para la entrega -->
+            <button
+              type="button"
+              (click)="toggleAccordion(q.id)"
+              class="px-5 sm:px-6 py-3.5 flex items-center justify-between text-xs text-emerald-700 font-bold border-t border-slate-100 hover:bg-emerald-50/40 transition-colors cursor-pointer"
+              [attr.aria-expanded]="expandedAccordionId === q.id">
+              <span class="inline-flex items-center gap-2">
                 <i class="fa-solid fa-circle-info text-emerald-600"></i>
-                Ver preparación para la entrega
+                <span>{{ expandedAccordionId === q.id ? 'Ocultar instrucciones de preparación' : 'Ver preparación para la entrega' }}</span>
               </span>
-              <span class="text-slate-400 group-hover:translate-x-1 transition-transform">→</span>
+              <i class="fa-solid fa-chevron-down text-xs transition-transform duration-200" [class.rotate-180]="expandedAccordionId === q.id"></i>
+            </button>
+
+            <!-- Panel Expandido del Acordeón en Desktop -->
+            <div *ngIf="expandedAccordionId === q.id" class="px-5 sm:px-6 py-4 bg-emerald-50/50 border-t border-emerald-100 anim-fade-in text-xs text-slate-700 leading-relaxed">
+              <div class="font-bold text-[#206935] mb-1 flex items-center gap-1.5">
+                <i class="fa-solid fa-list-check"></i>
+                <span>Instrucciones de preparación comunal:</span>
+              </div>
+              <p class="mb-2">{{ q.materialInstrucciones || 'Enjuagar y secar botellas y envases antes de depositar. Aplanar cajas de cartón.' }}</p>
+              <div class="text-[11px] font-semibold text-slate-600 flex items-center gap-1">
+                <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                <span>Entrega: {{ q.requisitos }} · Frente a frontis domiciliario</span>
+              </div>
             </div>
 
           </article>
@@ -300,26 +394,48 @@ export class HomeQuadrantsComponent implements OnInit {
   catalogLoaded = false;
   activeWeek: number = 1;
   selectedMobileIndex: number = 0;
+  expandedAccordionId: string | null = null;
 
-  constructor(private bffService: BffService) {}
+  isFadingOut = false;
+
+  constructor(private bffService: BffService, private cdr: ChangeDetectorRef) {}
+
+  toggleAccordion(id: string): void {
+    this.expandedAccordionId = this.expandedAccordionId === id ? null : id;
+  }
+
+  getMaterialBadgeClass(categoryKey: string): string {
+    const key = (categoryKey || '').toUpperCase();
+    if (key.includes('VIDRIO')) return 'bg-teal-50 text-teal-800 border-teal-200';
+    if (key.includes('CARTON') || key.includes('PAPEL')) return 'bg-amber-50 text-amber-900 border-amber-200';
+    if (key.includes('PLASTICO') || key.includes('PET')) return 'bg-sky-50 text-sky-800 border-sky-200';
+    if (key.includes('LATA') || key.includes('METAL')) return 'bg-slate-100 text-slate-800 border-slate-300';
+    return 'bg-emerald-50 text-emerald-800 border-emerald-200';
+  }
 
   setMobileQuadrant(index: number): void {
     this.selectedMobileIndex = index;
+    this.expandedAccordionId = null;
   }
 
   nextMobileQuadrant(): void {
     if (this.quadrants.length > 0) {
       this.selectedMobileIndex = (this.selectedMobileIndex + 1) % this.quadrants.length;
+      this.expandedAccordionId = null;
     }
   }
 
   prevMobileQuadrant(): void {
     if (this.quadrants.length > 0) {
       this.selectedMobileIndex = (this.selectedMobileIndex - 1 + this.quadrants.length) % this.quadrants.length;
+      this.expandedAccordionId = null;
     }
   }
 
+  private liveResiduosMap = new Map<string, Residuo>();
+
   ngOnInit(): void {
+    this.updateQuadrantsForWeek(this.activeWeek);
     this.loadCatalogResiduos();
   }
 
@@ -328,56 +444,64 @@ export class HomeQuadrantsComponent implements OnInit {
       next: (residuos: Residuo[]) => {
         if (residuos && residuos.length > 0) {
           this.catalogLoaded = true;
-          this.enrichWithCatalog(residuos);
+          residuos.forEach(r => {
+            const cat = (r.categoria || r.tipo || '').toUpperCase();
+            if (cat.includes('VIDRIO')) this.liveResiduosMap.set('VIDRIO', r);
+            else if (cat.includes('CARTON')) this.liveResiduosMap.set('CARTON', r);
+            else if (cat.includes('PLASTICO')) this.liveResiduosMap.set('PLASTICO', r);
+            else if (cat.includes('LATA') || cat.includes('METAL')) this.liveResiduosMap.set('LATAS', r);
+          });
+          this.updateQuadrantsForWeek(this.activeWeek);
+          this.cdr.markForCheck();
         }
       },
       error: () => {
-        // En caso de que el backend esté offline o cargando, se conservan los datos de INITIAL_QUADRANTS
         this.catalogLoaded = false;
       }
     });
   }
 
-  enrichWithCatalog(residuos: Residuo[]): void {
-    const residuosMap = new Map<string, Residuo>();
-    residuos.forEach(r => {
-      const cat = (r.categoria || r.tipo || '').toUpperCase();
-      if (cat.includes('VIDRIO')) residuosMap.set('VIDRIO', r);
-      else if (cat.includes('CARTON')) residuosMap.set('CARTON', r);
-      else if (cat.includes('PLASTICO')) residuosMap.set('PLASTICO', r);
-      else if (cat.includes('LATA') || cat.includes('METAL')) residuosMap.set('LATAS', r);
-    });
+  updateQuadrantsForWeek(weekNumber: number): void {
+    const offset = weekNumber === 2 ? 1 : 0;
 
-    this.quadrants = this.quadrants.map(q => {
-      const liveResiduo = residuosMap.get(q.categoryKey);
-      if (liveResiduo) {
-        return {
-          ...q,
-          materialNombre: liveResiduo.nombre,
-          materialDescripcion: liveResiduo.descripcion || q.materialDescripcion,
-          materialInstrucciones: liveResiduo.instrucciones || q.materialInstrucciones
-        };
-      }
-      return q;
+    this.quadrants = INITIAL_QUADRANTS.map((q, idx) => {
+      const matIndex = (idx + offset) % DEFAULT_MATERIALS_CYCLE.length;
+      const baseMat = DEFAULT_MATERIALS_CYCLE[matIndex];
+      const liveMat = this.liveResiduosMap.get(baseMat.categoryKey);
+
+      return {
+        ...q,
+        cuadranteNumber: q.cuadranteNumber,
+        name: q.name,
+        shortName: q.shortName,
+        day: q.day,
+        hours: q.hours,
+        image: q.image,
+        categoryKey: baseMat.categoryKey,
+        materialNombre: liveMat?.nombre || baseMat.materialNombre,
+        materialDescripcion: liveMat?.descripcion || baseMat.materialDescripcion,
+        materialInstrucciones: liveMat?.instrucciones || baseMat.materialInstrucciones,
+        binImage: baseMat.binImage
+      };
     });
   }
 
   selectWeek(weekNumber: number): void {
-    this.activeWeek = weekNumber;
-    // Si cambia de semana, rota ligeramente el material para reflejar la dinámica del retiro
-    if (weekNumber === 2) {
-      const rotated = [...this.quadrants];
-      const first = rotated.shift()!;
-      rotated.push(first);
-      this.quadrants = rotated.map((q, idx) => ({
-        ...q,
-        cuadranteNumber: idx + 1,
-        day: INITIAL_QUADRANTS[idx].day
-      }));
-    } else {
-      this.quadrants = [...INITIAL_QUADRANTS];
-      this.loadCatalogResiduos();
-    }
+    if (this.activeWeek === weekNumber && !this.isFadingOut) return;
+
+    this.isFadingOut = true;
+    this.expandedAccordionId = null;
+    this.cdr.markForCheck();
+
+    setTimeout(() => {
+      this.activeWeek = weekNumber;
+      this.updateQuadrantsForWeek(weekNumber);
+
+      setTimeout(() => {
+        this.isFadingOut = false;
+        this.cdr.markForCheck();
+      }, 50);
+    }, 140);
   }
 
   onSelectQuadrant(q: QuadrantCardInfo): void {

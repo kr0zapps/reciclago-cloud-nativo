@@ -4,6 +4,11 @@
 
 @layer base {
   :root {
+    --color-primary: #22a652;
+    --color-primary-hover: #1b8e45;
+    --color-primary-light: #ecf7e6;
+    --color-navy: #041624;
+    --color-navy-dark: #020d17;
     --color-bg: #F8FAF7;
     --color-surface: #FFFFFF;
     --color-border: #E2E9E4;
@@ -11,11 +16,32 @@
     --color-text-secondary: #61717A;
     --color-brand-green: #4F8A3D;
     --color-brand-navy: #123F5B;
+
+    /* Escala de espaciado estándar */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-12: 48px;
+    --space-16: 64px;
+
+    /* Bordes redondeados consistentes */
+    --radius-btn: 8px;
+    --radius-card: 16px;
+    --radius-pill: 9999px;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
   }
 
   html, body {
     margin: 0;
     padding: 0;
+    width: 100%;
+    max-width: 100%;
     background-color: var(--color-bg);
     color: var(--color-text-primary);
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -24,6 +50,9 @@
 
   app-root {
     display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 }
 
@@ -415,13 +444,32 @@
 .anim-delay-5 { animation-delay: 0.36s; }
 .anim-delay-6 { animation-delay: 0.44s; }
 
+/* Transición fluida al cambiar de semana en cuadrantes */
+@keyframes weekCardEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.anim-week-switch {
+  animation: weekCardEntrance 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .anim-fade-up,
   .anim-fade-in,
-  .anim-page-deploy {
+  .anim-page-deploy,
+  .anim-week-switch {
     opacity: 1 !important;
     transform: none !important;
     animation: none !important;
   }
 }
+
 

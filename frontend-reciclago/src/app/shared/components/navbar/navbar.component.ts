@@ -1,6 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -8,7 +8,7 @@ import { RouterModule } from '@angular/router';
   imports: [CommonModule, RouterModule],
   host: { class: 'contents' },
   template: `
-    <header [ngClass]="headerClass">
+    <header [ngClass]="headerClass" class="box-border">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4 lg:gap-8">
         
         <!-- LOGO RECICLAGO OFICIAL -->
@@ -33,34 +33,36 @@ import { RouterModule } from '@angular/router';
           </div>
         </a>
 
-        <!-- NAVEGACIÓN DESKTOP -->
-        <nav class="hidden md:flex items-center gap-5 lg:gap-7 xl:gap-8 text-[14px] lg:text-[15px] font-semibold transition-colors" [ngClass]="navTextClass">
-          <a routerLink="/" routerLinkActive="font-bold" [routerLinkActiveOptions]="{exact: true}" class="relative py-2 hover:text-[#4ade80] transition-colors flex flex-col items-center">
-            <span>Inicio</span>
-            <div class="w-6 h-0.5 sm:h-1 bg-[#4ade80] rounded-full mt-1"></div>
-          </a>
-          <button (click)="openHowItWorks.emit()" type="button" class="hover:text-[#4ade80] transition-colors py-2 font-semibold cursor-pointer">¿Cómo funciona?</button>
-          <button (click)="openMaterials.emit()" type="button" class="hover:text-[#4ade80] transition-colors py-2 font-semibold cursor-pointer">Materiales</button>
-          <a routerLink="/dashboard" class="hover:text-[#4ade80] transition-colors py-2">Retiro especial</a>
-          <button (click)="openContact.emit()" type="button" class="hover:text-[#4ade80] transition-colors py-2 font-semibold cursor-pointer">Contacto</button>
+        <!-- NAVEGACIÓN DESKTOP ESENCIAL (3 LINKS CLAVE) -->
+        <nav class="hidden lg:flex items-center gap-7 xl:gap-9 text-[14.5px] font-semibold transition-colors" [ngClass]="navTextClass">
+          <button (click)="scrollToSection('como-funciona')" type="button" class="hover:text-[#4ade80] transition-colors py-2 font-semibold cursor-pointer">
+            ¿Cómo funciona?
+          </button>
+          <button (click)="scrollToSection('cuadrantes')" type="button" class="hover:text-[#4ade80] transition-colors py-2 font-semibold cursor-pointer">
+            Cuadrantes
+          </button>
+          <button (click)="openMaterials.emit()" type="button" class="hover:text-[#4ade80] transition-colors py-2 font-semibold cursor-pointer">
+            Materiales
+          </button>
         </nav>
 
         <!-- ACCIONES DERECHA -->
-        <div class="flex items-center gap-4 sm:gap-5 lg:gap-6 flex-shrink-0">
-          <div class="hidden lg:flex items-center gap-2.5 pr-4 sm:pr-5 lg:pr-6 border-r transition-colors" [ngClass]="sealBorderClass">
-            <img src="assets/escudo-puerto-varas.svg" alt="Ilustre Municipalidad de Puerto Varas" class="h-9 w-auto object-contain">
+        <div class="flex items-center gap-4 sm:gap-6 flex-shrink-0">
+          <!-- Sello Municipal con Espacio y Presencia -->
+          <div class="hidden lg:flex items-center gap-3 pl-6 pr-6 border-l border-r transition-colors" [ngClass]="sealBorderClass">
+            <img src="assets/escudo-puerto-varas.svg" alt="Ilustre Municipalidad de Puerto Varas" class="h-10 sm:h-11 w-auto object-contain drop-shadow-xs">
             <div class="text-left leading-tight">
               <div class="text-[9.5px] font-bold uppercase tracking-wider transition-colors" [ngClass]="sealSubtextClass">Ilustre Municipalidad</div>
-              <div class="text-[12.5px] font-extrabold tracking-tight transition-colors" [ngClass]="sealTitleClass">Puerto Varas</div>
+              <div class="text-[13px] font-extrabold tracking-tight transition-colors" [ngClass]="sealTitleClass">Puerto Varas</div>
             </div>
           </div>
 
-          <!-- Botón Mi cuenta / Pill Vecinal -->
+          <!-- Botón Iniciar sesión (Outline secundario para no competir con el Hero CTA) -->
           <a *ngIf="!loginDisplay" routerLink="/login"
-             class="hidden sm:flex items-center gap-2 text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-200 shadow-xs cursor-pointer"
+             class="hidden sm:inline-flex items-center gap-2 text-xs sm:text-[13px] font-bold px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border transition-all duration-200 cursor-pointer text-center"
              [ngClass]="accountBtnClass">
-            <i class="fa-solid fa-circle-user text-sm"></i>
-            <span>Mi cuenta</span>
+            <i class="fa-regular fa-circle-user text-sm"></i>
+            <span>Iniciar sesión</span>
           </a>
 
           <div *ngIf="loginDisplay" class="hidden sm:flex items-center gap-3 bg-white border border-[#DFE8E1] hover:border-[#4F8A3D]/40 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full shadow-sm transition-all">
@@ -77,10 +79,10 @@ import { RouterModule } from '@angular/router';
             </button>
           </div>
 
-          <!-- Botón Hamburger Móvil -->
+          <!-- Botón Hamburger Móvil / Tablet (< 1024px) -->
           <button (click)="mobileMenuOpen = !mobileMenuOpen"
                   type="button"
-                  class="md:hidden relative w-10 h-10 inline-flex items-center justify-center rounded-xl transition-all duration-300 focus:outline-none cursor-pointer shadow-xs active:scale-95"
+                  class="lg:hidden relative w-10 h-10 inline-flex items-center justify-center rounded-xl transition-all duration-300 focus:outline-none cursor-pointer shadow-xs active:scale-95"
                   [ngClass]="hamburgerBtnClass"
                   aria-label="Abrir menú de navegación">
             <i class="fa-solid fa-bars text-lg transition-transform duration-300" [class.rotate-90]="mobileMenuOpen" [class.hidden]="mobileMenuOpen"></i>
@@ -89,9 +91,9 @@ import { RouterModule } from '@angular/router';
         </div>
       </div>
 
-      <!-- Menú Móvil Desplegable -->
+      <!-- Menú Móvil / Tablet Desplegable -->
       <div *ngIf="mobileMenuOpen"
-           class="md:hidden border-t border-[#E2E9E4] bg-white px-4 pt-3 pb-5 space-y-3.5 shadow-xl border-b border-[#E2E9E4] relative z-50 animate-drawer-slide">
+           class="lg:hidden border-t border-[#E2E9E4] bg-white px-4 pt-3 pb-5 space-y-3.5 shadow-xl border-b border-[#E2E9E4] relative z-50 animate-drawer-slide">
         <div class="flex items-center gap-3 p-2.5 rounded-xl bg-[#F8FAF7] border border-[#E2E9E4]">
           <img src="assets/escudo-puerto-varas.svg" alt="Escudo Puerto Varas" class="h-8 w-auto object-contain flex-shrink-0">
           <div class="text-xs text-[#546571] leading-tight">
@@ -101,26 +103,21 @@ import { RouterModule } from '@angular/router';
         </div>
 
         <nav class="flex flex-col space-y-1 text-[15px] font-semibold text-[#183247]">
-          <a routerLink="/" (click)="mobileMenuOpen = false" routerLinkActive="bg-[#EEF5EB] text-[#4F8A3D] font-bold" [routerLinkActiveOptions]="{exact: true}"
-             class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all cursor-pointer">
-            <i class="fa-solid fa-house w-5 text-center text-sm text-[#4F8A3D]"></i>
-            <span>Inicio</span>
-          </a>
-          <button type="button" (click)="openHowItWorks.emit(); mobileMenuOpen = false"
+          <button type="button" (click)="scrollToSection('como-funciona')"
                   class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all font-semibold text-[15px] text-[#183247] cursor-pointer">
             <i class="fa-solid fa-circle-question w-5 text-center text-sm text-[#0ea5e9]"></i>
             <span>¿Cómo funciona?</span>
           </button>
+          <button type="button" (click)="scrollToSection('cuadrantes')"
+                  class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all font-semibold text-[15px] text-[#183247] cursor-pointer">
+            <i class="fa-solid fa-map-location-dot w-5 text-center text-sm text-[#4F8A3D]"></i>
+            <span>Cuadrantes comunales</span>
+          </button>
           <button type="button" (click)="openMaterials.emit(); mobileMenuOpen = false"
                   class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all font-semibold text-[15px] text-[#183247] cursor-pointer">
             <i class="fa-solid fa-recycle w-5 text-center text-sm text-[#4F8A3D]"></i>
-            <span>Materiales</span>
+            <span>Materiales de reciclaje</span>
           </button>
-          <a routerLink="/dashboard" (click)="mobileMenuOpen = false" routerLinkActive="bg-[#EEF5EB] text-[#4F8A3D] font-bold"
-             class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all cursor-pointer">
-            <i class="fa-solid fa-truck-pickup w-5 text-center text-sm text-[#123F5B]"></i>
-            <span>Retiro especial</span>
-          </a>
           <button type="button" (click)="openContact.emit(); mobileMenuOpen = false"
                   class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all font-semibold text-[15px] text-[#183247] cursor-pointer">
             <i class="fa-solid fa-envelope w-5 text-center text-sm text-emerald-600"></i>
@@ -177,6 +174,21 @@ export class NavbarComponent {
   @Output() logoutClicked = new EventEmitter<void>();
 
   mobileMenuOpen = false;
+  private router = inject(Router);
+
+  scrollToSection(sectionId: string): void {
+    this.mobileMenuOpen = false;
+    if (this.isHomePage) {
+      if (typeof document !== 'undefined') {
+        const target = document.getElementById(sectionId);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+          return;
+        }
+      }
+    }
+    this.router.navigate(['/'], { fragment: sectionId });
+  }
 
   get headerClass(): string {
     if (this.mobileMenuOpen) {
@@ -186,7 +198,7 @@ export class NavbarComponent {
       if (this.isScrolled) {
         return 'sticky top-0 z-50 transition-all duration-300 -mb-20 bg-[#041624]/95 backdrop-blur-md border-b border-white/10 shadow-md text-white';
       }
-      return 'sticky top-0 z-50 transition-all duration-300 -mb-20 bg-transparent border-b border-transparent shadow-none text-white';
+      return 'sticky top-0 z-50 transition-all duration-300 -mb-20 bg-transparent border-b-0 border-transparent shadow-none text-white';
     }
     return 'sticky top-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-md border-b border-[#E2E9E4] shadow-sm text-[#183247]';
   }
@@ -214,9 +226,14 @@ export class NavbarComponent {
 
   get navTextClass(): string { return this.isHomePage ? 'text-white' : 'text-[#183247]'; }
   get sealBorderClass(): string { return this.isHomePage ? 'border-white/20' : 'border-[#E2E9E4]'; }
-  get sealSubtextClass(): string { return this.isHomePage ? 'text-slate-300' : 'text-[#546571]'; }
-  get sealTitleClass(): string { return this.isHomePage ? 'text-white' : 'text-[#123F5B]'; }
-  get accountBtnClass(): string { return this.isHomePage ? 'bg-[#22a652] hover:bg-[#1b8e45] text-white' : 'bg-[#0e5584] hover:bg-[#0b476f] text-white'; }
+  get sealSubtextClass(): string { return (this.isHomePage && !this.isScrolled) ? 'text-slate-300' : 'text-[#546571]'; }
+  get sealTitleClass(): string { return (this.isHomePage && !this.isScrolled) ? 'text-white' : 'text-[#123F5B]'; }
+  get accountBtnClass(): string {
+    if (this.isHomePage && !this.isScrolled) {
+      return 'border-white/35 hover:border-white text-white hover:bg-white/10 active:bg-white/15';
+    }
+    return 'border-slate-300 hover:border-slate-400 text-slate-700 hover:bg-slate-50 active:bg-slate-100';
+  }
 
   get hamburgerBtnClass(): string {
     if (this.mobileMenuOpen) {

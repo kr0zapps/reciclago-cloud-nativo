@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -8,93 +8,110 @@ import { RouterModule } from '@angular/router';
   imports: [CommonModule, RouterModule],
   template: `
     <!-- BEGIN: HeroSection -->
-    <section class="relative min-h-screen flex flex-col justify-center bg-[#041624] text-white overflow-hidden" id="inicio">
+    <section class="relative min-h-[100svh] lg:min-h-screen flex flex-col justify-between bg-[#041624] text-white overflow-hidden" id="inicio">
       
-      <!-- 1. Fondo Panorámico Fotográfico Ultrawide a Pantalla Completa con Volcán Osorno y Lago Llanquihue -->
-      <div class="absolute inset-0 z-0 pointer-events-none">
+      <!-- 1. Escenario Fotográfico: Volcán Osorno y Lago Llanquihue con Parallax Sutil y sangrado inferior de seguridad -->
+      <div class="absolute inset-0 -bottom-2 z-0 pointer-events-none overflow-hidden">
         <img
           alt="Lago Llanquihue y Volcán Osorno - Puerto Varas"
-          class="w-full h-full object-cover object-[center_35%] lg:object-[center_38%]"
+          class="w-full h-full object-cover object-[72%_32%] sm:object-[66%_35%] lg:object-[center_38%] scale-105 select-none pointer-events-none transition-transform duration-100 ease-out will-change-transform"
+          [ngStyle]="{ transform: 'translate3d(0, ' + parallaxOffset + 'px, 0)' }"
           src="assets/ultrawide.jpg"
         />
 
-        <!-- Overlay Direccional Sutil (Oscuro sólido en el cuadrante superior/izquierdo para contraste tipográfico, transparente en el volcán) -->
-        <div class="hidden lg:block absolute inset-0 bg-gradient-to-r from-[#041624]/95 via-[#041624]/75 via-45% to-transparent to-75%"></div>
+        <!-- Viñeta Superior para Contraste Impecable del Header Transparente -->
+        <div class="absolute top-0 inset-x-0 h-28 bg-gradient-to-b from-[#041624]/85 via-[#041624]/40 to-transparent"></div>
 
-        <!-- Overlay Direccional en Móvil / Tablet -->
-        <div class="lg:hidden absolute inset-0 bg-gradient-to-b from-[#041624]/95 via-[#041624]/75 to-[#041624]/45"></div>
+        <!-- Overlay Direccional Desktop: Easing suave desde azul institucional a la izquierda hasta apertura cristalina en el volcán -->
+        <div class="hidden lg:block absolute inset-0 bg-gradient-to-r from-[#041624] via-[#041624]/85 via-35% to-transparent to-70%"></div>
+        <div class="hidden lg:block absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-[#041624]/70 via-transparent via-60% to-transparent"></div>
 
-        <!-- Sombra de anclaje inferior natural sobre la fotografía -->
-        <div class="absolute bottom-0 inset-x-0 h-28 sm:h-36 bg-gradient-to-t from-[#041624]/90 via-[#041624]/40 to-transparent"></div>
+        <!-- Overlay Direccional Móvil / Tablet: Contraste vertical controlado que protege el H1 sin opacar el paisaje -->
+        <div class="lg:hidden absolute inset-0 bg-gradient-to-b from-[#041624]/92 via-[#041624]/60 via-45% to-[#041624]/85"></div>
+
+        <!-- Sombra de anclaje inferior hacia el fondo de la página con extensión de seguridad -->
+        <div class="absolute -bottom-2 inset-x-0 h-28 sm:h-36 bg-gradient-to-t from-[#041624] via-[#041624]/60 to-transparent"></div>
       </div>
 
+      <!-- 2. Espaciador Superior para Compensar el Navbar Sticky (80px) -->
+      <div class="h-20 flex-shrink-0 pointer-events-none"></div>
 
+      <!-- 3. Contenido Editorial Principal con Composición Asimétrica a la Izquierda -->
+      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 w-full my-auto anim-fade-up">
+        <div class="max-w-2xl xl:max-w-3xl">
 
-      <!-- 3. Contenido Editorial Principal con Cursiva Flotante a la Derecha (Sin Cards) -->
-      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 lg:pt-36 pb-20 sm:pb-24 lg:pb-28 w-full">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <!-- Título Principal de Autoridad Municipal (Sin Pills ni Textos de Relleno) -->
+          <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] xl:text-[58px] font-extrabold text-white tracking-tight uppercase leading-[1.08] mb-5 font-heading break-words">
+            JUNTOS CUIDAMOS<br />
+            PUERTO VARAS
+          </h1>
 
-          <!-- Columna Izquierda: Mensaje Central Comunal -->
-          <div class="lg:col-span-7 xl:col-span-8 max-w-2xl">
-            <!-- Eyebrow: PORTAL AMBIENTAL CIUDADANO · RECICLAGO -->
-            <div class="text-xs sm:text-sm font-bold text-[#22c55e] tracking-widest uppercase mb-3.5 drop-shadow-sm">
-              PORTAL AMBIENTAL CIUDADANO · RECICLAGO
-            </div>
+          <!-- Bajada / Subtítulo Oficial -->
+          <p class="text-sm sm:text-base lg:text-[17px] text-slate-200/90 font-normal leading-relaxed max-w-xl mb-8 break-words">
+            Reciclar hoy, es construir el futuro sustentable que queremos para nuestra comuna y la cuenca del Lago Llanquihue.
+          </p>
 
-            <!-- Título Principal con Tipografía de Impacto Condensada: JUNTOS CUIDAMOS PUERTO VARAS -->
-            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight uppercase leading-[0.95] mb-5 font-heading drop-shadow-md">
-              JUNTOS CUIDAMOS<br />
-              PUERTO VARAS
-            </h1>
+          <!-- Botones de Acción Sobrios con Altura e Identidad Unificada (Stacking responsivo sin desborde) -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 w-full sm:w-auto">
+            <!-- Botón Primario: Verde Institucional RecicLaGo -->
+            <a
+              routerLink="/dashboard"
+              class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-12 px-6 sm:px-7 rounded-lg bg-[#22a652] hover:bg-[#1b8e45] text-white font-bold text-xs sm:text-[13px] uppercase tracking-wider transition-colors duration-200 cursor-pointer text-center shadow-sm hover:shadow-md active:scale-[0.99]">
+              <i class="fa-solid fa-recycle text-sm"></i>
+              <span>Ingresar al Portal Vecinal</span>
+            </a>
 
-            <!-- Bajada / Subtítulo Oficial -->
-            <p class="text-sm sm:text-base lg:text-lg text-slate-100 font-normal leading-relaxed max-w-xl mb-8 drop-shadow-sm">
-              Reciclar hoy, es construir el futuro sustentable que queremos para nuestra comuna y la cuenca del Lago Llanquihue.
-            </p>
-
-            <!-- Botones de Acción Sobrios y Directos -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
-              <!-- Botón Primario Verde Sólido -->
-              <a
-                routerLink="/dashboard"
-                class="inline-flex items-center justify-center gap-2.5 bg-[#22a652] hover:bg-[#1b8e45] text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider px-7 py-4 rounded-lg transition-all cursor-pointer text-center shadow-lg shadow-emerald-950/40">
-                <i class="fa-solid fa-recycle text-sm"></i>
-                <span>Ingresar al Portal Vecinal</span>
-              </a>
-
-              <!-- Botón Secundario Outline con Fondo Translúcido -->
-              <a
-                href="#cuadrantes"
-                class="inline-flex items-center justify-center gap-2 border border-white/80 hover:border-white bg-[#041624]/40 hover:bg-[#041624]/70 text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider px-7 py-4 rounded-lg backdrop-blur-xs transition-all cursor-pointer text-center">
-                <i class="fa-solid fa-location-dot text-sm text-emerald-400"></i>
-                <span>Ver Cuadrantes de Reciclaje</span>
-              </a>
-            </div>
+            <!-- Botón Secundario Discreto (Outline) que no compite con el CTA Primario -->
+            <a
+              href="#cuadrantes"
+              (click)="scrollToSection($event, 'cuadrantes')"
+              class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-12 px-6 sm:px-7 rounded-lg bg-white/5 hover:bg-white/12 active:bg-white/20 text-white font-bold text-xs sm:text-[13px] uppercase tracking-wider border border-white/35 hover:border-white/70 transition-all duration-200 cursor-pointer text-center active:scale-[0.99]">
+              <i class="fa-solid fa-location-dot text-sm text-emerald-400"></i>
+              <span>Ver Cuadrantes de Reciclaje</span>
+            </a>
           </div>
 
-          <!-- Columna Derecha: Lema Manuscrito Cursivo Suelto sobre el Lago (Sin Cards) -->
-          <div class="lg:col-span-5 xl:col-span-4 hidden lg:flex justify-end items-center pointer-events-none pr-4 lg:pr-8">
-            <div class="text-right rotate-[-5deg] anim-float select-none">
-              <p class="font-script text-white text-4xl xl:text-5xl font-bold leading-snug drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]">
-                Reciclar también es<br>cuidar nuestro<br>lago
-              </p>
-            </div>
-          </div>
         </div>
       </div>
 
-      <!-- Indicador sutil de scroll hacia el ciclo comunal -->
-      <a href="#como-funciona"
-         class="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 hidden sm:flex flex-col items-center gap-1.5 text-white/60 hover:text-white transition-colors group cursor-pointer"
-         aria-label="Ir a la sección ¿Cómo funciona?">
-        <span class="text-[10px] font-bold tracking-widest uppercase opacity-75 group-hover:opacity-100 transition-opacity">Conoce el ciclo</span>
-        <i class="fa-solid fa-chevron-down text-xs animate-bounce"></i>
-      </a>
+      <!-- 4. Indicador Inferior Discreto hacia el Ciclo Comunal con Scroll Suave -->
+      <div class="relative z-10 pb-5 sm:pb-6 flex justify-center pointer-events-auto">
+        <a
+          href="#como-funciona"
+          (click)="scrollToSection($event, 'como-funciona')"
+          class="hidden sm:inline-flex flex-col items-center gap-1.5 text-white/60 hover:text-white transition-colors duration-200 group cursor-pointer"
+          aria-label="Ir a la sección ¿Cómo funciona?">
+          <span class="text-[10px] sm:text-[11px] font-bold tracking-[0.2em] uppercase opacity-75 group-hover:opacity-100 transition-opacity">
+            Conoce el ciclo
+          </span>
+          <i class="fa-solid fa-chevron-down text-[10px] transform group-hover:translate-y-0.5 transition-transform duration-200 ease-out"></i>
+        </a>
+      </div>
 
     </section>
     <!-- END: HeroSection -->
   `
 })
-export class HomeHeroComponent {}
+export class HomeHeroComponent {
+  parallaxOffset = 0;
 
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    if (typeof window !== 'undefined') {
+      const scroll = window.scrollY;
+      if (scroll <= 850) {
+        this.parallaxOffset = Math.round(scroll * 0.15);
+      }
+    }
+  }
 
+  scrollToSection(event: Event, sectionId: string): void {
+    event.preventDefault();
+    if (typeof document !== 'undefined') {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }
+}

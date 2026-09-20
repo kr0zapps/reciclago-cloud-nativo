@@ -1,5 +1,5 @@
 import { ApplicationConfig, APP_INITIALIZER } from '@angular/core';
-import { provideRouter, withViewTransitions, withHashLocation } from '@angular/router';
+import { provideRouter, withViewTransitions, withHashLocation, withInMemoryScrolling } from '@angular/router';
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
 import { MsalService, MSAL_INSTANCE, MsalGuard, MsalInterceptor, MSAL_INTERCEPTOR_CONFIG, MSAL_GUARD_CONFIG, MsalBroadcastService } from '@azure/msal-angular';
@@ -53,7 +53,12 @@ export function MSALInitializerFactory(msalInstance: IPublicClientApplication) {
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes, withViewTransitions({ skipInitialTransition: false }), withHashLocation()),
+    provideRouter(
+      routes,
+      withViewTransitions({ skipInitialTransition: false }),
+      withHashLocation(),
+      withInMemoryScrolling({ scrollPositionRestoration: 'top', anchorScrolling: 'enabled' })
+    ),
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimations(),
     {

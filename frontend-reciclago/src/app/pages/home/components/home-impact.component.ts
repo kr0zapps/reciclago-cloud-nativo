@@ -1,5 +1,5 @@
-import { Component, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Output, EventEmitter, OnInit, AfterViewInit, OnDestroy, ElementRef, ChangeDetectorRef, NgZone, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 @Component({
@@ -8,138 +8,115 @@ import { RouterModule } from '@angular/router';
   imports: [CommonModule, RouterModule],
   template: `
     <!-- BEGIN: ImpactSection -->
-    <section class="relative py-16 sm:py-20 bg-gradient-to-b from-sky-50/70 via-emerald-50/30 to-white overflow-hidden border-t border-slate-100" id="impacto">
+    <section class="relative py-16 sm:py-20 bg-gradient-to-b from-sky-50/60 via-emerald-50/25 to-[#F8FAF7] overflow-hidden border-t border-slate-200/60" id="impacto">
       <!-- Watermarked volcano silhouette background -->
-      <div class="absolute inset-0 opacity-15 pointer-events-none flex items-end justify-center">
-        <svg class="w-full h-auto text-sky-700 max-h-96" fill="currentColor" viewBox="0 0 1200 350">
+      <div class="absolute inset-0 opacity-10 pointer-events-none flex items-end justify-center" aria-hidden="true">
+        <svg class="w-full h-auto text-[#0a233b] max-h-96" fill="currentColor" viewBox="0 0 1200 350">
           <path d="M0,350 L350,140 L450,220 L650,40 L850,230 L1000,160 L1200,350 Z"></path>
         </svg>
       </div>
 
       <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Section Heading -->
-        <div class="mb-12">
-          <span class="inline-block px-3.5 py-1 rounded-full bg-cyan-100 text-cyan-900 font-bold text-xs mb-3 shadow-2xs">
-            Nuestra huella
+        <div class="mb-10 sm:mb-14 text-center sm:text-left">
+          <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-100/90 text-[#175c2e] font-bold text-xs mb-3 shadow-xs">
+            <i class="fa-solid fa-seedling text-xs"></i>
+            Nuestra huella comunal
           </span>
-          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a233b] tracking-tight mb-2 font-heading">
-            Impacto en la comuna
+          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#041624] tracking-tight mb-2 font-heading">
+            Impacto en Puerto Varas
           </h2>
-          <p class="text-xs sm:text-sm text-slate-600 max-w-xl">
-            Cada kilo reciclado cuenta. Así avanzamos juntos hacia una Puerto Varas más limpia y sustentable.
+          <p class="text-xs sm:text-sm text-slate-600 max-w-2xl leading-relaxed">
+            Cada kilo reciclado cuenta para proteger la cuenca del Lago Llanquihue y el entorno natural del Volcán Osorno. Así avanzamos como comunidad.
           </p>
         </div>
 
-        <!-- Mobile View: Franja compacta con 3 métricas (md:hidden) -->
-        <div class="md:hidden bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80 mb-10">
-          <div class="grid grid-cols-3 divide-x divide-slate-100 text-center">
-            <div class="px-1.5">
-              <p class="text-lg sm:text-xl font-black text-[#0a233b] font-heading leading-tight">
-                248.650
-              </p>
-              <span class="block text-[11px] font-bold text-emerald-700 mt-0.5">kg reciclados</span>
-              <span class="block text-[9px] text-slate-400">Certificados</span>
-            </div>
-            <div class="px-1.5">
-              <p class="text-lg sm:text-xl font-black text-[#0a233b] font-heading leading-tight">
-                32%
-              </p>
-              <span class="block text-[11px] font-bold text-emerald-700 mt-0.5">menos residuos</span>
-              <span class="block text-[9px] text-slate-400">En vertederos</span>
-            </div>
-            <div class="px-1.5">
-              <p class="text-lg sm:text-xl font-black text-[#0a233b] font-heading leading-tight">
-                4
-              </p>
-              <span class="block text-[11px] font-bold text-emerald-700 mt-0.5">camiones</span>
-              <span class="block text-[9px] text-slate-400">Activos en ruta</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Desktop View: 3 Metrics Cards (hidden md:grid) -->
-        <div class="hidden md:grid md:grid-cols-3 gap-6 mb-16">
-
+        <!-- Metric Cards: Responsive unified grid (Mobile & Desktop) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-12">
+          
           <!-- Métrica 1: Kilos certificados -->
-          <div class="bg-white rounded-2xl p-7 sm:p-8 text-center shadow-xs hover:shadow-md border border-slate-100 transition-all duration-300">
-            <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-emerald-50 flex items-center justify-center text-[#206935]">
-              <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                <path d="M12 3v2.05c-3.95.49-7 3.85-7 7.95 0 3.1 1.77 5.79 4.38 7.12L10.5 19H12v2H6v-2h2.5l.88-.72C6.18 17.02 4 13.8 4 10c0-4.08 3.05-7.44 7-7.95V0h2v2.05c3.95.49 7 3.85 7 7.95 0 3.8-2.18 7.02-5.38 8.28l.88.72H18v2h-6v-2h1.5l1.12-1.12C17.23 15.79 19 13.1 19 10c0-4.1-3.05-7.46-7-7.95V0h-2v3zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"></path>
-              </svg>
+          <div class="bg-white rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-md border border-slate-200/80 hover:border-emerald-500/40 transition-all duration-300 flex flex-col justify-between group">
+            <div>
+              <div class="w-11 h-11 rounded-xl bg-emerald-50 text-[#22a652] flex items-center justify-center text-lg shadow-xs group-hover:scale-105 transition-transform mb-4">
+                <i class="fa-solid fa-scale-balanced"></i>
+              </div>
+              <p class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#041624] font-heading tracking-tight mb-1 whitespace-nowrap">
+                {{ displayKg }} <span class="text-lg sm:text-xl font-bold text-[#22a652]">kg</span>
+              </p>
+              <h3 class="text-sm sm:text-base font-bold text-slate-800 leading-snug">
+                Kilos de reciclaje certificados
+              </h3>
             </div>
-            <p class="text-3xl sm:text-4xl font-black text-[#0a233b] mb-1 font-heading">
-              248.650 kg
-            </p>
-            <h3 class="text-xs sm:text-sm font-bold text-slate-700 mb-1">
-              Kilos de reciclaje certificados
-            </h3>
-            <p class="text-[11px] text-slate-400 font-medium">
-              Desde el inicio del programa
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed border-t border-slate-100 pt-2.5">
+              Pesaje digital en ruta vecinal bajo estándar Ley REP con certificación municipal.
             </p>
           </div>
 
           <!-- Métrica 2: Disminución en vertederos -->
-          <div class="bg-white rounded-2xl p-7 sm:p-8 text-center shadow-xs hover:shadow-md border border-slate-100 transition-all duration-300">
-            <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-emerald-50 flex items-center justify-center text-[#206935]">
-              <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5zm4 4h-2v-2h2v2zm0-4h-2V7h2v5z"></path>
-              </svg>
+          <div class="bg-white rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-md border border-slate-200/80 hover:border-sky-500/40 transition-all duration-300 flex flex-col justify-between group">
+            <div>
+              <div class="w-11 h-11 rounded-xl bg-sky-50 text-[#0284c7] flex items-center justify-center text-lg shadow-xs group-hover:scale-105 transition-transform mb-4">
+                <i class="fa-solid fa-arrow-trend-down"></i>
+              </div>
+              <p class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#041624] font-heading tracking-tight mb-1 whitespace-nowrap">
+                {{ currentPercent }}<span class="text-2xl sm:text-3xl font-bold text-[#0284c7]">%</span>
+              </p>
+              <h3 class="text-sm sm:text-base font-bold text-slate-800 leading-snug">
+                Menos residuos en vertederos
+              </h3>
             </div>
-            <p class="text-3xl sm:text-4xl font-black text-[#0a233b] mb-1 font-heading">
-              32%
-            </p>
-            <h3 class="text-xs sm:text-sm font-bold text-slate-700 mb-1">
-              Disminución de carga en vertederos provinciales
-            </h3>
-            <p class="text-[11px] text-slate-400 font-medium">
-              vs. año anterior
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed border-t border-slate-100 pt-2.5">
+              Disminución de residuos domiciliarios transportados a vertederos provinciales.
             </p>
           </div>
 
-          <!-- Métrica 3: Capacidad activa -->
-          <div class="bg-white rounded-2xl p-7 sm:p-8 text-center shadow-xs hover:shadow-md border border-slate-100 transition-all duration-300">
-            <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-emerald-50 flex items-center justify-center text-[#206935]">
-              <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                <path d="M20 8h-3V4H1v13h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zm-5-2v2H4V6h11zm-9 12c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm12 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm0-4h-2.5l-2-2.5H15V14h3v-2z"></path>
-              </svg>
+          <!-- Métrica 3: Flota activa -->
+          <div class="bg-white rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-md border border-slate-200/80 hover:border-indigo-500/40 transition-all duration-300 flex flex-col justify-between group">
+            <div>
+              <div class="w-11 h-11 rounded-xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center text-lg shadow-xs group-hover:scale-105 transition-transform mb-4">
+                <i class="fa-solid fa-truck-fast"></i>
+              </div>
+              <p class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#041624] font-heading tracking-tight mb-1 whitespace-nowrap">
+                {{ currentTrucks }} <span class="text-lg sm:text-xl font-bold text-[#4f46e5]">camiones</span>
+              </p>
+              <h3 class="text-sm sm:text-base font-bold text-slate-800 leading-snug">
+                Capacidad operativa en ruta
+              </h3>
             </div>
-            <p class="text-3xl sm:text-4xl font-black text-[#0a233b] mb-1 font-heading">
-              4
-            </p>
-            <h3 class="text-xs sm:text-sm font-bold text-slate-700 mb-1">
-              Capacidad activa de camiones
-            </h3>
-            <p class="text-[11px] text-slate-400 font-medium">
-              En operación diaria
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed border-t border-slate-100 pt-2.5">
+              Recorriendo los 4 cuadrantes de la comuna con pesaje y recolección programada.
             </p>
           </div>
 
         </div>
 
         <!-- Panoramic Scenic Banner: ¿Necesitas un retiro especial? -->
-        <div class="relative rounded-3xl overflow-hidden shadow-md border border-slate-100 min-h-[190px] sm:min-h-[220px] flex items-center">
+        <div class="relative rounded-3xl overflow-hidden shadow-lg border border-slate-200/90 min-h-[200px] sm:min-h-[230px] flex items-center">
           <!-- Scenic background photo: Lake, flowers, and volcano -->
           <img
             alt="Paisaje Lago Llanquihue y flores Puerto Varas"
             class="absolute inset-0 w-full h-full object-cover object-center"
             src="assets/stitch/cta_lake_flowers.png"
+            loading="lazy"
           />
-          <div class="absolute inset-0 bg-gradient-to-r from-white/95 via-white/90 to-white/40 md:to-white/20"></div>
+          <!-- Multi-stop gradient overlay ensuring AAA text contrast -->
+          <div class="absolute inset-0 bg-gradient-to-r from-white/95 via-white/92 to-white/75 sm:to-white/50 backdrop-blur-2xs"></div>
 
           <!-- Content Box -->
           <div class="relative z-10 p-6 sm:p-10 w-full flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div class="flex items-start gap-4 max-w-xl">
-              <div class="shrink-0 w-12 h-12 rounded-full bg-[#dcf2e3] flex items-center justify-center text-[#206935] mt-1 shadow-xs">
-                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                  <path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 0 0 8 20C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z"></path>
-                </svg>
+              <div class="shrink-0 w-12 h-12 rounded-2xl bg-emerald-100 border border-emerald-200 flex items-center justify-center text-[#22a652] text-xl mt-1 shadow-xs">
+                <i class="fa-solid fa-truck-ramp-box"></i>
               </div>
               <div>
-                <h2 class="text-xl sm:text-2xl lg:text-3xl font-black text-[#0a233b] tracking-tight mb-1 font-heading">
+                <span class="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-wider text-[#175c2e] mb-1">
+                  Servicio Especial DIMAO
+                </span>
+                <h3 class="text-xl sm:text-2xl lg:text-3xl font-black text-[#041624] tracking-tight mb-1.5 font-heading">
                   ¿Necesitas un retiro especial?
-                </h2>
+                </h3>
                 <p class="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
-                  Solicita recolección programada para podas, escombros o materiales fuera de tu cuadrante semanal.
+                  Solicita recolección programada para podas de jardín, escombros limpios o enseres fuera de tu cuadrante semanal.
                 </p>
               </div>
             </div>
@@ -147,15 +124,15 @@ import { RouterModule } from '@angular/router';
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
               <a
                 routerLink="/dashboard"
-                class="inline-flex items-center justify-center gap-2 bg-[#286f34] hover:bg-[#205b2a] text-white text-xs sm:text-sm font-bold py-3 px-6 rounded-xl transition-all shadow-sm hover:shadow group cursor-pointer text-center">
+                class="inline-flex items-center justify-center gap-2.5 bg-[#22a652] hover:bg-[#1b8c44] active:bg-[#17773a] text-white text-xs sm:text-sm font-bold py-3.5 px-6 rounded-xl transition-all shadow-md hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22a652] focus-visible:ring-offset-2 group cursor-pointer text-center">
                 <span>Agendar retiro especial</span>
-                <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+                <i class="fa-solid fa-arrow-right text-xs transform group-hover:translate-x-1 transition-transform"></i>
               </a>
               <button
                 type="button"
                 (click)="openInfoModal.emit()"
-                class="inline-flex items-center justify-center gap-1.5 bg-white/80 hover:bg-white text-slate-700 text-xs font-semibold py-2.5 px-4 rounded-xl border border-slate-200 transition-all cursor-pointer">
-                <i class="fa-solid fa-circle-question text-emerald-600"></i>
+                class="inline-flex items-center justify-center gap-2 bg-white/95 hover:bg-white active:bg-slate-100 text-slate-700 hover:text-slate-900 text-xs font-semibold py-3 px-4 rounded-xl border border-slate-300/90 hover:border-slate-400 transition-all shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#041624] focus-visible:ring-offset-2 cursor-pointer">
+                <i class="fa-solid fa-circle-question text-emerald-600 text-sm"></i>
                 <span>Preguntas frecuentes</span>
               </button>
             </div>
@@ -167,6 +144,104 @@ import { RouterModule } from '@angular/router';
     <!-- END: ImpactSection -->
   `
 })
-export class HomeImpactComponent {
+export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output() openInfoModal = new EventEmitter<void>();
+
+  targetKg = 248650;
+  targetPercent = 32;
+  targetTrucks = 4;
+
+  currentKg = 0;
+  currentPercent = 0;
+  currentTrucks = 0;
+  displayKg = '0';
+
+  private observer?: IntersectionObserver;
+  private animFrameId?: number;
+  private isBrowser: boolean;
+
+  constructor(
+    private el: ElementRef,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
+    @Inject(PLATFORM_ID) platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
+
+  ngOnInit(): void {
+    if (!this.isBrowser) {
+      this.currentKg = this.targetKg;
+      this.currentPercent = this.targetPercent;
+      this.currentTrucks = this.targetTrucks;
+      this.displayKg = '248.650';
+    }
+  }
+
+  ngAfterViewInit(): void {
+    if (!this.isBrowser) return;
+
+    if ('IntersectionObserver' in window) {
+      this.observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          this.observer?.disconnect();
+          this.startCountAnimation();
+        }
+      }, { threshold: 0.15 });
+
+      this.observer.observe(this.el.nativeElement);
+    } else {
+      this.startCountAnimation();
+    }
+  }
+
+  startCountAnimation(): void {
+    const duration = 1500;
+    const startTime = performance.now();
+
+    this.ngZone.runOutsideAngular(() => {
+      const step = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing: easeOutCubic
+        const ease = 1 - Math.pow(1 - progress, 3);
+
+        const valKg = Math.floor(ease * this.targetKg);
+        const valPercent = Math.floor(ease * this.targetPercent);
+        const valTrucks = Math.floor(ease * this.targetTrucks);
+
+        this.ngZone.run(() => {
+          this.currentKg = valKg;
+          this.displayKg = valKg.toLocaleString('es-CL');
+          this.currentPercent = valPercent;
+          this.currentTrucks = valTrucks;
+          this.cdr.markForCheck();
+        });
+
+        if (progress < 1) {
+          this.animFrameId = requestAnimationFrame(step);
+        } else {
+          this.ngZone.run(() => {
+            this.currentKg = this.targetKg;
+            this.displayKg = '248.650';
+            this.currentPercent = this.targetPercent;
+            this.currentTrucks = this.targetTrucks;
+            this.cdr.markForCheck();
+          });
+        }
+      };
+
+      this.animFrameId = requestAnimationFrame(step);
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+    if (this.animFrameId) {
+      cancelAnimationFrame(this.animFrameId);
+    }
+  }
 }

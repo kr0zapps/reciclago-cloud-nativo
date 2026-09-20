@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-page-loader',
   standalone: true,
   imports: [CommonModule],
-  host: { class: 'contents' },
+  host: { class: 'contents', '[style.display]': "isLoading ? 'contents' : 'none'" },
   template: `
     <!-- Top loader sutil -->
     <div *ngIf="isLoading" class="fixed top-0 left-0 right-0 h-1 z-[9999] pointer-events-none overflow-hidden bg-transparent">
