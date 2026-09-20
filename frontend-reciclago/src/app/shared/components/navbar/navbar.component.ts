@@ -9,7 +9,7 @@ import { RouterModule, Router } from '@angular/router';
   host: { class: 'contents' },
   template: `
     <header [ngClass]="headerClass" class="box-border">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4 lg:gap-8">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center justify-between gap-4 lg:gap-8">
         
         <!-- LOGO RECICLAGO OFICIAL -->
         <a routerLink="/" class="flex items-center gap-3 group flex-shrink-0 cursor-pointer">
@@ -209,9 +209,9 @@ export class NavbarComponent {
     }
     if (this.isHomePage) {
       if (this.isScrolled) {
-        return 'sticky top-0 z-50 transition-all duration-300 -mb-20 bg-[#041624]/95 backdrop-blur-md border-b border-white/10 shadow-md text-white';
+        return 'sticky top-0 z-50 transition-all duration-300 -mb-[96px] bg-[#041624]/95 backdrop-blur-md border-b border-white/10 shadow-md text-white';
       }
-      return 'sticky top-0 z-50 transition-all duration-300 -mb-20 bg-transparent border-b-0 border-transparent shadow-none text-white';
+      return 'sticky top-0 z-50 transition-all duration-300 -mb-[96px] bg-transparent border-b-0 border-transparent shadow-none text-white';
     }
     return 'sticky top-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-md border-b border-[#E2E9E4] shadow-sm text-[#183247]';
   }
