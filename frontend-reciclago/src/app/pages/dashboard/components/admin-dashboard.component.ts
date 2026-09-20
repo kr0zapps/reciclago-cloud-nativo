@@ -114,7 +114,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           </span>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+        <div *ngIf="camiones.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           <div *ngFor="let c of camiones"
                class="p-5 rounded-2xl border transition-all flex flex-col justify-between"
                [ngClass]="c.estado === 'MANTENIMIENTO' ? 'bg-rose-50/40 border-rose-200' : 'bg-[#F8FAF7] border-[#E2E9E4] hover:border-[#CFE2D4]'">
@@ -149,6 +149,21 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
               <span class="text-[11px] font-semibold text-slate-500">{{ c.estado === 'MANTENIMIENTO' ? 'Inoperable' : (c.estado === 'EN_RUTA' ? 'En servicio' : 'Operable') }}</span>
             </div>
           </div>
+        </div>
+
+        <!-- Estado cuando no hay camiones o el microservicio está caído -->
+        <div *ngIf="camiones.length === 0" class="p-8 text-center rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl mx-auto mb-3 border border-amber-200">
+            <i class="fa-solid fa-truck-slash"></i>
+          </div>
+          <h4 class="font-bold text-slate-700 text-sm">
+            {{ catalogoDisponible === false ? 'Servicio de Catálogo Desconectado' : (catalogoDisponible === null ? 'Cargando flota...' : 'Sin Camiones Registrados') }}
+          </h4>
+          <p class="text-xs text-slate-500 max-w-md mx-auto mt-1">
+            {{ catalogoDisponible === false
+                ? 'No fue posible conectar con el microservicio ms-reciclago-catalog (puerto 8081). Verifique que los microservicios Spring Boot estén iniciados.'
+                : (catalogoDisponible === null ? 'Consultando ms-reciclago-catalog...' : 'No existen datos de camiones en la base de datos PostgreSQL.') }}
+          </p>
         </div>
       </section>
 
@@ -645,6 +660,7 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
   @Input() sectores: Sector[] = [];
   @Input() pickups: Pickup[] = [];
   @Input() camiones: Camion[] = [];
+  @Input() catalogoDisponible: boolean | null = true;
   @Input() residuos: Residuo[] = [];
   @Input() activeWaypoint: Waypoint = { name: 'Costanera Sur', detail: 'Recorrido en curso', eta: '10 min', distancia: '1.2 km', x: 28, y: 72, estado: 'En recorrido' };
   @Input() truckSimulationRunning: boolean = true;

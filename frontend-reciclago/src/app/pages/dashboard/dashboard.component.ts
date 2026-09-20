@@ -74,9 +74,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   pickups: Pickup[] = [];
   /**
    * Inicializado vacío: si el catálogo responde, se reemplaza con datos reales de PostgreSQL.
-   * Si falla, loadCamiones() carga DEFAULT_CAMIONES como fallback offline explícito.
+   * Si falla, loadCamiones() deja el array vacío para que el admin vea que no hay datos reales.
    */
   camionesDisponibles: Camion[] = [];
+
+  /**
+   * Indica si el catálogo de camiones está disponible.
+   * false = microservicio caído, null = cargando, true = datos reales recibidos.
+   */
+  catalogoDisponible: boolean | null = null;
 
   /**
    * Rotación semanal de residuos desde ms-reciclago-catalog.
@@ -358,20 +364,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   loadCamiones(): void {
+    this.catalogoDisponible = null; // cargando...
     this.bffService.getCamiones().subscribe({
       next: (data) => {
         if (data && data.length > 0) {
+          this.catalogoDisponible = true;
           // Mapear capacidadTotalKg -> capacidadKilos para compatibilidad con el template
           this.camionesDisponibles = data.map((c: any) => ({
             ...c,
             capacidadKilos: c.capacidadKilos ?? c.capacidadTotalKg ?? c.capacidadMaximaKg ?? 0
           }));
         } else {
-          this.camionesDisponibles = [...DEFAULT_CAMIONES];
+          // Respuesta vacía: catálogo sin datos aún (seed no ejecutado)
+          this.catalogoDisponible = false;
+          this.camionesDisponibles = [];
         }
       },
-      // Fallback offline explícito: si el catálogo no responde, usar datos de demostración
-      error: () => this.camionesDisponibles = [...DEFAULT_CAMIONES]
+      // Catálogo no disponible: dejar vacío, no mostrar mocks que confunden
+      error: () => {
+        this.catalogoDisponible = false;
+        this.camionesDisponibles = [];
+      }
     });
   }
 

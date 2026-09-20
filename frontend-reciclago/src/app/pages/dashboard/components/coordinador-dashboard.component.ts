@@ -80,7 +80,9 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
             <div class="text-2xl sm:text-3xl lg:text-4xl font-black font-heading text-slate-900">
               {{ camionesDisponiblesCount }} / {{ camiones.length }}
             </div>
-            <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Unidades operativas hoy</p>
+            <p class="text-[11px] sm:text-xs text-slate-500 mt-1">
+              {{ catalogoDisponible === false ? 'Catálogo no disponible' : 'Unidades operativas hoy' }}
+            </p>
           </div>
         </div>
       </section>
@@ -566,6 +568,7 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges, OnDestr
   @Input() sectores: Sector[] = [];
   @Input() pickups: Pickup[] = [];
   @Input() camiones: Camion[] = [];
+  @Input() catalogoDisponible: boolean | null = true;
   @Input() residuos: Residuo[] = [];
   @Input() activeWaypoint: Waypoint = { name: 'Costanera Sur', detail: 'Recorrido en curso', eta: '10 min', distancia: '1.2 km', x: 28, y: 72, estado: 'En recorrido' };
   @Input() truckSimulationRunning: boolean = true;
