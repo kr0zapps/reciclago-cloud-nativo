@@ -74,6 +74,31 @@ import { RouterModule } from '@angular/router';
               </a>
             </div>
 
+            <!-- Canal de Asistencia Telefónica: Inclusión y Agendamiento Asistido DIMAO -->
+            <div class="anim-fade-up anim-delay-3 mt-7 pt-5 border-t border-white/15">
+              <a
+                href="tel:+56652361200"
+                class="group inline-flex items-start sm:items-center gap-3.5 p-3 sm:px-4 sm:py-2.5 rounded-xl bg-[#041624]/65 sm:bg-white/10 hover:bg-[#041624]/85 sm:hover:bg-white/15 border border-white/20 hover:border-white/35 backdrop-blur-md transition-all duration-200 cursor-pointer shadow-xs max-w-xl">
+                <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-sm flex-shrink-0 group-hover:scale-105 transition-transform mt-0.5 sm:mt-0">
+                  <i class="fa-solid fa-phone"></i>
+                </div>
+                <div class="text-left min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-xs sm:text-[13px] font-bold text-white group-hover:text-emerald-300 transition-colors">
+                      ¿Prefieres agendar por teléfono?
+                    </span>
+                    <span class="text-[11px] font-semibold text-emerald-300 flex items-center gap-1">
+                      <span>Llama al 65 236 1200</span>
+                      <i class="fa-solid fa-arrow-up-right-from-square text-[9px] opacity-75"></i>
+                    </span>
+                  </div>
+                  <p class="text-[11.5px] sm:text-xs text-slate-300/90 font-normal leading-tight mt-0.5">
+                    El coordinador de cuadrilla puede registrar tu retiro directamente en el sistema comunal.
+                  </p>
+                </div>
+              </a>
+            </div>
+
           </div>
 
           <!-- Columna Derecha: Lema en Cursiva Cálido / Humano que Rellena y Da Equilibrio en Desktop -->
