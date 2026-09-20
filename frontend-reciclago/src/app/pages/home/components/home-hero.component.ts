@@ -14,7 +14,7 @@ import { RouterModule } from '@angular/router';
       <div class="absolute inset-0 -bottom-2 z-0 pointer-events-none overflow-hidden">
         <img
           alt="Lago Llanquihue y Volcán Osorno - Puerto Varas"
-          class="w-full h-full object-cover object-[72%_32%] sm:object-[66%_35%] lg:object-[center_38%] scale-105 select-none pointer-events-none transition-transform duration-100 ease-out will-change-transform"
+          class="w-full h-full object-cover object-[62%_34%] sm:object-[66%_35%] lg:object-[center_38%] scale-105 select-none pointer-events-none transition-transform duration-100 ease-out will-change-transform"
           [ngStyle]="{ transform: 'translate3d(0, ' + parallaxOffset + 'px, 0)' }"
           src="assets/ultrawide.jpg"
         />
@@ -22,15 +22,15 @@ import { RouterModule } from '@angular/router';
         <!-- Viñeta Superior para Contraste Impecable del Header Transparente -->
         <div class="absolute top-0 inset-x-0 h-28 bg-gradient-to-b from-[#041624]/85 via-[#041624]/40 to-transparent"></div>
 
-        <!-- Overlay Direccional Desktop: Easing suave desde azul institucional a la izquierda hasta apertura cristalina en el volcán -->
-        <div class="hidden lg:block absolute inset-0 bg-gradient-to-r from-[#041624] via-[#041624]/85 via-35% to-transparent to-70%"></div>
-        <div class="hidden lg:block absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-[#041624]/70 via-transparent via-60% to-transparent"></div>
+        <!-- Overlay Direccional Desktop: Azul institucional con apertura hacia el paisaje -->
+        <div class="hidden lg:block absolute inset-0 hero-overlay-desktop"></div>
+        <div class="hidden lg:block absolute inset-0 hero-overlay-spotlight"></div>
 
-        <!-- Overlay Direccional Móvil / Tablet: Contraste vertical controlado que protege el H1 sin opacar el paisaje -->
-        <div class="lg:hidden absolute inset-0 bg-gradient-to-b from-[#041624]/92 via-[#041624]/60 via-45% to-[#041624]/85"></div>
+        <!-- Overlay Direccional Móvil / Tablet: Contraste vertical robusto con legibilidad AAA garantizada -->
+        <div class="lg:hidden absolute inset-0 hero-overlay-mobile"></div>
 
-        <!-- Sombra de anclaje inferior hacia el fondo de la página con extensión de seguridad -->
-        <div class="absolute -bottom-2 inset-x-0 h-28 sm:h-36 bg-gradient-to-t from-[#041624] via-[#041624]/60 to-transparent"></div>
+        <!-- Sombra de anclaje inferior hacia el fondo de la página -->
+        <div class="absolute -bottom-2 inset-x-0 h-28 sm:h-36 bg-gradient-to-t from-[#041624] via-[#041624]/80 to-transparent"></div>
       </div>
 
       <!-- 2. Espaciador Superior para Compensar el Navbar Sticky (80px) -->
@@ -40,14 +40,14 @@ import { RouterModule } from '@angular/router';
       <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 w-full my-auto">
         <div class="max-w-2xl xl:max-w-3xl">
 
-          <!-- Título Principal de Autoridad Municipal con Stagger 1 -->
-          <h1 class="anim-fade-up text-3xl sm:text-4xl md:text-5xl lg:text-[54px] xl:text-[58px] font-extrabold text-white tracking-tight uppercase leading-[1.08] mb-5 font-heading break-words">
+          <!-- Título Principal de Autoridad Municipal con Stagger 1 y Sombra Nítida -->
+          <h1 class="anim-fade-up text-3xl sm:text-4xl md:text-5xl lg:text-[54px] xl:text-[58px] font-extrabold text-white tracking-tight uppercase leading-[1.08] mb-5 font-heading break-words hero-text-shadow">
             JUNTOS CUIDAMOS<br />
             PUERTO VARAS
           </h1>
 
-          <!-- Bajada / Subtítulo Oficial con Stagger 2 -->
-          <p class="anim-fade-up anim-delay-1 text-sm sm:text-base lg:text-[17px] text-slate-200/90 font-normal leading-relaxed max-w-xl mb-8 break-words">
+          <!-- Bajada / Subtítulo Oficial con Stagger 2, Peso Mediano y Contraste Impecable -->
+          <p class="anim-fade-up anim-delay-1 text-[15px] sm:text-base lg:text-[17px] text-white/95 sm:text-slate-100 font-medium leading-relaxed max-w-xl mb-8 break-words hero-subtext-shadow">
             Reciclar hoy, es construir el futuro sustentable que queremos para nuestra comuna y la cuenca del Lago Llanquihue.
           </p>
 
@@ -56,16 +56,16 @@ import { RouterModule } from '@angular/router';
             <!-- Botón Primario: Verde Institucional RecicLaGo con Elevación y Presión -->
             <a
               routerLink="/dashboard"
-              class="group btn-interactive w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-12 px-6 sm:px-7 rounded-lg bg-[#22a652] hover:bg-[#1b8e45] text-white font-bold text-xs sm:text-[13px] uppercase tracking-wider cursor-pointer text-center shadow-md hover:shadow-lg hover:shadow-emerald-950/25">
+              class="group btn-interactive w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-12 px-6 sm:px-7 rounded-lg bg-[#22a652] hover:bg-[#1b8e45] text-white font-bold text-xs sm:text-[13px] uppercase tracking-wider cursor-pointer text-center shadow-md hover:shadow-lg hover:shadow-emerald-950/40">
               <i class="fa-solid fa-recycle text-sm group-hover:rotate-45 transition-transform duration-300 ease-out"></i>
               <span>Ingresar al Portal Vecinal</span>
             </a>
 
-            <!-- Botón Secundario Discreto (Outline) con Hover Suave -->
+            <!-- Botón Secundario Discreto (Outline con fondo glass en mobile para legibilidad garantizada) -->
             <a
               href="#cuadrantes"
               (click)="scrollToSection($event, 'cuadrantes')"
-              class="group btn-interactive w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-12 px-6 sm:px-7 rounded-lg bg-white/5 hover:bg-white/12 active:bg-white/20 text-white font-bold text-xs sm:text-[13px] uppercase tracking-wider border border-white/35 hover:border-white/70 cursor-pointer text-center">
+              class="group btn-interactive w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-12 px-6 sm:px-7 rounded-lg bg-[#041624]/60 sm:bg-white/5 hover:bg-white/15 active:bg-white/25 text-white font-bold text-xs sm:text-[13px] uppercase tracking-wider border border-white/40 hover:border-white/80 cursor-pointer text-center backdrop-blur-sm sm:backdrop-blur-none shadow-sm">
               <i class="fa-solid fa-location-dot text-sm text-emerald-400 group-hover:-translate-y-0.5 transition-transform duration-300 ease-out"></i>
               <span>Ver Cuadrantes de Reciclaje</span>
             </a>

@@ -476,6 +476,44 @@
 .delay-300 { transition-delay: 300ms; }
 .delay-375 { transition-delay: 375ms; }
 
+/* ==================== HERO CONTRASTE & LEGIBILIDAD MÁXIMA ==================== */
+.hero-overlay-mobile {
+  background: linear-gradient(
+    180deg,
+    rgba(4, 22, 36, 0.85) 0%,
+    rgba(4, 22, 36, 0.70) 25%,
+    rgba(4, 22, 36, 0.75) 55%,
+    rgba(4, 22, 36, 0.92) 100%
+  );
+}
+
+.hero-overlay-desktop {
+  background: linear-gradient(
+    90deg,
+    rgba(4, 22, 36, 0.95) 0%,
+    rgba(4, 22, 36, 0.88) 32%,
+    rgba(4, 22, 36, 0.42) 65%,
+    rgba(4, 22, 36, 0.08) 100%
+  );
+}
+
+.hero-overlay-spotlight {
+  background: radial-gradient(
+    ellipse at 25% 45%,
+    rgba(4, 22, 36, 0.88) 0%,
+    rgba(4, 22, 36, 0.40) 55%,
+    transparent 80%
+  );
+}
+
+.hero-text-shadow {
+  text-shadow: 0 2px 10px rgba(2, 13, 23, 0.8), 0 1px 3px rgba(2, 13, 23, 0.95);
+}
+
+.hero-subtext-shadow {
+  text-shadow: 0 1px 6px rgba(2, 13, 23, 0.9), 0 1px 2px rgba(2, 13, 23, 1);
+}
+
 /* Elevación de tarjetas y botones con físicas de alta gama */
 .hover-lift {
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.28s ease;
