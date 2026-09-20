@@ -18,7 +18,8 @@ import { RouterModule } from '@angular/router';
 
       <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Section Heading -->
-        <div class="mb-10 sm:mb-14 text-center sm:text-left">
+        <!-- Section Heading con Scroll Reveal -->
+        <div class="mb-10 sm:mb-14 text-center sm:text-left reveal-init" [class.reveal-active]="isVisible">
           <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-100/90 text-[#175c2e] font-bold text-xs mb-3 shadow-xs">
             <i class="fa-solid fa-seedling text-xs"></i>
             Nuestra huella comunal
@@ -31,19 +32,21 @@ import { RouterModule } from '@angular/router';
           </p>
         </div>
 
-        <!-- Metric Cards: Responsive unified grid (Mobile & Desktop) -->
+        <!-- Metric Cards: Responsive unified grid con Staggered Entrance y Físicas Suaves -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-12">
           
           <!-- Métrica 1: Kilos certificados -->
-          <div class="bg-white rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-md border border-slate-200/80 hover:border-emerald-500/40 transition-all duration-300 flex flex-col justify-between group">
+          <div class="group hover-lift bg-white rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-lg border border-slate-200/80 hover:border-emerald-500/40 flex flex-col justify-between reveal-init"
+               [class.reveal-active]="isVisible"
+               style="transition-delay: 50ms">
             <div>
-              <div class="w-11 h-11 rounded-xl bg-emerald-50 text-[#22a652] flex items-center justify-center text-lg shadow-xs group-hover:scale-105 transition-transform mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-[#22a652] flex items-center justify-center text-lg shadow-xs group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 ease-out mb-4">
                 <i class="fa-solid fa-scale-balanced"></i>
               </div>
               <p class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#041624] font-heading tracking-tight mb-1 whitespace-nowrap">
                 {{ displayKg }} <span class="text-lg sm:text-xl font-bold text-[#22a652]">kg</span>
               </p>
-              <h3 class="text-sm sm:text-base font-bold text-slate-800 leading-snug">
+              <h3 class="text-sm sm:text-base font-bold text-slate-800 leading-snug group-hover:text-[#22a652] transition-colors duration-200">
                 Kilos de reciclaje certificados
               </h3>
             </div>
@@ -53,15 +56,17 @@ import { RouterModule } from '@angular/router';
           </div>
 
           <!-- Métrica 2: Disminución en vertederos -->
-          <div class="bg-white rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-md border border-slate-200/80 hover:border-sky-500/40 transition-all duration-300 flex flex-col justify-between group">
+          <div class="group hover-lift bg-white rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-lg border border-slate-200/80 hover:border-sky-500/40 flex flex-col justify-between reveal-init"
+               [class.reveal-active]="isVisible"
+               style="transition-delay: 140ms">
             <div>
-              <div class="w-11 h-11 rounded-xl bg-sky-50 text-[#0284c7] flex items-center justify-center text-lg shadow-xs group-hover:scale-105 transition-transform mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-sky-50 text-[#0284c7] flex items-center justify-center text-lg shadow-xs group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 ease-out mb-4">
                 <i class="fa-solid fa-arrow-trend-down"></i>
               </div>
               <p class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#041624] font-heading tracking-tight mb-1 whitespace-nowrap">
                 {{ currentPercent }}<span class="text-2xl sm:text-3xl font-bold text-[#0284c7]">%</span>
               </p>
-              <h3 class="text-sm sm:text-base font-bold text-slate-800 leading-snug">
+              <h3 class="text-sm sm:text-base font-bold text-slate-800 leading-snug group-hover:text-[#0284c7] transition-colors duration-200">
                 Menos residuos en vertederos
               </h3>
             </div>
@@ -71,15 +76,17 @@ import { RouterModule } from '@angular/router';
           </div>
 
           <!-- Métrica 3: Flota activa -->
-          <div class="bg-white rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-md border border-slate-200/80 hover:border-indigo-500/40 transition-all duration-300 flex flex-col justify-between group">
+          <div class="group hover-lift bg-white rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-lg border border-slate-200/80 hover:border-indigo-500/40 flex flex-col justify-between reveal-init"
+               [class.reveal-active]="isVisible"
+               style="transition-delay: 230ms">
             <div>
-              <div class="w-11 h-11 rounded-xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center text-lg shadow-xs group-hover:scale-105 transition-transform mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center text-lg shadow-xs group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 ease-out mb-4">
                 <i class="fa-solid fa-truck-fast"></i>
               </div>
               <p class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#041624] font-heading tracking-tight mb-1 whitespace-nowrap">
                 {{ currentTrucks }} <span class="text-lg sm:text-xl font-bold text-[#4f46e5]">camiones</span>
               </p>
-              <h3 class="text-sm sm:text-base font-bold text-slate-800 leading-snug">
+              <h3 class="text-sm sm:text-base font-bold text-slate-800 leading-snug group-hover:text-[#4f46e5] transition-colors duration-200">
                 Capacidad operativa en ruta
               </h3>
             </div>
@@ -90,12 +97,14 @@ import { RouterModule } from '@angular/router';
 
         </div>
 
-        <!-- Panoramic Scenic Banner: ¿Necesitas un retiro especial? -->
-        <div class="relative rounded-3xl overflow-hidden shadow-lg border border-slate-200/90 min-h-[200px] sm:min-h-[230px] flex items-center">
+        <!-- Panoramic Scenic Banner con Zoom Sutil y Hover-Lift: ¿Necesitas un retiro especial? -->
+        <div class="group relative rounded-3xl overflow-hidden shadow-lg hover:shadow-xl border border-slate-200/90 min-h-[200px] sm:min-h-[230px] flex items-center reveal-init"
+             [class.reveal-active]="isVisible"
+             style="transition-delay: 300ms">
           <!-- Scenic background photo: Lake, flowers, and volcano -->
           <img
             alt="Paisaje Lago Llanquihue y flores Puerto Varas"
-            class="absolute inset-0 w-full h-full object-cover object-center"
+            class="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-104 transition-transform duration-700 ease-out"
             src="assets/stitch/cta_lake_flowers.png"
             loading="lazy"
           />
@@ -105,7 +114,7 @@ import { RouterModule } from '@angular/router';
           <!-- Content Box -->
           <div class="relative z-10 p-6 sm:p-10 w-full flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div class="flex items-start gap-4 max-w-xl">
-              <div class="shrink-0 w-12 h-12 rounded-2xl bg-emerald-100 border border-emerald-200 flex items-center justify-center text-[#22a652] text-xl mt-1 shadow-xs">
+              <div class="shrink-0 w-12 h-12 rounded-2xl bg-emerald-100 border border-emerald-200 flex items-center justify-center text-[#22a652] text-xl mt-1 shadow-xs group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 ease-out">
                 <i class="fa-solid fa-truck-ramp-box"></i>
               </div>
               <div>
@@ -124,14 +133,14 @@ import { RouterModule } from '@angular/router';
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
               <a
                 routerLink="/dashboard"
-                class="inline-flex items-center justify-center gap-2.5 bg-[#22a652] hover:bg-[#1b8c44] active:bg-[#17773a] text-white text-xs sm:text-sm font-bold py-3.5 px-6 rounded-xl transition-all shadow-md hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22a652] focus-visible:ring-offset-2 group cursor-pointer text-center">
+                class="btn-interactive group/btn inline-flex items-center justify-center gap-2.5 bg-[#22a652] hover:bg-[#1b8c44] active:bg-[#17773a] text-white text-xs sm:text-sm font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22a652] focus-visible:ring-offset-2 cursor-pointer text-center">
                 <span>Agendar retiro especial</span>
-                <i class="fa-solid fa-arrow-right text-xs transform group-hover:translate-x-1 transition-transform"></i>
+                <i class="fa-solid fa-arrow-right text-xs transform group-hover/btn:translate-x-1.5 transition-transform duration-200"></i>
               </a>
               <button
                 type="button"
                 (click)="openInfoModal.emit()"
-                class="inline-flex items-center justify-center gap-2 bg-white/95 hover:bg-white active:bg-slate-100 text-slate-700 hover:text-slate-900 text-xs font-semibold py-3 px-4 rounded-xl border border-slate-300/90 hover:border-slate-400 transition-all shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#041624] focus-visible:ring-offset-2 cursor-pointer">
+                class="btn-interactive inline-flex items-center justify-center gap-2 bg-white/95 hover:bg-white active:bg-slate-100 text-slate-700 hover:text-slate-900 text-xs font-semibold py-3 px-4 rounded-xl border border-slate-300/90 hover:border-slate-400 shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#041624] focus-visible:ring-offset-2 cursor-pointer">
                 <i class="fa-solid fa-circle-question text-emerald-600 text-sm"></i>
                 <span>Preguntas frecuentes</span>
               </button>
@@ -155,6 +164,7 @@ export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
   currentPercent = 0;
   currentTrucks = 0;
   displayKg = '0';
+  isVisible = false;
 
   private observer?: IntersectionObserver;
   private animFrameId?: number;
@@ -175,6 +185,7 @@ export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
       this.currentPercent = this.targetPercent;
       this.currentTrucks = this.targetTrucks;
       this.displayKg = '248.650';
+      this.isVisible = true;
     }
   }
 
@@ -184,6 +195,8 @@ export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
     if ('IntersectionObserver' in window) {
       this.observer = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting) {
+          this.isVisible = true;
+          this.cdr.markForCheck();
           this.observer?.disconnect();
           this.startCountAnimation();
         }
@@ -191,6 +204,7 @@ export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
 
       this.observer.observe(this.el.nativeElement);
     } else {
+      this.isVisible = true;
       this.startCountAnimation();
     }
   }

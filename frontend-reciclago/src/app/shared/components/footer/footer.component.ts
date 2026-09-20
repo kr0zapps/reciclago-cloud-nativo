@@ -78,7 +78,7 @@ import { RouterModule } from '@angular/router';
               <a
                 title="Visitar página oficial de Facebook de la Municipalidad de Puerto Varas"
                 aria-label="Facebook Municipalidad de Puerto Varas"
-                class="w-9 h-9 rounded-full bg-white/10 hover:bg-[#22a652] flex items-center justify-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22a652] focus-visible:ring-offset-2 focus-visible:ring-offset-[#041D2D]"
+                class="btn-interactive w-9 h-9 rounded-full bg-white/10 hover:bg-[#22a652] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22a652] focus-visible:ring-offset-2 focus-visible:ring-offset-[#041D2D]"
                 href="https://www.facebook.com/munipuertovaras"
                 target="_blank"
                 rel="noopener noreferrer">
@@ -87,7 +87,7 @@ import { RouterModule } from '@angular/router';
               <a
                 title="Visitar cuenta de Instagram de la Municipalidad de Puerto Varas"
                 aria-label="Instagram Municipalidad de Puerto Varas"
-                class="w-9 h-9 rounded-full bg-white/10 hover:bg-[#22a652] flex items-center justify-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22a652] focus-visible:ring-offset-2 focus-visible:ring-offset-[#041D2D]"
+                class="btn-interactive w-9 h-9 rounded-full bg-white/10 hover:bg-[#22a652] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22a652] focus-visible:ring-offset-2 focus-visible:ring-offset-[#041D2D]"
                 href="https://www.instagram.com/munipuertovaras"
                 target="_blank"
                 rel="noopener noreferrer">
@@ -96,7 +96,7 @@ import { RouterModule } from '@angular/router';
               <a
                 title="Visitar canal de YouTube de la Municipalidad de Puerto Varas"
                 aria-label="YouTube Municipalidad de Puerto Varas"
-                class="w-9 h-9 rounded-full bg-white/10 hover:bg-[#22a652] flex items-center justify-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22a652] focus-visible:ring-offset-2 focus-visible:ring-offset-[#041D2D]"
+                class="btn-interactive w-9 h-9 rounded-full bg-white/10 hover:bg-[#22a652] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22a652] focus-visible:ring-offset-2 focus-visible:ring-offset-[#041D2D]"
                 href="https://www.youtube.com/@MunicipalidadPuertoVaras"
                 target="_blank"
                 rel="noopener noreferrer">

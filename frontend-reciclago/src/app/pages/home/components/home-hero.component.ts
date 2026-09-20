@@ -37,36 +37,36 @@ import { RouterModule } from '@angular/router';
       <div class="h-20 flex-shrink-0 pointer-events-none"></div>
 
       <!-- 3. Contenido Editorial Principal con Composición Asimétrica a la Izquierda -->
-      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 w-full my-auto anim-fade-up">
+      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 w-full my-auto">
         <div class="max-w-2xl xl:max-w-3xl">
 
-          <!-- Título Principal de Autoridad Municipal (Sin Pills ni Textos de Relleno) -->
-          <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] xl:text-[58px] font-extrabold text-white tracking-tight uppercase leading-[1.08] mb-5 font-heading break-words">
+          <!-- Título Principal de Autoridad Municipal con Stagger 1 -->
+          <h1 class="anim-fade-up text-3xl sm:text-4xl md:text-5xl lg:text-[54px] xl:text-[58px] font-extrabold text-white tracking-tight uppercase leading-[1.08] mb-5 font-heading break-words">
             JUNTOS CUIDAMOS<br />
             PUERTO VARAS
           </h1>
 
-          <!-- Bajada / Subtítulo Oficial -->
-          <p class="text-sm sm:text-base lg:text-[17px] text-slate-200/90 font-normal leading-relaxed max-w-xl mb-8 break-words">
+          <!-- Bajada / Subtítulo Oficial con Stagger 2 -->
+          <p class="anim-fade-up anim-delay-1 text-sm sm:text-base lg:text-[17px] text-slate-200/90 font-normal leading-relaxed max-w-xl mb-8 break-words">
             Reciclar hoy, es construir el futuro sustentable que queremos para nuestra comuna y la cuenca del Lago Llanquihue.
           </p>
 
-          <!-- Botones de Acción Sobrios con Altura e Identidad Unificada (Stacking responsivo sin desborde) -->
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 w-full sm:w-auto">
-            <!-- Botón Primario: Verde Institucional RecicLaGo -->
+          <!-- Botones de Acción Sobrios con Stagger 3 y Micro-interacciones -->
+          <div class="anim-fade-up anim-delay-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 w-full sm:w-auto">
+            <!-- Botón Primario: Verde Institucional RecicLaGo con Elevación y Presión -->
             <a
               routerLink="/dashboard"
-              class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-12 px-6 sm:px-7 rounded-lg bg-[#22a652] hover:bg-[#1b8e45] text-white font-bold text-xs sm:text-[13px] uppercase tracking-wider transition-colors duration-200 cursor-pointer text-center shadow-sm hover:shadow-md active:scale-[0.99]">
-              <i class="fa-solid fa-recycle text-sm"></i>
+              class="group btn-interactive w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-12 px-6 sm:px-7 rounded-lg bg-[#22a652] hover:bg-[#1b8e45] text-white font-bold text-xs sm:text-[13px] uppercase tracking-wider cursor-pointer text-center shadow-md hover:shadow-lg hover:shadow-emerald-950/25">
+              <i class="fa-solid fa-recycle text-sm group-hover:rotate-45 transition-transform duration-300 ease-out"></i>
               <span>Ingresar al Portal Vecinal</span>
             </a>
 
-            <!-- Botón Secundario Discreto (Outline) que no compite con el CTA Primario -->
+            <!-- Botón Secundario Discreto (Outline) con Hover Suave -->
             <a
               href="#cuadrantes"
               (click)="scrollToSection($event, 'cuadrantes')"
-              class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-12 px-6 sm:px-7 rounded-lg bg-white/5 hover:bg-white/12 active:bg-white/20 text-white font-bold text-xs sm:text-[13px] uppercase tracking-wider border border-white/35 hover:border-white/70 transition-all duration-200 cursor-pointer text-center active:scale-[0.99]">
-              <i class="fa-solid fa-location-dot text-sm text-emerald-400"></i>
+              class="group btn-interactive w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-12 px-6 sm:px-7 rounded-lg bg-white/5 hover:bg-white/12 active:bg-white/20 text-white font-bold text-xs sm:text-[13px] uppercase tracking-wider border border-white/35 hover:border-white/70 cursor-pointer text-center">
+              <i class="fa-solid fa-location-dot text-sm text-emerald-400 group-hover:-translate-y-0.5 transition-transform duration-300 ease-out"></i>
               <span>Ver Cuadrantes de Reciclaje</span>
             </a>
           </div>
@@ -74,17 +74,19 @@ import { RouterModule } from '@angular/router';
         </div>
       </div>
 
-      <!-- 4. Indicador Inferior Discreto hacia el Ciclo Comunal con Scroll Suave -->
-      <div class="relative z-10 pb-5 sm:pb-6 flex justify-center pointer-events-auto">
+      <!-- 4. Indicador Inferior Discreto hacia el Ciclo Comunal con Flotación Suave -->
+      <div class="relative z-10 pb-5 sm:pb-6 flex justify-center pointer-events-auto anim-fade-up anim-delay-3">
         <a
           href="#como-funciona"
           (click)="scrollToSection($event, 'como-funciona')"
-          class="hidden sm:inline-flex flex-col items-center gap-1.5 text-white/60 hover:text-white transition-colors duration-200 group cursor-pointer"
+          class="hidden sm:inline-flex flex-col items-center gap-1.5 text-white/60 hover:text-white transition-colors duration-300 group cursor-pointer"
           aria-label="Ir a la sección ¿Cómo funciona?">
           <span class="text-[10px] sm:text-[11px] font-bold tracking-[0.2em] uppercase opacity-75 group-hover:opacity-100 transition-opacity">
             Conoce el ciclo
           </span>
-          <i class="fa-solid fa-chevron-down text-[10px] transform group-hover:translate-y-0.5 transition-transform duration-200 ease-out"></i>
+          <div class="anim-float-subtle">
+            <i class="fa-solid fa-chevron-down text-[10px] text-white/70 group-hover:text-white transition-colors"></i>
+          </div>
         </a>
       </div>
 

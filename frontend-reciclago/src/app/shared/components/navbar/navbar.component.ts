@@ -33,33 +33,36 @@ import { RouterModule, Router } from '@angular/router';
           </div>
         </a>
 
-        <!-- NAVEGACIÓN DESKTOP ESENCIAL (3 LINKS CLAVE) -->
+        <!-- NAVEGACIÓN DESKTOP ESENCIAL (3 LINKS CLAVE) CON INDICADORES SUAVES -->
         <nav class="hidden lg:flex items-center gap-7 xl:gap-9 text-[14.5px] font-semibold transition-colors" [ngClass]="navTextClass">
-          <button (click)="scrollToSection('como-funciona')" type="button" class="hover:text-[#4ade80] transition-colors py-2 font-semibold cursor-pointer">
-            ¿Cómo funciona?
+          <button (click)="scrollToSection('como-funciona')" type="button" class="relative group hover:text-[#4ade80] transition-colors py-2 font-semibold cursor-pointer">
+            <span>¿Cómo funciona?</span>
+            <span class="absolute bottom-0.5 left-0 w-0 h-0.5 bg-[#4ade80] rounded-full group-hover:w-full transition-all duration-300 ease-out"></span>
           </button>
-          <button (click)="scrollToSection('cuadrantes')" type="button" class="hover:text-[#4ade80] transition-colors py-2 font-semibold cursor-pointer">
-            Cuadrantes
+          <button (click)="scrollToSection('cuadrantes')" type="button" class="relative group hover:text-[#4ade80] transition-colors py-2 font-semibold cursor-pointer">
+            <span>Cuadrantes</span>
+            <span class="absolute bottom-0.5 left-0 w-0 h-0.5 bg-[#4ade80] rounded-full group-hover:w-full transition-all duration-300 ease-out"></span>
           </button>
-          <button (click)="openMaterials.emit()" type="button" class="hover:text-[#4ade80] transition-colors py-2 font-semibold cursor-pointer">
-            Materiales
+          <button (click)="openMaterials.emit()" type="button" class="relative group hover:text-[#4ade80] transition-colors py-2 font-semibold cursor-pointer">
+            <span>Materiales</span>
+            <span class="absolute bottom-0.5 left-0 w-0 h-0.5 bg-[#4ade80] rounded-full group-hover:w-full transition-all duration-300 ease-out"></span>
           </button>
         </nav>
 
         <!-- ACCIONES DERECHA -->
         <div class="flex items-center gap-4 sm:gap-6 flex-shrink-0">
           <!-- Sello Municipal con Espacio y Presencia -->
-          <div class="hidden lg:flex items-center gap-3 pl-6 pr-6 border-l border-r transition-colors" [ngClass]="sealBorderClass">
-            <img src="assets/escudo-puerto-varas.svg" alt="Ilustre Municipalidad de Puerto Varas" class="h-10 sm:h-11 w-auto object-contain drop-shadow-xs">
+          <div class="hidden lg:flex items-center gap-3 pl-6 pr-6 border-l border-r transition-colors select-none" [ngClass]="sealBorderClass">
+            <img src="assets/escudo-puerto-varas.svg" alt="Ilustre Municipalidad de Puerto Varas" class="h-10 sm:h-11 w-auto object-contain drop-shadow-xs transition-transform duration-300 hover:scale-105">
             <div class="text-left leading-tight">
               <div class="text-[9.5px] font-bold uppercase tracking-wider transition-colors" [ngClass]="sealSubtextClass">Ilustre Municipalidad</div>
               <div class="text-[13px] font-extrabold tracking-tight transition-colors" [ngClass]="sealTitleClass">Puerto Varas</div>
             </div>
           </div>
 
-          <!-- Botón Iniciar sesión (Outline secundario para no competir con el Hero CTA) -->
+          <!-- Botón Iniciar sesión con Físicas Interactivas -->
           <a *ngIf="!loginDisplay" routerLink="/login"
-             class="hidden sm:inline-flex items-center gap-2 text-xs sm:text-[13px] font-bold px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border transition-all duration-200 cursor-pointer text-center"
+             class="btn-interactive hidden sm:inline-flex items-center gap-2 text-xs sm:text-[13px] font-bold px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border cursor-pointer text-center"
              [ngClass]="accountBtnClass">
             <i class="fa-regular fa-circle-user text-sm"></i>
             <span>Iniciar sesión</span>

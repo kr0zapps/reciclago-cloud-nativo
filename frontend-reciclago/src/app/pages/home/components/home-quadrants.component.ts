@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter, ChangeDetectorRef, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BffService } from '../../../services/bff.service';
 import { QuadrantCardInfo, INITIAL_QUADRANTS } from '../data/home-sectors.data';
@@ -52,8 +52,9 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
     <section class="py-14 sm:py-20 bg-white relative overflow-hidden" id="cuadrantes">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <!-- Section Tag & Heading -->
-        <div class="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <!-- Section Tag & Heading con Scroll Reveal -->
+        <div class="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4 reveal-init"
+             [class.reveal-active]="isVisible">
           <div>
             <span class="inline-block px-3.5 py-1 rounded-full bg-emerald-100 text-[#256c38] font-bold text-xs mb-3 shadow-2xs">
               Tu comuna, cuatro cuadrantes
@@ -66,7 +67,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
             </p>
           </div>
 
-          <!-- Selector / Indicador Reactivo de Rotación Municipal -->
+          <!-- Selector / Indicador Reactivo de Rotación Municipal con Feedback Táctil -->
           <div class="inline-flex items-center gap-1 bg-[#edf5ef] p-1.5 rounded-2xl border border-emerald-200/80 self-start md:self-auto shadow-xs">
             <button
               type="button"
@@ -76,7 +77,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
               [class.shadow-sm]="activeWeek === 1"
               [class.font-bold]="activeWeek === 1"
               [class.text-slate-600]="activeWeek !== 1"
-              class="px-4 py-2 rounded-xl text-xs font-medium transition-all duration-200 cursor-pointer flex items-center gap-1.5">
+              class="px-4 py-2 rounded-xl text-xs font-medium transition-all duration-200 cursor-pointer flex items-center gap-1.5 active:scale-95">
               <i class="fa-solid fa-calendar-check text-xs" [class.text-emerald-600]="activeWeek === 1" [class.text-slate-400]="activeWeek !== 1"></i>
               <span>Semana Actual</span>
             </button>
@@ -88,7 +89,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
               [class.shadow-sm]="activeWeek === 2"
               [class.font-bold]="activeWeek === 2"
               [class.text-slate-600]="activeWeek !== 2"
-              class="px-4 py-2 rounded-xl text-xs font-medium transition-all duration-200 cursor-pointer flex items-center gap-1.5">
+              class="px-4 py-2 rounded-xl text-xs font-medium transition-all duration-200 cursor-pointer flex items-center gap-1.5 active:scale-95">
               <i class="fa-solid fa-calendar-plus text-xs" [class.text-emerald-600]="activeWeek === 2" [class.text-slate-400]="activeWeek !== 2"></i>
               <span>Próxima Semana</span>
             </button>
@@ -229,46 +230,53 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
             <button
               type="button"
               (click)="toggleAccordion(q.id)"
-              class="w-full px-4 py-3 flex items-center justify-between text-xs text-emerald-700 font-bold border-t border-slate-100 hover:bg-emerald-50/40 transition-colors cursor-pointer"
+              class="w-full px-4 py-3 flex items-center justify-between text-xs text-emerald-700 font-bold border-t border-slate-100 hover:bg-emerald-50/50 transition-colors cursor-pointer"
               [attr.aria-expanded]="expandedAccordionId === q.id">
               <span class="inline-flex items-center gap-1.5">
                 <i class="fa-solid fa-circle-info text-emerald-600"></i>
                 <span>{{ expandedAccordionId === q.id ? 'Ocultar preparación' : 'Ver preparación para la entrega' }}</span>
               </span>
-              <i class="fa-solid fa-chevron-down text-xs transition-transform duration-200" [class.rotate-180]="expandedAccordionId === q.id"></i>
+              <i class="fa-solid fa-chevron-down text-xs transition-transform duration-300 ease-out" [class.rotate-180]="expandedAccordionId === q.id"></i>
             </button>
 
-            <!-- Panel Expandido del Acordeón -->
-            <div *ngIf="expandedAccordionId === q.id" class="p-4 bg-emerald-50/60 border-t border-emerald-100 anim-fade-in text-xs text-slate-700 leading-relaxed">
-              <div class="font-bold text-[#206935] mb-1 flex items-center gap-1.5">
-                <i class="fa-solid fa-list-check"></i>
-                <span>Instrucciones de preparación comunal:</span>
-              </div>
-              <p class="mb-2">{{ q.materialInstrucciones || 'Enjuagar y secar botellas y envases antes de depositar. Aplanar cajas de cartón.' }}</p>
-              <div class="text-[11px] font-semibold text-slate-600 flex items-center gap-1">
-                <i class="fa-solid fa-circle-check text-emerald-600"></i>
-                <span>Entrega: {{ q.requisitos }} · Frente a frontis domiciliario</span>
+            <!-- Panel Expandido del Acordeón Móvil con Grid Animado -->
+            <div class="grid transition-all duration-300 ease-out"
+                 [class.grid-rows-[1fr]]="expandedAccordionId === q.id"
+                 [class.grid-rows-[0fr]]="expandedAccordionId !== q.id">
+              <div class="overflow-hidden">
+                <div class="p-4 bg-emerald-50/60 border-t border-emerald-100/80 text-xs text-slate-700 leading-relaxed">
+                  <div class="font-bold text-[#206935] mb-1 flex items-center gap-1.5">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>Instrucciones de preparación comunal:</span>
+                  </div>
+                  <p class="mb-2">{{ q.materialInstrucciones || 'Enjuagar y secar botellas y envases antes de depositar. Aplanar cajas de cartón.' }}</p>
+                  <div class="text-[11px] font-semibold text-slate-600 flex items-center gap-1">
+                    <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                    <span>Entrega: {{ q.requisitos }} · Frente a frontis domiciliario</span>
+                  </div>
+                </div>
               </div>
             </div>
 
           </article>
         </div>
 
-        <!-- Desktop View: 4 Quadrants Grid con Acordeón y Badges de Color -->
-        <div class="hidden md:grid md:grid-cols-2 gap-8">
+        <!-- Desktop View: 4 Quadrants Grid con Acordeón Fluido y Micro-interacciones -->
+        <div class="hidden md:grid md:grid-cols-2 gap-7 lg:gap-8">
           <article
             *ngFor="let q of quadrants; let i = index"
-            class="bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between"
-            [ngClass]="{ 'opacity-0 translate-y-3 scale-[0.98] pointer-events-none': isFadingOut, 'anim-week-switch': !isFadingOut }"
-            [style.animation-delay]="!isFadingOut ? (i * 0.07) + 's' : '0s'">
+            class="group bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-xs hover-lift hover:border-emerald-300/80 hover:shadow-lg transition-all duration-300 flex flex-col justify-between reveal-init"
+            [class.reveal-active]="isVisible"
+            [style.transition-delay]="(i * 100) + 'ms'"
+            [ngClass]="{ 'opacity-0 translate-y-3 scale-[0.98] pointer-events-none': isFadingOut, 'anim-week-switch': !isFadingOut && isVisible }">
             
             <div>
-              <!-- Imagen Paisajística del Sector con Badge Cuadrante -->
+              <!-- Imagen Paisajística del Sector con Zoom Sutil -->
               <div class="relative h-44 sm:h-48 w-full overflow-hidden bg-slate-100">
                 <img
                   [src]="q.image"
                   [alt]="'Sector ' + q.name + ' - Puerto Varas'"
-                  class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   loading="lazy"
                 />
                 <span
@@ -285,7 +293,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
               <!-- Contenido Informativo de la Tarjeta -->
               <div class="p-5 sm:p-6">
                 <div class="flex items-baseline justify-between mb-4">
-                  <h3 class="text-xl sm:text-2xl font-extrabold text-[#0a233b] tracking-tight font-heading">
+                  <h3 class="text-xl sm:text-2xl font-extrabold text-[#0a233b] tracking-tight font-heading group-hover:text-[#22a652] transition-colors duration-200">
                     {{ q.name }}
                   </h3>
                   <span class="text-xs text-slate-400 font-medium">{{ q.hours }}</span>
@@ -319,7 +327,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                   </div>
                 </div>
 
-                <!-- Fila Inferior: Material Asignado con Badge de Color + Bin -->
+                <!-- Fila Inferior: Material Asignado con Micro-interacción en el Bin -->
                 <div class="pt-4 flex items-center justify-between">
                   <div>
                     <span class="block text-[11px] text-slate-500 font-medium">{{ activeWeek === 1 ? 'Material esta semana' : 'Material próxima semana' }}</span>
@@ -333,12 +341,12 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                     </span>
                   </div>
 
-                  <!-- Ilustración de Material / Bin Fiel al Diseño -->
+                  <!-- Ilustración de Material / Bin con Flotación Suave -->
                   <div class="flex items-center gap-2 pl-2">
                     <img
                       [src]="q.binImage"
                       [alt]="q.materialNombre"
-                      class="h-16 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300"
+                      class="h-16 w-auto object-contain drop-shadow-sm group-hover:scale-110 group-hover:-translate-y-1.5 transition-all duration-300 ease-out"
                     />
                   </div>
                 </div>
@@ -349,25 +357,31 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
             <button
               type="button"
               (click)="toggleAccordion(q.id)"
-              class="px-5 sm:px-6 py-3.5 flex items-center justify-between text-xs text-emerald-700 font-bold border-t border-slate-100 hover:bg-emerald-50/40 transition-colors cursor-pointer"
+              class="px-5 sm:px-6 py-3.5 flex items-center justify-between text-xs text-emerald-700 font-bold border-t border-slate-100 hover:bg-emerald-50/50 transition-colors cursor-pointer"
               [attr.aria-expanded]="expandedAccordionId === q.id">
               <span class="inline-flex items-center gap-2">
                 <i class="fa-solid fa-circle-info text-emerald-600"></i>
                 <span>{{ expandedAccordionId === q.id ? 'Ocultar instrucciones de preparación' : 'Ver preparación para la entrega' }}</span>
               </span>
-              <i class="fa-solid fa-chevron-down text-xs transition-transform duration-200" [class.rotate-180]="expandedAccordionId === q.id"></i>
+              <i class="fa-solid fa-chevron-down text-xs transition-transform duration-300 ease-out" [class.rotate-180]="expandedAccordionId === q.id"></i>
             </button>
 
-            <!-- Panel Expandido del Acordeón en Desktop -->
-            <div *ngIf="expandedAccordionId === q.id" class="px-5 sm:px-6 py-4 bg-emerald-50/50 border-t border-emerald-100 anim-fade-in text-xs text-slate-700 leading-relaxed">
-              <div class="font-bold text-[#206935] mb-1 flex items-center gap-1.5">
-                <i class="fa-solid fa-list-check"></i>
-                <span>Instrucciones de preparación comunal:</span>
-              </div>
-              <p class="mb-2">{{ q.materialInstrucciones || 'Enjuagar y secar botellas y envases antes de depositar. Aplanar cajas de cartón.' }}</p>
-              <div class="text-[11px] font-semibold text-slate-600 flex items-center gap-1">
-                <i class="fa-solid fa-circle-check text-emerald-600"></i>
-                <span>Entrega: {{ q.requisitos }} · Frente a frontis domiciliario</span>
+            <!-- Panel Expandido del Acordeón en Desktop con Grid Animado -->
+            <div class="grid transition-all duration-300 ease-out"
+                 [class.grid-rows-[1fr]]="expandedAccordionId === q.id"
+                 [class.grid-rows-[0fr]]="expandedAccordionId !== q.id">
+              <div class="overflow-hidden">
+                <div class="px-5 sm:px-6 py-4 bg-emerald-50/50 border-t border-emerald-100/80 text-xs text-slate-700 leading-relaxed">
+                  <div class="font-bold text-[#206935] mb-1 flex items-center gap-1.5">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>Instrucciones oficiales de entrega DIMAO:</span>
+                  </div>
+                  <p class="mb-2">{{ q.materialInstrucciones || 'Enjuagar y secar botellas y envases antes de depositar. Aplanar cajas de cartón.' }}</p>
+                  <div class="text-[11px] font-semibold text-slate-600 flex items-center gap-1">
+                    <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                    <span>Entrega: {{ q.requisitos }} · Frente a frontis domiciliario</span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -379,7 +393,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
     <!-- END: QuadrantsSection -->
   `
 })
-export class HomeQuadrantsComponent implements OnInit {
+export class HomeQuadrantsComponent implements OnInit, OnDestroy {
   @Output() quadrantSelected = new EventEmitter<QuadrantCardInfo>();
 
   quadrants: QuadrantCardInfo[] = [...INITIAL_QUADRANTS];
@@ -389,6 +403,9 @@ export class HomeQuadrantsComponent implements OnInit {
   expandedAccordionId: string | null = null;
 
   isFadingOut = false;
+  isVisible = false;
+  private el = inject(ElementRef);
+  private observer: IntersectionObserver | null = null;
 
   constructor(private bffService: BffService, private cdr: ChangeDetectorRef) {}
 
@@ -420,6 +437,23 @@ export class HomeQuadrantsComponent implements OnInit {
   ngOnInit(): void {
     this.updateQuadrantsForWeek(this.activeWeek);
     this.loadCatalogResiduos();
+
+    if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
+      this.observer = new IntersectionObserver((entries) => {
+        if (entries[0]?.isIntersecting) {
+          this.isVisible = true;
+          this.cdr.markForCheck();
+          this.observer?.disconnect();
+        }
+      }, { threshold: 0.12 });
+      this.observer.observe(this.el.nativeElement);
+    } else {
+      this.isVisible = true;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.observer?.disconnect();
   }
 
   loadCatalogResiduos(): void {
