@@ -7,7 +7,7 @@ import { Sector } from '../data/sectors.data';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <section class="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-6 sm:p-8 lg:p-10 relative card-hover anim-fade-up anim-delay-2">
+    <section class="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-6 sm:p-8 lg:p-10 relative z-10 card-hover anim-fade-up anim-delay-2">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
         <!-- COLUMNA IZQUIERDA: INFORMACIÓN PROTAGONISTA DEL RETIRO (7 Cols) -->
         <div class="lg:col-span-7 flex flex-col justify-between space-y-6">
