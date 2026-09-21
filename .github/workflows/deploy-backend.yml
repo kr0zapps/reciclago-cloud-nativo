@@ -37,9 +37,9 @@ jobs:
       - name: 🔑 Configurar credenciales de AWS Backend (DEV 2)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID || secrets.AWS_BACKEND_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY || secrets.AWS_BACKEND_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN || secrets.AWS_BACKEND_SESSION_TOKEN }} # Requerido para cuentas AWS Academy / Learner Lab
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
 
       - name: 📦 Login en Amazon ECR
