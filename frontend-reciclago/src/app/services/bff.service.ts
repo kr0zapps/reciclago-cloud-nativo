@@ -43,6 +43,10 @@ export class BffService {
     return this.http.get<Camion[]>(`${this.baseUrl}/api/catalog/camiones`);
   }
 
+  getImpactoComunal(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/api/citizens/impacto`);
+  }
+
   actualizarEstadoCamion(id: number, estado: string): Observable<Camion> {
     return this.http.patch<Camion>(`${this.baseUrl}/api/catalog/camiones/${id}/estado?estado=${encodeURIComponent(estado)}`, {});
   }

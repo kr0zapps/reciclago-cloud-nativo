@@ -58,7 +58,7 @@ public class SecurityConfig {
                 .requestMatchers("/public/**", "/actuator/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // Acceso público a información cívica y consultas comunitarias
-                .requestMatchers(HttpMethod.GET, "/api/citizens/how-it-works", "/api/citizens/faq").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/citizens/how-it-works", "/api/citizens/faq", "/api/citizens/impacto").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/citizens/contact").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/routes/cuadrante", "/api/routes/cuadrantes", "/api/routes/cuadrantes/*", "/api/routes/*/tracking", "/api/routes/tracking/*").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/catalog/residuos", "/api/catalog/camiones").permitAll()

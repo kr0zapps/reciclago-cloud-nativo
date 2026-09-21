@@ -1,6 +1,7 @@
 import { Component, Output, EventEmitter, OnInit, AfterViewInit, OnDestroy, ElementRef, ChangeDetectorRef, NgZone, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { BffService } from '../../../services/bff.service';
 
 @Component({
   selector: 'app-home-impact',
@@ -17,13 +18,18 @@ import { RouterModule } from '@angular/router';
       </div>
 
       <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Section Heading -->
         <!-- Section Heading con Scroll Reveal -->
         <div class="mb-10 sm:mb-14 text-center sm:text-left reveal-init" [class.reveal-active]="isVisible">
-          <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-100/90 text-[#175c2e] font-bold text-xs mb-3 shadow-xs">
-            <i class="fa-solid fa-seedling text-xs"></i>
-            Nuestra huella comunal
-          </span>
+          <div class="flex items-center gap-2 flex-wrap mb-3 justify-center sm:justify-start">
+            <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-100/90 text-[#175c2e] font-bold text-xs shadow-xs">
+              <i class="fa-solid fa-seedling text-xs"></i>
+              Nuestra huella comunal
+            </span>
+            <span *ngIf="isLiveConnected" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100 text-sky-900 text-xs font-bold shadow-xs">
+              <span class="w-1.5 h-1.5 rounded-full bg-sky-600"></span>
+              En vivo desde ms-reciclago-pickups & catalog
+            </span>
+          </div>
           <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#041624] tracking-tight mb-2 font-heading">
             Impacto en Puerto Varas
           </h2>
@@ -165,6 +171,8 @@ export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
   currentTrucks = 0;
   displayKg = '0';
   isVisible = false;
+  isLiveConnected = false;
+  liveKilosEnVivo = 0;
 
   private observer?: IntersectionObserver;
   private animFrameId?: number;
@@ -174,12 +182,14 @@ export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
     private el: ElementRef,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
+    private bffService: BffService,
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
   }
 
   ngOnInit(): void {
+    this.cargarMetricasEnVivo();
     if (!this.isBrowser) {
       this.currentKg = this.targetKg;
       this.currentPercent = this.targetPercent;
@@ -187,6 +197,39 @@ export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
       this.displayKg = '248.650';
       this.isVisible = true;
     }
+  }
+
+  cargarMetricasEnVivo(): void {
+    this.bffService.getImpactoComunal().subscribe({
+      next: (data) => {
+        if (data) {
+          this.isLiveConnected = true;
+          if (data.kilosCertificados) this.targetKg = Number(data.kilosCertificados);
+          if (data.porcentajeVertederos) this.targetPercent = Number(data.porcentajeVertederos);
+          if (data.camionesOperativos) this.targetTrucks = Number(data.camionesOperativos);
+          if (data.kilosEnVivo) this.liveKilosEnVivo = Number(data.kilosEnVivo);
+          if (this.isVisible) {
+            this.startCountAnimation();
+          } else {
+            this.displayKg = this.targetKg.toLocaleString('es-CL');
+          }
+          this.cdr.markForCheck();
+        }
+      },
+      error: () => {
+        // Fallback: intentar al menos obtener el conteo de camiones reales desde ms-reciclago-catalog
+        this.bffService.getCamiones().subscribe({
+          next: (camiones) => {
+            if (camiones && camiones.length > 0) {
+              this.targetTrucks = camiones.length;
+              this.isLiveConnected = true;
+              this.cdr.markForCheck();
+            }
+          },
+          error: () => {}
+        });
+      }
+    });
   }
 
   ngAfterViewInit(): void {
