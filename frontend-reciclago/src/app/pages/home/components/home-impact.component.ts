@@ -162,9 +162,9 @@ import { BffService } from '../../../services/bff.service';
 export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output() openInfoModal = new EventEmitter<void>();
 
-  targetKg = 248650;
-  targetPercent = 32;
-  targetTrucks = 4;
+  targetKg = 0;
+  targetPercent = 25;
+  targetTrucks = 2;
 
   currentKg = 0;
   currentPercent = 0;
@@ -194,7 +194,7 @@ export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
       this.currentKg = this.targetKg;
       this.currentPercent = this.targetPercent;
       this.currentTrucks = this.targetTrucks;
-      this.displayKg = '248.650';
+      this.displayKg = this.targetKg.toLocaleString('es-CL');
       this.isVisible = true;
     }
   }
@@ -204,10 +204,10 @@ export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
       next: (data) => {
         if (data) {
           this.isLiveConnected = true;
-          if (data.kilosCertificados) this.targetKg = Number(data.kilosCertificados);
-          if (data.porcentajeVertederos) this.targetPercent = Number(data.porcentajeVertederos);
-          if (data.camionesOperativos) this.targetTrucks = Number(data.camionesOperativos);
-          if (data.kilosEnVivo) this.liveKilosEnVivo = Number(data.kilosEnVivo);
+          if (data.kilosCertificados !== undefined && data.kilosCertificados !== null) this.targetKg = Number(data.kilosCertificados);
+          if (data.porcentajeVertederos !== undefined && data.porcentajeVertederos !== null) this.targetPercent = Number(data.porcentajeVertederos);
+          if (data.camionesOperativos !== undefined && data.camionesOperativos !== null) this.targetTrucks = Number(data.camionesOperativos);
+          if (data.kilosEnVivo !== undefined && data.kilosEnVivo !== null) this.liveKilosEnVivo = Number(data.kilosEnVivo);
           if (this.isVisible) {
             this.startCountAnimation();
           } else {
@@ -281,7 +281,7 @@ export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
         } else {
           this.ngZone.run(() => {
             this.currentKg = this.targetKg;
-            this.displayKg = '248.650';
+            this.displayKg = this.targetKg.toLocaleString('es-CL');
             this.currentPercent = this.targetPercent;
             this.currentTrucks = this.targetTrucks;
             this.cdr.markForCheck();

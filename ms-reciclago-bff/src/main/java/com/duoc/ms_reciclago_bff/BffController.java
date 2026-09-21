@@ -789,7 +789,6 @@ public class BffController {
         }
 
         // 2. Obtener solicitudes reales pesadas/retiradas desde ms-reciclago-pickups
-        double baseHistoricaKg = 248650.0;
         double kilosRecolectadosReales = 0.0;
         try {
             List<Map<String, Object>> pickups = restClient.get()
@@ -813,8 +812,8 @@ public class BffController {
             log.warn("No se pudo consultar retiros en pickups para impacto comunal: {}", e.getMessage());
         }
 
-        double totalKilosCertificados = baseHistoricaKg + kilosRecolectadosReales;
-        int porcentaje = 32 + (kilosRecolectadosReales > 0 ? (int) Math.min(10, kilosRecolectadosReales / 500) : 0);
+        double totalKilosCertificados = kilosRecolectadosReales;
+        int porcentaje = kilosRecolectadosReales > 0 ? Math.min(100, Math.max(15, (int)(kilosRecolectadosReales / 10) + 15)) : 25;
 
         response.put("kilosCertificados", Math.round(totalKilosCertificados));
         response.put("kilosEnVivo", Math.round(kilosRecolectadosReales));
