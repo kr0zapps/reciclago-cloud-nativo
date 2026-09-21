@@ -20,16 +20,6 @@ import { BffService } from '../../../services/bff.service';
       <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Section Heading con Scroll Reveal -->
         <div class="mb-10 sm:mb-14 text-center sm:text-left reveal-init" [class.reveal-active]="isVisible">
-          <div class="flex items-center gap-2 flex-wrap mb-3 justify-center sm:justify-start">
-            <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-100/90 text-[#175c2e] font-bold text-xs shadow-xs">
-              <i class="fa-solid fa-seedling text-xs"></i>
-              Nuestra huella comunal
-            </span>
-            <span *ngIf="isLiveConnected" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100 text-sky-900 text-xs font-bold shadow-xs">
-              <span class="w-1.5 h-1.5 rounded-full bg-sky-600"></span>
-              En vivo desde ms-reciclago-pickups & catalog
-            </span>
-          </div>
           <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#041624] tracking-tight mb-2 font-heading">
             Impacto en Puerto Varas
           </h2>
@@ -124,14 +114,11 @@ import { BffService } from '../../../services/bff.service';
                 <i class="fa-solid fa-truck-ramp-box"></i>
               </div>
               <div>
-                <span class="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-wider text-[#175c2e] mb-1">
-                  Servicio Especial DIMAO
-                </span>
                 <h3 class="text-xl sm:text-2xl lg:text-3xl font-black text-[#041624] tracking-tight mb-1.5 font-heading">
                   ¿Necesitas un retiro especial?
                 </h3>
                 <p class="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
-                  Solicita recolección programada para podas de jardín, escombros limpios o enseres fuera de tu cuadrante semanal.
+                  Solicita a la DIMAO una recolección programada para podas de jardín, escombros limpios o enseres fuera de tu cuadrante semanal.
                 </p>
               </div>
             </div>

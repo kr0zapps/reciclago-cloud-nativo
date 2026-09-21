@@ -56,9 +56,6 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
         <div class="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4 reveal-init"
              [class.reveal-active]="isVisible">
           <div>
-            <span class="inline-block px-3.5 py-1 rounded-full bg-emerald-100 text-[#256c38] font-bold text-xs mb-3 shadow-2xs">
-              Tu comuna, cuatro cuadrantes
-            </span>
             <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a233b] tracking-tight mb-2 font-heading">
               Cuadrantes y Residuos Comunales
             </h2>

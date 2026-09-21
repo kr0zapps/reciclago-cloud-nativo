@@ -17,11 +17,8 @@ interface CycleStep {
     <!-- BEGIN: HowItWorks -->
     <section class="py-14 sm:py-20 bg-[#f7faf7] border-b border-emerald-50 relative overflow-hidden" id="como-funciona">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <!-- Title & Subtitle con Revelación Suave (Etiqueta única y limpia) -->
+        <!-- Title & Subtitle con Revelación Suave -->
         <div class="reveal-init" [class.reveal-active]="isVisible">
-          <span class="inline-block px-3.5 py-1 rounded-full bg-emerald-100 text-[#256c38] font-bold text-xs mb-3 shadow-2xs">
-            ¿Cómo funciona?
-          </span>
           <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a233b] tracking-tight mb-2.5 font-heading">
             El ciclo de vida del retiro
           </h2>

@@ -45,9 +45,8 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
           </div>
           <div class="mt-3">
             <div class="text-2xl sm:text-3xl font-black font-mono text-[#123F5B]">{{ selectedCamion.patente }}</div>
-            <p class="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
-              <span>En servicio • GPS Activo</span>
+            <p class="text-xs text-slate-500 mt-1 font-medium">
+              En servicio • GPS Activo
             </p>
           </div>
         </div>
