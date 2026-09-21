@@ -21,3 +21,9 @@ dist/
 
 # Security & Private Keys
 *.pem
+
+# Temporary text notes
+caso7_text.txt
+ep1_text.txt
+ep2_text.txt
+

@@ -5,17 +5,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Controller para el calendario de Rotación Semanal de Residuos Domiciliarios.
  *
- * Expone el endpoint que el frontend y el BFF consumen para saber qué residuo
- * se recolecta en la semana actual (o en cualquier fecha de consulta).
- *
- * Endpoint principal:
- *   GET /api/catalog/rotacion/semanal
- *   GET /api/catalog/rotacion/semanal?fecha=2026-09-22   (consulta fecha específica)
+ * Endpoints:
+ *   GET   /api/catalog/rotacion/semanal               - Residuo de la semana activa
+ *   GET   /api/catalog/rotacion/config                - Configuración administrativa y estado del ciclo
+ *   PUT   /api/catalog/rotacion/config                - Actualizar modo (AUTOMATICO/MANUAL) y anulación
+ *   POST  /api/catalog/rotacion/reset                 - Restablecer a modo automático municipal
+ *   PATCH /api/catalog/rotacion/sector/{sectorNombre} - Modificar manualmente día o material de un sector
  */
 @RestController
 @RequestMapping("/api/catalog/rotacion")
@@ -30,11 +31,6 @@ public class RotacionSemanalController {
 
     /**
      * Retorna el residuo domiciliario de la semana actual (o de la fecha indicada).
-     *
-     * @param fecha Opcional. Fecha ISO (yyyy-MM-dd) de consulta. Por defecto: hoy.
-     * @return JSON con numSemanaISO, slotSemana, residuoCodigo, residuoNombre,
-     *         descripcion, instrucciones, categoria, precioPorKg,
-     *         vigenciaDesde, vigenciaHasta.
      */
     @GetMapping("/semanal")
     public ResponseEntity<Map<String, Object>> getRotacionSemanal(
@@ -51,5 +47,48 @@ public class RotacionSemanalController {
                 Map.of("error", "Fecha inválida o error al calcular rotación: " + e.getMessage())
             );
         }
+    }
+
+    /**
+     * Retorna la configuración completa del ciclo de 4 semanas y overrides por sector.
+     */
+    @GetMapping("/config")
+    public ResponseEntity<Map<String, Object>> getConfiguracion() {
+        return ResponseEntity.ok(rotacionSemanalService.getConfiguracion());
+    }
+
+    /**
+     * Actualiza el modo de operación (AUTOMATICO o MANUAL) y el residuo forzado de la semana.
+     */
+    @PutMapping("/config")
+    public ResponseEntity<Map<String, Object>> actualizarConfiguracion(
+            @RequestBody Map<String, Object> payload) {
+        String modo = (String) payload.get("modo");
+        String overrideCodigo = (String) payload.get("overrideCodigoResiduo");
+        @SuppressWarnings("unchecked")
+        List<String> slots = (List<String>) payload.get("slots");
+        Map<String, Object> actualizada = rotacionSemanalService.actualizarConfiguracion(modo, overrideCodigo, slots);
+        return ResponseEntity.ok(actualizada);
+    }
+
+    /**
+     * Restablece la rotación a modo automático por semana ISO.
+     */
+    @PostMapping("/reset")
+    public ResponseEntity<Map<String, Object>> restablecerAutomatico() {
+        return ResponseEntity.ok(rotacionSemanalService.restablecerAutomatico());
+    }
+
+    /**
+     * Modifica manualmente el día de recolección o el material de un sector específico.
+     */
+    @PatchMapping("/sector/{sectorNombre}")
+    public ResponseEntity<Map<String, Object>> actualizarSector(
+            @PathVariable String sectorNombre,
+            @RequestBody Map<String, String> payload) {
+        String dia = payload.get("dia");
+        String materialCodigo = payload.get("materialCodigo");
+        Map<String, Object> actualizada = rotacionSemanalService.actualizarSector(sectorNombre, dia, materialCodigo);
+        return ResponseEntity.ok(actualizada);
     }
 }

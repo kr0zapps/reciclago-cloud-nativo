@@ -387,6 +387,78 @@ export interface RotacionSemanal {
   residuoId?: number | null;
 }
 
+export interface RotacionConfig {
+  modo: 'AUTOMATICO' | 'MANUAL';
+  overrideCodigoResiduo: string | null;
+  numSemanaActual: number;
+  slotSemanaActual: number;
+  residuoSemanalActual?: RotacionSemanal;
+  semanas: Array<{
+    slot: number;
+    codigo: string;
+    nombre: string;
+    categoria: string;
+    descripcion?: string;
+  }>;
+  sectoresOverrides?: Record<string, { dia?: string; materialCodigo?: string; materialNombre?: string }>;
+}
+
+export const SEMANAS_ROTACION_DEFAULT = [
+  { slot: 1, codigo: 'VIDRIO', nombre: 'Vidrio', categoria: 'VIDRIO', descripcion: 'Botellas, frascos y recipientes de vidrio limpios' },
+  { slot: 2, codigo: 'CARTON_PAPEL', nombre: 'Cartón y Papel', categoria: 'CARTON', descripcion: 'Cajas secas, periódicos, papel blanco y embalaje aplanado' },
+  { slot: 3, codigo: 'PLASTICO_PET', nombre: 'Plásticos (PET y PEAD)', categoria: 'PLASTICO', descripcion: 'Botellas plásticas compactadas, bidones y envases limpios' },
+  { slot: 4, codigo: 'LATAS_METALES', nombre: 'Latas y Metales', categoria: 'LATAS', descripcion: 'Aluminio de bebidas, hojalata y conservas limpias' },
+];
+
+export function loadLocalRotacionConfig(): { modo: 'AUTOMATICO' | 'MANUAL'; overrideCodigoResiduo: string | null } {
+  try {
+    const raw = localStorage.getItem('reciclago_rotacion_config');
+    if (raw) {
+      return JSON.parse(raw);
+    }
+  } catch {}
+  return { modo: 'AUTOMATICO', overrideCodigoResiduo: null };
+}
+
+export function saveLocalRotacionConfig(config: { modo: 'AUTOMATICO' | 'MANUAL'; overrideCodigoResiduo: string | null }): void {
+  try {
+    localStorage.setItem('reciclago_rotacion_config', JSON.stringify(config));
+  } catch {}
+}
+
+export function loadLocalSectorOverrides(): Record<string, { dia?: string; material?: string; materialPrincipal?: string }> {
+  try {
+    const raw = localStorage.getItem('reciclago_sectors_override');
+    if (raw) {
+      return JSON.parse(raw);
+    }
+  } catch {}
+  return {};
+}
+
+export function saveLocalSectorOverrides(overrides: Record<string, { dia?: string; material?: string; materialPrincipal?: string }>): void {
+  try {
+    localStorage.setItem('reciclago_sectors_override', JSON.stringify(overrides));
+  } catch {}
+}
+
+export function aplicarSectorOverrides(sectores: Sector[]): Sector[] {
+  const overrides = loadLocalSectorOverrides();
+  if (!overrides || Object.keys(overrides).length === 0) {
+    return sectores;
+  }
+  return sectores.map(s => {
+    const ov = overrides[s.nombre] || overrides[s.sector] || overrides[s.cuadrante];
+    if (!ov) return s;
+    return {
+      ...s,
+      dia: ov.dia || s.dia,
+      material: ov.material || s.material,
+      materialPrincipal: ov.materialPrincipal || s.materialPrincipal
+    };
+  });
+}
+
 /**
  * Catálogo local de los 4 residuos rotativos.
  * Espeja la lógica de RotacionSemanalService.java.
@@ -402,17 +474,26 @@ const ROTACION_FALLBACK: Pick<RotacionSemanal, 'slotSemana' | 'residuoCodigo' | 
 /**
  * Calcula la rotación semanal local (fallback offline).
  * Usa el número de semana ISO del año actual, igual que el backend.
+ * Considera override manual guardado en localStorage si existe.
  * @returns RotacionSemanal con datos mínimos para que el UI no muestre vacío.
  */
 export function calcularRotacionLocal(): RotacionSemanal {
   const now = new Date();
-  // Cálculo de semana ISO: similar a Java WeekFields.ISO.weekOfYear()
   const startOfYear = new Date(now.getFullYear(), 0, 1);
   const dayOfYear = Math.floor((now.getTime() - startOfYear.getTime()) / 86_400_000) + 1;
   const numSemanaISO = Math.ceil(dayOfYear / 7);
   const mod = numSemanaISO % 4;
   const slot = mod === 0 ? 4 : mod;
-  const entry = ROTACION_FALLBACK[slot - 1];
+
+  const localConfig = loadLocalRotacionConfig();
+  let entry = ROTACION_FALLBACK[slot - 1];
+
+  if (localConfig.modo === 'MANUAL' && localConfig.overrideCodigoResiduo) {
+    const overrideFound = ROTACION_FALLBACK.find(r => r.residuoCodigo === localConfig.overrideCodigoResiduo);
+    if (overrideFound) {
+      entry = overrideFound;
+    }
+  }
 
   // Calcular inicio y fin de la semana actual (lunes a domingo)
   const diaSemana = now.getDay(); // 0=Dom, 1=Lun...
@@ -426,7 +507,7 @@ export function calcularRotacionLocal(): RotacionSemanal {
 
   return {
     numSemanaISO,
-    slotSemana: slot,
+    slotSemana: entry.slotSemana,
     residuoCodigo: entry.residuoCodigo,
     residuoNombre: entry.residuoNombre,
     descripcion: null,

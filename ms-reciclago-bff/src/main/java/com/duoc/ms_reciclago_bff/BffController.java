@@ -164,6 +164,74 @@ public class BffController {
         }
     }
 
+    @GetMapping("/api/catalog/rotacion/config")
+    public ResponseEntity<?> getRotacionConfig() {
+        try {
+            Object config = restClient.get()
+                    .uri(catalogUrl + "/api/catalog/rotacion/config")
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(config);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "ms-reciclago-catalog no disponible para consultar configuración de rotación");
+            error.put("details", e.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+        }
+    }
+
+    @PutMapping("/api/catalog/rotacion/config")
+    public ResponseEntity<?> actualizarRotacionConfig(@RequestBody Map<String, Object> payload) {
+        try {
+            Object actualizada = restClient.put()
+                    .uri(catalogUrl + "/api/catalog/rotacion/config")
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                    .body(payload)
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(actualizada);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Error actualizando configuración de rotación en ms-reciclago-catalog");
+            error.put("details", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+    }
+
+    @PostMapping("/api/catalog/rotacion/reset")
+    public ResponseEntity<?> resetRotacionConfig() {
+        try {
+            Object res = restClient.post()
+                    .uri(catalogUrl + "/api/catalog/rotacion/reset")
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(res);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Error restableciendo rotación en ms-reciclago-catalog");
+            error.put("details", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+    }
+
+    @PatchMapping("/api/catalog/rotacion/sector/{sectorNombre}")
+    public ResponseEntity<?> actualizarSectorRotacion(@PathVariable String sectorNombre, @RequestBody Map<String, String> payload) {
+        try {
+            Object res = restClient.patch()
+                    .uri(catalogUrl + "/api/catalog/rotacion/sector/" + java.net.URLEncoder.encode(sectorNombre, java.nio.charset.StandardCharsets.UTF_8))
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                    .body(payload)
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(res);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Error actualizando programación del sector en ms-reciclago-catalog");
+            error.put("details", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+    }
+
     @PatchMapping("/api/catalog/camiones/{id}/estado")
     public ResponseEntity<?> actualizarEstadoCamion(@PathVariable Long id, @RequestParam String estado) {
         try {

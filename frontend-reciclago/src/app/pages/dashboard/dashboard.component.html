@@ -159,6 +159,7 @@
       [camiones]="camionesDisponibles"
       [catalogoDisponible]="catalogoDisponible"
       [residuos]="residuos"
+      [rotacionSemanal]="rotacionSemanal"
       [activeWaypoint]="activeWaypoint"
       [truckSimulationRunning]="truckSimulationRunning"
       [truckSpeed]="truckSpeed"
@@ -168,7 +169,9 @@
       (toggleTruckSimulation)="toggleTruckSimulation()"
       (toggleTruckSpeed)="toggleTruckSpeed()"
       (resetTruckSimulation)="resetTruckSimulation()"
-      (camionEstadoCambiado)="onCamionEstadoCambiado($event)">
+      (camionEstadoCambiado)="onCamionEstadoCambiado($event)"
+      (rotacionModificada)="onRotacionModificada()"
+      (sectoresModificados)="onSectoresModificados($event)">
     </app-admin-dashboard>
 
     <!-- 2. VISTA COORDINADOR: Programación y Asignación de Solicitudes -->

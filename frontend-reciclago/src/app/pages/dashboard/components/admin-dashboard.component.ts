@@ -1,7 +1,22 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, SimpleChanges, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Sector, Camion, Residuo, Pickup, Waypoint, EstadoCamion } from '../data/sectors.data';
+import {
+  Sector,
+  Camion,
+  Residuo,
+  Pickup,
+  Waypoint,
+  EstadoCamion,
+  RotacionSemanal,
+  RotacionConfig,
+  SEMANAS_ROTACION_DEFAULT,
+  loadLocalRotacionConfig,
+  saveLocalRotacionConfig,
+  loadLocalSectorOverrides,
+  saveLocalSectorOverrides,
+  DEFAULT_SECTORES
+} from '../data/sectors.data';
 import { BffService } from '../../../services/bff.service';
 import { formatRut, validateRut } from '../../../shared/utils/rut.utils';
 import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/phone.utils';
@@ -164,6 +179,235 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                 ? 'No fue posible conectar con el microservicio ms-reciclago-catalog (puerto 8081). Verifique que los microservicios Spring Boot estén iniciados.'
                 : (catalogoDisponible === null ? 'Consultando ms-reciclago-catalog...' : 'No existen datos de camiones en la base de datos PostgreSQL.') }}
           </p>
+        </div>
+      </section>
+
+      <!-- ==================== GESTIÓN Y CONTROL DE ROTACIÓN SEMANAL Y CATÁLOGO POR SECTOR (DIMAO) ==================== -->
+      <section class="bg-white rounded-2xl border border-[#E2E9E4] p-6 sm:p-8 shadow-xs space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#EAEFE8]">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-[#123F5B]">Planificación Operativa Comunal</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded"
+                    [ngClass]="rotacionModo === 'MANUAL' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-[#EBF5E7] text-emerald-900 border border-[#CDE8C7]'">
+                {{ rotacionModo === 'MANUAL' ? 'Modo Manual Activo' : 'Rotación Automática ISO' }}
+              </span>
+            </div>
+            <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy mt-0.5">
+              Calendario y Rotación Semanal de Residuos
+            </h3>
+          </div>
+          <div class="flex items-center gap-2">
+            <button (click)="restablecerRotacionAutomatica()"
+                    type="button"
+                    [disabled]="isSavingRotacion"
+                    class="px-3 py-2 rounded-xl text-xs font-bold border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
+              <i class="fa-solid fa-rotate-left text-slate-500"></i>
+              <span>Restablecer Automático</span>
+            </button>
+            <button (click)="guardarRotacionConfig()"
+                    type="button"
+                    [disabled]="isSavingRotacion"
+                    class="px-4 py-2 rounded-xl text-xs font-bold bg-[#123F5B] hover:bg-[#0D3549] text-white transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
+              <i class="fa-solid" [class.fa-spinner]="isSavingRotacion" [class.fa-spin]="isSavingRotacion" [class.fa-floppy-disk]="!isSavingRotacion"></i>
+              <span>{{ isSavingRotacion ? 'Guardando...' : 'Guardar Calendario' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Banner de Feedback -->
+        <div *ngIf="rotacionFeedback"
+             class="p-3.5 rounded-xl text-xs flex items-center justify-between gap-2 transition-all"
+             [ngClass]="rotacionFeedback.tipo === 'success' ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-rose-50 text-rose-900 border border-rose-200'">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid" [class.fa-circle-check]="rotacionFeedback.tipo === 'success'" [class.fa-circle-exclamation]="rotacionFeedback.tipo === 'error'"></i>
+            <span class="font-semibold">{{ rotacionFeedback.mensaje }}</span>
+          </div>
+          <button (click)="rotacionFeedback = null" type="button" class="text-slate-400 hover:text-slate-600 text-xs">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Controles de Modo y Ciclo de 4 Semanas -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <!-- Columna Izquierda: Selector de Modo y Override -->
+          <div class="p-5 rounded-2xl bg-[#F8FAF7] border border-[#E2E9E4] space-y-4">
+            <div>
+              <label for="rotacionModoSelect" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1.5">
+                Modalidad del Calendario
+              </label>
+              <select id="rotacionModoSelect"
+                      [(ngModel)]="rotacionModo"
+                      class="select-stitch w-full py-2 px-3 text-xs font-bold text-[#123F5B] bg-white border border-[#D5E2D9]">
+                <option value="AUTOMATICO">Automático (Calendario Municipal ISO)</option>
+                <option value="MANUAL">Manual (Anulación por Contingencia)</option>
+              </select>
+            </div>
+
+            <div *ngIf="rotacionModo === 'MANUAL'" class="pt-2 border-t border-[#E2E9E4] space-y-2">
+              <label for="overrideMaterialSelect" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1.5">
+                Forzar Material Semana Actual
+              </label>
+              <select id="overrideMaterialSelect"
+                      [(ngModel)]="overrideMaterialCodigo"
+                      class="select-stitch w-full py-2 px-3 text-xs font-bold text-[#123F5B] bg-white border border-[#D5E2D9]">
+                <option value="VIDRIO">Semana de Vidrio</option>
+                <option value="CARTON_PAPEL">Semana de Cartón y Papel</option>
+                <option value="PLASTICO_PET">Semana de Plásticos (PET y PEAD)</option>
+                <option value="LATAS_METALES">Semana de Latas y Metales</option>
+              </select>
+              <p class="text-[11px] text-slate-500">
+                Aplica a la recolección comunal durante la semana en curso.
+              </p>
+            </div>
+
+            <div class="pt-2 border-t border-[#E2E9E4]">
+              <div class="text-[11px] text-slate-600 space-y-1">
+                <div class="flex justify-between">
+                  <span class="font-medium text-slate-500">Semana ISO del Año:</span>
+                  <span class="font-bold text-brand-navy">Semana {{ rotacionSemanal?.numSemanaISO || currentSemanaISO }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-medium text-slate-500">Vigencia Actual:</span>
+                  <span class="font-bold text-slate-700">{{ rotacionSemanal?.vigenciaDesde }} al {{ rotacionSemanal?.vigenciaHasta }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-medium text-slate-500">Material Activo:</span>
+                  <span class="font-bold text-emerald-800">{{ rotacionSemanal?.residuoNombre || 'Vidrio' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Columna Derecha: Tarjetas del Ciclo de 4 Semanas -->
+          <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div *ngFor="let sem of semanasRotacion"
+                 class="p-4 rounded-xl border transition-all flex flex-col justify-between"
+                 [ngClass]="isSemanaActiva(sem.slot) ? 'bg-[#F0F6F9] border-2 border-[#123F5B] shadow-xs' : 'bg-white border-[#E2E9E4]'">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-extrabold text-[#123F5B]">Semana {{ sem.slot }}</span>
+                  <span *ngIf="isSemanaActiva(sem.slot)"
+                        class="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#123F5B] text-white">
+                    Activa
+                  </span>
+                </div>
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm mb-2"
+                     [ngClass]="isSemanaActiva(sem.slot) ? 'bg-[#123F5B] text-white' : 'bg-[#EEF5EB] text-[#4F8A3D]'">
+                  <i [class]="getRotacionMaterialIcon(sem.codigo)"></i>
+                </div>
+                <h5 class="text-xs font-extrabold text-brand-navy leading-tight">{{ sem.nombre }}</h5>
+                <p class="text-[10px] text-slate-500 mt-1 line-clamp-2 leading-snug">{{ sem.descripcion }}</p>
+              </div>
+              <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px]">
+                <span class="font-bold text-slate-400">Ciclo DIMAO</span>
+                <span class="font-mono text-slate-500">{{ sem.categoria }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== GESTIÓN DE CATÁLOGO Y DÍA POR SECTOR ==================== -->
+        <div class="pt-4 border-t border-[#EAEFE8] space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h4 class="font-heading font-extrabold text-base text-[#123F5B]">
+                Ajuste Manual de Recolección por Sector y Cuadrante
+              </h4>
+              <p class="text-xs text-slate-500">
+                Permite reasignar el día de recolección o el material principal asignado a un sector ante feriados o contingencias.
+              </p>
+            </div>
+            <span class="text-xs text-slate-500 font-semibold">
+              {{ sectores.length }} cuadrantes comunales
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div *ngFor="let s of sectores"
+                 class="p-4 rounded-xl border border-[#E2E9E4] bg-[#F8FAF7] hover:border-[#CFE2D4] transition-all space-y-3">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-mono text-xs font-black px-2 py-0.5 rounded bg-white border border-[#DFE8E1] text-[#123F5B]">
+                      C{{ s.numero }}
+                    </span>
+                    <h5 class="text-sm font-extrabold text-brand-navy">{{ s.nombre }}</h5>
+                  </div>
+                  <p class="text-xs text-slate-500 mt-0.5">{{ s.sector }} • Camión {{ s.patente }}</p>
+                </div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded"
+                      [ngClass]="isSectorOverride(s.nombre) ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-slate-100 text-slate-600 border border-slate-200'">
+                  {{ isSectorOverride(s.nombre) ? 'Modificado' : 'Predeterminado' }}
+                </span>
+              </div>
+
+              <!-- Selectores de Día y Material -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1" *ngIf="sectorFormOverrides[s.nombre]">
+                <div>
+                  <label [for]="'diaSector_' + s.id" class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                    Día de Recorrido
+                  </label>
+                  <select [id]="'diaSector_' + s.id"
+                          [(ngModel)]="sectorFormOverrides[s.nombre].dia"
+                          class="select-stitch w-full py-1.5 px-2.5 text-xs font-bold text-[#123F5B] bg-white border border-[#D5E2D9]">
+                    <option value="Lunes">Lunes</option>
+                    <option value="Martes">Martes</option>
+                    <option value="Miércoles">Miércoles</option>
+                    <option value="Jueves">Jueves</option>
+                    <option value="Viernes">Viernes</option>
+                    <option value="Sábado">Sábado</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label [for]="'materialSector_' + s.id" class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                    Material Asignado
+                  </label>
+                  <select [id]="'materialSector_' + s.id"
+                          [(ngModel)]="sectorFormOverrides[s.nombre].material"
+                          class="select-stitch w-full py-1.5 px-2.5 text-xs font-bold text-[#123F5B] bg-white border border-[#D5E2D9]">
+                    <option value="Vidrio">Vidrio</option>
+                    <option value="Cartón y Papel">Cartón y Papel</option>
+                    <option value="Plásticos (PET y PEAD)">Plásticos (PET y PEAD)</option>
+                    <option value="Latas y Metales">Latas y Metales</option>
+                    <option value="Papel, Cartón y Latas">Papel, Cartón y Latas</option>
+                    <option value="Vidrio, Plásticos y Latas">Vidrio, Plásticos y Latas</option>
+                    <option value="Plásticos (PET) y Envases">Plásticos (PET) y Envases</option>
+                    <option value="Vidrio, Cartón y Plásticos">Vidrio, Cartón y Plásticos</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Acciones por Sector -->
+              <div class="flex items-center justify-between pt-2 border-t border-slate-200/60">
+                <span *ngIf="sectorFeedback[s.nombre]"
+                      class="text-[11px] font-bold"
+                      [ngClass]="sectorFeedback[s.nombre].tipo === 'success' ? 'text-emerald-700' : 'text-rose-700'">
+                  {{ sectorFeedback[s.nombre].mensaje }}
+                </span>
+                <span *ngIf="!sectorFeedback[s.nombre]" class="text-[11px] text-slate-500">
+                  Horario: {{ s.horario }}
+                </span>
+
+                <div class="flex items-center gap-1.5">
+                  <button *ngIf="isSectorOverride(s.nombre)"
+                          (click)="restablecerSector(s)"
+                          type="button"
+                          class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white hover:bg-slate-100 text-slate-600 border border-slate-300 transition-colors cursor-pointer">
+                    Restablecer
+                  </button>
+                  <button (click)="guardarSectorOverride(s)"
+                          type="button"
+                          [disabled]="savingSectorNombre === s.nombre"
+                          class="px-3 py-1 rounded-lg text-xs font-bold bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white transition-all cursor-pointer flex items-center gap-1 shadow-2xs">
+                    <i class="fa-solid" [class.fa-spinner]="savingSectorNombre === s.nombre" [class.fa-spin]="savingSectorNombre === s.nombre" [class.fa-check]="savingSectorNombre !== s.nombre"></i>
+                    <span>Actualizar</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -662,6 +906,7 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
   @Input() camiones: Camion[] = [];
   @Input() catalogoDisponible: boolean | null = true;
   @Input() residuos: Residuo[] = [];
+  @Input() rotacionSemanal: RotacionSemanal | null = null;
   @Input() activeWaypoint: Waypoint = { name: 'Costanera Sur', detail: 'Recorrido en curso', eta: '10 min', distancia: '1.2 km', x: 28, y: 72, estado: 'En recorrido' };
   @Input() truckSimulationRunning: boolean = true;
   @Input() truckSpeed: number = 1;
@@ -673,9 +918,20 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
   @Output() toggleTruckSpeed = new EventEmitter<void>();
   @Output() resetTruckSimulation = new EventEmitter<void>();
   @Output() camionEstadoCambiado = new EventEmitter<Camion>();
+  @Output() rotacionModificada = new EventEmitter<void>();
+  @Output() sectoresModificados = new EventEmitter<Sector[]>();
 
   Math = Math;
   selectedTruckPatente: string = 'PV-RC-2026';
+
+  rotacionModo: 'AUTOMATICO' | 'MANUAL' = 'AUTOMATICO';
+  overrideMaterialCodigo: string = 'VIDRIO';
+  semanasRotacion = SEMANAS_ROTACION_DEFAULT;
+  rotacionFeedback: { tipo: 'success' | 'error'; mensaje: string } | null = null;
+  isSavingRotacion = false;
+  sectorFormOverrides: Record<string, { dia: string; material: string }> = {};
+  savingSectorNombre: string | null = null;
+  sectorFeedback: Record<string, { tipo: 'success' | 'error'; mensaje: string }> = {};
 
   filterStatus: string = 'ALL';
   filterSector: string = 'ALL';
@@ -755,12 +1011,210 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
     document.body.style.overflow = '';
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.initRotacionConfig();
+    this.initSectorForms();
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['residuos'] && this.residuos && this.residuos.length > 0) {
       this.nuevoResiduoId = this.residuos[0].id;
     }
+    if (changes['sectores'] && this.sectores && this.sectores.length > 0) {
+      this.initSectorForms();
+    }
+    if (changes['rotacionSemanal'] && this.rotacionSemanal) {
+      if (this.rotacionModo === 'MANUAL' && this.rotacionSemanal.residuoCodigo) {
+        this.overrideMaterialCodigo = this.rotacionSemanal.residuoCodigo;
+      }
+    }
+  }
+
+  initRotacionConfig(): void {
+    const local = loadLocalRotacionConfig();
+    this.rotacionModo = local.modo || 'AUTOMATICO';
+    if (local.overrideCodigoResiduo) {
+      this.overrideMaterialCodigo = local.overrideCodigoResiduo;
+    }
+    this.bffService.getRotacionConfig().subscribe({
+      next: (cfg) => {
+        if (cfg && cfg.modo) {
+          this.rotacionModo = cfg.modo;
+          if (cfg.overrideCodigoResiduo) {
+            this.overrideMaterialCodigo = cfg.overrideCodigoResiduo;
+          }
+          saveLocalRotacionConfig({
+            modo: this.rotacionModo,
+            overrideCodigoResiduo: this.rotacionModo === 'MANUAL' ? this.overrideMaterialCodigo : null
+          });
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  initSectorForms(): void {
+    const overrides = loadLocalSectorOverrides();
+    this.sectores.forEach(s => {
+      const ov = overrides[s.nombre] || overrides[s.sector] || overrides[s.cuadrante];
+      this.sectorFormOverrides[s.nombre] = {
+        dia: ov?.dia || s.dia,
+        material: ov?.material || ov?.materialPrincipal || s.materialPrincipal || s.material
+      };
+    });
+  }
+
+  get currentSemanaISO(): number {
+    const now = new Date();
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    const dayOfYear = Math.floor((now.getTime() - startOfYear.getTime()) / 86_400_000) + 1;
+    return Math.ceil(dayOfYear / 7);
+  }
+
+  isSemanaActiva(slot: number): boolean {
+    return this.rotacionSemanal?.slotSemana === slot;
+  }
+
+  getRotacionMaterialIcon(codigo: string): string {
+    switch (codigo) {
+      case 'VIDRIO': return 'fa-solid fa-wine-bottle';
+      case 'CARTON_PAPEL': return 'fa-solid fa-box-archive';
+      case 'PLASTICO_PET': return 'fa-solid fa-bottle-water';
+      case 'LATAS_METALES': return 'fa-solid fa-can-food';
+      default: return 'fa-solid fa-recycle';
+    }
+  }
+
+  isSectorOverride(sectorNombre: string): boolean {
+    const overrides = loadLocalSectorOverrides();
+    return !!(overrides && overrides[sectorNombre]);
+  }
+
+  guardarRotacionConfig(): void {
+    this.isSavingRotacion = true;
+    this.rotacionFeedback = null;
+    const payload = {
+      modo: this.rotacionModo,
+      overrideCodigoResiduo: this.rotacionModo === 'MANUAL' ? this.overrideMaterialCodigo : null
+    };
+
+    saveLocalRotacionConfig(payload);
+
+    this.bffService.actualizarRotacionConfig(payload).subscribe({
+      next: () => {
+        this.isSavingRotacion = false;
+        this.rotacionFeedback = {
+          tipo: 'success',
+          mensaje: this.rotacionModo === 'MANUAL'
+            ? 'Rotación manual guardada con éxito en el catálogo municipal.'
+            : 'Rotación automática guardada y sincronizada.'
+        };
+        this.rotacionModificada.emit();
+        setTimeout(() => { if (this.rotacionFeedback?.tipo === 'success') this.rotacionFeedback = null; }, 4000);
+      },
+      error: () => {
+        this.isSavingRotacion = false;
+        this.rotacionFeedback = {
+          tipo: 'success',
+          mensaje: 'Configuración guardada localmente (ms-reciclago-catalog fuera de línea).'
+        };
+        this.rotacionModificada.emit();
+        setTimeout(() => { if (this.rotacionFeedback?.tipo === 'success') this.rotacionFeedback = null; }, 4000);
+      }
+    });
+  }
+
+  restablecerRotacionAutomatica(): void {
+    this.isSavingRotacion = true;
+    this.rotacionFeedback = null;
+    const payload = { modo: 'AUTOMATICO' as const, overrideCodigoResiduo: null };
+    saveLocalRotacionConfig(payload);
+    this.rotacionModo = 'AUTOMATICO';
+
+    this.bffService.resetRotacionConfig().subscribe({
+      next: () => {
+        this.isSavingRotacion = false;
+        this.rotacionFeedback = {
+          tipo: 'success',
+          mensaje: 'Calendario restablecido a rotación automática según semana ISO municipal.'
+        };
+        this.rotacionModificada.emit();
+        setTimeout(() => { if (this.rotacionFeedback?.tipo === 'success') this.rotacionFeedback = null; }, 4000);
+      },
+      error: () => {
+        this.isSavingRotacion = false;
+        this.rotacionFeedback = {
+          tipo: 'success',
+          mensaje: 'Calendario restablecido localmente a modo automático.'
+        };
+        this.rotacionModificada.emit();
+        setTimeout(() => { if (this.rotacionFeedback?.tipo === 'success') this.rotacionFeedback = null; }, 4000);
+      }
+    });
+  }
+
+  guardarSectorOverride(sector: Sector): void {
+    const form = this.sectorFormOverrides[sector.nombre];
+    if (!form) return;
+
+    this.savingSectorNombre = sector.nombre;
+    const overrides = loadLocalSectorOverrides();
+    overrides[sector.nombre] = {
+      dia: form.dia,
+      material: form.material,
+      materialPrincipal: form.material
+    };
+    saveLocalSectorOverrides(overrides);
+
+    sector.dia = form.dia;
+    sector.material = form.material;
+    sector.materialPrincipal = form.material;
+
+    let matCod = 'VIDRIO';
+    const mLower = form.material.toLowerCase();
+    if (mLower.includes('cartón') || mLower.includes('carton') || mLower.includes('papel')) matCod = 'CARTON_PAPEL';
+    else if (mLower.includes('plástico') || mLower.includes('plastico') || mLower.includes('pet')) matCod = 'PLASTICO_PET';
+    else if (mLower.includes('lata') || mLower.includes('metal')) matCod = 'LATAS_METALES';
+
+    this.bffService.actualizarSectorRotacion(sector.nombre, { dia: form.dia, materialCodigo: matCod, materialNombre: form.material }).subscribe({
+      next: () => {
+        this.savingSectorNombre = null;
+        this.sectorFeedback[sector.nombre] = { tipo: 'success', mensaje: 'Actualizado' };
+        this.sectoresModificados.emit(this.sectores);
+        this.rotacionModificada.emit();
+        setTimeout(() => { delete this.sectorFeedback[sector.nombre]; }, 3000);
+      },
+      error: () => {
+        this.savingSectorNombre = null;
+        this.sectorFeedback[sector.nombre] = { tipo: 'success', mensaje: 'Guardado local' };
+        this.sectoresModificados.emit(this.sectores);
+        this.rotacionModificada.emit();
+        setTimeout(() => { delete this.sectorFeedback[sector.nombre]; }, 3000);
+      }
+    });
+  }
+
+  restablecerSector(sector: Sector): void {
+    const defaultSec = DEFAULT_SECTORES.find(s => s.nombre === sector.nombre || s.numero === sector.numero);
+    if (!defaultSec) return;
+
+    const overrides = loadLocalSectorOverrides();
+    delete overrides[sector.nombre];
+    saveLocalSectorOverrides(overrides);
+
+    sector.dia = defaultSec.dia;
+    sector.material = defaultSec.material;
+    sector.materialPrincipal = defaultSec.materialPrincipal;
+
+    this.sectorFormOverrides[sector.nombre] = {
+      dia: defaultSec.dia,
+      material: defaultSec.materialPrincipal || defaultSec.material
+    };
+
+    this.sectorFeedback[sector.nombre] = { tipo: 'success', mensaje: 'Restablecido' };
+    this.sectoresModificados.emit(this.sectores);
+    this.rotacionModificada.emit();
+    setTimeout(() => { delete this.sectorFeedback[sector.nombre]; }, 3000);
   }
 
   get selectedCamion(): Camion {
