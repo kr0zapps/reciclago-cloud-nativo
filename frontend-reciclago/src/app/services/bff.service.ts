@@ -148,5 +148,21 @@ export class BffService {
       : `${this.baseUrl}/api/catalog/rotacion/semanal`;
     return this.http.get(url);
   }
+
+  getRotacionConfig(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/api/catalog/rotacion/config`);
+  }
+
+  actualizarRotacionConfig(payload: { modo: string; overrideCodigoResiduo?: string | null }): Observable<any> {
+    return this.http.put(`${this.baseUrl}/api/catalog/rotacion/config`, payload);
+  }
+
+  resetRotacionConfig(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/api/catalog/rotacion/reset`, {});
+  }
+
+  actualizarSectorRotacion(sectorNombre: string, payload: { dia?: string; materialCodigo?: string; materialNombre?: string }): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/api/catalog/rotacion/sector/${encodeURIComponent(sectorNombre)}`, payload);
+  }
 }
 

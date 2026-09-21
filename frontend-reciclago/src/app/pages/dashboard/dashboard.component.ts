@@ -32,7 +32,9 @@ import {
   DEFAULT_CAMIONES,
   DEFAULT_ROTACION_SEMANAL,
   RotacionSemanal,
-  getNextDateForDay
+  getNextDateForDay,
+  aplicarSectorOverrides,
+  calcularRotacionLocal
 } from './data/sectors.data';
 import { DAY_NAME_TO_NUMBER } from './utils/sector.utils';
 
@@ -66,7 +68,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   userEmail = '';
   userRoles: string[] = [];
 
-  sectores: Sector[] = [...DEFAULT_SECTORES];
+  sectores: Sector[] = aplicarSectorOverrides([...DEFAULT_SECTORES]);
   selectedSector = 'Costanera Sur y Llanquihue Sur';
   userActiveAddress = 'Calle Los Guindos 450, Costanera, Puerto Varas';
 
@@ -357,6 +359,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
               (sec as any).enRuta = Boolean(c.camionEnRuta);
             }
           });
+          this.sectores = aplicarSectorOverrides(this.sectores);
         }
       },
       error: () => {}
@@ -391,20 +394,30 @@ export class DashboardComponent implements OnInit, OnDestroy {
   /**
    * Carga la rotación semanal de residuos desde ms-reciclago-catalog vía BFF.
    * Si el catálogo no está disponible, mantiene el fallback calculado localmente
-   * (DEFAULT_ROTACION_SEMANAL) que usa la misma lógica modular que el backend.
+   * (con soporte de override manual persistido en localStorage).
    */
   loadRotacionSemanal(): void {
     this.bffService.getRotacionSemanal().subscribe({
       next: (data) => {
         if (data && data.residuoCodigo && !data.error) {
           this.rotacionSemanal = data as RotacionSemanal;
+        } else {
+          this.rotacionSemanal = calcularRotacionLocal();
         }
-        // Si viene un objeto de error (503 del BFF), se mantiene el fallback local
       },
       error: () => {
-        // Mantener rotacionSemanal = DEFAULT_ROTACION_SEMANAL (ya inicializado)
+        this.rotacionSemanal = calcularRotacionLocal();
       }
     });
+  }
+
+  onRotacionModificada(): void {
+    this.loadRotacionSemanal();
+  }
+
+  onSectoresModificados(sectoresActualizados: Sector[]): void {
+    this.sectores = [...sectoresActualizados];
+    this.truckWaypoints = this.currentSectorInfo?.waypoints || [];
   }
 
   onCamionEstadoCambiado(camionActualizado: Camion): void {
