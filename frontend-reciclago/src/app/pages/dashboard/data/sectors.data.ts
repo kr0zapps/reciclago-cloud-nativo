@@ -24,6 +24,9 @@ export interface Sector {
   waypoints: Waypoint[];
   enRuta?: boolean;
   fechaTexto?: string;
+  diaModificado?: boolean;
+  diaOriginal?: string;
+  motivoModificacion?: string;
 }
 
 export interface Residuo {
@@ -426,6 +429,42 @@ export function saveLocalRotacionConfig(config: { modo: 'AUTOMATICO' | 'MANUAL';
   } catch {}
 }
 
+export interface SectorScheduleOverride {
+  semana: number;           // 1, 2, 3, 4
+  sectorNombre: string;     // ej: 'Costanera Sur y Llanquihue Sur'
+  diaOriginal: string;      // ej: 'Martes'
+  nuevoDia: string;         // ej: 'Miércoles'
+  motivo?: string;          // ej: 'Feriado irrenunciable'
+  fechaModificacion: string;
+}
+
+export function loadScheduleOverrides(): SectorScheduleOverride[] {
+  try {
+    const raw = localStorage.getItem('reciclago_schedule_overrides');
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return [];
+}
+
+export function saveScheduleOverrides(overrides: SectorScheduleOverride[]): void {
+  try {
+    localStorage.setItem('reciclago_schedule_overrides', JSON.stringify(overrides));
+  } catch {}
+}
+
+export function getScheduleOverrideForSector(sectorNombre: string, semana: number): SectorScheduleOverride | null {
+  const overrides = loadScheduleOverrides();
+  return overrides.find(o =>
+    (o.sectorNombre === sectorNombre || sectorNombre.includes(o.sectorNombre) || o.sectorNombre.includes(sectorNombre)) &&
+    o.semana === semana
+  ) || null;
+}
+
+export function getAllAvisosParaSemana(semana: number): SectorScheduleOverride[] {
+  const overrides = loadScheduleOverrides();
+  return overrides.filter(o => o.semana === semana);
+}
+
 export function loadLocalSectorOverrides(): Record<string, { dia?: string; material?: string; materialPrincipal?: string }> {
   try {
     const raw = localStorage.getItem('reciclago_sectors_override');
@@ -442,19 +481,57 @@ export function saveLocalSectorOverrides(overrides: Record<string, { dia?: strin
   } catch {}
 }
 
-export function aplicarSectorOverrides(sectores: Sector[]): Sector[] {
-  const overrides = loadLocalSectorOverrides();
-  if (!overrides || Object.keys(overrides).length === 0) {
-    return sectores;
-  }
+export function aplicarSectorOverrides(sectores: Sector[], semana?: number): Sector[] {
+  const scheduleOverrides = loadScheduleOverrides();
+  const legacyOverrides = loadLocalSectorOverrides();
+
   return sectores.map(s => {
-    const ov = overrides[s.nombre] || overrides[s.sector] || overrides[s.cuadrante];
-    if (!ov) return s;
+    let diaActual = s.dia;
+    let diaModificado = false;
+    let diaOriginal = s.dia;
+    let motivo = '';
+
+    if (semana) {
+      const match = scheduleOverrides.find(o =>
+        (o.sectorNombre === s.nombre || s.nombre.includes(o.sectorNombre) || o.sectorNombre.includes(s.nombre)) &&
+        o.semana === semana
+      );
+      if (match) {
+        diaActual = match.nuevoDia;
+        diaModificado = true;
+        diaOriginal = match.diaOriginal;
+        motivo = match.motivo || '';
+      }
+    } else if (scheduleOverrides.length > 0) {
+      // Si no se especifica semana, buscar el override más reciente para este sector
+      const match = scheduleOverrides.find(o =>
+        (o.sectorNombre === s.nombre || s.nombre.includes(o.sectorNombre) || o.sectorNombre.includes(s.nombre))
+      );
+      if (match) {
+        diaActual = match.nuevoDia;
+        diaModificado = true;
+        diaOriginal = match.diaOriginal;
+        motivo = match.motivo || '';
+      }
+    }
+
+    if (!diaModificado) {
+      const ov = legacyOverrides[s.nombre] || legacyOverrides[s.sector] || legacyOverrides[s.cuadrante];
+      if (ov && ov.dia) {
+        diaActual = ov.dia;
+      }
+    }
+
+    const legacyOv = legacyOverrides[s.nombre] || legacyOverrides[s.sector] || legacyOverrides[s.cuadrante];
+
     return {
       ...s,
-      dia: ov.dia || s.dia,
-      material: ov.material || s.material,
-      materialPrincipal: ov.materialPrincipal || s.materialPrincipal
+      dia: diaActual,
+      material: legacyOv?.material || s.material,
+      materialPrincipal: legacyOv?.materialPrincipal || s.materialPrincipal,
+      diaModificado,
+      diaOriginal,
+      motivoModificacion: motivo
     };
   });
 }

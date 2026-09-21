@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, Output, EventEmitter, ChangeDetectorRef, 
 import { CommonModule } from '@angular/common';
 import { BffService } from '../../../services/bff.service';
 import { QuadrantCardInfo, INITIAL_QUADRANTS } from '../data/home-sectors.data';
-import { Residuo } from '../../dashboard/data/sectors.data';
+import { Residuo, getScheduleOverrideForSector } from '../../dashboard/data/sectors.data';
 
 interface MaterialDefinition {
   categoryKey: string;
@@ -142,6 +142,11 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                 Cuadrante {{ q.cuadranteNumber }} · {{ q.name }}
               </span>
 
+              <!-- Badge Aviso Reprogramación DIMAO -->
+              <span *ngIf="q.diaModificado" class="absolute top-3 left-3 bg-amber-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded shadow-sm flex items-center gap-1">
+                <i class="fa-solid fa-bullhorn text-[9px]"></i> Aviso DIMAO
+              </span>
+
               <!-- Badge Catálogo Live -->
               <span *ngIf="catalogLoaded" class="absolute top-3 right-3 bg-white/95 backdrop-blur-sm text-[10px] font-bold text-emerald-800 px-2 py-0.5 rounded shadow-2xs border border-emerald-200">
                 <i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i>Catálogo Activo
@@ -187,7 +192,10 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                   </svg>
                   <div>
                     <span class="block text-[10px] text-slate-500 font-medium">Día de retiro</span>
-                    <span class="block text-xs font-extrabold text-slate-800">{{ q.day }}</span>
+                    <span class="block text-xs font-extrabold" [ngClass]="q.diaModificado ? 'text-amber-900' : 'text-slate-800'">{{ q.day }}</span>
+                    <span *ngIf="q.diaModificado" class="text-[9px] font-bold text-amber-800 bg-amber-100 px-1 py-0.5 rounded border border-amber-300 mt-0.5 inline-block">
+                      Reprogramado
+                    </span>
                   </div>
                 </div>
 
@@ -284,6 +292,11 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                   Cuadrante {{ q.cuadranteNumber }}
                 </span>
                 
+                <!-- Badge Aviso Reprogramación DIMAO -->
+                <span *ngIf="q.diaModificado" class="absolute top-3 left-3 bg-amber-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded shadow-sm flex items-center gap-1">
+                  <i class="fa-solid fa-bullhorn text-[9px]"></i> Aviso DIMAO
+                </span>
+
                 <!-- Badge Catálogo Live -->
                 <span *ngIf="catalogLoaded" class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-[10px] font-bold text-emerald-800 px-2 py-0.5 rounded shadow-2xs border border-emerald-200">
                   <i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i>Catálogo Activo
@@ -310,7 +323,16 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                     </svg>
                     <div>
                       <span class="block text-[11px] text-slate-500 font-medium">Día de retiro</span>
-                      <span class="block text-sm font-extrabold text-slate-800">{{ q.day }}</span>
+                      <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="text-sm font-extrabold" [ngClass]="q.diaModificado ? 'text-amber-900' : 'text-slate-800'">{{ q.day }}</span>
+                        <span *ngIf="q.diaModificado" class="text-[9px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-300 inline-flex items-center gap-1">
+                          <i class="fa-solid fa-circle-exclamation text-[9px] text-amber-600"></i>
+                          <span>Reprogramado</span>
+                        </span>
+                      </div>
+                      <span *ngIf="q.diaModificado && q.motivoModificacion" class="block text-[10px] text-amber-700 font-medium mt-0.5">
+                        {{ q.motivoModificacion }}
+                      </span>
                     </div>
                   </div>
 
@@ -456,7 +478,20 @@ export class HomeQuadrantsComponent implements OnInit, OnDestroy {
     this.observer?.disconnect();
   }
 
+  currentCycleWeek: number = 3;
+
   loadCatalogResiduos(): void {
+    this.bffService.getRotacionSemanal().subscribe({
+      next: (rot) => {
+        if (rot && rot.slotSemana) {
+          this.currentCycleWeek = rot.slotSemana;
+          this.updateQuadrantsForWeek(this.activeWeek);
+          this.cdr.markForCheck();
+        }
+      },
+      error: () => {}
+    });
+
     this.bffService.getResiduos().subscribe({
       next: (residuos: Residuo[]) => {
         if (residuos && residuos.length > 0) {
@@ -478,27 +513,41 @@ export class HomeQuadrantsComponent implements OnInit, OnDestroy {
     });
   }
 
+  getEffectiveWeek(weekNumber: number): number {
+    if (weekNumber === 2) {
+      return (this.currentCycleWeek % 4) + 1;
+    }
+    return this.currentCycleWeek;
+  }
+
   updateQuadrantsForWeek(weekNumber: number): void {
     const offset = weekNumber === 2 ? 1 : 0;
+    const effectiveWeek = this.getEffectiveWeek(weekNumber);
 
     this.quadrants = INITIAL_QUADRANTS.map((q, idx) => {
       const matIndex = (idx + offset) % DEFAULT_MATERIALS_CYCLE.length;
       const baseMat = DEFAULT_MATERIALS_CYCLE[matIndex];
       const liveMat = this.liveResiduosMap.get(baseMat.categoryKey);
 
+      // Sincronización con reprogramación de día del admin DIMAO
+      const override = getScheduleOverrideForSector(q.name, effectiveWeek);
+
       return {
         ...q,
         cuadranteNumber: q.cuadranteNumber,
         name: q.name,
         shortName: q.shortName,
-        day: q.day,
+        day: override ? override.nuevoDia : q.day,
         hours: q.hours,
         image: q.image,
         categoryKey: baseMat.categoryKey,
         materialNombre: liveMat?.nombre || baseMat.materialNombre,
         materialDescripcion: liveMat?.descripcion || baseMat.materialDescripcion,
         materialInstrucciones: liveMat?.instrucciones || baseMat.materialInstrucciones,
-        binImage: baseMat.binImage
+        binImage: baseMat.binImage,
+        diaModificado: !!override,
+        diaOriginal: override ? override.diaOriginal : q.day,
+        motivoModificacion: override?.motivo || ''
       };
     });
   }

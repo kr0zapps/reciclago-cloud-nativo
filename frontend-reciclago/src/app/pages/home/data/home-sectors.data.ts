@@ -14,6 +14,9 @@ export interface QuadrantCardInfo {
   binImage: string;
   badgeColor: string;
   iconClass: string;
+  diaModificado?: boolean;
+  diaOriginal?: string;
+  motivoModificacion?: string;
 }
 
 export const INITIAL_QUADRANTS: QuadrantCardInfo[] = [

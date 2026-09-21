@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, SimpleChanges, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data';
+import { Sector, Camion, Residuo, Pickup, Waypoint, RotacionSemanal } from '../data/sectors.data';
 import { formatRut, validateRut } from '../../../shared/utils/rut.utils';
 import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/phone.utils';
 
@@ -19,6 +19,45 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           <i class="fa-solid fa-plus text-xs"></i>
           <span>Ingresar Solicitud</span>
         </button>
+      </div>
+
+      <!-- Banner de Alerta Operativa DIMAO para Coordinación de Rutas -->
+      <div *ngIf="sectoresReprogramados.length > 0"
+           class="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border-2 border-amber-300 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-start gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center text-lg flex-shrink-0 shadow-xs">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-amber-600 text-white">
+                Alerta de Despacho DIMAO
+              </span>
+              <span class="text-xs font-bold text-amber-950">
+                Sectores con Reprogramación de Día (Semana {{ rotacionSemanal?.slotSemana || 'Actual' }})
+              </span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-700 mt-1">
+              Atención cuadrilla: Los siguientes sectores han sido reprogramados excepcionalmente por la administración comunal:
+            </p>
+            <div class="flex flex-wrap gap-2 mt-2">
+              <span *ngFor="let s of sectoresReprogramados"
+                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-amber-300 text-xs font-bold text-[#123F5B] shadow-2xs">
+                <i class="fa-solid fa-map-pin text-amber-600 text-[11px]"></i>
+                <strong>{{ s.nombre }}:</strong>
+                <span class="line-through text-slate-400">{{ s.diaOriginal }}</span>
+                <i class="fa-solid fa-arrow-right text-[10px] text-amber-600"></i>
+                <span class="text-[#4F8A3D] font-extrabold">{{ s.dia }}</span>
+                <span *ngIf="s.motivoModificacion" class="text-slate-500 font-normal">({{ s.motivoModificacion }})</span>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="self-end md:self-center flex-shrink-0 text-right">
+          <span class="text-[11px] font-bold text-amber-900 bg-amber-100/80 px-2.5 py-1 rounded-lg border border-amber-200">
+            Ajustar Hoja de Ruta
+          </span>
+        </div>
       </div>
 
       <!-- ==================== 2. PIPELINE DE DESPACHO EN TIEMPO REAL ==================== -->
@@ -573,6 +612,7 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges, OnDestr
   @Input() activeWaypoint: Waypoint = { name: 'Costanera Sur', detail: 'Recorrido en curso', eta: '10 min', distancia: '1.2 km', x: 28, y: 72, estado: 'En recorrido' };
   @Input() truckSimulationRunning: boolean = true;
   @Input() truckSpeed: number = 1;
+  @Input() rotacionSemanal: RotacionSemanal | null = null;
 
   @Output() actionRequested = new EventEmitter<{ pickup: Pickup; action: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar' }>();
   @Output() pickupCreated = new EventEmitter<any>();
@@ -582,6 +622,10 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges, OnDestr
 
   Math = Math;
   selectedTruckPatente: string = 'PV-RC-2026';
+
+  get sectoresReprogramados(): Sector[] {
+    return (this.sectores || []).filter(s => s.diaModificado);
+  }
 
   filterStatus: string = 'ALL';
   filterSector: string = 'ALL';

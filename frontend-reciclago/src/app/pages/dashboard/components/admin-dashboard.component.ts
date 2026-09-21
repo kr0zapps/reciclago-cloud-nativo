@@ -13,9 +13,14 @@ import {
   SEMANAS_ROTACION_DEFAULT,
   loadLocalRotacionConfig,
   saveLocalRotacionConfig,
+  loadScheduleOverrides,
+  saveScheduleOverrides,
+  getScheduleOverrideForSector,
+  SectorScheduleOverride,
+  DEFAULT_SECTORES,
+  aplicarSectorOverrides,
   loadLocalSectorOverrides,
-  saveLocalSectorOverrides,
-  DEFAULT_SECTORES
+  saveLocalSectorOverrides
 } from '../data/sectors.data';
 import { BffService } from '../../../services/bff.service';
 import { formatRut, validateRut } from '../../../shared/utils/rut.utils';
@@ -182,118 +187,79 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
         </div>
       </section>
 
-      <!-- ==================== GESTIÓN Y CONTROL DE ROTACIÓN SEMANAL Y CATÁLOGO POR SECTOR (DIMAO) ==================== -->
+      <!-- ==================== GESTIÓN Y REPROGRAMACIÓN DE RECORRIDOS POR SEMANA Y SECTOR (DIMAO) ==================== -->
       <section class="bg-white rounded-2xl border border-[#E2E9E4] p-6 sm:p-8 shadow-xs space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#EAEFE8]">
           <div>
             <div class="flex items-center gap-2">
               <span class="text-xs font-bold uppercase tracking-wider text-[#123F5B]">Planificación Operativa Comunal</span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded"
-                    [ngClass]="rotacionModo === 'MANUAL' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-[#EBF5E7] text-emerald-900 border border-[#CDE8C7]'">
-                {{ rotacionModo === 'MANUAL' ? 'Modo Manual Activo' : 'Rotación Automática ISO' }}
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-[#EBF5E7] text-emerald-900 border border-[#CDE8C7]">
+                Sincronización en Tiempo Real
               </span>
             </div>
             <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy mt-0.5">
               Calendario y Rotación Semanal de Residuos
             </h3>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Haz clic en cualquier semana para seleccionarla y reprogramar el día de recolección de un sector específico.
+            </p>
           </div>
           <div class="flex items-center gap-2">
-            <button (click)="restablecerRotacionAutomatica()"
+            <button *ngIf="hayModificacionesEnSemana(semanaSeleccionada)"
+                    (click)="restablecerTodosSectoresDeSemana()"
                     type="button"
-                    [disabled]="isSavingRotacion"
                     class="px-3 py-2 rounded-xl text-xs font-bold border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
               <i class="fa-solid fa-rotate-left text-slate-500"></i>
-              <span>Restablecer Automático</span>
-            </button>
-            <button (click)="guardarRotacionConfig()"
-                    type="button"
-                    [disabled]="isSavingRotacion"
-                    class="px-4 py-2 rounded-xl text-xs font-bold bg-[#123F5B] hover:bg-[#0D3549] text-white transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
-              <i class="fa-solid" [class.fa-spinner]="isSavingRotacion" [class.fa-spin]="isSavingRotacion" [class.fa-floppy-disk]="!isSavingRotacion"></i>
-              <span>{{ isSavingRotacion ? 'Guardando...' : 'Guardar Calendario' }}</span>
+              <span>Restablecer Semana {{ semanaSeleccionada }}</span>
             </button>
           </div>
         </div>
 
         <!-- Banner de Feedback -->
-        <div *ngIf="rotacionFeedback"
+        <div *ngIf="reprogramacionFeedback"
              class="p-3.5 rounded-xl text-xs flex items-center justify-between gap-2 transition-all"
-             [ngClass]="rotacionFeedback.tipo === 'success' ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-rose-50 text-rose-900 border border-rose-200'">
+             [ngClass]="reprogramacionFeedback.tipo === 'success' ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-rose-50 text-rose-900 border border-rose-200'">
           <div class="flex items-center gap-2">
-            <i class="fa-solid" [class.fa-circle-check]="rotacionFeedback.tipo === 'success'" [class.fa-circle-exclamation]="rotacionFeedback.tipo === 'error'"></i>
-            <span class="font-semibold">{{ rotacionFeedback.mensaje }}</span>
+            <i class="fa-solid" [class.fa-circle-check]="reprogramacionFeedback.tipo === 'success'" [class.fa-circle-exclamation]="reprogramacionFeedback.tipo === 'error'"></i>
+            <span class="font-semibold">{{ reprogramacionFeedback.mensaje }}</span>
           </div>
-          <button (click)="rotacionFeedback = null" type="button" class="text-slate-400 hover:text-slate-600 text-xs">
+          <button (click)="reprogramacionFeedback = null" type="button" class="text-slate-400 hover:text-slate-600 text-xs cursor-pointer">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
 
-        <!-- Controles de Modo y Ciclo de 4 Semanas -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          <!-- Columna Izquierda: Selector de Modo y Override -->
-          <div class="p-5 rounded-2xl bg-[#F8FAF7] border border-[#E2E9E4] space-y-4">
-            <div>
-              <label for="rotacionModoSelect" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1.5">
-                Modalidad del Calendario
-              </label>
-              <select id="rotacionModoSelect"
-                      [(ngModel)]="rotacionModo"
-                      class="select-stitch w-full py-2 px-3 text-xs font-bold text-[#123F5B] bg-white border border-[#D5E2D9]">
-                <option value="AUTOMATICO">Automático (Calendario Municipal ISO)</option>
-                <option value="MANUAL">Manual (Anulación por Contingencia)</option>
-              </select>
-            </div>
-
-            <div *ngIf="rotacionModo === 'MANUAL'" class="pt-2 border-t border-[#E2E9E4] space-y-2">
-              <label for="overrideMaterialSelect" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1.5">
-                Forzar Material Semana Actual
-              </label>
-              <select id="overrideMaterialSelect"
-                      [(ngModel)]="overrideMaterialCodigo"
-                      class="select-stitch w-full py-2 px-3 text-xs font-bold text-[#123F5B] bg-white border border-[#D5E2D9]">
-                <option value="VIDRIO">Semana de Vidrio</option>
-                <option value="CARTON_PAPEL">Semana de Cartón y Papel</option>
-                <option value="PLASTICO_PET">Semana de Plásticos (PET y PEAD)</option>
-                <option value="LATAS_METALES">Semana de Latas y Metales</option>
-              </select>
-              <p class="text-[11px] text-slate-500">
-                Aplica a la recolección comunal durante la semana en curso.
-              </p>
-            </div>
-
-            <div class="pt-2 border-t border-[#E2E9E4]">
-              <div class="text-[11px] text-slate-600 space-y-1">
-                <div class="flex justify-between">
-                  <span class="font-medium text-slate-500">Semana ISO del Año:</span>
-                  <span class="font-bold text-brand-navy">Semana {{ rotacionSemanal?.numSemanaISO || currentSemanaISO }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="font-medium text-slate-500">Vigencia Actual:</span>
-                  <span class="font-bold text-slate-700">{{ rotacionSemanal?.vigenciaDesde }} al {{ rotacionSemanal?.vigenciaHasta }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="font-medium text-slate-500">Material Activo:</span>
-                  <span class="font-bold text-emerald-800">{{ rotacionSemanal?.residuoNombre || 'Vidrio' }}</span>
-                </div>
-              </div>
-            </div>
+        <!-- Las 4 Tarjetas de Semanas (Interactivas / Clickeables) -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-[#123F5B]">
+              1. Selecciona la Semana del Ciclo DIMAO (Haz clic en una semana)
+            </span>
+            <span class="text-xs text-slate-500 font-semibold">
+              Semana en curso: <strong class="text-[#123F5B]">Semana {{ rotacionSemanal?.slotSemana || 3 }} ({{ rotacionSemanal?.residuoNombre || 'Plásticos' }})</strong>
+            </span>
           </div>
 
-          <!-- Columna Derecha: Tarjetas del Ciclo de 4 Semanas -->
-          <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div *ngFor="let sem of semanasRotacion"
-                 class="p-4 rounded-xl border transition-all flex flex-col justify-between"
-                 [ngClass]="isSemanaActiva(sem.slot) ? 'bg-[#F0F6F9] border-2 border-[#123F5B] shadow-xs' : 'bg-white border-[#E2E9E4]'">
+                 (click)="seleccionarSemana(sem.slot)"
+                 class="p-4 rounded-xl border transition-all flex flex-col justify-between cursor-pointer select-none"
+                 [ngClass]="semanaSeleccionada === sem.slot
+                   ? 'bg-[#F0F6F9] border-2 border-[#123F5B] ring-2 ring-[#123F5B]/20 shadow-xs'
+                   : 'bg-white border-[#E2E9E4] hover:border-[#123F5B]/50 hover:bg-[#FAFBF9]'">
               <div>
                 <div class="flex items-center justify-between mb-2">
                   <span class="text-xs font-extrabold text-[#123F5B]">Semana {{ sem.slot }}</span>
-                  <span *ngIf="isSemanaActiva(sem.slot)"
+                  <span *ngIf="semanaSeleccionada === sem.slot"
                         class="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#123F5B] text-white">
-                    Activa
+                    Seleccionada
+                  </span>
+                  <span *ngIf="semanaSeleccionada !== sem.slot && isSemanaEnCurso(sem.slot)"
+                        class="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                    En Curso
                   </span>
                 </div>
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm mb-2"
-                     [ngClass]="isSemanaActiva(sem.slot) ? 'bg-[#123F5B] text-white' : 'bg-[#EEF5EB] text-[#4F8A3D]'">
+                     [ngClass]="semanaSeleccionada === sem.slot ? 'bg-[#123F5B] text-white' : 'bg-[#EEF5EB] text-[#4F8A3D]'">
                   <i [class]="getRotacionMaterialIcon(sem.codigo)"></i>
                 </div>
                 <h5 class="text-xs font-extrabold text-brand-navy leading-tight">{{ sem.nombre }}</h5>
@@ -307,104 +273,168 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           </div>
         </div>
 
-        <!-- ==================== GESTIÓN DE CATÁLOGO Y DÍA POR SECTOR ==================== -->
-        <div class="pt-4 border-t border-[#EAEFE8] space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <h4 class="font-heading font-extrabold text-base text-[#123F5B]">
-                Ajuste Manual de Recolección por Sector y Cuadrante
-              </h4>
-              <p class="text-xs text-slate-500">
-                Permite reasignar el día de recolección o el material principal asignado a un sector ante feriados o contingencias.
-              </p>
+        <!-- Panel de Control: Reprogramar Día del Sector Seleccionado -->
+        <div class="p-5 rounded-2xl bg-[#F8FAF7] border border-[#E2E9E4] space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#E2E9E4]">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-[#123F5B] text-white flex items-center justify-center text-xs font-bold">
+                <i class="fa-solid fa-sliders"></i>
+              </div>
+              <div>
+                <h4 class="text-sm font-extrabold text-[#123F5B]">
+                  2. Reprogramar Día de Recolección por Sector
+                </h4>
+                <p class="text-[11px] text-slate-500">
+                  Configurando: <strong>Semana {{ semanaSeleccionada }} ({{ getSemanaNombre(semanaSeleccionada) }})</strong>
+                </p>
+              </div>
             </div>
-            <span class="text-xs text-slate-500 font-semibold">
-              {{ sectores.length }} cuadrantes comunales
+
+            <span *ngIf="isSectorModificadoEnSemana(sectorSeleccionadoNombre, semanaSeleccionada)"
+                  class="text-xs font-bold px-2.5 py-1 rounded-md bg-amber-100 text-amber-900 border border-amber-300">
+              <i class="fa-solid fa-circle-exclamation mr-1 text-amber-700"></i> Reprogramación Activa
             </span>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Fila de Selectores Intuitivos -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 items-end">
+            <!-- Selector de Sector -->
+            <div>
+              <label for="adminSelectSector" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1.5">
+                Sector / Cuadrante
+              </label>
+              <select id="adminSelectSector"
+                      [(ngModel)]="sectorSeleccionadoNombre"
+                      (ngModelChange)="onSectorSeleccionadoChange()"
+                      class="select-stitch w-full py-2 px-3 text-xs font-bold text-[#123F5B] bg-white border border-[#D5E2D9]">
+                <option *ngFor="let s of sectores" [value]="s.nombre">
+                  C{{ s.numero }}: {{ s.nombre }} (Habitual: {{ getDiaHabitual(s.nombre) }})
+                </option>
+              </select>
+            </div>
+
+            <!-- Selector de Nuevo Día -->
+            <div>
+              <label for="adminSelectNuevoDia" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1.5">
+                Día de Recolección para Semana {{ semanaSeleccionada }}
+              </label>
+              <select id="adminSelectNuevoDia"
+                      [(ngModel)]="nuevoDiaSeleccionado"
+                      class="select-stitch w-full py-2 px-3 text-xs font-bold text-[#123F5B] bg-white border border-[#D5E2D9]">
+                <option value="Lunes">Lunes</option>
+                <option value="Martes">Martes</option>
+                <option value="Miércoles">Miércoles</option>
+                <option value="Jueves">Jueves</option>
+                <option value="Viernes">Viernes</option>
+                <option value="Sábado">Sábado</option>
+              </select>
+            </div>
+
+            <!-- Motivo del Cambio -->
+            <div>
+              <label for="adminMotivoCambio" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1.5">
+                Motivo del Aviso a Vecinos (Opcional)
+              </label>
+              <input id="adminMotivoCambio"
+                     type="text"
+                     [(ngModel)]="motivoCambioDia"
+                     placeholder="Ej: Feriado irrenunciable o contingencia climática"
+                     class="input-stitch w-full py-2 px-3 text-xs font-medium bg-white border border-[#D5E2D9]">
+            </div>
+          </div>
+
+          <!-- Botones de Acción -->
+          <div class="pt-2 flex items-center justify-between flex-wrap gap-2">
+            <p class="text-[11px] text-slate-500">
+              Día habitual: <strong class="text-slate-700">{{ getDiaHabitual(sectorSeleccionadoNombre) }}</strong>.
+              <span *ngIf="nuevoDiaSeleccionado !== getDiaHabitual(sectorSeleccionadoNombre)" class="text-amber-800 font-bold ml-1">
+                Se reprogramará al {{ nuevoDiaSeleccionado }} y se notificará en toda la comuna.
+              </span>
+            </p>
+
+            <div class="flex items-center gap-2">
+              <button *ngIf="isSectorModificadoEnSemana(sectorSeleccionadoNombre, semanaSeleccionada)"
+                      (click)="restablecerSectorSeleccionado()"
+                      type="button"
+                      class="px-3 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-100 text-slate-600 border border-slate-300 transition-colors cursor-pointer shadow-2xs">
+                <i class="fa-solid fa-rotate-left mr-1"></i> Volver a Día Habitual
+              </button>
+              <button (click)="guardarReprogramacionSector()"
+                      type="button"
+                      [disabled]="isSavingRotacion"
+                      class="btn-stitch-primary px-4 py-2 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs">
+                <i class="fa-solid" [class.fa-spinner]="isSavingRotacion" [class.fa-spin]="isSavingRotacion" [class.fa-bullhorn]="!isSavingRotacion"></i>
+                <span>{{ isSavingRotacion ? 'Guardando...' : 'Aplicar Cambio y Sincronizar' }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Tarjetas de Cuadrantes para la Semana Seleccionada -->
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-[#123F5B]">
+              Resumen de los 4 Cuadrantes para Semana {{ semanaSeleccionada }} ({{ getSemanaNombre(semanaSeleccionada) }})
+            </span>
+            <span class="text-xs text-slate-500 font-semibold">
+              Haz clic en cualquier cuadrante para seleccionarlo en el formulario
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
             <div *ngFor="let s of sectores"
-                 class="p-4 rounded-xl border border-[#E2E9E4] bg-[#F8FAF7] hover:border-[#CFE2D4] transition-all space-y-3">
-              <div class="flex items-start justify-between gap-2">
-                <div>
-                  <div class="flex items-center gap-1.5">
-                    <span class="font-mono text-xs font-black px-2 py-0.5 rounded bg-white border border-[#DFE8E1] text-[#123F5B]">
-                      C{{ s.numero }}
+                 (click)="seleccionarSectorEnGrilla(s.nombre)"
+                 class="p-4 rounded-xl border transition-all flex flex-col justify-between cursor-pointer select-none"
+                 [ngClass]="sectorSeleccionadoNombre === s.nombre
+                   ? 'border-[#123F5B] bg-[#F4F8FA] ring-2 ring-[#123F5B]/20 shadow-xs'
+                   : (isSectorModificadoEnSemana(s.nombre, semanaSeleccionada)
+                     ? 'border-amber-300 bg-amber-50/40 hover:border-amber-400'
+                     : 'border-[#E2E9E4] bg-white hover:border-slate-300')">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="font-mono text-xs font-black px-2 py-0.5 rounded bg-white border border-[#DFE8E1] text-[#123F5B]">
+                    C{{ s.numero }}
+                  </span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded"
+                        [ngClass]="isSectorModificadoEnSemana(s.nombre, semanaSeleccionada)
+                          ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                          : 'bg-slate-100 text-slate-600'">
+                    {{ isSectorModificadoEnSemana(s.nombre, semanaSeleccionada) ? 'Reprogramado' : 'Habitual' }}
+                  </span>
+                </div>
+
+                <h5 class="text-xs font-extrabold text-brand-navy leading-tight">{{ s.nombre }}</h5>
+                <p class="text-[11px] text-slate-500 mt-0.5">{{ s.sector }} • {{ s.patente }}</p>
+
+                <!-- Día asignado destacado -->
+                <div class="mt-3 p-2.5 rounded-lg flex items-center justify-between"
+                     [ngClass]="isSectorModificadoEnSemana(s.nombre, semanaSeleccionada)
+                       ? 'bg-amber-100/70 border border-amber-300 text-amber-950'
+                       : 'bg-[#F8FAF7] border border-[#E2E9E4] text-slate-800'">
+                  <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider block text-slate-500">Día de Retiro</span>
+                    <span class="text-sm font-extrabold"
+                          [ngClass]="isSectorModificadoEnSemana(s.nombre, semanaSeleccionada) ? 'text-amber-900' : 'text-[#123F5B]'">
+                      {{ getDiaSector(s.nombre, semanaSeleccionada) }}
                     </span>
-                    <h5 class="text-sm font-extrabold text-brand-navy">{{ s.nombre }}</h5>
                   </div>
-                  <p class="text-xs text-slate-500 mt-0.5">{{ s.sector }} • Camión {{ s.patente }}</p>
-                </div>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded"
-                      [ngClass]="isSectorOverride(s.nombre) ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-slate-100 text-slate-600 border border-slate-200'">
-                  {{ isSectorOverride(s.nombre) ? 'Modificado' : 'Predeterminado' }}
-                </span>
-              </div>
-
-              <!-- Selectores de Día y Material -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1" *ngIf="sectorFormOverrides[s.nombre]">
-                <div>
-                  <label [for]="'diaSector_' + s.id" class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
-                    Día de Recorrido
-                  </label>
-                  <select [id]="'diaSector_' + s.id"
-                          [(ngModel)]="sectorFormOverrides[s.nombre].dia"
-                          class="select-stitch w-full py-1.5 px-2.5 text-xs font-bold text-[#123F5B] bg-white border border-[#D5E2D9]">
-                    <option value="Lunes">Lunes</option>
-                    <option value="Martes">Martes</option>
-                    <option value="Miércoles">Miércoles</option>
-                    <option value="Jueves">Jueves</option>
-                    <option value="Viernes">Viernes</option>
-                    <option value="Sábado">Sábado</option>
-                  </select>
+                  <i class="fa-solid text-sm"
+                     [class.fa-triangle-exclamation]="isSectorModificadoEnSemana(s.nombre, semanaSeleccionada)"
+                     [class.text-amber-600]="isSectorModificadoEnSemana(s.nombre, semanaSeleccionada)"
+                     [class.fa-calendar-check]="!isSectorModificadoEnSemana(s.nombre, semanaSeleccionada)"
+                     [class.text-emerald-700]="!isSectorModificadoEnSemana(s.nombre, semanaSeleccionada)"></i>
                 </div>
 
-                <div>
-                  <label [for]="'materialSector_' + s.id" class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
-                    Material Asignado
-                  </label>
-                  <select [id]="'materialSector_' + s.id"
-                          [(ngModel)]="sectorFormOverrides[s.nombre].material"
-                          class="select-stitch w-full py-1.5 px-2.5 text-xs font-bold text-[#123F5B] bg-white border border-[#D5E2D9]">
-                    <option value="Vidrio">Vidrio</option>
-                    <option value="Cartón y Papel">Cartón y Papel</option>
-                    <option value="Plásticos (PET y PEAD)">Plásticos (PET y PEAD)</option>
-                    <option value="Latas y Metales">Latas y Metales</option>
-                    <option value="Papel, Cartón y Latas">Papel, Cartón y Latas</option>
-                    <option value="Vidrio, Plásticos y Latas">Vidrio, Plásticos y Latas</option>
-                    <option value="Plásticos (PET) y Envases">Plásticos (PET) y Envases</option>
-                    <option value="Vidrio, Cartón y Plásticos">Vidrio, Cartón y Plásticos</option>
-                  </select>
+                <!-- Aviso / Motivo si está modificado -->
+                <div *ngIf="isSectorModificadoEnSemana(s.nombre, semanaSeleccionada)" class="mt-2 text-[10px] text-amber-800 font-semibold bg-amber-50 p-1.5 rounded border border-amber-200/80">
+                  <i class="fa-solid fa-bullhorn mr-1 text-amber-600"></i>
+                  <span>{{ getAvisoMotivo(s.nombre, semanaSeleccionada) }}</span>
                 </div>
               </div>
 
-              <!-- Acciones por Sector -->
-              <div class="flex items-center justify-between pt-2 border-t border-slate-200/60">
-                <span *ngIf="sectorFeedback[s.nombre]"
-                      class="text-[11px] font-bold"
-                      [ngClass]="sectorFeedback[s.nombre].tipo === 'success' ? 'text-emerald-700' : 'text-rose-700'">
-                  {{ sectorFeedback[s.nombre].mensaje }}
-                </span>
-                <span *ngIf="!sectorFeedback[s.nombre]" class="text-[11px] text-slate-500">
-                  Horario: {{ s.horario }}
-                </span>
-
-                <div class="flex items-center gap-1.5">
-                  <button *ngIf="isSectorOverride(s.nombre)"
-                          (click)="restablecerSector(s)"
-                          type="button"
-                          class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white hover:bg-slate-100 text-slate-600 border border-slate-300 transition-colors cursor-pointer">
-                    Restablecer
-                  </button>
-                  <button (click)="guardarSectorOverride(s)"
-                          type="button"
-                          [disabled]="savingSectorNombre === s.nombre"
-                          class="px-3 py-1 rounded-lg text-xs font-bold bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white transition-all cursor-pointer flex items-center gap-1 shadow-2xs">
-                    <i class="fa-solid" [class.fa-spinner]="savingSectorNombre === s.nombre" [class.fa-spin]="savingSectorNombre === s.nombre" [class.fa-check]="savingSectorNombre !== s.nombre"></i>
-                    <span>Actualizar</span>
-                  </button>
-                </div>
+              <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                <span class="text-slate-400 font-medium">Horario: {{ s.horario }}</span>
+                <span class="font-bold text-[#123F5B] hover:underline">Editar →</span>
               </div>
             </div>
           </div>
@@ -933,6 +963,13 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
   savingSectorNombre: string | null = null;
   sectorFeedback: Record<string, { tipo: 'success' | 'error'; mensaje: string }> = {};
 
+  // Reprogramación interactiva por semana y sector DIMAO
+  semanaSeleccionada: number = 3;
+  sectorSeleccionadoNombre: string = 'Costanera Sur y Llanquihue Sur';
+  nuevoDiaSeleccionado: string = 'Miércoles';
+  motivoCambioDia: string = '';
+  reprogramacionFeedback: { tipo: 'success' | 'error'; mensaje: string } | null = null;
+
   filterStatus: string = 'ALL';
   filterSector: string = 'ALL';
 
@@ -1012,6 +1049,13 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+    if (this.rotacionSemanal?.slotSemana) {
+      this.semanaSeleccionada = this.rotacionSemanal.slotSemana;
+    }
+    if (this.sectores && this.sectores.length > 0) {
+      this.sectorSeleccionadoNombre = this.sectores[0].nombre;
+    }
+    this.syncSectorSeleccionadoForm();
     this.initRotacionConfig();
     this.initSectorForms();
   }
@@ -1021,11 +1065,19 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
       this.nuevoResiduoId = this.residuos[0].id;
     }
     if (changes['sectores'] && this.sectores && this.sectores.length > 0) {
+      if (!this.sectorSeleccionadoNombre) {
+        this.sectorSeleccionadoNombre = this.sectores[0].nombre;
+      }
+      this.syncSectorSeleccionadoForm();
       this.initSectorForms();
     }
     if (changes['rotacionSemanal'] && this.rotacionSemanal) {
       if (this.rotacionModo === 'MANUAL' && this.rotacionSemanal.residuoCodigo) {
         this.overrideMaterialCodigo = this.rotacionSemanal.residuoCodigo;
+      }
+      if (this.rotacionSemanal.slotSemana) {
+        this.semanaSeleccionada = this.rotacionSemanal.slotSemana;
+        this.syncSectorSeleccionadoForm();
       }
     }
   }
@@ -1215,6 +1267,168 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
     this.sectoresModificados.emit(this.sectores);
     this.rotacionModificada.emit();
     setTimeout(() => { delete this.sectorFeedback[sector.nombre]; }, 3000);
+  }
+
+  // ==================== MÉTODOS DE REPROGRAMACIÓN POR SEMANA Y SECTOR DIMAO ====================
+  seleccionarSemana(slot: number): void {
+    this.semanaSeleccionada = slot;
+    this.syncSectorSeleccionadoForm();
+  }
+
+  getSemanaNombre(slot: number): string {
+    const s = this.semanasRotacion.find(sem => sem.slot === slot);
+    return s ? s.nombre : `Semana ${slot}`;
+  }
+
+  isSemanaEnCurso(slot: number): boolean {
+    return this.rotacionSemanal?.slotSemana === slot;
+  }
+
+  getDiaHabitual(sectorNombre: string): string {
+    if (!sectorNombre) return 'Lunes';
+    const sec = DEFAULT_SECTORES.find(s =>
+      s.nombre === sectorNombre ||
+      sectorNombre.includes(s.nombre) ||
+      s.nombre.includes(sectorNombre)
+    );
+    return sec?.dia || 'Lunes';
+  }
+
+  getDiaSector(sectorNombre: string, semana: number): string {
+    const override = getScheduleOverrideForSector(sectorNombre, semana);
+    if (override) return override.nuevoDia;
+    return this.getDiaHabitual(sectorNombre);
+  }
+
+  isSectorModificadoEnSemana(sectorNombre: string, semana: number): boolean {
+    if (!sectorNombre) return false;
+    return !!getScheduleOverrideForSector(sectorNombre, semana);
+  }
+
+  getAvisoMotivo(sectorNombre: string, semana: number): string {
+    const override = getScheduleOverrideForSector(sectorNombre, semana);
+    if (!override) return '';
+    return override.motivo || `Reprogramado excepcionalmente al ${override.nuevoDia}`;
+  }
+
+  hayModificacionesEnSemana(semana: number): boolean {
+    const all = loadScheduleOverrides();
+    return all.some(o => o.semana === semana);
+  }
+
+  onSectorSeleccionadoChange(): void {
+    this.syncSectorSeleccionadoForm();
+  }
+
+  seleccionarSectorEnGrilla(sectorNombre: string): void {
+    this.sectorSeleccionadoNombre = sectorNombre;
+    this.syncSectorSeleccionadoForm();
+  }
+
+  syncSectorSeleccionadoForm(): void {
+    if (!this.sectorSeleccionadoNombre && this.sectores.length > 0) {
+      this.sectorSeleccionadoNombre = this.sectores[0].nombre;
+    }
+    const override = getScheduleOverrideForSector(this.sectorSeleccionadoNombre, this.semanaSeleccionada);
+    if (override) {
+      this.nuevoDiaSeleccionado = override.nuevoDia;
+      this.motivoCambioDia = override.motivo || '';
+    } else {
+      this.nuevoDiaSeleccionado = this.getDiaHabitual(this.sectorSeleccionadoNombre);
+      this.motivoCambioDia = '';
+    }
+  }
+
+  guardarReprogramacionSector(): void {
+    this.isSavingRotacion = true;
+    const diaHabitual = this.getDiaHabitual(this.sectorSeleccionadoNombre);
+    const overrides = loadScheduleOverrides().filter(
+      o => !(o.sectorNombre === this.sectorSeleccionadoNombre && o.semana === this.semanaSeleccionada)
+    );
+
+    if (this.nuevoDiaSeleccionado !== diaHabitual || (this.motivoCambioDia && this.motivoCambioDia.trim())) {
+      overrides.push({
+        semana: this.semanaSeleccionada,
+        sectorNombre: this.sectorSeleccionadoNombre,
+        diaOriginal: diaHabitual,
+        nuevoDia: this.nuevoDiaSeleccionado,
+        motivo: this.motivoCambioDia.trim() || `Reprogramado excepcionalmente al ${this.nuevoDiaSeleccionado}`,
+        fechaModificacion: new Date().toISOString()
+      });
+    }
+
+    saveScheduleOverrides(overrides);
+
+    const matSemana = this.semanasRotacion.find(s => s.slot === this.semanaSeleccionada);
+    this.bffService.actualizarSectorRotacion(this.sectorSeleccionadoNombre, {
+      dia: this.nuevoDiaSeleccionado,
+      materialCodigo: matSemana?.codigo || 'VIDRIO',
+      materialNombre: matSemana?.nombre || 'Residuo'
+    }).subscribe({
+      next: () => this.finalizarGuardadoReprogramacion(),
+      error: () => this.finalizarGuardadoReprogramacion()
+    });
+  }
+
+  private finalizarGuardadoReprogramacion(): void {
+    this.isSavingRotacion = false;
+    this.reprogramacionFeedback = {
+      tipo: 'success',
+      mensaje: `¡Reprogramación aplicada con éxito! El sector "${this.sectorSeleccionadoNombre}" se recolectará el día ${this.nuevoDiaSeleccionado} en Semana ${this.semanaSeleccionada}. Aviso sincronizado para vecinos y coordinadores.`
+    };
+    const semanaActiva = this.rotacionSemanal?.slotSemana || 3;
+    const updatedSectores = aplicarSectorOverrides(this.sectores, semanaActiva);
+    this.sectoresModificados.emit(updatedSectores);
+    this.rotacionModificada.emit();
+    setTimeout(() => {
+      if (this.reprogramacionFeedback?.tipo === 'success') {
+        this.reprogramacionFeedback = null;
+      }
+    }, 5000);
+  }
+
+  restablecerSectorSeleccionado(): void {
+    const overrides = loadScheduleOverrides().filter(
+      o => !(o.sectorNombre === this.sectorSeleccionadoNombre && o.semana === this.semanaSeleccionada)
+    );
+    saveScheduleOverrides(overrides);
+    this.syncSectorSeleccionadoForm();
+
+    const semanaActiva = this.rotacionSemanal?.slotSemana || 3;
+    const updatedSectores = aplicarSectorOverrides(this.sectores, semanaActiva);
+    this.sectoresModificados.emit(updatedSectores);
+    this.rotacionModificada.emit();
+
+    this.reprogramacionFeedback = {
+      tipo: 'success',
+      mensaje: `Sector "${this.sectorSeleccionadoNombre}" restablecido a su día habitual (${this.nuevoDiaSeleccionado}) para Semana ${this.semanaSeleccionada}.`
+    };
+    setTimeout(() => {
+      if (this.reprogramacionFeedback?.tipo === 'success') {
+        this.reprogramacionFeedback = null;
+      }
+    }, 4000);
+  }
+
+  restablecerTodosSectoresDeSemana(): void {
+    const overrides = loadScheduleOverrides().filter(o => o.semana !== this.semanaSeleccionada);
+    saveScheduleOverrides(overrides);
+    this.syncSectorSeleccionadoForm();
+
+    const semanaActiva = this.rotacionSemanal?.slotSemana || 3;
+    const updatedSectores = aplicarSectorOverrides(this.sectores, semanaActiva);
+    this.sectoresModificados.emit(updatedSectores);
+    this.rotacionModificada.emit();
+
+    this.reprogramacionFeedback = {
+      tipo: 'success',
+      mensaje: `Se restablecieron todos los sectores de la Semana ${this.semanaSeleccionada} a sus días habituales.`
+    };
+    setTimeout(() => {
+      if (this.reprogramacionFeedback?.tipo === 'success') {
+        this.reprogramacionFeedback = null;
+      }
+    }, 4000);
   }
 
   get selectedCamion(): Camion {

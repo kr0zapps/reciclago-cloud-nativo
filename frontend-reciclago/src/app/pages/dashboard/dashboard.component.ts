@@ -34,7 +34,9 @@ import {
   RotacionSemanal,
   getNextDateForDay,
   aplicarSectorOverrides,
-  calcularRotacionLocal
+  calcularRotacionLocal,
+  getScheduleOverrideForSector,
+  SectorScheduleOverride
 } from './data/sectors.data';
 import { DAY_NAME_TO_NUMBER } from './utils/sector.utils';
 
@@ -117,6 +119,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
       ...sec,
       fechaTexto: getNextDateForDay(sec.dia)
     };
+  }
+
+  get avisoSectorActivo(): SectorScheduleOverride | null {
+    const sec = this.currentSectorInfo;
+    if (!sec) return null;
+    const semana = this.rotacionSemanal?.slotSemana || 3;
+    return getScheduleOverrideForSector(sec.nombre, semana);
   }
 
   get isStaff(): boolean {
@@ -359,7 +368,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
               (sec as any).enRuta = Boolean(c.camionEnRuta);
             }
           });
-          this.sectores = aplicarSectorOverrides(this.sectores);
+          this.sectores = aplicarSectorOverrides(this.sectores, this.rotacionSemanal?.slotSemana);
         }
       },
       error: () => {}
@@ -404,9 +413,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
         } else {
           this.rotacionSemanal = calcularRotacionLocal();
         }
+        this.sectores = aplicarSectorOverrides(this.sectores, this.rotacionSemanal?.slotSemana);
+        this.truckWaypoints = this.currentSectorInfo?.waypoints || [];
       },
       error: () => {
         this.rotacionSemanal = calcularRotacionLocal();
+        this.sectores = aplicarSectorOverrides(this.sectores, this.rotacionSemanal?.slotSemana);
+        this.truckWaypoints = this.currentSectorInfo?.waypoints || [];
       }
     });
   }

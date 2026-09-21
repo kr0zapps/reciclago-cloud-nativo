@@ -27,7 +27,16 @@ import { Sector } from '../data/sectors.data';
                 <span class="font-heading font-semibold text-xl sm:text-2xl text-[#1F6685]">
                   {{ sector?.fechaTexto }}
                 </span>
+                <span *ngIf="sector?.diaModificado"
+                      class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                  <i class="fa-solid fa-triangle-exclamation text-amber-600 text-[11px]"></i>
+                  <span>Día Reprogramado</span>
+                </span>
               </div>
+              <p *ngIf="sector?.diaModificado" class="text-xs text-amber-800 font-semibold mt-1.5 flex items-center gap-1.5">
+                <i class="fa-solid fa-bullhorn text-amber-600 text-[11px]"></i>
+                <span>Día habitual: {{ sector?.diaOriginal }}. {{ sector?.motivoModificacion || 'Reprogramación extraordinaria DIMAO.' }}</span>
+              </p>
             </div>
 
             <!-- DETALLES (Horario y Dirección) -->

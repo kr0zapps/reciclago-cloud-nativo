@@ -183,6 +183,7 @@
       [camiones]="camionesDisponibles"
       [catalogoDisponible]="catalogoDisponible"
       [residuos]="residuos"
+      [rotacionSemanal]="rotacionSemanal"
       [activeWaypoint]="activeWaypoint"
       [truckSimulationRunning]="truckSimulationRunning"
       [truckSpeed]="truckSpeed"
@@ -207,6 +208,40 @@
 
   <!-- ==================== VISTA CIUDADANA PARA VECINOS ==================== -->
   <ng-container *ngIf="!isStaff">
+    <!-- BANNER DE AVISO MUNICIPAL DIMAO: REPROGRAMACIÓN DE DÍA EN EL SECTOR DEL VECINO -->
+    <div *ngIf="avisoSectorActivo"
+         class="rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-amber-500/15 via-amber-50 to-emerald-50 border-2 border-amber-300 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 anim-fade-up">
+      <div class="flex items-start sm:items-center gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center text-lg flex-shrink-0 shadow-xs">
+          <i class="fa-solid fa-bullhorn"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500 text-white">
+              Aviso DIMAO Puerto Varas
+            </span>
+            <span class="text-xs font-bold text-amber-900">
+              Reprogramación de Retiro en {{ currentSectorInfo?.nombre }}
+            </span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-700 mt-1">
+            Atención vecinos: En la <strong class="text-slate-900">Semana {{ rotacionSemanal.slotSemana }}</strong>, el retiro habitual del día
+            <span class="line-through text-slate-400 font-semibold">{{ avisoSectorActivo.diaOriginal }}</span>
+            se realizará excepcionalmente el <strong class="text-[#123F5B] font-extrabold underline decoration-amber-500 decoration-2">{{ avisoSectorActivo.nuevoDia }}</strong>.
+          </p>
+          <p *ngIf="avisoSectorActivo.motivo" class="text-xs text-amber-800 font-medium mt-0.5 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-info text-amber-600 text-[11px]"></i>
+            <span>Motivo: {{ avisoSectorActivo.motivo }}</span>
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 self-end sm:self-center flex-shrink-0">
+        <span class="px-3 py-1.5 rounded-xl bg-white border border-amber-300 text-xs font-extrabold text-[#123F5B] shadow-2xs">
+          Nuevo día: {{ avisoSectorActivo.nuevoDia }}
+        </span>
+      </div>
+    </div>
+
     <!-- 2. HERO PRINCIPAL: PRÓXIMO RETIRO + MATERIAL DE LA SEMANA -->
     <app-hero-pickup [sector]="currentSectorInfo" [userAddress]="userActiveAddress"></app-hero-pickup>
 
