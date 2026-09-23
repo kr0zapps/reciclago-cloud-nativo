@@ -108,10 +108,10 @@ import { environment } from '../../../environments/environment';
 export class LoginComponent implements OnInit {
 
   constructor(
-    @Inject(MSAL_GUARD_CONFIG) private msalGuardConfig: MsalGuardConfiguration,
-    private authService: MsalService,
-    private router: Router,
-    private route: ActivatedRoute
+    @Inject(MSAL_GUARD_CONFIG) private readonly msalGuardConfig: MsalGuardConfiguration,
+    private readonly authService: MsalService,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute
   ) {
     this.checkSessionAndRedirect();
   }

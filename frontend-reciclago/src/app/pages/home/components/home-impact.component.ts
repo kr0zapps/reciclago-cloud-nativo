@@ -78,7 +78,8 @@ import { BffService } from '../../../services/bff.service';
                 <i class="fa-solid fa-truck-ramp-box text-sm"></i>
               </div>
               <div>
-                <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-emerald-400 block mb-0.5">
+                <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400 mb-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                   Retiros Especiales
                 </span>
                 <h3 class="text-base sm:text-lg font-extrabold text-white tracking-tight mb-0.5 font-heading">
@@ -125,13 +126,13 @@ export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private observer?: IntersectionObserver;
   private animFrameId?: number;
-  private isBrowser: boolean;
+  private readonly isBrowser: boolean;
 
   constructor(
-    private el: ElementRef,
-    private cdr: ChangeDetectorRef,
-    private ngZone: NgZone,
-    private bffService: BffService,
+    private readonly el: ElementRef,
+    private readonly cdr: ChangeDetectorRef,
+    private readonly ngZone: NgZone,
+    private readonly bffService: BffService,
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
@@ -148,36 +149,41 @@ export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  private updateMetricsFromData(data: any): void {
+    this.isLiveConnected = true;
+    if (data.kilosCertificados !== undefined && data.kilosCertificados !== null) this.targetKg = Number(data.kilosCertificados);
+    if (data.porcentajeVertederos !== undefined && data.porcentajeVertederos !== null) this.targetPercent = Number(data.porcentajeVertederos);
+    if (data.camionesOperativos !== undefined && data.camionesOperativos !== null) this.targetTrucks = Number(data.camionesOperativos);
+    if (data.kilosEnVivo !== undefined && data.kilosEnVivo !== null) this.liveKilosEnVivo = Number(data.kilosEnVivo);
+    if (this.isVisible) {
+      this.startCountAnimation();
+    } else {
+      this.displayKg = this.targetKg.toLocaleString('es-CL');
+    }
+    this.cdr.markForCheck();
+  }
+
+  private loadTrucksFallback(): void {
+    this.bffService.getCamiones().subscribe({
+      next: (camiones) => {
+        if (camiones && camiones.length > 0) {
+          this.targetTrucks = camiones.length;
+          this.isLiveConnected = true;
+          this.cdr.markForCheck();
+        }
+      },
+      error: () => {}
+    });
+  }
+
   cargarMetricasEnVivo(): void {
     this.bffService.getImpactoComunal().subscribe({
       next: (data) => {
         if (data) {
-          this.isLiveConnected = true;
-          if (data.kilosCertificados !== undefined && data.kilosCertificados !== null) this.targetKg = Number(data.kilosCertificados);
-          if (data.porcentajeVertederos !== undefined && data.porcentajeVertederos !== null) this.targetPercent = Number(data.porcentajeVertederos);
-          if (data.camionesOperativos !== undefined && data.camionesOperativos !== null) this.targetTrucks = Number(data.camionesOperativos);
-          if (data.kilosEnVivo !== undefined && data.kilosEnVivo !== null) this.liveKilosEnVivo = Number(data.kilosEnVivo);
-          if (this.isVisible) {
-            this.startCountAnimation();
-          } else {
-            this.displayKg = this.targetKg.toLocaleString('es-CL');
-          }
-          this.cdr.markForCheck();
+          this.updateMetricsFromData(data);
         }
       },
-      error: () => {
-        // Fallback: intentar al menos obtener el conteo de camiones reales desde ms-reciclago-catalog
-        this.bffService.getCamiones().subscribe({
-          next: (camiones) => {
-            if (camiones && camiones.length > 0) {
-              this.targetTrucks = camiones.length;
-              this.isLiveConnected = true;
-              this.cdr.markForCheck();
-            }
-          },
-          error: () => {}
-        });
-      }
+      error: () => this.loadTrucksFallback()
     });
   }
 

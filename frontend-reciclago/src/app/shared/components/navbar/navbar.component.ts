@@ -187,7 +187,7 @@ export class NavbarComponent {
   @Output() logoutClicked = new EventEmitter<void>();
 
   mobileMenuOpen = false;
-  private router = inject(Router);
+  private readonly router = inject(Router);
 
   scrollToSection(sectionId: string): void {
     this.mobileMenuOpen = false;

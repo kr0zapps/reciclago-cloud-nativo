@@ -30,9 +30,9 @@ export function MSALInstanceFactory(): IPublicClientApplication {
       setActiveAccount: () => {},
       handleRedirectPromise: () => Promise.resolve(null),
       loginRedirect: () => Promise.resolve(),
-      loginPopup: () => Promise.reject('MSAL not active in this environment'),
+      loginPopup: () => Promise.reject(new Error('MSAL not active in this environment')),
       logoutRedirect: () => Promise.resolve(),
-      acquireTokenSilent: () => Promise.reject('MSAL not active in this environment')
+      acquireTokenSilent: () => Promise.reject(new Error('MSAL not active in this environment'))
     } as unknown as IPublicClientApplication;
   }
 }

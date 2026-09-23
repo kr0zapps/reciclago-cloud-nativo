@@ -58,7 +58,7 @@ export function validateRut(rut: string | null | undefined): boolean {
   let multiplo = 2;
 
   for (let i = cuerpo.length - 1; i >= 0; i--) {
-    suma += parseInt(cuerpo.charAt(i), 10) * multiplo;
+    suma += Number.parseInt(cuerpo.charAt(i), 10) * multiplo;
     multiplo = multiplo < 7 ? multiplo + 1 : 2;
   }
 

@@ -98,26 +98,24 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
           </div>
         </div>
 
-        <!-- Mobile View: Selector con Scroll Horizontal + Tarjeta Interactiva (md:hidden) -->
+        <!-- Mobile View: Selector de 4 Sectores en 1 Fila (CERO scroll horizontal) + Tarjeta Interactiva (md:hidden) -->
         <div class="md:hidden">
-          <!-- Pills cuadrantes móvil -->
-          <div class="relative mb-3">
-            <div class="flex items-center gap-2 overflow-x-auto pb-1 px-0.5 no-scrollbar scroll-smooth">
-              <button
-                *ngFor="let q of quadrants; let i = index"
-                type="button"
-                (click)="setMobileQuadrant(i)"
-                [class.bg-slate-900]="selectedMobileIndex === i"
-                [class.text-white]="selectedMobileIndex === i"
-                [class.border-slate-900]="selectedMobileIndex === i"
-                [class.shadow-xs]="selectedMobileIndex === i"
-                [class.bg-white]="selectedMobileIndex !== i"
-                [class.text-slate-600]="selectedMobileIndex !== i"
-                [class.border-slate-200]="selectedMobileIndex !== i"
-                class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer">
-                C{{ q.cuadranteNumber }} · {{ q.shortName }}
-              </button>
-            </div>
+          <!-- Selector Cuadrantes Móvil: Grid de 4 columnas que encaja al 100% de la pantalla sin deslizar -->
+          <div class="grid grid-cols-4 gap-1 p-1 bg-slate-200/80 rounded-xl mb-3 border border-slate-200/90 shadow-2xs">
+            <button
+              *ngFor="let q of quadrants; let i = index"
+              type="button"
+              (click)="setMobileQuadrant(i)"
+              [class.bg-white]="selectedMobileIndex === i"
+              [class.text-slate-900]="selectedMobileIndex === i"
+              [class.shadow-xs]="selectedMobileIndex === i"
+              [class.font-bold]="selectedMobileIndex === i"
+              [class.text-slate-600]="selectedMobileIndex !== i"
+              [class.hover:text-slate-900]="selectedMobileIndex !== i"
+              class="py-2 px-1 rounded-lg text-center transition-all cursor-pointer">
+              <span class="block text-xs font-bold leading-none">C{{ q.cuadranteNumber }}</span>
+              <span class="block text-[10px] leading-tight truncate mt-1 text-slate-500" [class.text-emerald-700]="selectedMobileIndex === i" [class.font-semibold]="selectedMobileIndex === i">{{ q.shortName }}</span>
+            </button>
           </div>
 
           <!-- Single Interactive Card Móvil Compacta -->
@@ -170,7 +168,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                 <h3 class="font-heading font-extrabold text-xl text-white tracking-tight drop-shadow-sm">
                   {{ q.name }}
                 </h3>
-                <span class="text-[10px] font-semibold tracking-wider text-emerald-300 uppercase">Sector Residencial</span>
+                <span class="text-[10px] font-medium text-emerald-300">Residencial</span>
               </div>
             </div>
 
@@ -186,8 +184,9 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
               <!-- Placa Material Asignado -->
               <div class="p-3 rounded-xl border border-slate-200/90 bg-slate-50/70 flex items-center justify-between gap-3 mb-3">
                 <div class="min-w-0">
-                  <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60 inline-block mb-1">
-                    {{ activeWeek === 1 ? 'Esta Semana' : 'Próxima Semana' }}
+                  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-[11px] font-semibold mb-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    {{ activeWeek === 1 ? 'Esta semana' : 'Próxima semana' }}
                   </span>
                   <h4 class="font-heading font-extrabold text-base text-slate-900 leading-snug truncate">{{ q.materialNombre }}</h4>
                   <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">{{ q.materialDescripcion }}</p>
@@ -282,7 +281,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                   <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-white tracking-tight drop-shadow-sm">
                     {{ q.name }}
                   </h3>
-                  <span class="text-[10px] font-semibold tracking-wider text-emerald-300 uppercase">Sector Residencial</span>
+                  <span class="text-[10px] font-medium text-emerald-300">Residencial</span>
                 </div>
               </div>
 
@@ -298,8 +297,9 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                 <!-- Bloque Héroe del Material -->
                 <div class="p-3 sm:p-3.5 rounded-xl border border-slate-200/90 bg-slate-50/70 flex items-center justify-between gap-3 mb-3">
                   <div class="min-w-0">
-                    <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60 inline-block mb-1">
-                      {{ activeWeek === 1 ? 'Esta Semana' : 'Próxima Semana' }}
+                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-[11px] font-semibold mb-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      {{ activeWeek === 1 ? 'Esta semana' : 'Próxima semana' }}
                     </span>
                     <h4 class="font-heading font-extrabold text-base sm:text-lg text-slate-900 leading-snug truncate">{{ q.materialNombre }}</h4>
                     <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">{{ q.materialDescripcion }}</p>
@@ -373,10 +373,10 @@ export class HomeQuadrantsComponent implements OnInit, OnDestroy {
 
   isFadingOut = false;
   isVisible = false;
-  private el = inject(ElementRef);
+  private readonly el = inject(ElementRef);
   private observer: IntersectionObserver | null = null;
 
-  constructor(private bffService: BffService, private cdr: ChangeDetectorRef) {}
+  constructor(private readonly bffService: BffService, private readonly cdr: ChangeDetectorRef) {}
 
   toggleAccordion(id: string): void {
     this.expandedAccordionId = this.expandedAccordionId === id ? null : id;
@@ -484,7 +484,7 @@ export class HomeQuadrantsComponent implements OnInit, OnDestroy {
         cuadranteNumber: q.cuadranteNumber,
         name: q.name,
         shortName: q.shortName,
-        day: override ? override.nuevoDia : q.day,
+        day: override?.nuevoDia ?? q.day,
         hours: q.hours,
         image: q.image,
         categoryKey: baseMat.categoryKey,
@@ -494,7 +494,7 @@ export class HomeQuadrantsComponent implements OnInit, OnDestroy {
         binImage: baseMat.binImage,
         iconClass: baseMat.iconClass || q.iconClass,
         diaModificado: !!override,
-        diaOriginal: override ? override.diaOriginal : q.day,
+        diaOriginal: override?.diaOriginal ?? q.day,
         motivoModificacion: override?.motivo || ''
       };
     });

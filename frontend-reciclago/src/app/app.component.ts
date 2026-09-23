@@ -88,10 +88,10 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   constructor(
-    @Inject(MSAL_GUARD_CONFIG) private msalGuardConfig: MsalGuardConfiguration,
-    private authService: MsalService,
-    private msalBroadcastService: MsalBroadcastService,
-    private router: Router
+    @Inject(MSAL_GUARD_CONFIG) private readonly msalGuardConfig: MsalGuardConfiguration,
+    private readonly authService: MsalService,
+    private readonly msalBroadcastService: MsalBroadcastService,
+    private readonly router: Router
   ) { }
 
   ngOnInit(): void {

@@ -20,8 +20,10 @@ module.exports = {
         border: '#e2e8f0',
       },
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-        heading: ['"Outfit"', 'sans-serif'],
+        sans: ['"Inter"', '"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        heading: ['"Inter"', '"Plus Jakarta Sans"', 'sans-serif'],
+        display: ['"DM Sans"', '"Inter"', 'sans-serif'],
+        mono: ['"Inter"', 'system-ui', 'sans-serif'],
         script: ['"Kalam"', '"Caveat"', 'cursive'],
         handwriting: ['"Caveat"', '"Kalam"', 'cursive'],
       },

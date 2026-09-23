@@ -17,7 +17,7 @@ export interface UserProfile {
 export class BffService {
   private readonly baseUrl = environment.apiConfig?.uri || 'http://localhost:8080';
 
-  constructor(private http: HttpClient) { }
+  constructor(private readonly http: HttpClient) { }
 
   getProfile(): Observable<UserProfile> {
     return this.http.get<UserProfile>(`${this.baseUrl}/api/me`);

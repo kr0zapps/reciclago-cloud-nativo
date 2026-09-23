@@ -58,7 +58,7 @@ import { RouterModule } from '@angular/router';
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 w-full sm:w-auto">
               <a
                 routerLink="/dashboard"
-                class="inline-flex items-center justify-center gap-2.5 min-h-[48px] px-7 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white font-mono font-bold text-xs uppercase tracking-wider cursor-pointer shadow-lg shadow-emerald-950/40 transition-all">
+                class="inline-flex items-center justify-center gap-2.5 min-h-[48px] px-6 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white font-semibold text-sm cursor-pointer shadow-lg shadow-emerald-950/40 hover:-translate-y-0.5 active:translate-y-0 transition-all">
                 <span>Ingresar al Portal Vecinal</span>
                 <i class="fa-solid fa-arrow-right text-xs"></i>
               </a>
@@ -66,7 +66,7 @@ import { RouterModule } from '@angular/router';
               <a
                 href="#cuadrantes"
                 (click)="scrollToSection($event, 'cuadrantes')"
-                class="inline-flex items-center justify-center gap-2.5 min-h-[48px] px-7 rounded-xl bg-white/10 hover:bg-white/20 text-white font-mono font-bold text-xs uppercase tracking-wider border border-white/25 cursor-pointer backdrop-blur-sm shadow-sm transition-all">
+                class="inline-flex items-center justify-center gap-2.5 min-h-[48px] px-6 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm border border-white/25 cursor-pointer backdrop-blur-sm shadow-sm hover:-translate-y-0.5 active:translate-y-0 transition-all">
                 <i class="fa-solid fa-calendar-days text-[#22a652]"></i>
                 <span>Ver Cuadrantes y Días</span>
               </a>

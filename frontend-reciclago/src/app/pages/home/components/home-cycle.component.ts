@@ -34,7 +34,7 @@ interface CycleStep {
             <div *ngIf="!isLast" class="absolute left-3.5 top-6 bottom-[-8px] w-0.5 bg-slate-200 -z-0"></div>
 
             <!-- Número del Paso -->
-            <div class="w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center text-[10px] font-mono font-bold shrink-0 z-10 shadow-2xs">
+            <div class="w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center text-[11px] font-semibold shrink-0 z-10 shadow-2xs">
               0{{ step.stepNumber }}
             </div>
 
@@ -75,7 +75,7 @@ interface CycleStep {
               
               <!-- Top Row: Number + Icon Medallion -->
               <div class="flex items-center justify-between mb-2">
-                <span class="font-mono text-xs font-bold text-slate-400 group-hover:text-emerald-700 transition-colors">
+                <span class="text-xs font-semibold text-slate-400 group-hover:text-emerald-700 transition-colors">
                   0{{ step.stepNumber }}
                 </span>
                 <div class="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-xs shadow-2xs group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900 transition-all duration-200">
@@ -103,7 +103,7 @@ interface CycleStep {
   `
 })
 export class HomeCycleComponent implements OnInit, OnDestroy {
-  private elementRef = inject(ElementRef);
+  private readonly elementRef = inject(ElementRef);
   private observer: IntersectionObserver | null = null;
   isVisible = false;
   hoveredStep = 0;

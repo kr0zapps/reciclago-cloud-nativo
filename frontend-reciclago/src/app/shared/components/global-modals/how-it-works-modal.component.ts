@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <div *ngIf="isOpen"
-         (click)="close.emit()"
+         (click)="modalClose.emit()"
          class="fixed inset-0 z-50 overflow-y-auto bg-[#041D2D]/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 anim-modal-backdrop">
       
       <div (click)="$event.stopPropagation()"
@@ -29,7 +29,7 @@ import { CommonModule } from '@angular/common';
               </h3>
             </div>
           </div>
-          <button (click)="close.emit()" type="button"
+          <button (click)="modalClose.emit()" type="button"
                   class="w-9 h-9 rounded-full bg-white border border-[#DFE8E1] hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-sm transition-colors shadow-xs cursor-pointer"
                   aria-label="Cerrar ventana">
             <i class="fa-solid fa-xmark"></i>
@@ -81,7 +81,7 @@ import { CommonModule } from '@angular/common';
             <img src="assets/escudo-puerto-varas.svg" alt="Puerto Varas" class="h-5 w-auto opacity-75">
             <span>DIMAO • Municipalidad de Puerto Varas</span>
           </div>
-          <button (click)="close.emit()" type="button"
+          <button (click)="modalClose.emit()" type="button"
                   class="bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-full transition-all shadow-sm cursor-pointer">
             Entendido, gracias
           </button>
@@ -92,5 +92,5 @@ import { CommonModule } from '@angular/common';
 })
 export class HowItWorksModalComponent {
   @Input() isOpen = false;
-  @Output() close = new EventEmitter<void>();
+  @Output() modalClose = new EventEmitter<void>();
 }
