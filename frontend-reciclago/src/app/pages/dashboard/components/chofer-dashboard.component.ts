@@ -1,7 +1,7 @@
-﻿import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data';
+import { Sector, Camion, Pickup, Waypoint } from '../data/sectors.data';
 
 @Component({
   selector: 'app-chofer-dashboard',
@@ -364,7 +364,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
     </div>
   `
 })
-export class ChoferDashboardComponent implements OnInit, OnChanges {
+export class ChoferDashboardComponent {
   @Input() userName: string = '';
   @Input() sector: Sector | null = null;
   @Input() pickups: Pickup[] = [];
@@ -380,10 +380,6 @@ export class ChoferDashboardComponent implements OnInit, OnChanges {
     'PV-RC-2027': { name: 'Puerto Chico / Av. Los Colonos', detail: 'Recolección de cartón y vidrios', eta: '12 min', distancia: '1.4 km', x: 52, y: 35, estado: 'En ruta' },
     'PV-RC-2028': { name: 'Camino a Ensenada Km 2', detail: 'Traslado a planta de valorización', eta: '18 min', distancia: '3.1 km', x: 75, y: 60, estado: 'En traslado' }
   };
-
-  ngOnInit(): void {}
-
-  ngOnChanges(changes: SimpleChanges): void {}
 
   get selectedCamion(): Camion {
     return this.camiones.find(c => c.patente === this.selectedTruckPatente) || this.camiones[0] || { id: 1, patente: 'PV-RC-2026', capacidadKilos: 1500, estado: 'DISPONIBLE' };
