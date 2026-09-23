@@ -83,7 +83,7 @@ export const INITIAL_QUADRANTS: QuadrantCardInfo[] = [
     materialDescripcion: 'Latas de bebidas y conservas',
     materialInstrucciones: 'Enjuagar para evitar olores. Aplastar si es posible.',
     requisitos: 'Limpios y secos',
-    image: 'assets/stitch/quadrant_nueva_braunau.png',
+    image: 'assets/stitch/quadrant_braunau.png',
     binImage: 'assets/bin_latas_clean.png',
     badgeColor: '#c25e1a',
     iconClass: 'fa-solid fa-can-food'
