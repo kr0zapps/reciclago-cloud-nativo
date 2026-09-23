@@ -13,15 +13,15 @@ import { CommonModule } from '@angular/common';
       <div (click)="$event.stopPropagation()"
            class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto">
         
-        <div class="h-1.5 w-full bg-gradient-to-r from-[#4F8A3D] via-[#38BDF8] to-[#123F5B]"></div>
+        <div class="h-1.5 w-full bg-gradient-to-r from-[#22a652] via-[#38BDF8] to-[#123F5B]"></div>
 
         <div class="px-6 sm:px-8 pt-6 pb-4 border-b border-[#E2E9E4] flex items-center justify-between bg-[#F8FAF7]">
           <div class="flex items-center gap-3.5">
-            <div class="w-11 h-11 rounded-2xl bg-[#EEF5EB] border border-[#D5E6D2] flex items-center justify-center text-[#4F8A3D] text-lg flex-shrink-0 shadow-xs">
+            <div class="w-11 h-11 rounded-2xl bg-[#ecf7e6] border border-gray-200 flex items-center justify-center text-[#22a652] text-lg flex-shrink-0 shadow-xs">
               <i class="fa-solid fa-leaf"></i>
             </div>
             <div>
-              <span class="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-[#4F8A3D] block">
+              <span class="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-[#22a652] block">
                 Guía Ciudadana • Puerto Varas
               </span>
               <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#123F5B] leading-tight">
@@ -30,7 +30,7 @@ import { CommonModule } from '@angular/common';
             </div>
           </div>
           <button (click)="modalClose.emit()" type="button"
-                  class="w-9 h-9 rounded-full bg-white border border-[#DFE8E1] hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-sm transition-colors shadow-xs cursor-pointer"
+                  class="w-9 h-9 rounded-full bg-white border border-gray-200 hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-sm transition-colors shadow-xs cursor-pointer"
                   aria-label="Cerrar ventana">
             <i class="fa-solid fa-xmark"></i>
           </button>
@@ -41,9 +41,9 @@ import { CommonModule } from '@angular/common';
             RecicLaGo es el servicio municipal puerta a puerta de Puerto Varas diseñado para proteger la cuenca del Lago Llanquihue mediante un proceso trazable en 4 pasos:
           </p>
 
-          <div class="relative pl-6 border-l-2 border-[#D5E6D2] space-y-6 ml-3 my-3">
+          <div class="relative pl-6 border-l-2 border-gray-200 space-y-6 ml-3 my-3">
             <div class="relative">
-              <span class="absolute -left-[2.15rem] top-0 w-7 h-7 rounded-full bg-white border-2 border-[#4F8A3D] text-[#4F8A3D] font-black text-xs flex items-center justify-center shadow-xs">1</span>
+              <span class="absolute -left-[2.15rem] top-0 w-7 h-7 rounded-full bg-white border-2 border-[#22a652] text-[#22a652] font-black text-xs flex items-center justify-center shadow-xs">1</span>
               <h4 class="font-bold text-sm text-[#123F5B]">Separación limpia en origen</h4>
               <p class="text-xs text-slate-600 mt-1">Limpia, seca y enjuaga envases de vidrio, cartón, latas y botellas plásticas. Retira restos de alimentos y aplasta los envases para optimizar volumen.</p>
             </div>
@@ -61,14 +61,14 @@ import { CommonModule } from '@angular/common';
             </div>
 
             <div class="relative">
-              <span class="absolute -left-[2.15rem] top-0 w-7 h-7 rounded-full bg-white border-2 border-[#72be36] text-[#4F8A3D] font-black text-xs flex items-center justify-center shadow-xs">4</span>
+              <span class="absolute -left-[2.15rem] top-0 w-7 h-7 rounded-full bg-white border-2 border-[#22a652] text-[#22a652] font-black text-xs flex items-center justify-center shadow-xs">4</span>
               <h4 class="font-bold text-sm text-[#123F5B]">Valorización y protección de la cuenca</h4>
               <p class="text-xs text-slate-600 mt-1">Tus reciclables se derivan a plantas de valorización certificadas, evitando que terminen en vertederos o en la ribera del lago.</p>
             </div>
           </div>
 
-          <div class="p-4 rounded-2xl bg-[#EEF5EB] border border-[#D5E6D2] flex items-start gap-3 text-xs text-[#123F5B]">
-            <i class="fa-solid fa-lightbulb text-base text-[#4F8A3D] mt-0.5 flex-shrink-0"></i>
+          <div class="p-4 rounded-2xl bg-[#ecf7e6] border border-gray-200 flex items-start gap-3 text-xs text-[#123F5B]">
+            <i class="fa-solid fa-lightbulb text-base text-[#22a652] mt-0.5 flex-shrink-0"></i>
             <div>
               <strong class="font-bold block mb-0.5">¿Vives en condominio o pasaje estrecho?</strong>
               <span>Los camiones coordinan puntos de acopio comunitarios con las juntas de vecinos para facilitar la recolección sin entorpecer el tránsito.</span>
@@ -77,12 +77,12 @@ import { CommonModule } from '@angular/common';
         </div>
 
         <div class="px-6 sm:px-8 py-4 bg-[#F8FAF7] border-t border-[#E2E9E4] flex items-center justify-between">
-          <div class="flex items-center gap-2 text-xs text-[#546571]">
+          <div class="flex items-center gap-2 text-xs text-gray-500">
             <img src="assets/escudo-puerto-varas.svg" alt="Puerto Varas" class="h-5 w-auto opacity-75">
             <span>DIMAO • Municipalidad de Puerto Varas</span>
           </div>
           <button (click)="modalClose.emit()" type="button"
-                  class="bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-full transition-all shadow-sm cursor-pointer">
+                  class="bg-[#22a652] hover:bg-[#1b8e45] text-white font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-full transition-all shadow-sm cursor-pointer">
             Entendido, gracias
           </button>
         </div>

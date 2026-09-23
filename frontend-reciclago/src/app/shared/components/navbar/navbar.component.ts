@@ -35,7 +35,7 @@ import { RouterModule, Router } from '@angular/router';
 
         <!-- NAVEGACIÓN DESKTOP ESENCIAL (3 LINKS CLAVE) CON INDICADORES SUAVES -->
         <nav class="hidden lg:flex items-center gap-7 xl:gap-9 text-[14.5px] font-semibold transition-colors" [ngClass]="navTextClass">
-          <button (click)="scrollToSection('como-funciona')" type="button" class="relative group hover:text-[#22a652] transition-colors py-2 font-semibold cursor-pointer">
+          <button (click)="openHowItWorks.emit()" type="button" class="relative group hover:text-[#22a652] transition-colors py-2 font-semibold cursor-pointer">
             <span>¿Cómo funciona?</span>
             <span class="absolute bottom-0.5 left-0 w-0 h-0.5 bg-[#22a652] rounded-full group-hover:w-full transition-all duration-300 ease-out"></span>
           </button>
@@ -116,9 +116,9 @@ import { RouterModule, Router } from '@angular/router';
         </div>
 
         <nav class="flex flex-col space-y-1 text-[15px] font-semibold text-[#123F5B]">
-          <button type="button" (click)="scrollToSection('como-funciona')"
+          <button type="button" (click)="openHowItWorks.emit(); mobileMenuOpen = false"
                   class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all font-semibold text-[15px] text-[#123F5B] cursor-pointer">
-            <i class="fa-solid fa-circle-question w-5 text-center text-sm text-[#0ea5e9]"></i>
+            <i class="fa-solid fa-circle-question w-5 text-center text-sm text-[#22a652]"></i>
             <span>¿Cómo funciona?</span>
           </button>
           <button type="button" (click)="scrollToSection('cuadrantes')"

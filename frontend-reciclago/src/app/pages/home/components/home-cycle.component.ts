@@ -14,16 +14,16 @@ interface CycleStep {
   imports: [CommonModule],
   template: `
     <!-- BEGIN: HowItWorks -->
-    <section class="py-10 sm:py-16 bg-white border-b border-slate-200 relative overflow-hidden" id="como-funciona">
+    <section class="scroll-mt-24 py-10 sm:py-16 bg-white border-b border-slate-200 relative overflow-hidden" id="como-funciona">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <!-- Title & Subtitle Header -->
         <div class="text-center mb-6 sm:mb-10">
           <h2 class="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-heading mb-1">
-            El Ciclo de Vida del Retiro
+            ¿Cómo Funciona el Retiro Domiciliario?
           </h2>
           <p class="text-xs sm:text-sm text-slate-500 max-w-lg mx-auto font-sans">
-            Proceso simple de reciclaje domiciliario, desde tu puerta hasta la valorización final.
+            El ciclo de reciclaje oficial de Puerto Varas en 5 etapas trazables, desde tu puerta hasta la valorización final.
           </p>
         </div>
 
