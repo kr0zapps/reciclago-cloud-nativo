@@ -1,4 +1,4 @@
-﻿import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, SimpleChanges, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, SimpleChanges, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -56,81 +56,78 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           </button>
       </div>
 
-      <!-- ==================== 2. TARJETAS DE KPIS EJECUTIVOS ==================== -->
+      <!-- ==================== 2. TARJETAS DE KPIS ==================== -->
       <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-        <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-xl p-5 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-500">Por asignar</span>
-            <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-xs font-bold border border-amber-200/80">
+            <span class="text-xs font-semibold text-gray-500">Por asignar</span>
+            <div class="w-8 h-8 rounded-lg bg-[#ecf7e6] text-[#22a652] flex items-center justify-center text-xs font-bold">
               <i class="fa-solid fa-bell"></i>
             </div>
           </div>
           <div class="mt-3">
-            <div class="text-3xl sm:text-4xl font-black font-heading text-[#123F5B]">{{ countPendientes }}</div>
-            <p class="text-xs text-slate-500 mt-1">
-              <span [ngClass]="countPendientes > 0 ? 'text-amber-700 font-bold' : 'text-emerald-700 font-bold'">
+            <div class="text-3xl font-extrabold font-heading text-[#123F5B]">{{ countPendientes }}</div>
+            <p class="text-xs text-gray-500 mt-1">
+              <span [ngClass]="countPendientes > 0 ? 'text-amber-700 font-bold' : 'text-[#22a652] font-semibold'">
                 {{ countPendientes > 0 ? 'Requieren programación' : 'Al día' }}
               </span>
             </p>
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-xl p-5 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-500">En recorrido</span>
-            <div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center text-xs font-bold border border-sky-200/80">
+            <span class="text-xs font-semibold text-gray-500">En recorrido</span>
+            <div class="w-8 h-8 rounded-lg bg-[#ecf7e6] text-[#22a652] flex items-center justify-center text-xs font-bold">
               <i class="fa-solid fa-truck-moving"></i>
             </div>
           </div>
           <div class="mt-3">
-            <div class="text-3xl sm:text-4xl font-black font-heading text-[#123F5B]">{{ countEnRuta }}</div>
-            <p class="text-xs text-slate-500 mt-1">Cuadrillas activas en calle</p>
+            <div class="text-3xl font-extrabold font-heading text-[#123F5B]">{{ countEnRuta }}</div>
+            <p class="text-xs text-gray-500 mt-1">Cuadrillas activas en calle</p>
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-xl p-5 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-500">Kilos certificados</span>
-            <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs font-bold border border-emerald-200/80">
+            <span class="text-xs font-semibold text-gray-500">Kilos certificados</span>
+            <div class="w-8 h-8 rounded-lg bg-[#ecf7e6] text-[#22a652] flex items-center justify-center text-xs font-bold">
               <i class="fa-solid fa-scale-balanced"></i>
             </div>
           </div>
           <div class="mt-3">
-            <div class="text-3xl sm:text-4xl font-black font-heading text-emerald-800">
-              {{ totalKilosRecogidos | number:'1.0-1' }} <span class="text-lg font-bold text-slate-400">kg</span>
+            <div class="text-3xl font-extrabold font-heading text-[#123F5B]">
+              {{ totalKilosRecogidos | number:'1.0-1' }} <span class="text-base font-bold text-[#22a652]">kg</span>
             </div>
-            <p class="text-xs text-slate-500 mt-1">Pesaje verificado en báscula</p>
+            <p class="text-xs text-gray-500 mt-1">Pesaje verificado en báscula</p>
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-xl p-5 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-500">Cumplimiento comunal</span>
-            <div class="w-8 h-8 rounded-xl bg-slate-100 text-[#123F5B] flex items-center justify-center text-xs font-bold border border-slate-200">
+            <span class="text-xs font-semibold text-gray-500">Cumplimiento comunal</span>
+            <div class="w-8 h-8 rounded-lg bg-[#ecf7e6] text-[#22a652] flex items-center justify-center text-xs font-bold">
               <i class="fa-solid fa-chart-pie"></i>
             </div>
           </div>
           <div class="mt-3">
-            <div class="text-3xl sm:text-4xl font-black font-heading text-[#123F5B]">{{ porcentajeCumplimiento }}%</div>
-            <p class="text-xs text-slate-500 mt-1">{{ countCompletados }} de {{ pickups.length }} retiros completados</p>
+            <div class="text-3xl font-extrabold font-heading text-[#123F5B]">{{ porcentajeCumplimiento }}%</div>
+            <p class="text-xs text-gray-500 mt-1">{{ countCompletados }} de {{ pickups.length }} retiros completados</p>
           </div>
         </div>
       </section>
 
-      <!-- ==================== 3. GESTIÓN Y DISPONIBILIDAD DE FLOTA (EXCLUSIVO ADMIN) ==================== -->
-      <section class="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 shadow-xs">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-6 border-b border-[#F8FAF7]">
+      <!-- ==================== 3. GESTIÓN Y DISPONIBILIDAD DE FLOTA ==================== -->
+      <section class="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-2xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-5 border-b border-[#E2E8F0]">
           <div>
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-bold uppercase tracking-wider text-[#123F5B]">Control de Activos y Mantenimiento</span>
-              <span class="text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded">Exclusivo Admin</span>
-            </div>
-            <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#123F5B] mt-0.5">
-              Disponibilidad Operativa de Camiones Tolva
+            <h3 class="font-heading font-extrabold text-xl text-[#123F5B]">
+              Disponibilidad de Flota
             </h3>
+            <p class="text-xs text-gray-500 mt-0.5">Control de unidades operativas y mantenimiento municipal</p>
           </div>
-          <span class="text-xs text-slate-500 font-semibold">
-            Flota total municipal: {{ camiones.length }} unidades registradas
+          <span class="text-xs text-gray-500 font-medium">
+            Flota total: {{ camiones.length }} unidades registradas
           </span>
         </div>
 
@@ -172,36 +169,30 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
         </div>
 
         <!-- Estado cuando no hay camiones o el microservicio está caído -->
-        <div *ngIf="camiones.length === 0" class="p-8 text-center rounded-2xl bg-slate-50 border border-slate-200">
-          <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl mx-auto mb-3 border border-amber-200">
+        <div *ngIf="camiones.length === 0" class="p-6 text-center rounded-xl bg-[#F8FAF7] border border-[#E2E8F0]">
+          <div class="w-10 h-10 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center text-lg mx-auto mb-2">
             <i class="fa-solid fa-truck-slash"></i>
           </div>
-          <h4 class="font-bold text-slate-700 text-sm">
-            {{ catalogoDisponible === false ? 'Servicio de Catálogo Desconectado' : (catalogoDisponible === null ? 'Cargando flota...' : 'Sin Camiones Registrados') }}
+          <h4 class="font-bold text-[#123F5B] text-sm">
+            {{ catalogoDisponible === false ? 'Catálogo de Flota Desconectado' : (catalogoDisponible === null ? 'Cargando flota...' : 'Sin Camiones Registrados') }}
           </h4>
-          <p class="text-xs text-slate-500 max-w-md mx-auto mt-1">
+          <p class="text-xs text-gray-500 max-w-md mx-auto mt-1">
             {{ catalogoDisponible === false
-                ? 'No fue posible conectar con el microservicio ms-reciclago-catalog (puerto 8081). Verifique que los microservicios Spring Boot estén iniciados.'
-                : (catalogoDisponible === null ? 'Consultando ms-reciclago-catalog...' : 'No existen datos de camiones en la base de datos PostgreSQL.') }}
+                ? 'No fue posible sincronizar el catálogo de camiones en este momento. Intente nuevamente en unos minutos.'
+                : (catalogoDisponible === null ? 'Cargando información municipal...' : 'No existen unidades registradas en la base de datos municipal.') }}
           </p>
         </div>
       </section>
 
-      <!-- ==================== GESTIÓN Y REPROGRAMACIÓN DE RECORRIDOS POR SEMANA Y SECTOR (DIMAO) ==================== -->
-      <section class="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 shadow-xs space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#F8FAF7]">
+      <!-- ==================== GESTIÓN Y REPROGRAMACIÓN DE RECORRIDOS ==================== -->
+      <section class="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-2xs space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E2E8F0]">
           <div>
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-bold uppercase tracking-wider text-[#123F5B]">Planificación Operativa Comunal</span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-[#ecf7e6] text-emerald-900 border border-[#E2E8F0]">
-                Sincronización en Tiempo Real
-              </span>
-            </div>
-            <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#123F5B] mt-0.5">
-              Calendario y Rotación Semanal de Residuos
+            <h3 class="font-heading font-extrabold text-xl text-[#123F5B]">
+              Rotación Semanal y Reprogramación
             </h3>
-            <p class="text-xs text-slate-500 mt-0.5">
-              Haz clic en cualquier semana para seleccionarla y reprogramar el día de recolección de un sector específico.
+            <p class="text-xs text-gray-500 mt-0.5">
+              Planificación comunal y excepciones de recolección por sector
             </p>
           </div>
           <div class="flex items-center gap-2">
@@ -231,10 +222,10 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
         <!-- Las 4 Tarjetas de Semanas (Interactivas / Clickeables) -->
         <div>
           <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-bold uppercase tracking-wider text-[#123F5B]">
-              1. Selecciona la Semana del Ciclo DIMAO (Haz clic en una semana)
+            <span class="text-xs font-bold text-[#123F5B]">
+              Ciclo de 4 semanas DIMAO
             </span>
-            <span class="text-xs text-slate-500 font-semibold">
+            <span class="text-xs text-gray-500 font-medium">
               Semana en curso: <strong class="text-[#123F5B]">Semana {{ rotacionSemanal?.slotSemana || 3 }} ({{ rotacionSemanal?.residuoNombre || 'Plásticos' }})</strong>
             </span>
           </div>
@@ -282,10 +273,10 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
               </div>
               <div>
                 <h4 class="text-sm font-extrabold text-[#123F5B]">
-                  2. Reprogramar Día de Recolección por Sector
+                  Reprogramar Día de Recolección por Sector
                 </h4>
-                <p class="text-[11px] text-slate-500">
-                  Configurando: <strong>Semana {{ semanaSeleccionada }} ({{ getSemanaNombre(semanaSeleccionada) }})</strong>
+                <p class="text-[11px] text-gray-500">
+                  Semana {{ semanaSeleccionada }} ({{ getSemanaNombre(semanaSeleccionada) }})
                 </p>
               </div>
             </div>
@@ -441,15 +432,15 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
         </div>
       </section>
 
-      <!-- ==================== 4. PLANILLA MAESTRA DE DESPACHO CON PAGINACIÓN ==================== -->
-      <section class="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs overflow-hidden">
-        <div class="p-6 border-b border-[#F8FAF7] space-y-4">
+      <!-- ==================== 4. PLANILLA DE RETIROS ==================== -->
+      <section class="bg-white rounded-xl border border-[#E2E8F0] shadow-2xs overflow-hidden">
+        <div class="p-6 border-b border-[#E2E8F0] space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <span class="text-xs font-bold uppercase tracking-wider text-[#123F5B]">Supervisión y Control Integral</span>
-              <h3 class="font-heading font-extrabold text-2xl text-[#123F5B] mt-0.5">
-                Planilla Maestra de Trazabilidad Comunal
+              <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#123F5B]">
+                Planilla de Retiros
               </h3>
+              <p class="text-xs text-gray-500 mt-0.5">Gestión y control de solicitudes en los 4 cuadrantes</p>
             </div>
 
             <!-- Filtros de Sector y Tamaño de Página -->
@@ -683,14 +674,14 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
         </div>
       </section>
 
-      <!-- ==================== 5. SUPERVISIÓN SATELITAL GPS DE TODA LA FLOTA ==================== -->
-      <section class="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 shadow-xs">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-[#F8FAF7]">
+      <!-- ==================== 5. MAPA DE FLOTA EN RUTA ==================== -->
+      <section class="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-2xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-[#E2E8F0]">
           <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-[#123F5B]">Telemetría Satelital de Flota</span>
-            <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#123F5B] mt-0.5">
-              Supervisión de Camiones en Puerto Varas
+            <h3 class="font-heading font-extrabold text-xl text-[#123F5B]">
+              Mapa de Flota en Ruta
             </h3>
+            <p class="text-xs text-gray-500 mt-0.5">Monitoreo de cuadrillas activas en la comuna</p>
           </div>
 
           <div class="flex items-center gap-2 flex-wrap">
