@@ -36,10 +36,10 @@ import { RouterModule } from '@angular/router';
       <!-- 3. Contenido Editorial Principal: Monumental, Centrado e Imponente (Cero Slop, Cero Cuadritos) -->
       <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-14 w-full my-auto text-center flex flex-col items-center justify-center">
         
-        <!-- Titular Monumental, Limpio e Imponente con Syne (Cero sombras pesadas) -->
-        <h1 class="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[92px] font-heading font-extrabold tracking-tight leading-[0.98] sm:leading-[1.0] text-white drop-shadow-sm">
+        <!-- Titular Monumental, Prominente y de Alto Impacto con Syne -->
+        <h1 class="hero-title text-5xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[106px] tracking-tight leading-[0.92] text-white drop-shadow-sm">
           Reciclaje Comunal<br />
-          <span class="text-[#22a652]">Puerto Varas</span>
+          Puerto Varas
         </h1>
 
         <!-- Subtítulo Corto, Directo y Conciso -->
