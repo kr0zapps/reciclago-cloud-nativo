@@ -177,7 +177,7 @@
     </div>
 
     <!-- 1. VISTA: ESTADO Y RASTREO (COMPACTA, EN PANTALLA INMEDIATA) -->
-    <div *ngIf="activeVecinoTab === 'seguimiento'" class="space-y-3">
+    <div *ngIf="activeVecinoTab === 'seguimiento'" class="space-y-3 anim-tab-enter">
       
       <!-- Mini barra informativa del sector (reemplaza al hero gigante para que el rastreo sea visible de inmediato) -->
       <div class="px-3.5 py-2 rounded-xl bg-white border border-[#E2E8F0] shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs">
@@ -206,7 +206,7 @@
     </div>
 
     <!-- 2. VISTA: FORMULARIO DE AVISO DE RETIRO -->
-    <div *ngIf="activeVecinoTab === 'solicitar'">
+    <div *ngIf="activeVecinoTab === 'solicitar'" class="anim-tab-enter">
       <app-pickup-form
         [sector]="currentSectorInfo"
         [residuos]="residuos"
@@ -217,7 +217,7 @@
     </div>
 
     <!-- 3. VISTA: HISTORIAL DE RETIROS VECINALES -->
-    <div *ngIf="activeVecinoTab === 'historial'" class="space-y-4">
+    <div *ngIf="activeVecinoTab === 'historial'" class="space-y-4 anim-tab-enter">
       <app-pickup-history
         [pickups]="pickups"
         [isStaff]="isStaff"
