@@ -36,17 +36,20 @@ public class Cuadrante {
     public Cuadrante() {
     }
 
-    public Cuadrante(Long id, Integer numero, String nombre, String sector, String diaSemana,
-                     String horario, String callesPrincipales, String camionPatente, Boolean camionEnRuta) {
-        this.id = id;
-        this.numero = numero;
-        this.nombre = nombre;
-        this.sector = sector;
-        this.diaSemana = diaSemana;
-        this.horario = horario;
-        this.callesPrincipales = callesPrincipales;
-        this.camionPatente = camionPatente;
-        this.camionEnRuta = camionEnRuta != null ? camionEnRuta : false;
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private Cuadrante(Builder builder) {
+        this.id = builder.id;
+        this.numero = builder.numero;
+        this.nombre = builder.nombre;
+        this.sector = builder.sector;
+        this.diaSemana = builder.diaSemana;
+        this.horario = builder.horario;
+        this.callesPrincipales = builder.callesPrincipales;
+        this.camionPatente = builder.camionPatente;
+        this.camionEnRuta = Boolean.TRUE.equals(builder.camionEnRuta);
     }
 
     public Long getId() {
@@ -119,5 +122,66 @@ public class Cuadrante {
 
     public void setCamionEnRuta(Boolean camionEnRuta) {
         this.camionEnRuta = camionEnRuta;
+    }
+
+    public static class Builder {
+        private Long id;
+        private Integer numero;
+        private String nombre;
+        private String sector;
+        private String diaSemana;
+        private String horario;
+        private String callesPrincipales;
+        private String camionPatente;
+        private Boolean camionEnRuta = false;
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder numero(Integer numero) {
+            this.numero = numero;
+            return this;
+        }
+
+        public Builder nombre(String nombre) {
+            this.nombre = nombre;
+            return this;
+        }
+
+        public Builder sector(String sector) {
+            this.sector = sector;
+            return this;
+        }
+
+        public Builder diaSemana(String diaSemana) {
+            this.diaSemana = diaSemana;
+            return this;
+        }
+
+        public Builder horario(String horario) {
+            this.horario = horario;
+            return this;
+        }
+
+        public Builder callesPrincipales(String callesPrincipales) {
+            this.callesPrincipales = callesPrincipales;
+            return this;
+        }
+
+        public Builder camionPatente(String camionPatente) {
+            this.camionPatente = camionPatente;
+            return this;
+        }
+
+        public Builder camionEnRuta(Boolean camionEnRuta) {
+            this.camionEnRuta = camionEnRuta;
+            return this;
+        }
+
+        public Cuadrante build() {
+            return new Cuadrante(this);
+        }
     }
 }

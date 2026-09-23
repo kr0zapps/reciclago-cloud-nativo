@@ -178,7 +178,7 @@ import { Pickup } from '../data/sectors.data';
     </div>
   `
 })
-export class PickupHistoryComponent {
+export class PickupHistoryComponent implements OnDestroy {
   @Input() pickups: Pickup[] = [];
   @Input() isStaff: boolean = false;
   @Input() userEmail: string = '';
@@ -195,7 +195,7 @@ export class PickupHistoryComponent {
   historialList: Pickup[] = [];
   isLoadingHistorial = false;
 
-  constructor(private bffService: BffService) {}
+  constructor(private readonly bffService: BffService) {}
 
   isRetiradoOPesado(p: Pickup): boolean {
     return p.estado === 'completado' || p.estado === 'PESADO' || p.estado === 'RETIRADO';
@@ -227,7 +227,7 @@ export class PickupHistoryComponent {
     this.bffService.getPickupsHistory(emailToQuery, '', page, 6).subscribe({
       next: (res) => {
         this.isLoadingHistorial = false;
-        if (res && res.content) {
+        if (res?.content) {
           this.historialList = res.content;
           this.historialTotalPages = res.totalPages || 1;
           this.historialTotalElements = res.totalElements || res.content.length;

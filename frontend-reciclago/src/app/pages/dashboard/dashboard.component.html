@@ -240,7 +240,7 @@
     [isOpen]="showRutaModal"
     [sectores]="sectores"
     [selectedSector]="selectedSector"
-    (close)="closeRutaModal()"
+    (modalClose)="closeRutaModal()"
     (selectSector)="onSectorSelect($event)">
   </app-ruta-modal>
 
@@ -251,7 +251,7 @@
     [currentPage]="auditoriaPage"
     [totalPages]="auditoriaTotalPages"
     [totalElements]="auditoriaTotalElements"
-    (close)="closeAuditoriaModal()"
+    (modalClose)="closeAuditoriaModal()"
     (changePage)="loadAuditoria($event)">
   </app-auditoria-modal>
 
@@ -261,7 +261,7 @@
     [isOpen]="showActionModal && actionType === 'programar'"
     [pickup]="selectedPickupForAction"
     [camionesDisponibles]="camionesDisponibles"
-    (close)="showActionModal = false"
+    (modalClose)="showActionModal = false"
     (actionCompleted)="onActionCompleted()">
   </app-programar-modal>
 
@@ -271,7 +271,7 @@
     [pickup]="selectedPickupForAction"
     [actionType]="actionType === 'en-ruta' ? 'en-ruta' : 'retirado'"
     [camionesDisponibles]="camionesDisponibles"
-    (close)="showActionModal = false"
+    (modalClose)="showActionModal = false"
     (actionCompleted)="onActionCompleted()">
   </app-chofer-operacion-modal>
 
@@ -279,7 +279,7 @@
   <app-pesaje-modal
     [isOpen]="showActionModal && actionType === 'pesado'"
     [pickup]="selectedPickupForAction"
-    (close)="showActionModal = false"
+    (modalClose)="showActionModal = false"
     (actionCompleted)="onActionCompleted()">
   </app-pesaje-modal>
 
@@ -287,7 +287,7 @@
   <app-cancelar-modal
     [isOpen]="showActionModal && actionType === 'cancelar'"
     [pickup]="selectedPickupForAction"
-    (close)="showActionModal = false"
+    (modalClose)="showActionModal = false"
     (actionCompleted)="onActionCompleted()">
   </app-cancelar-modal>
 

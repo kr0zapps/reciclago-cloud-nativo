@@ -40,9 +40,20 @@ public class PickupControllerTest {
     @Test
     @DisplayName("GET /api/pickups - Debe retornar lista de retiros")
     void testListarTodos() throws Exception {
-        Pickup p1 = new Pickup(1L, "RET-11112222", "Juan Pérez", "juan@example.com", "Av. Providencia 123",
-                "Providencia", 1L, "Plástico PET", null, null,
-                15.0, null, "SOLICITADO", LocalDateTime.now(), null, null, "Dejar en conserjería");
+        Pickup p1 = Pickup.builder()
+                .id(1L)
+                .codigoRetiro("RET-11112222")
+                .vecinoNombre("Juan Pérez")
+                .vecinoEmail("juan@example.com")
+                .direccion("Av. Providencia 123")
+                .comuna("Providencia")
+                .residuoId(1L)
+                .residuoNombre("Plástico PET")
+                .pesoEstimadoKg(15.0)
+                .estado("SOLICITADO")
+                .fechaSolicitud(LocalDateTime.now())
+                .observaciones("Dejar en conserjería")
+                .build();
 
         when(pickupService.obtenerTodos()).thenReturn(Arrays.asList(p1));
 
@@ -56,9 +67,20 @@ public class PickupControllerTest {
     @Test
     @DisplayName("GET /api/pickups/{id} - Debe retornar un retiro por ID")
     void testObtenerPorId() throws Exception {
-        Pickup p1 = new Pickup(1L, "RET-11112222", "Juan Pérez", "juan@example.com", "Av. Providencia 123",
-                "Providencia", 1L, "Plástico PET", null, null,
-                15.0, null, "SOLICITADO", LocalDateTime.now(), null, null, "Dejar en conserjería");
+        Pickup p1 = Pickup.builder()
+                .id(1L)
+                .codigoRetiro("RET-11112222")
+                .vecinoNombre("Juan Pérez")
+                .vecinoEmail("juan@example.com")
+                .direccion("Av. Providencia 123")
+                .comuna("Providencia")
+                .residuoId(1L)
+                .residuoNombre("Plástico PET")
+                .pesoEstimadoKg(15.0)
+                .estado("SOLICITADO")
+                .fechaSolicitud(LocalDateTime.now())
+                .observaciones("Dejar en conserjería")
+                .build();
 
         when(pickupService.obtenerPorId(1L)).thenReturn(Optional.of(p1));
 
@@ -79,9 +101,19 @@ public class PickupControllerTest {
         request.setResiduoId(1L);
         request.setPesoEstimadoKg(20.0);
 
-        Pickup guardado = new Pickup(2L, "RET-PV-999988", "Maria Gonzalez", "maria@example.com", "Calle Los Robles 456",
-                "Puerto Varas", 1L, "Plástico", null, null,
-                20.0, null, "SOLICITADO", LocalDateTime.now(), null, null, null);
+        Pickup guardado = Pickup.builder()
+                .id(2L)
+                .codigoRetiro("RET-PV-999988")
+                .vecinoNombre("Maria Gonzalez")
+                .vecinoEmail("maria@example.com")
+                .direccion("Calle Los Robles 456")
+                .comuna("Puerto Varas")
+                .residuoId(1L)
+                .residuoNombre("Plástico")
+                .pesoEstimadoKg(20.0)
+                .estado("SOLICITADO")
+                .fechaSolicitud(LocalDateTime.now())
+                .build();
 
         when(pickupService.crearSolicitud(any(Pickup.class))).thenReturn(guardado);
 

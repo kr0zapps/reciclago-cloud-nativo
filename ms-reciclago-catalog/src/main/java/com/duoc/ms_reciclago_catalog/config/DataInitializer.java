@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DataInitializer implements CommandLineRunner {
 
+    private static final String PUERTO_VARAS = "Puerto Varas";
+
     private final ResiduoRepository residuoRepository;
     private final CamionRepository camionRepository;
     private final TarifaRepository tarifaRepository;
@@ -27,21 +29,61 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (residuoRepository.count() == 0) {
-            residuoRepository.save(new Residuo(null, "Vidrio", "VIDRIO", 
-                    "Botellas y frascos de vidrio transparente o color limpio", 80.0, false, true, 
-                    "VIDRIO", "Enjuagar botellas y frascos, retirar tapas y corchos. No incluir cerámica ni espejos.", true));
-            residuoRepository.save(new Residuo(null, "Cartón y Papel", "CARTON_PAPEL", 
-                    "Cajas de cartón corrugado, papel blanco, diarios y revistas limpias", 100.0, false, true, 
-                    "CARTON", "Aplanar cajas para reducir volumen. Mantener seco y sin residuos de comida o grasa.", true));
-            residuoRepository.save(new Residuo(null, "Plásticos (PET y PEAD)", "PLASTICO_PET", 
-                    "Botellas plásticas de bebidas, envases de detergente y lácteos", 150.0, false, true, 
-                    "PLASTICO", "Lavar, escurrir, aplastar y volver a colocar la tapa plástica.", true));
-            residuoRepository.save(new Residuo(null, "Latas y Metales", "LATAS_METALES", 
-                    "Latas de bebidas en aluminio y tarros de conserva de hojalata", 200.0, false, true, 
-                    "LATAS", "Enjuagar para evitar olores y vectores. Aplastar si es posible.", true));
-            residuoRepository.save(new Residuo(null, "Residuos Electrónicos (RAEE)", "RAEE", 
-                    "Electrodomésticos menores, computadores, cargadores y cables en desuso", 500.0, true, true, 
-                    "RAEE", "Entregar secos, completos y con sus cables enrollados.", true));
+            residuoRepository.save(Residuo.builder()
+                    .nombre("Vidrio")
+                    .codigo("VIDRIO")
+                    .descripcion("Botellas y frascos de vidrio transparente o color limpio")
+                    .precioPorKg(80.0)
+                    .requiereManejoEspecial(false)
+                    .activo(true)
+                    .categoria("VIDRIO")
+                    .instrucciones("Enjuagar botellas y frascos, retirar tapas y corchos. No incluir cerámica ni espejos.")
+                    .permitido(true)
+                    .build());
+            residuoRepository.save(Residuo.builder()
+                    .nombre("Cartón y Papel")
+                    .codigo("CARTON_PAPEL")
+                    .descripcion("Cajas de cartón corrugado, papel blanco, diarios y revistas limpias")
+                    .precioPorKg(100.0)
+                    .requiereManejoEspecial(false)
+                    .activo(true)
+                    .categoria("CARTON")
+                    .instrucciones("Aplanar cajas para reducir volumen. Mantener seco y sin residuos de comida o grasa.")
+                    .permitido(true)
+                    .build());
+            residuoRepository.save(Residuo.builder()
+                    .nombre("Plásticos (PET y PEAD)")
+                    .codigo("PLASTICO_PET")
+                    .descripcion("Botellas plásticas de bebidas, envases de detergente y lácteos")
+                    .precioPorKg(150.0)
+                    .requiereManejoEspecial(false)
+                    .activo(true)
+                    .categoria("PLASTICO")
+                    .instrucciones("Lavar, escurrir, aplastar y volver a colocar la tapa plástica.")
+                    .permitido(true)
+                    .build());
+            residuoRepository.save(Residuo.builder()
+                    .nombre("Latas y Metales")
+                    .codigo("LATAS_METALES")
+                    .descripcion("Latas de bebidas en aluminio y tarros de conserva de hojalata")
+                    .precioPorKg(200.0)
+                    .requiereManejoEspecial(false)
+                    .activo(true)
+                    .categoria("LATAS")
+                    .instrucciones("Enjuagar para evitar olores y vectores. Aplastar si es posible.")
+                    .permitido(true)
+                    .build());
+            residuoRepository.save(Residuo.builder()
+                    .nombre("Residuos Electrónicos (RAEE)")
+                    .codigo("RAEE")
+                    .descripcion("Electrodomésticos menores, computadores, cargadores y cables en desuso")
+                    .precioPorKg(500.0)
+                    .requiereManejoEspecial(true)
+                    .activo(true)
+                    .categoria("RAEE")
+                    .instrucciones("Entregar secos, completos y con sus cables enrollados.")
+                    .permitido(true)
+                    .build());
         }
 
         if (camionRepository.count() == 0) {
@@ -51,9 +93,9 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         if (tarifaRepository.count() == 0) {
-            tarifaRepository.save(new Tarifa(null, "Tarifa Domiciliaria Costanera y Centro", "Puerto Varas", 2000.0, 40.0, true));
-            tarifaRepository.save(new Tarifa(null, "Tarifa Domiciliaria Puerto Chico / Mirador", "Puerto Varas", 2000.0, 40.0, true));
-            tarifaRepository.save(new Tarifa(null, "Tarifa Comercial Pymes Lago Llanquihue", "Puerto Varas", 4500.0, 30.0, true));
+            tarifaRepository.save(new Tarifa(null, "Tarifa Domiciliaria Costanera y Centro", PUERTO_VARAS, 2000.0, 40.0, true));
+            tarifaRepository.save(new Tarifa(null, "Tarifa Domiciliaria Puerto Chico / Mirador", PUERTO_VARAS, 2000.0, 40.0, true));
+            tarifaRepository.save(new Tarifa(null, "Tarifa Comercial Pymes Lago Llanquihue", PUERTO_VARAS, 4500.0, 30.0, true));
         }
     }
 }

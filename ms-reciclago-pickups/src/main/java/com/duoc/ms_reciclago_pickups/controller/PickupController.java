@@ -4,7 +4,6 @@ import com.duoc.ms_reciclago_pickups.dto.PickupHistoryResponse;
 import com.duoc.ms_reciclago_pickups.model.Pickup;
 import com.duoc.ms_reciclago_pickups.service.PickupService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -93,9 +91,9 @@ public class PickupController {
                                               @RequestParam(required = false) String camionPatente,
                                               @RequestParam(required = false) String fechaProgramada,
                                               @RequestBody(required = false) Map<String, Object> body) {
-        Long effCamionId = camionId != null ? camionId : (body != null && body.get("camionId") != null ? Long.valueOf(body.get("camionId").toString()) : null);
-        String effPatente = camionPatente != null ? camionPatente : (body != null && body.get("camionPatente") != null ? body.get("camionPatente").toString() : null);
-        String effFecha = fechaProgramada != null ? fechaProgramada : (body != null && body.get("fechaProgramada") != null ? body.get("fechaProgramada").toString() : null);
+        Long effCamionId = resolverLong(camionId, body, "camionId");
+        String effPatente = resolverString(camionPatente, body, "camionPatente");
+        String effFecha = resolverString(fechaProgramada, body, "fechaProgramada");
 
         if (effCamionId == null || effPatente == null || effPatente.isBlank() || effFecha == null || effFecha.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Los campos camionId, camionPatente y fechaProgramada son obligatorios para programar un retiro"));
@@ -125,7 +123,7 @@ public class PickupController {
     public ResponseEntity<?> registrarPesaje(@PathVariable Long id,
                                               @RequestParam(required = false) Double pesoRealKg,
                                               @RequestBody(required = false) Map<String, Object> body) {
-        Double effPeso = pesoRealKg != null ? pesoRealKg : (body != null && body.get("pesoRealKg") != null ? Double.valueOf(body.get("pesoRealKg").toString()) : null);
+        Double effPeso = resolverDouble(pesoRealKg, body, "pesoRealKg");
         if (effPeso == null || effPeso <= 0) {
             return ResponseEntity.badRequest().body(Map.of("error", "El campo pesoRealKg es obligatorio y debe ser mayor a 0"));
         }
@@ -138,12 +136,42 @@ public class PickupController {
     public ResponseEntity<?> cancelarRetiro(@PathVariable Long id,
                                             @RequestParam(required = false) String motivo,
                                             @RequestBody(required = false) Map<String, Object> body) {
-        String effMotivo = motivo != null ? motivo : (body != null && body.get("motivo") != null ? body.get("motivo").toString() : null);
+        String effMotivo = resolverString(motivo, body, "motivo");
         Pickup actualizado = pickupService.cancelarRetiro(id, effMotivo);
         return ResponseEntity.ok(actualizado);
     }
 
-    // ── Utilidad interna ──────────────────────────────────────────────
+    // ── Utilidades internas ───────────────────────────────────────────
+
+    private Long resolverLong(Long valor, Map<String, Object> body, String clave) {
+        if (valor != null) {
+            return valor;
+        }
+        if (body != null && body.get(clave) != null) {
+            return Long.valueOf(body.get(clave).toString());
+        }
+        return null;
+    }
+
+    private String resolverString(String valor, Map<String, Object> body, String clave) {
+        if (valor != null) {
+            return valor;
+        }
+        if (body != null && body.get(clave) != null) {
+            return body.get(clave).toString();
+        }
+        return null;
+    }
+
+    private Double resolverDouble(Double valor, Map<String, Object> body, String clave) {
+        if (valor != null) {
+            return valor;
+        }
+        if (body != null && body.get(clave) != null) {
+            return Double.valueOf(body.get(clave).toString());
+        }
+        return null;
+    }
 
     /**
      * Parsea la fecha programada desde el formato ISO 8601.
@@ -157,7 +185,9 @@ public class PickupController {
         String normalized = fechaProgramada.trim();
         try {
             normalized = java.net.URLDecoder.decode(normalized, java.nio.charset.StandardCharsets.UTF_8);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            // Se ignora el fallo de decodificación de URL y se conserva el valor de fecha normalizado original
+        }
         if (normalized.length() == 16) {
             normalized += ":00";
         }

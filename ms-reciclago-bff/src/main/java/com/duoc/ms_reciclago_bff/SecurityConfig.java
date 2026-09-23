@@ -37,6 +37,11 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    private static final String ROLE_ADMIN = "Admin";
+    private static final String ROLE_COORDINADOR = "Coordinador";
+    private static final String ROLE_CHOFER = "Chofer";
+    private static final String ROLE_PREFIX = "ROLE_";
+
     @Value("${azure.activedirectory.tenant-id:5625266d-cae0-4070-a7ea-b5e88273580f}")
     private String tenantId;
 
@@ -63,17 +68,17 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/routes/cuadrante", "/api/routes/cuadrantes", "/api/routes/cuadrantes/*", "/api/routes/*/tracking", "/api/routes/tracking/*").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/catalog/residuos", "/api/catalog/camiones").permitAll()
                 // Paneles administrativos, coordinación y chofer
-                .requestMatchers("/api/admin/**").hasRole("Admin")
-                .requestMatchers("/api/coordinador/**").hasAnyRole("Admin", "Coordinador")
-                .requestMatchers("/api/chofer/**").hasAnyRole("Admin", "Coordinador", "Chofer")
-                .requestMatchers(HttpMethod.GET, "/api/citizens/contact").hasAnyRole("Admin", "Coordinador")
-                .requestMatchers(HttpMethod.PUT, "/api/routes/tracking/**").hasAnyRole("Admin", "Coordinador", "Chofer")
+                .requestMatchers("/api/admin/**").hasRole(ROLE_ADMIN)
+                .requestMatchers("/api/coordinador/**").hasAnyRole(ROLE_ADMIN, ROLE_COORDINADOR)
+                .requestMatchers("/api/chofer/**").hasAnyRole(ROLE_ADMIN, ROLE_COORDINADOR, ROLE_CHOFER)
+                .requestMatchers(HttpMethod.GET, "/api/citizens/contact").hasAnyRole(ROLE_ADMIN, ROLE_COORDINADOR)
+                .requestMatchers(HttpMethod.PUT, "/api/routes/tracking/**").hasAnyRole(ROLE_ADMIN, ROLE_COORDINADOR, ROLE_CHOFER)
                 // RBAC estricto en operaciones logisticas de ciclo de vida (Admin, Coordinador y Chofer)
-                .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/programar").hasAnyRole("Admin", "Coordinador")
-                .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/en-ruta").hasAnyRole("Admin", "Coordinador", "Chofer")
-                .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/retirado").hasAnyRole("Admin", "Coordinador", "Chofer")
-                .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/pesado").hasAnyRole("Admin", "Coordinador", "Chofer")
-                .requestMatchers(HttpMethod.PATCH, "/api/catalog/camiones/*/estado").hasAnyRole("Admin", "Coordinador")
+                .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/programar").hasAnyRole(ROLE_ADMIN, ROLE_COORDINADOR)
+                .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/en-ruta").hasAnyRole(ROLE_ADMIN, ROLE_COORDINADOR, ROLE_CHOFER)
+                .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/retirado").hasAnyRole(ROLE_ADMIN, ROLE_COORDINADOR, ROLE_CHOFER)
+                .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/pesado").hasAnyRole(ROLE_ADMIN, ROLE_COORDINADOR, ROLE_CHOFER)
+                .requestMatchers(HttpMethod.PATCH, "/api/catalog/camiones/*/estado").hasAnyRole(ROLE_ADMIN, ROLE_COORDINADOR)
                 .requestMatchers("/api/pickups/**").authenticated()
                 .requestMatchers("/api/catalog/**").authenticated()
                 .requestMatchers("/api/routes/**").authenticated()
@@ -123,49 +128,53 @@ public class SecurityConfig {
     private JwtAuthenticationConverter customJwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setPrincipalClaimName("preferred_username");
-        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
-            Collection<GrantedAuthority> authorities = new ArrayList<>();
-
-            Object rolesClaim = jwt.getClaims().get("roles");
-            if (rolesClaim instanceof List<?> rolesList && !rolesList.isEmpty()) {
-                for (Object role : rolesList) {
-                    if (role != null) {
-                        String r = role.toString().trim();
-                        authorities.add(new SimpleGrantedAuthority("ROLE_" + r));
-                        if (!r.isEmpty()) {
-                            String cap = Character.toUpperCase(r.charAt(0)) + (r.length() > 1 ? r.substring(1).toLowerCase() : "");
-                            if (!cap.equals(r)) {
-                                authorities.add(new SimpleGrantedAuthority("ROLE_" + cap));
-                            }
-                        }
-                    }
-                }
-            } else if (rolesClaim instanceof String roleStr && !roleStr.isBlank()) {
-                for (String r : roleStr.split(",")) {
-                    r = r.trim();
-                    authorities.add(new SimpleGrantedAuthority("ROLE_" + r));
-                    if (!r.isEmpty()) {
-                        String cap = Character.toUpperCase(r.charAt(0)) + (r.length() > 1 ? r.substring(1).toLowerCase() : "");
-                        if (!cap.equals(r)) {
-                            authorities.add(new SimpleGrantedAuthority("ROLE_" + cap));
-                        }
-                    }
-                }
-            } else {
-                authorities.add(new SimpleGrantedAuthority("ROLE_Vecino"));
-            }
-
-            Object scpClaim = jwt.getClaims().get("scp");
-            if (scpClaim instanceof String scpString) {
-                for (String scope : scpString.split(" ")) {
-                    authorities.add(new SimpleGrantedAuthority("SCOPE_" + scope));
-                }
-            }
-
-            return authorities;
-        });
-
+        converter.setJwtGrantedAuthoritiesConverter(this::extractAuthorities);
         return converter;
+    }
+
+    private Collection<GrantedAuthority> extractAuthorities(Jwt jwt) {
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        extractRoles(jwt, authorities);
+        extractScopes(jwt, authorities);
+        return authorities;
+    }
+
+    private void extractRoles(Jwt jwt, Collection<GrantedAuthority> authorities) {
+        Object rolesClaim = jwt.getClaims().get("roles");
+        if (rolesClaim instanceof List<?> rolesList && !rolesList.isEmpty()) {
+            for (Object role : rolesList) {
+                if (role != null) {
+                    addRoleAuthorities(role.toString(), authorities);
+                }
+            }
+        } else if (rolesClaim instanceof String roleStr && !roleStr.isBlank()) {
+            for (String r : roleStr.split(",")) {
+                addRoleAuthorities(r, authorities);
+            }
+        } else {
+            authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + "Vecino"));
+        }
+    }
+
+    private void addRoleAuthorities(String roleName, Collection<GrantedAuthority> authorities) {
+        String r = roleName.trim();
+        if (r.isEmpty()) {
+            return;
+        }
+        authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + r));
+        String cap = Character.toUpperCase(r.charAt(0)) + (r.length() > 1 ? r.substring(1).toLowerCase() : "");
+        if (!cap.equals(r)) {
+            authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + cap));
+        }
+    }
+
+    private void extractScopes(Jwt jwt, Collection<GrantedAuthority> authorities) {
+        Object scpClaim = jwt.getClaims().get("scp");
+        if (scpClaim instanceof String scpString) {
+            for (String scope : scpString.split(" ")) {
+                authorities.add(new SimpleGrantedAuthority("SCOPE_" + scope));
+            }
+        }
     }
 
     @Bean

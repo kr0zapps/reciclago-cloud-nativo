@@ -1,4 +1,4 @@
-﻿import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Sector, Waypoint } from '../data/sectors.data';
 
@@ -132,7 +132,7 @@ import { Sector, Waypoint } from '../data/sectors.data';
   `
 })
 export class InteractiveMapComponent {
-  @Input() sector!: Sector | any;
+  @Input() sector!: Sector;
   @Input() activeWaypoint!: Waypoint;
   @Input() truckSimulationRunning: boolean = true;
   @Input() truckSpeed: number = 1;

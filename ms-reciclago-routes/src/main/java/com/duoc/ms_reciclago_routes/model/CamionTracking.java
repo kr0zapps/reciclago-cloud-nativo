@@ -2,6 +2,7 @@ package com.duoc.ms_reciclago_routes.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "camiones_tracking")
@@ -35,26 +36,28 @@ public class CamionTracking {
     private Double capacidadTotalKg;
     private Double kilosCargados;
 
-    private LocalDateTime ultimaActualizacion;
+    private LocalDateTime ultimaActualizacion = LocalDateTime.now(ZoneId.systemDefault());
 
     public CamionTracking() {
     }
 
-    public CamionTracking(Long id, Long camionId, String patente, Long cuadranteId, Double lat, Double lng,
-                          String calleActual, String estado, Double velocidadKmH, Double capacidadTotalKg,
-                          Double kilosCargados, LocalDateTime ultimaActualizacion) {
-        this.id = id;
-        this.camionId = camionId;
-        this.patente = patente;
-        this.cuadranteId = cuadranteId;
-        this.lat = lat;
-        this.lng = lng;
-        this.calleActual = calleActual;
-        this.estado = estado != null ? estado : "EN_CIRCULACION";
-        this.velocidadKmH = velocidadKmH;
-        this.capacidadTotalKg = capacidadTotalKg;
-        this.kilosCargados = kilosCargados;
-        this.ultimaActualizacion = ultimaActualizacion != null ? ultimaActualizacion : LocalDateTime.now();
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private CamionTracking(Builder builder) {
+        this.id = builder.id;
+        this.camionId = builder.camionId;
+        this.patente = builder.patente;
+        this.cuadranteId = builder.cuadranteId;
+        this.lat = builder.lat;
+        this.lng = builder.lng;
+        this.calleActual = builder.calleActual;
+        this.estado = builder.estado != null ? builder.estado : "EN_CIRCULACION";
+        this.velocidadKmH = builder.velocidadKmH;
+        this.capacidadTotalKg = builder.capacidadTotalKg;
+        this.kilosCargados = builder.kilosCargados;
+        this.ultimaActualizacion = builder.ultimaActualizacion != null ? builder.ultimaActualizacion : LocalDateTime.now(ZoneId.systemDefault());
     }
 
     public Long getId() {
@@ -151,5 +154,84 @@ public class CamionTracking {
 
     public void setUltimaActualizacion(LocalDateTime ultimaActualizacion) {
         this.ultimaActualizacion = ultimaActualizacion;
+    }
+
+    public static class Builder {
+        private Long id;
+        private Long camionId;
+        private String patente;
+        private Long cuadranteId;
+        private Double lat;
+        private Double lng;
+        private String calleActual;
+        private String estado = "EN_CIRCULACION";
+        private Double velocidadKmH;
+        private Double capacidadTotalKg;
+        private Double kilosCargados;
+        private LocalDateTime ultimaActualizacion;
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder camionId(Long camionId) {
+            this.camionId = camionId;
+            return this;
+        }
+
+        public Builder patente(String patente) {
+            this.patente = patente;
+            return this;
+        }
+
+        public Builder cuadranteId(Long cuadranteId) {
+            this.cuadranteId = cuadranteId;
+            return this;
+        }
+
+        public Builder lat(Double lat) {
+            this.lat = lat;
+            return this;
+        }
+
+        public Builder lng(Double lng) {
+            this.lng = lng;
+            return this;
+        }
+
+        public Builder calleActual(String calleActual) {
+            this.calleActual = calleActual;
+            return this;
+        }
+
+        public Builder estado(String estado) {
+            this.estado = estado;
+            return this;
+        }
+
+        public Builder velocidadKmH(Double velocidadKmH) {
+            this.velocidadKmH = velocidadKmH;
+            return this;
+        }
+
+        public Builder capacidadTotalKg(Double capacidadTotalKg) {
+            this.capacidadTotalKg = capacidadTotalKg;
+            return this;
+        }
+
+        public Builder kilosCargados(Double kilosCargados) {
+            this.kilosCargados = kilosCargados;
+            return this;
+        }
+
+        public Builder ultimaActualizacion(LocalDateTime ultimaActualizacion) {
+            this.ultimaActualizacion = ultimaActualizacion;
+            return this;
+        }
+
+        public CamionTracking build() {
+            return new CamionTracking(this);
+        }
     }
 }

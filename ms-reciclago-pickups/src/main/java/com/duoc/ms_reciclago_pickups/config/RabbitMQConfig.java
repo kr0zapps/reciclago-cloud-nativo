@@ -16,6 +16,9 @@ import java.util.Map;
 @Configuration
 public class RabbitMQConfig {
 
+    private static final String X_DEAD_LETTER_EXCHANGE = "x-dead-letter-exchange";
+    private static final String X_DEAD_LETTER_ROUTING_KEY = "x-dead-letter-routing-key";
+
     // Nombres de Colas y DLQs
     public static final String QUEUE_EMAIL = "q.cmd.email";
     public static final String DLQ_EMAIL = "q.cmd.email.dlq";
@@ -48,8 +51,8 @@ public class RabbitMQConfig {
     @Bean
     public Queue emailQueue() {
         Map<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange", DLX_EXCHANGE);
-        args.put("x-dead-letter-routing-key", DLQ_EMAIL);
+        args.put(X_DEAD_LETTER_EXCHANGE, DLX_EXCHANGE);
+        args.put(X_DEAD_LETTER_ROUTING_KEY, DLQ_EMAIL);
         return QueueBuilder.durable(QUEUE_EMAIL).withArguments(args).build();
     }
 
@@ -67,8 +70,8 @@ public class RabbitMQConfig {
     @Bean
     public Queue routeQueue() {
         Map<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange", DLX_EXCHANGE);
-        args.put("x-dead-letter-routing-key", DLQ_ROUTE);
+        args.put(X_DEAD_LETTER_EXCHANGE, DLX_EXCHANGE);
+        args.put(X_DEAD_LETTER_ROUTING_KEY, DLQ_ROUTE);
         return QueueBuilder.durable(QUEUE_ROUTE).withArguments(args).build();
     }
 
@@ -86,8 +89,8 @@ public class RabbitMQConfig {
     @Bean
     public Queue certificateQueue() {
         Map<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange", DLX_EXCHANGE);
-        args.put("x-dead-letter-routing-key", DLQ_CERTIFICATE);
+        args.put(X_DEAD_LETTER_EXCHANGE, DLX_EXCHANGE);
+        args.put(X_DEAD_LETTER_ROUTING_KEY, DLQ_CERTIFICATE);
         return QueueBuilder.durable(QUEUE_CERTIFICATE).withArguments(args).build();
     }
 

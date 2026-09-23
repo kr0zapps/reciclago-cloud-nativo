@@ -140,7 +140,7 @@ export class PickupFormComponent implements OnChanges {
   rutError = '';
   phoneError = '';
 
-  constructor(private bffService: BffService) {}
+  constructor(private readonly bffService: BffService) {}
 
   onRutInput(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -170,7 +170,7 @@ export class PickupFormComponent implements OnChanges {
   }
 
   syncOfficialMaterialForSector(): void {
-    if (!this.isRetiroEspecial && this.sector && this.sector.materialPrincipal) {
+    if (!this.isRetiroEspecial && this.sector?.materialPrincipal) {
       const mat = this.sector.materialPrincipal.toLowerCase();
       const matchingRes = this.residuos.find(r => 
         r.nombre?.toLowerCase().includes(mat) || mat.includes(r.nombre?.toLowerCase())
@@ -192,7 +192,7 @@ export class PickupFormComponent implements OnChanges {
     this.bffService.getCuadrante(this.newPickup.direccion).subscribe({
       next: (res) => {
         this.isDetectingCuadrante = false;
-        if (res && res.cuadranteId) {
+        if (res?.cuadranteId) {
           this.detectedCuadrante = `Detectado: ${res.nombre} (${res.diaSemana}) • Horario: ${res.horario}`;
           if (res.sector) {
             this.newPickup.sector = res.sector;
@@ -229,7 +229,7 @@ export class PickupFormComponent implements OnChanges {
     }
 
     const pesoNum = Number(this.newPickup.pesoEstimadoKg);
-    if (isNaN(pesoNum) || pesoNum <= 0) {
+    if (Number.isNaN(pesoNum) || pesoNum <= 0) {
       this.generalError = 'Por favor ingresa un peso estimado válido mayor a 0 kg.';
       return;
     }
@@ -248,8 +248,8 @@ export class PickupFormComponent implements OnChanges {
       : `${this.newPickup.direccion.trim()}, ${currentSectorName}`;
 
     const matchingRes = this.residuos.find(r => r.nombre === this.newPickup.residuoNombre);
-    const residuoId = matchingRes && matchingRes.id ? matchingRes.id : 1;
-    const residuoNombre = matchingRes ? matchingRes.nombre : (this.newPickup.residuoNombre || 'Vidrio');
+    const residuoId = matchingRes?.id ?? 1;
+    const residuoNombre = matchingRes?.nombre ?? (this.newPickup.residuoNombre || 'Vidrio');
 
     const tipoPrefijo = this.isRetiroEspecial ? '[RETIRO ESPECIAL DIMAO]' : '[AVISO RECORRIDO REGULAR]';
     const contactoInfo = [

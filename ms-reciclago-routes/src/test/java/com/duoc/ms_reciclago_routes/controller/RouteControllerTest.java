@@ -31,10 +31,28 @@ public class RouteControllerTest {
     @Test
     @DisplayName("GET /api/routes/cuadrantes - Debe listar todos los cuadrantes")
     void testListarCuadrantes() throws Exception {
-        Cuadrante c1 = new Cuadrante(1L, 1, "Cuadrante 1: Puerto Chico", "Sector Puerto Chico",
-                "LUNES", "08:00 - 17:00 hrs", "Colo Colo", "PV-RC-2027", true);
-        Cuadrante c2 = new Cuadrante(2L, 2, "Costanera Sur y Llanquihue Sur", "Sector Lago",
-                "MARTES", "08:00 - 17:00 hrs", "Los Guindos", "PV-RC-2026", true);
+        Cuadrante c1 = Cuadrante.builder()
+                .id(1L)
+                .numero(1)
+                .nombre("Cuadrante 1: Puerto Chico")
+                .sector("Sector Puerto Chico")
+                .diaSemana("LUNES")
+                .horario("08:00 - 17:00 hrs")
+                .callesPrincipales("Colo Colo")
+                .camionPatente("PV-RC-2027")
+                .camionEnRuta(true)
+                .build();
+        Cuadrante c2 = Cuadrante.builder()
+                .id(2L)
+                .numero(2)
+                .nombre("Costanera Sur y Llanquihue Sur")
+                .sector("Sector Lago")
+                .diaSemana("MARTES")
+                .horario("08:00 - 17:00 hrs")
+                .callesPrincipales("Los Guindos")
+                .camionPatente("PV-RC-2026")
+                .camionEnRuta(true)
+                .build();
 
         when(routeService.listarCuadrantes()).thenReturn(Arrays.asList(c1, c2));
 
@@ -69,9 +87,20 @@ public class RouteControllerTest {
     @Test
     @DisplayName("GET /api/routes/{cuadranteId}/tracking - Debe retornar telemetría del camión en el cuadrante")
     void testObtenerTrackingPorCuadrante() throws Exception {
-        CamionTracking tracking = new CamionTracking(1L, 1L, "PV-RC-2026", 2L,
-                -41.3204, -72.9856, "Av. Vicente Pérez Rosales", "EN_CIRCULACION",
-                24.5, 1500.0, 420.0, LocalDateTime.now());
+        CamionTracking tracking = CamionTracking.builder()
+                .id(1L)
+                .camionId(1L)
+                .patente("PV-RC-2026")
+                .cuadranteId(2L)
+                .lat(-41.3204)
+                .lng(-72.9856)
+                .calleActual("Av. Vicente Pérez Rosales")
+                .estado("EN_CIRCULACION")
+                .velocidadKmH(24.5)
+                .capacidadTotalKg(1500.0)
+                .kilosCargados(420.0)
+                .ultimaActualizacion(LocalDateTime.now())
+                .build();
 
         when(routeService.obtenerTrackingPorCuadrante(2L)).thenReturn(Optional.of(tracking));
 

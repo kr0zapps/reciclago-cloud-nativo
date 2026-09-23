@@ -1,4 +1,4 @@
-﻿import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Pickup } from '../data/sectors.data';
 
@@ -8,7 +8,7 @@ import { Pickup } from '../data/sectors.data';
   imports: [CommonModule],
   template: `
     <div *ngIf="isOpen"
-         (click)="close.emit()"
+         (click)="modalClose.emit()"
          class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
       
       <div (click)="$event.stopPropagation()"
@@ -27,7 +27,7 @@ import { Pickup } from '../data/sectors.data';
               </h3>
             </div>
           </div>
-          <button (click)="close.emit()" type="button" class="w-9 h-9 rounded-full bg-white border border-[#DFE8E1] hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-sm transition-colors shadow-xs cursor-pointer" aria-label="Cerrar">
+          <button (click)="modalClose.emit()" type="button" class="w-9 h-9 rounded-full bg-white border border-[#DFE8E1] hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-sm transition-colors shadow-xs cursor-pointer" aria-label="Cerrar">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -87,7 +87,7 @@ import { Pickup } from '../data/sectors.data';
 
         <div class="px-6 sm:px-8 py-4 bg-[#F8FAF7] border-t border-[#E2E9E4] flex items-center justify-between">
           <span class="text-xs text-slate-500 font-medium">Trazabilidad DIMAO Puerto Varas</span>
-          <button (click)="close.emit()" type="button" class="btn-stitch-primary px-5 py-2 text-xs font-bold cursor-pointer">
+          <button (click)="modalClose.emit()" type="button" class="btn-stitch-primary px-5 py-2 text-xs font-bold cursor-pointer">
             Cerrar
           </button>
         </div>
@@ -102,7 +102,7 @@ export class AuditoriaModalComponent {
   @Input() totalPages: number = 1;
   @Input() totalElements: number = 0;
 
-  @Output() close = new EventEmitter<void>();
+  @Output() modalClose = new EventEmitter<void>();
   @Output() changePage = new EventEmitter<number>();
 }
 

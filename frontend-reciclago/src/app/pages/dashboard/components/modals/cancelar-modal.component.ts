@@ -93,7 +93,7 @@ export class CancelarModalComponent implements OnChanges, OnDestroy {
   @Input() isOpen: boolean = false;
   @Input() pickup: Pickup | null = null;
 
-  @Output() close = new EventEmitter<void>();
+  @Output() modalClose = new EventEmitter<void>();
   @Output() actionCompleted = new EventEmitter<void>();
 
   actionMotivo = '';
@@ -101,7 +101,7 @@ export class CancelarModalComponent implements OnChanges, OnDestroy {
   errorMessage = '';
   errorTitle = 'Aviso de Cancelación';
 
-  constructor(private bffService: BffService) {}
+  constructor(private readonly bffService: BffService) {}
 
   @HostListener('document:keydown.escape')
   handleEscape(): void {
@@ -132,7 +132,7 @@ export class CancelarModalComponent implements OnChanges, OnDestroy {
   onClose(): void {
     this.errorMessage = '';
     document.body.style.overflow = '';
-    this.close.emit();
+    this.modalClose.emit();
   }
 
   confirmarCancelacion(): void {

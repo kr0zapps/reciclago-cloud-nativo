@@ -115,7 +115,7 @@ export class PesajeModalComponent implements OnChanges, OnDestroy {
   @Input() isOpen: boolean = false;
   @Input() pickup: Pickup | null = null;
 
-  @Output() close = new EventEmitter<void>();
+  @Output() modalClose = new EventEmitter<void>();
   @Output() actionCompleted = new EventEmitter<void>();
 
   actionPesoKg = 5.0;
@@ -123,11 +123,11 @@ export class PesajeModalComponent implements OnChanges, OnDestroy {
   errorMessage = '';
   errorTitle = 'Aviso de Báscula';
 
-  constructor(private bffService: BffService) {}
+  constructor(private readonly bffService: BffService) {}
 
   get isInvalidPeso(): boolean {
     const val = Number(this.actionPesoKg);
-    return !this.actionPesoKg || isNaN(val) || val <= 0 || val > 5000;
+    return !this.actionPesoKg || Number.isNaN(val) || val <= 0 || val > 5000;
   }
 
   @HostListener('document:keydown.escape')
@@ -160,7 +160,7 @@ export class PesajeModalComponent implements OnChanges, OnDestroy {
   onClose(): void {
     this.errorMessage = '';
     document.body.style.overflow = '';
-    this.close.emit();
+    this.modalClose.emit();
   }
 
   guardarPesaje(): void {

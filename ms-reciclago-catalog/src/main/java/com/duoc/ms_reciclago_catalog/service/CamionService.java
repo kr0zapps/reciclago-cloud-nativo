@@ -14,6 +14,8 @@ import java.util.Optional;
 @Transactional
 public class CamionService {
 
+    private static final String CAMION_NO_ENCONTRADO_CON_ID = "Camión no encontrado con id: ";
+
     private final CamionRepository camionRepository;
 
     public CamionService(CamionRepository camionRepository) {
@@ -60,14 +62,14 @@ public class CamionService {
             c.setCapacidadDisponibleKg(detalles.getCapacidadDisponibleKg());
             c.setEstado(detalles.getEstado());
             return camionRepository.save(c);
-        }).orElseThrow(() -> new RuntimeException("Camión no encontrado con id: " + id));
+        }).orElseThrow(() -> new RuntimeException(CAMION_NO_ENCONTRADO_CON_ID + id));
     }
 
     public Camion actualizarEstado(Long id, EstadoCamion nuevoEstado) {
         return camionRepository.findById(id).map(c -> {
             c.setEstado(nuevoEstado);
             return camionRepository.save(c);
-        }).orElseThrow(() -> new RuntimeException("Camión no encontrado con id: " + id));
+        }).orElseThrow(() -> new RuntimeException(CAMION_NO_ENCONTRADO_CON_ID + id));
     }
 
     public Camion actualizarEstado(Long id, String nuevoEstado) {
@@ -103,7 +105,7 @@ public class CamionService {
             double restar = pesoKg != null ? pesoKg : 0.0;
             c.setCapacidadDisponibleKg(Math.max(0.0, actual - restar));
             return camionRepository.save(c);
-        }).orElseThrow(() -> new RuntimeException("Camión no encontrado con id: " + id));
+        }).orElseThrow(() -> new RuntimeException(CAMION_NO_ENCONTRADO_CON_ID + id));
     }
 
     public void eliminar(Long id) {

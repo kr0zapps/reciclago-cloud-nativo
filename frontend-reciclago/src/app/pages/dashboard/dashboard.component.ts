@@ -31,7 +31,6 @@ import {
   Pickup,
   DEFAULT_SECTORES,
   DEFAULT_RESIDUOS,
-  DEFAULT_CAMIONES,
   DEFAULT_ROTACION_SEMANAL,
   RotacionSemanal,
   getNextDateForDay,
@@ -185,12 +184,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   constructor(
-    private bffService: BffService,
-    private authService: MsalService
+    private readonly bffService: BffService,
+    private readonly authService: MsalService
   ) {}
 
   ngOnInit(): void {
-    const account = this.authService.instance.getActiveAccount() || this.authService.instance.getAllAccounts()[0];
+    const account = this.authService.instance?.getActiveAccount?.() || this.authService.instance?.getAllAccounts?.()[0];
     if (account) {
       this.userName = account.name || account.username || '';
       const claims = account.idTokenClaims as Record<string, any> | undefined;
@@ -212,16 +211,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.bffService.getProfile().subscribe({
       next: (profile) => {
         let changed = false;
-        if (profile && Array.isArray(profile.roles) && profile.roles.length > 0) {
+        if (profile?.roles && Array.isArray(profile.roles) && profile.roles.length > 0) {
           this.userRoles = Array.from(new Set([...this.userRoles, ...profile.roles]));
           this.syncDefaultStaffRole();
           changed = true;
         }
-        if (profile && (profile.email || profile.username) && !this.userEmail) {
-          this.userEmail = profile.email || profile.username || '';
+        if ((profile?.email || profile?.username) && !this.userEmail) {
+          this.userEmail = profile?.email || profile?.username || '';
           changed = true;
         }
-        if (profile && profile.name && !this.userName) {
+        if (profile?.name && !this.userName) {
           this.userName = profile.name;
         }
         if (changed) {
@@ -269,18 +268,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   isSectorDropdownOpen = false;
 
   toggleSectorDropdown(event?: Event): void {
-    if (event) {
-      event.stopPropagation();
-      event.preventDefault();
-    }
+    event?.stopPropagation();
+    event?.preventDefault();
     this.isSectorDropdownOpen = !this.isSectorDropdownOpen;
   }
 
   selectSector(sectorNombre: string, event?: Event): void {
-    if (event) {
-      event.stopPropagation();
-      event.preventDefault();
-    }
+    event?.stopPropagation();
+    event?.preventDefault();
     this.selectedSector = sectorNombre;
     this.isSectorDropdownOpen = false;
     this.onHeaderSectorChange();
@@ -289,7 +284,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
-    if (!target || !target.closest('.sector-dropdown-container')) {
+    if (!target?.closest('.sector-dropdown-container')) {
       this.isSectorDropdownOpen = false;
     }
   }
@@ -312,10 +307,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   startTruckSimulation(): void {
-    if (this.truckTimer) clearInterval(this.truckTimer);
-    const intervalMs = this.truckSpeed === 2 ? 1800 : 3500;
+    if (this.truckTimer) {
+      clearInterval(this.truckTimer);
+      this.truckTimer = null;
+    }
+    const intervalMs = this.truckSpeed === 2 ? 1500 : 3000;
     this.truckTimer = setInterval(() => {
-      if (this.truckSimulationRunning && this.isCamionEnRuta && this.truckWaypoints.length > 0) {
+      if (this.truckSimulationRunning && this.truckWaypoints.length > 0) {
         this.currentTruckIndex = (this.currentTruckIndex + 1) % this.truckWaypoints.length;
       }
     }, intervalMs);
@@ -338,9 +336,36 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   loadResiduos(): void {
     this.bffService.getResiduos().subscribe({
-      next: (data) => this.residuos = (data && data.length > 0) ? data : [...DEFAULT_RESIDUOS],
-      error: () => this.residuos = [...DEFAULT_RESIDUOS]
+      next: (data) => {
+        this.residuos = (data?.length) ? data : [...DEFAULT_RESIDUOS];
+      },
+      error: () => {
+        this.residuos = [...DEFAULT_RESIDUOS];
+      }
     });
+  }
+
+  private formatPickupFechaTexto(p: any): string {
+    if (p.fechaProgramada) {
+      return new Date(p.fechaProgramada).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
+    }
+    if (p.fechaTexto) {
+      return p.fechaTexto;
+    }
+    if (p.fechaSolicitud) {
+      return new Date(p.fechaSolicitud).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
+    }
+    return 'Hoy';
+  }
+
+  private resolveKilosRecolectados(p: any): number | null {
+    if (p.pesoRealKg != null) {
+      return p.pesoRealKg;
+    }
+    if (p.estado === 'PESADO') {
+      return p.kilosRecolectados ?? null;
+    }
+    return null;
   }
 
   loadPickups(): void {
@@ -349,17 +374,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: (data) => {
         if (Array.isArray(data)) {
           const filtered = (!this.isStaff && this.userEmail)
-            ? data.filter((p: any) => p.vecinoEmail && p.vecinoEmail.toLowerCase() === this.userEmail.toLowerCase())
+            ? data.filter((p: any) => p.vecinoEmail?.toLowerCase() === this.userEmail.toLowerCase())
             : data;
           this.pickups = filtered.map((p: any) => ({
             ...p,
             fecha: p.fechaSolicitud ? p.fechaSolicitud.split('T')[0] : (p.fecha || ''),
-            fechaTexto: p.fechaProgramada 
-              ? new Date(p.fechaProgramada).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' })
-              : (p.fechaTexto || (p.fechaSolicitud ? new Date(p.fechaSolicitud).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' }) : 'Hoy')),
-            kilosRecolectados: p.pesoRealKg != null ? p.pesoRealKg : (p.estado === 'PESADO' ? (p.kilosRecolectados || null) : null),
-            pesoRealKg: p.pesoRealKg != null ? p.pesoRealKg : null,
-            pesoEstimadoKg: p.pesoEstimadoKg != null ? p.pesoEstimadoKg : null,
+            fechaTexto: this.formatPickupFechaTexto(p),
+            kilosRecolectados: this.resolveKilosRecolectados(p),
+            pesoRealKg: p.pesoRealKg ?? null,
+            pesoEstimadoKg: p.pesoEstimadoKg ?? null,
             comentarios: p.observaciones || p.comentarios || ''
           }));
         } else {
@@ -538,7 +561,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       direccion: data.direccion,
       comuna: data.comuna || 'Puerto Varas',
       residuoId: Number(data.residuoId || 1),
-      residuoNombre: data.residuoNombre || (resObj ? resObj.nombre : 'Vidrio'),
+      residuoNombre: data.residuoNombre || (resObj?.nombre ?? 'Vidrio'),
       pesoEstimadoKg: Number(data.pesoEstimadoKg) || 5.0,
       comentarios: data.comentarios || '',
       observaciones: data.observaciones || data.comentarios || ''

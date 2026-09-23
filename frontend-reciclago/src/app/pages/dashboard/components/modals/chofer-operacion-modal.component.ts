@@ -1,4 +1,4 @@
-﻿import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BffService } from '../../../../services/bff.service';
@@ -246,7 +246,7 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
   @Input() actionType: 'en-ruta' | 'retirado' = 'en-ruta';
   @Input() camionesDisponibles: Camion[] = [];
 
-  @Output() close = new EventEmitter<void>();
+  @Output() modalClose = new EventEmitter<void>();
   @Output() actionCompleted = new EventEmitter<void>();
 
   isSubmitting = false;
@@ -262,7 +262,7 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
   nextDateOptions: DateOption[] = [];
   availableTimeSlots: TimeSlot[] = [];
 
-  constructor(private bffService: BffService) {}
+  constructor(private readonly bffService: BffService) {}
 
   get isBlocked(): boolean {
     return this.actionType === 'en-ruta' && this.pickup?.estado === 'SOLICITADO';
@@ -311,46 +311,52 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
     return found ? found.periodo : 'Turno Oficial';
   }
 
+  private handleIsOpenChange(): void {
+    this.errorMessage = '';
+    this.showAdjustSchedule = false;
+    this.hasScheduleChanges = false;
+    if (this.isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }
+
+  private handlePickupChange(): void {
+    if (!this.pickup) return;
+    this.errorMessage = '';
+    this.hasScheduleChanges = false;
+    this.showAdjustSchedule = false;
+    this.computeDateAndHourOptions();
+
+    const fallbackPatente = this.sectorDetected.patente || 'PV-RC-2026';
+    this.actionCamionPatente = this.getValidCamionPatente(this.pickup.camionPatente || fallbackPatente);
+
+    if (this.pickup.fechaProgramada) {
+      const parts = String(this.pickup.fechaProgramada).split('T');
+      if (parts[0]) {
+        this.selectedFecha = parts[0];
+        this.ensureFechaInOptions(parts[0]);
+      }
+      if (parts[1]) {
+        const hora = parts[1].substring(0, 5);
+        this.selectedHora = hora;
+        this.ensureHoraInSlots(hora);
+      }
+    } else if (this.nextDateOptions.length > 0) {
+      this.selectedFecha = this.nextDateOptions[0].value;
+    }
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isOpen']) {
-      this.errorMessage = '';
-      this.showAdjustSchedule = false;
-      this.hasScheduleChanges = false;
-      if (this.isOpen) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = '';
-      }
+      this.handleIsOpenChange();
     }
     if (changes['camionesDisponibles']) {
       this.actionCamionPatente = this.getValidCamionPatente(this.actionCamionPatente);
     }
     if (changes['pickup'] && this.pickup) {
-      this.errorMessage = '';
-      this.hasScheduleChanges = false;
-      this.showAdjustSchedule = false;
-      this.computeDateAndHourOptions();
-
-      if (this.pickup.camionPatente) {
-        this.actionCamionPatente = this.getValidCamionPatente(this.pickup.camionPatente);
-      } else {
-        this.actionCamionPatente = this.getValidCamionPatente(this.sectorDetected.patente || 'PV-RC-2026');
-      }
-
-      if (this.pickup.fechaProgramada) {
-        const parts = String(this.pickup.fechaProgramada).split('T');
-        if (parts[0]) {
-          this.selectedFecha = parts[0];
-          this.ensureFechaInOptions(parts[0]);
-        }
-        if (parts[1]) {
-          const hora = parts[1].substring(0, 5);
-          this.selectedHora = hora;
-          this.ensureHoraInSlots(hora);
-        }
-      } else if (this.nextDateOptions.length > 0) {
-        this.selectedFecha = this.nextDateOptions[0].value;
-      }
+      this.handlePickupChange();
     }
   }
 
@@ -492,7 +498,7 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
   onClose(): void {
     this.errorMessage = '';
     document.body.style.overflow = '';
-    this.close.emit();
+    this.modalClose.emit();
   }
 
   confirmarOperacion(): void {
@@ -502,7 +508,7 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
 
     if (this.actionType === 'en-ruta') {
       const camionSeleccionado = (this.camionesDisponibles || []).find(c => c.patente === this.actionCamionPatente);
-      if (camionSeleccionado && camionSeleccionado.estado === 'MANTENIMIENTO') {
+      if (camionSeleccionado?.estado === 'MANTENIMIENTO') {
         this.errorMessage = `El camión ${camionSeleccionado.patente} se encuentra en taller/mantenimiento y no puede iniciar ruta.`;
         this.isSubmitting = false;
         return;
@@ -512,7 +518,7 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
     // Si se modificó la programación antes de despachar a cuadrilla, guardar primero
     if (this.actionType === 'en-ruta' && this.hasScheduleChanges && this.selectedFecha && this.selectedHora) {
       const camionSeleccionado = this.camionesDisponibles.find(c => c.patente === this.actionCamionPatente) || this.camionesDisponibles[0];
-      const camionId = camionSeleccionado ? camionSeleccionado.id : 1;
+      const camionId = camionSeleccionado?.id ?? 1;
       const isoDateTime = `${this.selectedFecha}T${this.selectedHora}:00`;
 
       this.bffService.programarPickup(this.pickup.id, {

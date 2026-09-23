@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "retira_pickups")
@@ -58,7 +59,7 @@ public class Pickup {
     private String estado = "SOLICITADO"; // SOLICITADO, PROGRAMADO, EN_RUTA, RETIRADO, PESADO, CANCELADO
 
     @Column(nullable = false)
-    private LocalDateTime fechaSolicitud = LocalDateTime.now();
+    private LocalDateTime fechaSolicitud = LocalDateTime.now(ZoneId.systemDefault());
 
     private LocalDateTime fechaProgramada;
     private LocalDateTime fechaCompletado;
@@ -68,27 +69,28 @@ public class Pickup {
     public Pickup() {
     }
 
-    public Pickup(Long id, String codigoRetiro, String vecinoNombre, String vecinoEmail, String direccion,
-                  String comuna, Long residuoId, String residuoNombre, Long camionId, String camionPatente,
-                  Double pesoEstimadoKg, Double pesoRealKg, String estado, LocalDateTime fechaSolicitud,
-                  LocalDateTime fechaProgramada, LocalDateTime fechaCompletado, String observaciones) {
-        this.id = id;
-        this.codigoRetiro = codigoRetiro;
-        this.vecinoNombre = vecinoNombre;
-        this.vecinoEmail = vecinoEmail;
-        this.direccion = direccion;
-        this.comuna = comuna;
-        this.residuoId = residuoId;
-        this.residuoNombre = residuoNombre;
-        this.camionId = camionId;
-        this.camionPatente = camionPatente;
-        this.pesoEstimadoKg = pesoEstimadoKg;
-        this.pesoRealKg = pesoRealKg;
-        this.estado = estado != null ? estado : "SOLICITADO";
-        this.fechaSolicitud = fechaSolicitud != null ? fechaSolicitud : LocalDateTime.now();
-        this.fechaProgramada = fechaProgramada;
-        this.fechaCompletado = fechaCompletado;
-        this.observaciones = observaciones;
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private Pickup(Builder builder) {
+        this.id = builder.id;
+        this.codigoRetiro = builder.codigoRetiro;
+        this.vecinoNombre = builder.vecinoNombre;
+        this.vecinoEmail = builder.vecinoEmail;
+        this.direccion = builder.direccion;
+        this.comuna = builder.comuna != null ? builder.comuna : "Puerto Varas";
+        this.residuoId = builder.residuoId != null ? builder.residuoId : 1L;
+        this.residuoNombre = builder.residuoNombre != null ? builder.residuoNombre : "Residuo Reciclable";
+        this.camionId = builder.camionId;
+        this.camionPatente = builder.camionPatente;
+        this.pesoEstimadoKg = builder.pesoEstimadoKg != null ? builder.pesoEstimadoKg : 5.0;
+        this.pesoRealKg = builder.pesoRealKg;
+        this.estado = builder.estado != null ? builder.estado : "SOLICITADO";
+        this.fechaSolicitud = builder.fechaSolicitud != null ? builder.fechaSolicitud : LocalDateTime.now(ZoneId.systemDefault());
+        this.fechaProgramada = builder.fechaProgramada;
+        this.fechaCompletado = builder.fechaCompletado;
+        this.observaciones = builder.observaciones;
     }
 
     public Long getId() {
@@ -228,12 +230,121 @@ public class Pickup {
     }
 
     public String getComentarios() {
-        return observaciones;
+        return getObservaciones();
     }
 
     public void setComentarios(String comentarios) {
         if (this.observaciones == null || this.observaciones.isBlank()) {
             this.observaciones = comentarios;
+        }
+    }
+
+    public static class Builder {
+        private Long id;
+        private String codigoRetiro;
+        private String vecinoNombre;
+        private String vecinoEmail;
+        private String direccion;
+        private String comuna = "Puerto Varas";
+        private Long residuoId = 1L;
+        private String residuoNombre = "Residuo Reciclable";
+        private Long camionId;
+        private String camionPatente;
+        private Double pesoEstimadoKg = 5.0;
+        private Double pesoRealKg;
+        private String estado = "SOLICITADO";
+        private LocalDateTime fechaSolicitud;
+        private LocalDateTime fechaProgramada;
+        private LocalDateTime fechaCompletado;
+        private String observaciones;
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder codigoRetiro(String codigoRetiro) {
+            this.codigoRetiro = codigoRetiro;
+            return this;
+        }
+
+        public Builder vecinoNombre(String vecinoNombre) {
+            this.vecinoNombre = vecinoNombre;
+            return this;
+        }
+
+        public Builder vecinoEmail(String vecinoEmail) {
+            this.vecinoEmail = vecinoEmail;
+            return this;
+        }
+
+        public Builder direccion(String direccion) {
+            this.direccion = direccion;
+            return this;
+        }
+
+        public Builder comuna(String comuna) {
+            this.comuna = comuna;
+            return this;
+        }
+
+        public Builder residuoId(Long residuoId) {
+            this.residuoId = residuoId;
+            return this;
+        }
+
+        public Builder residuoNombre(String residuoNombre) {
+            this.residuoNombre = residuoNombre;
+            return this;
+        }
+
+        public Builder camionId(Long camionId) {
+            this.camionId = camionId;
+            return this;
+        }
+
+        public Builder camionPatente(String camionPatente) {
+            this.camionPatente = camionPatente;
+            return this;
+        }
+
+        public Builder pesoEstimadoKg(Double pesoEstimadoKg) {
+            this.pesoEstimadoKg = pesoEstimadoKg;
+            return this;
+        }
+
+        public Builder pesoRealKg(Double pesoRealKg) {
+            this.pesoRealKg = pesoRealKg;
+            return this;
+        }
+
+        public Builder estado(String estado) {
+            this.estado = estado;
+            return this;
+        }
+
+        public Builder fechaSolicitud(LocalDateTime fechaSolicitud) {
+            this.fechaSolicitud = fechaSolicitud;
+            return this;
+        }
+
+        public Builder fechaProgramada(LocalDateTime fechaProgramada) {
+            this.fechaProgramada = fechaProgramada;
+            return this;
+        }
+
+        public Builder fechaCompletado(LocalDateTime fechaCompletado) {
+            this.fechaCompletado = fechaCompletado;
+            return this;
+        }
+
+        public Builder observaciones(String observaciones) {
+            this.observaciones = observaciones;
+            return this;
+        }
+
+        public Pickup build() {
+            return new Pickup(this);
         }
     }
 }

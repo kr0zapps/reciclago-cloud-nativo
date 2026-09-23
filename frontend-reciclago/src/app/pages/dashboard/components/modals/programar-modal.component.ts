@@ -274,7 +274,7 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
   @Input() pickup: Pickup | null = null;
   @Input() camionesDisponibles: Camion[] = [];
 
-  @Output() close = new EventEmitter<void>();
+  @Output() modalClose = new EventEmitter<void>();
   @Output() actionCompleted = new EventEmitter<void>();
 
   isRetiroEspecial: boolean = false;
@@ -287,7 +287,7 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
   nextDateOptions: DateOption[] = [];
   availableTimeSlots: TimeSlot[] = [];
 
-  constructor(private bffService: BffService) {}
+  constructor(private readonly bffService: BffService) {}
 
   get materialName(): string {
     return this.pickup?.residuoNombre || 'Vidrio';
@@ -336,44 +336,50 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
     return found ? found.periodo : 'Turno Oficial';
   }
 
+  private handleIsOpenChange(): void {
+    this.errorMessage = '';
+    if (this.isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }
+
+  private handlePickupChange(): void {
+    if (!this.pickup) return;
+    this.errorMessage = '';
+    const obs = (this.pickup.comentarios || '').toUpperCase();
+    this.isRetiroEspecial = obs.includes('ESPECIAL');
+    this.updateConfiguration();
+
+    if (this.isEditMode) {
+      if (this.pickup.camionPatente) {
+        this.actionCamionPatente = this.getValidCamionPatente(this.pickup.camionPatente);
+      }
+      if (this.pickup.fechaProgramada) {
+        const parts = String(this.pickup.fechaProgramada).split('T');
+        if (parts[0]) {
+          this.selectedFecha = parts[0];
+          this.ensureFechaInOptions(parts[0]);
+        }
+        if (parts[1]) {
+          const hora = parts[1].substring(0, 5);
+          this.selectedHora = hora;
+          this.ensureHoraInSlots(hora);
+        }
+      }
+    }
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isOpen']) {
-      this.errorMessage = '';
-      if (this.isOpen) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = '';
-      }
+      this.handleIsOpenChange();
     }
     if (changes['camionesDisponibles']) {
       this.actionCamionPatente = this.getValidCamionPatente(this.actionCamionPatente);
     }
     if (changes['pickup'] && this.pickup) {
-      this.errorMessage = '';
-      // Detectar si el vecino pidió retiro especial en observaciones
-      const obs = (this.pickup.comentarios || '').toUpperCase();
-      this.isRetiroEspecial = obs.includes('ESPECIAL');
-      this.updateConfiguration();
-
-      // Si está en modo edición (ya programado), pre-cargar los datos existentes
-      if (this.isEditMode) {
-        if (this.pickup.camionPatente) {
-          this.actionCamionPatente = this.getValidCamionPatente(this.pickup.camionPatente);
-        }
-        if (this.pickup.fechaProgramada) {
-          const parts = String(this.pickup.fechaProgramada).split('T');
-          if (parts[0]) {
-            this.selectedFecha = parts[0];
-            // Asegurar que esta fecha exista en la grilla visual
-            this.ensureFechaInOptions(parts[0]);
-          }
-          if (parts[1]) {
-            const hora = parts[1].substring(0, 5);
-            this.selectedHora = hora;
-            this.ensureHoraInSlots(hora);
-          }
-        }
-      }
+      this.handlePickupChange();
     }
   }
 
@@ -534,7 +540,7 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
   onClose(): void {
     this.errorMessage = '';
     document.body.style.overflow = '';
-    this.close.emit();
+    this.modalClose.emit();
   }
 
   confirmarProgramacion(): void {
@@ -543,12 +549,12 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
     this.errorMessage = '';
 
     const camionSeleccionado = this.camionesDisponibles.find(c => c.patente === this.actionCamionPatente) || this.camionesDisponibles[0];
-    if (camionSeleccionado && camionSeleccionado.estado === 'MANTENIMIENTO') {
+    if (camionSeleccionado?.estado === 'MANTENIMIENTO') {
       this.errorMessage = `El camión ${camionSeleccionado.patente} se encuentra en taller/mantenimiento. Seleccione una unidad disponible.`;
       this.isSubmitting = false;
       return;
     }
-    const camionId = camionSeleccionado ? camionSeleccionado.id : 1;
+    const camionId = camionSeleccionado?.id ?? 1;
     const isoDateTime = `${this.selectedFecha}T${this.selectedHora}:00`;
 
     this.bffService.programarPickup(this.pickup.id, {

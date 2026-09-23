@@ -164,9 +164,9 @@ export class TruckTrackingComponent {
   ];
 
   get userPickups(): Pickup[] {
-    if (!this.pickups || this.pickups.length === 0) return [];
+    if (!this.pickups?.length) return [];
     if (this.userEmail) {
-      const mine = this.pickups.filter(p => p.vecinoEmail && p.vecinoEmail.toLowerCase() === this.userEmail.toLowerCase() && p.estado !== 'CANCELADO');
+      const mine = this.pickups.filter(p => p.vecinoEmail?.toLowerCase() === this.userEmail.toLowerCase() && p.estado !== 'CANCELADO');
       if (mine.length > 0) return mine;
     }
     return this.pickups.filter(p => p.estado !== 'CANCELADO');
@@ -192,7 +192,7 @@ export class TruckTrackingComponent {
   }
 
   get effectiveEstado(): string {
-    if (this.activePickup && this.activePickup.estado) {
+    if (this.activePickup?.estado) {
       return this.activePickup.estado.toUpperCase();
     }
     return 'SOLICITADO';

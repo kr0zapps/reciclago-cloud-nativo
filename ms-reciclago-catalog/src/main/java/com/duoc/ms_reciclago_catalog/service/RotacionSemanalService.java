@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,7 +60,7 @@ public class RotacionSemanalService {
     public Map<String, Object> obtenerRotacionParaFecha(LocalDate fecha) {
         boolean esHoy = (fecha == null);
         if (fecha == null) {
-            fecha = LocalDate.now();
+            fecha = LocalDate.now(ZoneId.systemDefault());
         }
 
         int numSemanaISO = fecha.get(WeekFields.ISO.weekOfYear());

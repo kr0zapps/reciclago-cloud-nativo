@@ -50,23 +50,100 @@ public class Residuo {
         this.codigo = codigo;
         this.descripcion = descripcion;
         this.precioPorKg = precioPorKg;
-        this.requiereManejoEspecial = requiereManejoEspecial != null ? requiereManejoEspecial : false;
-        this.activo = activo != null ? activo : true;
-        this.permitido = true;
+        if (requiereManejoEspecial != null) {
+            this.requiereManejoEspecial = requiereManejoEspecial;
+        }
+        if (activo != null) {
+            this.activo = activo;
+        }
     }
 
-    public Residuo(Long id, String nombre, String codigo, String descripcion, Double precioPorKg, 
-                   Boolean requiereManejoEspecial, Boolean activo, String categoria, String instrucciones, Boolean permitido) {
-        this.id = id;
-        this.nombre = nombre;
-        this.codigo = codigo;
-        this.descripcion = descripcion;
-        this.precioPorKg = precioPorKg;
-        this.requiereManejoEspecial = requiereManejoEspecial != null ? requiereManejoEspecial : false;
-        this.activo = activo != null ? activo : true;
-        this.categoria = categoria;
-        this.instrucciones = instrucciones;
-        this.permitido = permitido != null ? permitido : true;
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private Long id;
+        private String nombre;
+        private String codigo;
+        private String descripcion;
+        private Double precioPorKg;
+        private Boolean requiereManejoEspecial = false;
+        private Boolean activo = true;
+        private String categoria;
+        private String instrucciones;
+        private Boolean permitido = true;
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder nombre(String nombre) {
+            this.nombre = nombre;
+            return this;
+        }
+
+        public Builder codigo(String codigo) {
+            this.codigo = codigo;
+            return this;
+        }
+
+        public Builder descripcion(String descripcion) {
+            this.descripcion = descripcion;
+            return this;
+        }
+
+        public Builder precioPorKg(Double precioPorKg) {
+            this.precioPorKg = precioPorKg;
+            return this;
+        }
+
+        public Builder requiereManejoEspecial(Boolean requiereManejoEspecial) {
+            if (requiereManejoEspecial != null) {
+                this.requiereManejoEspecial = requiereManejoEspecial;
+            }
+            return this;
+        }
+
+        public Builder activo(Boolean activo) {
+            if (activo != null) {
+                this.activo = activo;
+            }
+            return this;
+        }
+
+        public Builder categoria(String categoria) {
+            this.categoria = categoria;
+            return this;
+        }
+
+        public Builder instrucciones(String instrucciones) {
+            this.instrucciones = instrucciones;
+            return this;
+        }
+
+        public Builder permitido(Boolean permitido) {
+            if (permitido != null) {
+                this.permitido = permitido;
+            }
+            return this;
+        }
+
+        public Residuo build() {
+            Residuo residuo = new Residuo();
+            residuo.setId(this.id);
+            residuo.setNombre(this.nombre);
+            residuo.setCodigo(this.codigo);
+            residuo.setDescripcion(this.descripcion);
+            residuo.setPrecioPorKg(this.precioPorKg);
+            residuo.setRequiereManejoEspecial(this.requiereManejoEspecial);
+            residuo.setActivo(this.activo);
+            residuo.setCategoria(this.categoria);
+            residuo.setInstrucciones(this.instrucciones);
+            residuo.setPermitido(this.permitido);
+            return residuo;
+        }
     }
 
     public Long getId() {
