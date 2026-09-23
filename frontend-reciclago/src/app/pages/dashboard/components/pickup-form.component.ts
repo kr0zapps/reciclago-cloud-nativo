@@ -2,108 +2,282 @@ import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BffService } from '../../../services/bff.service';
-import { Sector, Residuo, Pickup } from '../data/sectors.data';
-import { formatRut, validateRut } from '../../../shared/utils/rut.utils';
-import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/phone.utils';
+import { Sector, Residuo, Pickup, DEFAULT_SECTORES } from '../data/sectors.data';
+
+interface MaterialChip {
+  nombre: string;
+  icon: string;
+}
+
+interface MaterialEspecialChip {
+  nombre: string;
+  descripcion: string;
+  icon: string;
+  pesoSugerido: number;
+}
 
 @Component({
   selector: 'app-pickup-form',
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <section id="solicitud-retiro" class="bg-white border border-[#E2E8F0] rounded-xl p-6 sm:p-8 mt-8">
-      <div class="pb-6 mb-6 border-b border-[#E2E8F0]">
-        <h3 class="font-heading font-extrabold text-2xl sm:text-3xl text-[#123F5B]">
-          {{ isRetiroEspecial ? 'Retiro especial' : 'Solicitar retiro' }}
-        </h3>
+    <section id="solicitud-retiro" class="bg-white border border-[#E2E8F0] rounded-2xl p-5 sm:p-7 shadow-xs">
+      <!-- Encabezado con selector de modo intuitivo -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-6 border-b border-[#E2E8F0]">
+        <div>
+          <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#123F5B] flex items-center gap-2">
+            <i [class]="isRetiroEspecial ? 'fa-solid fa-couch text-amber-500' : 'fa-solid fa-recycle text-[#22a652]'"></i>
+            <span>{{ isRetiroEspecial ? 'Retiro Especial de Voluminosos' : 'Solicitar Retiro de Reciclaje' }}</span>
+          </h3>
+          <p class="text-xs sm:text-sm text-gray-500 mt-1">
+            {{ isRetiroEspecial
+              ? 'Servicio municipal DIMAO para enseres, ramas y artefactos que no entran en la recolección regular.'
+              : 'Recolección selectiva puerta a puerta programada semanalmente para tu cuadrante.' }}
+          </p>
+        </div>
+
+        <!-- Selector de Tipo de Retiro Intuitivo -->
+        <div class="inline-flex p-1 bg-gray-100 rounded-xl border border-gray-200 self-start sm:self-auto flex-shrink-0">
+          <button
+            type="button"
+            (click)="setModoRetiro(false)"
+            class="py-2 px-3.5 rounded-lg text-xs font-bold flex items-center gap-2 transition cursor-pointer"
+            [ngClass]="!isRetiroEspecial ? 'bg-[#123F5B] text-white shadow-xs' : 'text-gray-600 hover:text-[#123F5B]'">
+            <i class="fa-solid fa-recycle text-[#22a652]"></i>
+            <span>Reciclaje Regular</span>
+          </button>
+          <button
+            type="button"
+            (click)="setModoRetiro(true)"
+            class="py-2 px-3.5 rounded-lg text-xs font-bold flex items-center gap-2 transition cursor-pointer"
+            [ngClass]="isRetiroEspecial ? 'bg-[#123F5B] text-white shadow-xs' : 'text-gray-600 hover:text-[#123F5B]'">
+            <i class="fa-solid fa-couch text-amber-400"></i>
+            <span>Retiro Especial</span>
+          </button>
+        </div>
       </div>
 
-      <form (ngSubmit)="onSubmit()" class="space-y-6 text-gray-700">
-        <!-- Banners -->
-        <div *ngIf="submitStatus === 'success'" class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6 text-sm">
-          <strong>¡Éxito!</strong> Solicitud recibida.
+      <form (ngSubmit)="onSubmit()" class="space-y-5 text-gray-700">
+        <!-- Banners de Notificación de Estado -->
+        <div *ngIf="submitStatus === 'success'" class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl text-sm flex items-center gap-2.5">
+          <i class="fa-solid fa-circle-check text-emerald-600 text-lg flex-shrink-0"></i>
+          <div>
+            <strong class="font-extrabold">¡Solicitud recibida con éxito!</strong>
+            <p class="text-xs mt-0.5">El equipo municipal ha registrado tu aviso para la ruta correspondiente.</p>
+          </div>
         </div>
         
-        <div *ngIf="submitStatus === 'error'" class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 text-sm">
-          <strong>Error:</strong> {{ errorMessage || 'Hubo un problema.' }}
-        </div>
-
-        <div *ngIf="generalError" class="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg mb-6 text-sm">
-          <strong>Aviso:</strong> {{ generalError }}
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="space-y-1 text-left">
-            <label for="vecinoRutInput" class="block text-sm font-semibold text-[#123F5B]">RUT (Opcional)</label>
-            <input id="vecinoRutInput" type="text" [value]="vecinoRut" (input)="onRutInput($event)" placeholder="Ej: 12.345.678-K" maxlength="12" class="input-stitch w-full text-sm p-2 border border-[#E2E8F0] rounded-lg">
-            <p *ngIf="rutError" class="text-sm text-red-600 mt-1">{{ rutError }}</p>
-          </div>
-
-          <div class="space-y-1 text-left">
-            <label for="vecinoTelefonoInput" class="block text-sm font-semibold text-[#123F5B]">Teléfono (Opcional)</label>
-            <input id="vecinoTelefonoInput" type="text" [value]="vecinoTelefono" (input)="onPhoneInput($event)" placeholder="Ej: +56 9 8765 4321" maxlength="16" class="input-stitch w-full text-sm p-2 border border-[#E2E8F0] rounded-lg">
-            <p *ngIf="phoneError" class="text-sm text-red-600 mt-1">{{ phoneError }}</p>
+        <div *ngIf="submitStatus === 'error'" class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl text-sm flex items-center gap-2.5">
+          <i class="fa-solid fa-circle-exclamation text-red-600 text-lg flex-shrink-0"></i>
+          <div>
+            <strong class="font-extrabold">No fue posible enviar:</strong>
+            <p class="text-xs mt-0.5">{{ errorMessage || 'Ocurrió un error al procesar la solicitud.' }}</p>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div class="space-y-1">
-            <label class="block text-sm font-semibold text-[#123F5B]">Sector</label>
-            <div class="p-2 border border-[#E2E8F0] rounded-lg bg-gray-50 min-h-[42px] flex items-center">
-              <span class="text-sm text-gray-700">{{ sector?.nombre }} - {{ sector?.cuadrante }}</span>
-            </div>
+        <div *ngIf="generalError" class="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2.5 rounded-xl text-xs sm:text-sm flex items-center gap-2">
+          <i class="fa-solid fa-circle-info text-amber-600 flex-shrink-0"></i>
+          <span>{{ generalError }}</span>
+        </div>
+
+        <!-- 1. SELECTOR VISUAL DE SECTOR / CUADRANTE (INTUITIVO, 1 CLICK) -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500">
+              Sector / Cuadrante
+            </label>
+            <span class="text-xs text-gray-600 font-bold">
+              Día de retiro: <strong class="text-[#123F5B]">{{ sector?.dia || 'Programado' }}</strong>
+            </span>
           </div>
 
-          <div class="space-y-1">
-            <div class="flex items-center justify-between">
-              <label class="block text-sm font-semibold text-[#123F5B]" for="direccion">Dirección</label>
-              <button (click)="detectarCuadrante()" type="button" class="text-xs text-[#22a652] hover:underline cursor-pointer">
-                {{ isDetectingCuadrante ? 'Detectando...' : 'Detectar' }}
-              </button>
-            </div>
-            <input [(ngModel)]="newPickup.direccion" (blur)="detectarCuadrante()" class="input-stitch w-full text-sm p-2 border border-[#E2E8F0] rounded-lg" id="direccion" name="direccion" placeholder="Calle y número" required type="text" />
-            <p *ngIf="detectedCuadrante" class="text-xs text-green-800 mt-1">{{ detectedCuadrante }}</p>
-          </div>
-
-          <div class="space-y-1">
-            <div class="flex items-center justify-between">
-              <label class="block text-sm font-semibold text-[#123F5B]">Material</label>
-              <button type="button" (click)="toggleRetiroEspecial()" class="text-xs text-[#22a652] hover:underline cursor-pointer">
-                {{ isRetiroEspecial ? 'Volver' : 'Especial' }}
-              </button>
-            </div>
-            <div *ngIf="!isRetiroEspecial" class="p-2 border border-[#E2E8F0] rounded-lg bg-gray-50 min-h-[42px] flex items-center">
-              <span class="text-sm text-gray-700">{{ newPickup.residuoNombre || sector?.materialPrincipal || 'Vidrio' }}</span>
-            </div>
-            <select *ngIf="isRetiroEspecial" [(ngModel)]="newPickup.residuoNombre" class="select-stitch w-full text-sm p-2 border border-[#E2E8F0] rounded-lg" id="residuoNombre" name="residuoNombre" required>
-              <option value="">Selecciona material</option>
-              <option *ngFor="let res of residuos" [value]="res.nombre">{{ res.nombre }}</option>
-            </select>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button
+              *ngFor="let s of sectoresDisponibles"
+              type="button"
+              (click)="onSelectCuadrante(s)"
+              class="p-2.5 sm:p-3 rounded-xl border text-left transition cursor-pointer flex flex-col justify-between"
+              [ngClass]="isSectorSelected(s) 
+                ? 'border-[#123F5B] bg-[#123F5B] text-white shadow-sm ring-2 ring-[#123F5B]/20' 
+                : 'border-[#E2E8F0] bg-[#F8FAF7] hover:bg-white hover:border-gray-300 text-gray-700'">
+              <div class="flex items-center justify-between w-full">
+                <span class="text-[10px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded"
+                  [ngClass]="isSectorSelected(s) ? 'bg-white/20 text-emerald-300' : 'bg-emerald-100 text-[#22a652]'">
+                  C{{ s.numero || s.id }}
+                </span>
+                <span class="text-[11px] font-bold" [ngClass]="isSectorSelected(s) ? 'text-gray-200' : 'text-gray-500'">
+                  {{ s.dia }}
+                </span>
+              </div>
+              <span class="text-xs font-bold leading-tight mt-1.5 truncate w-full" [title]="s.nombre">
+                {{ getShortSectorName(s.nombre) }}
+              </span>
+            </button>
           </div>
         </div>
 
+        <!-- 2. DIRECCIÓN CON BOTÓN DETECTAR CUADRANTE -->
         <div class="space-y-1">
-          <label class="block text-sm font-semibold text-[#123F5B]" for="pesoEstimado">Peso Estimado (kg)</label>
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500" for="direccion">
+              Dirección en Puerto Varas
+            </label>
+            <button
+              (click)="detectarCuadrante()"
+              type="button"
+              class="text-xs font-bold text-[#22a652] hover:text-[#1b8e45] cursor-pointer flex items-center gap-1">
+              <i class="fa-solid fa-location-crosshairs"></i>
+              <span>{{ isDetectingCuadrante ? 'Detectando...' : 'Detectar Cuadrante' }}</span>
+            </button>
+          </div>
+          <input
+            [(ngModel)]="newPickup.direccion"
+            (blur)="detectarCuadrante()"
+            class="w-full text-sm p-2.5 border border-[#E2E8F0] rounded-xl focus:border-[#22a652] focus:outline-none focus:ring-2 focus:ring-[#22a652]/10 bg-white"
+            id="direccion"
+            name="direccion"
+            placeholder="Calle y número (Ej: Av. Colón 450, Costanera)"
+            required
+            type="text" />
+          <p *ngIf="detectedCuadrante" class="text-xs text-emerald-800 font-semibold mt-1 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-check text-[#22a652]"></i>
+            <span>{{ detectedCuadrante }}</span>
+          </p>
+        </div>
+
+        <!-- 3. SELECCIÓN DE MATERIAL O RESIDUO -->
+        <!-- MODO REGULAR -->
+        <div *ngIf="!isRetiroEspecial" class="space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500">
+              Material a Reciclar
+            </label>
+            <span class="text-xs text-emerald-700 font-bold">
+              Turno oficial: {{ sector?.materialPrincipal || 'Vidrio' }}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button
+              *ngFor="let mat of materialesRegulares"
+              type="button"
+              (click)="selectMaterialRegular(mat.nombre)"
+              class="py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer"
+              [ngClass]="newPickup.residuoNombre === mat.nombre 
+                ? 'border-[#22a652] bg-[#22a652] text-white shadow-xs' 
+                : 'border-[#E2E8F0] bg-white hover:border-[#22a652] text-gray-700'">
+              <i [class]="mat.icon"></i>
+              <span>{{ mat.nombre }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- MODO RETIRO ESPECIAL (VOLUMINOSOS) -->
+        <div *ngIf="isRetiroEspecial" class="space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500">
+              Tipo de Enser o Residuo Especial
+            </label>
+            <span class="text-xs text-amber-700 font-bold flex items-center gap-1">
+              <i class="fa-solid fa-truck-ramp-box"></i>
+              <span>Cuadrilla municipal DIMAO</span>
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <button
+              *ngFor="let esp of residuosEspeciales"
+              type="button"
+              (click)="selectMaterialEspecial(esp)"
+              class="p-2.5 sm:p-3 rounded-xl border text-left transition cursor-pointer flex flex-col gap-1"
+              [ngClass]="newPickup.residuoNombre === esp.nombre 
+                ? 'border-[#123F5B] bg-[#123F5B] text-white shadow-sm ring-2 ring-[#123F5B]/20' 
+                : 'border-amber-200 bg-amber-50/50 hover:bg-amber-50 text-gray-700'">
+              <div class="flex items-center justify-between">
+                <i [class]="esp.icon + ' text-sm'" [ngClass]="newPickup.residuoNombre === esp.nombre ? 'text-amber-300' : 'text-amber-600'"></i>
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                  [ngClass]="newPickup.residuoNombre === esp.nombre ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800'">
+                  ~{{ esp.pesoSugerido }} kg
+                </span>
+              </div>
+              <div>
+                <span class="text-xs font-bold block leading-tight">{{ esp.nombre }}</span>
+                <span class="text-[11px] opacity-80 block leading-tight mt-0.5"
+                  [ngClass]="newPickup.residuoNombre === esp.nombre ? 'text-gray-200' : 'text-gray-500'">
+                  {{ esp.descripcion }}
+                </span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. PESO ESTIMADO Y ACCESOS RÁPIDOS -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500" for="pesoEstimado">
+              Peso Estimado (kg)
+            </label>
+            <span class="text-xs text-gray-400">
+              {{ isRetiroEspecial ? 'Máximo 500 kg por solicitud' : 'Aproximado para estimar capacidad del camión' }}
+            </span>
+          </div>
           <div class="flex items-center gap-3">
-            <input [(ngModel)]="newPickup.pesoEstimadoKg" class="input-stitch w-24 text-sm p-2 border border-[#E2E8F0] rounded-lg" id="pesoEstimado" name="pesoEstimado" type="number" step="0.5" min="0.5" max="500" placeholder="Ej: 5.0" required />
-            <div class="flex items-center gap-2">
-              <button type="button" *ngFor="let k of [2, 5, 10, 15, 25]" (click)="setQuickWeight(k)"
-                      class="px-2 py-1 rounded text-xs border cursor-pointer"
-                      [ngClass]="newPickup.pesoEstimadoKg === k ? 'bg-[#22a652] text-white border-[#22a652]' : 'bg-white text-gray-700 border-gray-300'">
-                {{ k }}
+            <div class="relative w-28 flex-shrink-0">
+              <input
+                [(ngModel)]="newPickup.pesoEstimadoKg"
+                class="w-full text-sm p-2.5 pr-8 border border-[#E2E8F0] rounded-xl font-bold text-[#123F5B] focus:border-[#22a652] focus:outline-none"
+                id="pesoEstimado"
+                name="pesoEstimado"
+                type="number"
+                step="0.5"
+                min="0.5"
+                max="500"
+                required />
+              <span class="absolute right-3 top-2.5 text-xs text-gray-400 font-bold pointer-events-none">kg</span>
+            </div>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <button
+                type="button"
+                *ngFor="let k of (isRetiroEspecial ? [10, 20, 35, 50, 100] : [2, 5, 10, 15, 25])"
+                (click)="setQuickWeight(k)"
+                class="px-2.5 py-1.5 rounded-lg text-xs font-bold border transition cursor-pointer"
+                [ngClass]="newPickup.pesoEstimadoKg === k 
+                  ? 'bg-[#22a652] text-white border-[#22a652] shadow-2xs' 
+                  : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'">
+                {{ k }} kg
               </button>
             </div>
           </div>
         </div>
 
+        <!-- 5. COMENTARIOS / INDICACIONES -->
         <div class="space-y-1">
-          <label class="block text-sm font-semibold text-[#123F5B]" for="comentarios">Comentarios</label>
-          <textarea [(ngModel)]="newPickup.comentarios" class="input-stitch w-full text-sm p-2 border border-[#E2E8F0] rounded-lg" id="comentarios" name="comentarios" placeholder="Opcional"></textarea>
+          <label class="block text-xs font-bold uppercase tracking-wider text-gray-500" for="comentarios">
+            Indicaciones para el retiro (Opcional)
+          </label>
+          <textarea
+            [(ngModel)]="newPickup.comentarios"
+            rows="2"
+            class="w-full text-sm p-2.5 border border-[#E2E8F0] rounded-xl focus:border-[#22a652] focus:outline-none bg-white"
+            id="comentarios"
+            name="comentarios"
+            placeholder="Ej: Dejar en antejardín, portón verde, llamar antes al timbre..."></textarea>
         </div>
 
-        <div class="pt-4 flex justify-end">
-          <button [disabled]="isSubmitting" class="btn-stitch-primary px-6 py-2 bg-[#22a652] hover:bg-[#1b8e45] text-white rounded-lg font-semibold text-sm cursor-pointer border-none" type="submit">
-            {{ isSubmitting ? 'Procesando...' : 'Solicitar Retiro' }}
+        <!-- 6. ACCIÓN DE ENVÍO -->
+        <div class="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-gray-100">
+          <div class="text-xs text-gray-500 flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-[#22a652]"></i>
+            <span>Servicio municipal gratuito &middot; Puerto Varas Sustentable</span>
+          </div>
+
+          <button
+            [disabled]="isSubmitting"
+            class="px-6 py-2.5 bg-[#22a652] hover:bg-[#1b8e45] text-white rounded-xl font-bold text-sm cursor-pointer border-none shadow-xs transition flex items-center justify-center gap-2"
+            type="submit">
+            <i *ngIf="isSubmitting" class="fa-solid fa-circle-notch fa-spin"></i>
+            <i *ngIf="!isSubmitting" [class]="isRetiroEspecial ? 'fa-solid fa-truck-ramp-box' : 'fa-solid fa-paper-plane'"></i>
+            <span>{{ isSubmitting ? 'Registrando...' : (isRetiroEspecial ? 'Solicitar Retiro Especial' : 'Solicitar Retiro') }}</span>
           </button>
         </div>
       </form>
@@ -112,16 +286,18 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
 })
 export class PickupFormComponent implements OnChanges {
   @Input() sector!: Sector | null;
+  @Input() sectores: Sector[] = [];
   @Input() residuos: Residuo[] = [];
   @Input() userEmail: string = '';
   @Input() userName: string = '';
 
   @Output() pickupCreated = new EventEmitter<Pickup>();
+  @Output() sectorChange = new EventEmitter<string>();
 
   newPickup = {
     sector: '',
     direccion: '',
-    residuoNombre: '',
+    residuoNombre: 'Vidrio',
     pesoEstimadoKg: 5.0,
     comentarios: ''
   };
@@ -135,54 +311,88 @@ export class PickupFormComponent implements OnChanges {
   errorMessage = '';
   generalError = '';
 
-  vecinoRut = '';
-  vecinoTelefono = '';
-  rutError = '';
-  phoneError = '';
+  materialesRegulares: MaterialChip[] = [
+    { nombre: 'Vidrio', icon: 'fa-solid fa-wine-bottle' },
+    { nombre: 'Cartón y Papel', icon: 'fa-solid fa-box-open' },
+    { nombre: 'Plásticos (PET)', icon: 'fa-solid fa-bottle-water' },
+    { nombre: 'Latas y Metales', icon: 'fa-solid fa-can-food' }
+  ];
+
+  residuosEspeciales: MaterialEspecialChip[] = [
+    { nombre: 'Muebles & Enseres', descripcion: 'Sillones, colchones, mesas, sillas', icon: 'fa-solid fa-couch', pesoSugerido: 25 },
+    { nombre: 'Electrodomésticos / RAEE', descripcion: 'Línea blanca, TV, microondas', icon: 'fa-solid fa-tv', pesoSugerido: 20 },
+    { nombre: 'Restos de Poda', descripcion: 'Ramas atadas, hojas y jardinería', icon: 'fa-solid fa-tree', pesoSugerido: 15 },
+    { nombre: 'Escombros Menores', descripcion: 'Material de construcción (máx. 5 sacos)', icon: 'fa-solid fa-cubes', pesoSugerido: 40 },
+    { nombre: 'Chatarra Metálica', descripcion: 'Perfiles, latas grandes y fierros', icon: 'fa-solid fa-gears', pesoSugerido: 20 },
+    { nombre: 'Otros Voluminosos', descripcion: 'Enseres mayores varios', icon: 'fa-solid fa-box-archive', pesoSugerido: 15 }
+  ];
 
   constructor(private readonly bffService: BffService) {}
 
-  onRutInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.vecinoRut = formatRut(input.value);
-    if (this.vecinoRut.length > 3) {
-      this.rutError = validateRut(this.vecinoRut) ? '' : 'RUT inválido (ej: 12.345.678-K)';
-    } else {
-      this.rutError = '';
+  get sectoresDisponibles(): Sector[] {
+    return (this.sectores && this.sectores.length > 0) ? this.sectores : DEFAULT_SECTORES;
+  }
+
+  isSectorSelected(s: Sector): boolean {
+    if (!this.sector) return false;
+    return s.nombre === this.sector.nombre || s.id === this.sector.id;
+  }
+
+  getShortSectorName(name: string): string {
+    if (!name) return 'Sector';
+    if (name.includes('Puerto Chico')) return 'Puerto Chico';
+    if (name.includes('Costanera')) return 'Costanera Sur';
+    if (name.includes('Santa Rosa') || name.includes('Mirador')) return 'Santa Rosa';
+    if (name.includes('Braunau')) return 'N. Braunau';
+    if (name.includes('Ensenada')) return 'Ensenada';
+    return name.split(' ')[0] || name;
+  }
+
+  onSelectCuadrante(s: Sector): void {
+    this.sector = s;
+    this.newPickup.sector = s.nombre;
+    this.sectorChange.emit(s.nombre);
+    if (!this.isRetiroEspecial) {
+      this.syncOfficialMaterialForSector();
     }
   }
 
-  onPhoneInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.vecinoTelefono = formatChileanPhone(input.value);
-    if (this.vecinoTelefono.length > 6) {
-      this.phoneError = validateChileanPhone(this.vecinoTelefono) ? '' : 'Formato inválido (ej: +56 9 8765 4321)';
+  setModoRetiro(esEspecial: boolean): void {
+    this.isRetiroEspecial = esEspecial;
+    if (esEspecial) {
+      this.newPickup.residuoNombre = this.residuosEspeciales[0].nombre;
+      this.newPickup.pesoEstimadoKg = this.residuosEspeciales[0].pesoSugerido;
     } else {
-      this.phoneError = '';
+      this.newPickup.pesoEstimadoKg = 5.0;
+      this.syncOfficialMaterialForSector();
     }
+  }
+
+  selectMaterialRegular(nombre: string): void {
+    this.newPickup.residuoNombre = nombre;
+  }
+
+  selectMaterialEspecial(esp: MaterialEspecialChip): void {
+    this.newPickup.residuoNombre = esp.nombre;
+    this.newPickup.pesoEstimadoKg = esp.pesoSugerido;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['sector'] && this.sector) {
       this.newPickup.sector = this.sector.nombre || '';
-      this.syncOfficialMaterialForSector();
+      if (!this.isRetiroEspecial) {
+        this.syncOfficialMaterialForSector();
+      }
     }
   }
 
   syncOfficialMaterialForSector(): void {
     if (!this.isRetiroEspecial && this.sector?.materialPrincipal) {
       const mat = this.sector.materialPrincipal.toLowerCase();
-      const matchingRes = this.residuos.find(r => 
-        r.nombre?.toLowerCase().includes(mat) || mat.includes(r.nombre?.toLowerCase())
+      const matchingRes = this.materialesRegulares.find(r => 
+        r.nombre.toLowerCase().includes(mat) || mat.includes(r.nombre.toLowerCase())
       );
       this.newPickup.residuoNombre = matchingRes ? matchingRes.nombre : this.sector.materialPrincipal;
-    }
-  }
-
-  toggleRetiroEspecial(): void {
-    this.isRetiroEspecial = !this.isRetiroEspecial;
-    if (!this.isRetiroEspecial) {
-      this.syncOfficialMaterialForSector();
     }
   }
 
@@ -194,8 +404,14 @@ export class PickupFormComponent implements OnChanges {
         this.isDetectingCuadrante = false;
         if (res?.cuadranteId) {
           this.detectedCuadrante = `Detectado: ${res.nombre} (${res.diaSemana}) • Horario: ${res.horario}`;
-          if (res.sector) {
-            this.newPickup.sector = res.sector;
+          if (res.nombre) {
+            const matchingSector = this.sectoresDisponibles.find(s => 
+              s.nombre.toLowerCase().includes(res.nombre.toLowerCase()) || 
+              res.nombre.toLowerCase().includes(s.nombre.toLowerCase())
+            );
+            if (matchingSector) {
+              this.onSelectCuadrante(matchingSector);
+            }
           }
         }
       },
@@ -212,19 +428,7 @@ export class PickupFormComponent implements OnChanges {
   onSubmit(): void {
     this.generalError = '';
     if (!this.newPickup.direccion || !this.newPickup.direccion.trim()) {
-      this.generalError = 'Por favor ingresa la calle y número de tu domicilio.';
-      return;
-    }
-
-    if (this.vecinoRut && !validateRut(this.vecinoRut)) {
-      this.rutError = 'El RUT ingresado no es válido (ej: 12.345.678-K).';
-      this.generalError = 'Corrige el RUT ingresado antes de enviar.';
-      return;
-    }
-
-    if (this.vecinoTelefono && !validateChileanPhone(this.vecinoTelefono)) {
-      this.phoneError = 'El teléfono celular debe tener formato +56 9 XXXX XXXX.';
-      this.generalError = 'Corrige el teléfono de contacto antes de enviar.';
+      this.generalError = 'Por favor ingresa la calle y número de tu domicilio en Puerto Varas.';
       return;
     }
 
@@ -235,7 +439,7 @@ export class PickupFormComponent implements OnChanges {
     }
 
     if (!this.newPickup.residuoNombre) {
-      this.syncOfficialMaterialForSector();
+      this.newPickup.residuoNombre = this.isRetiroEspecial ? 'Muebles & Enseres' : (this.sector?.materialPrincipal || 'Vidrio');
     }
 
     this.isSubmitting = true;
@@ -247,20 +451,16 @@ export class PickupFormComponent implements OnChanges {
       ? this.newPickup.direccion.trim()
       : `${this.newPickup.direccion.trim()}, ${currentSectorName}`;
 
-    const matchingRes = this.residuos.find(r => r.nombre === this.newPickup.residuoNombre);
-    const residuoId = matchingRes?.id ?? 1;
-    const residuoNombre = matchingRes?.nombre ?? (this.newPickup.residuoNombre || 'Vidrio');
+    const matchingRes = this.residuos.find(r => 
+      r.nombre?.toLowerCase() === this.newPickup.residuoNombre.toLowerCase()
+    );
+    const residuoId = matchingRes?.id ?? (this.isRetiroEspecial ? 99 : 1);
+    const residuoNombre = this.newPickup.residuoNombre;
 
     const tipoPrefijo = this.isRetiroEspecial ? '[RETIRO ESPECIAL DIMAO]' : '[AVISO RECORRIDO REGULAR]';
-    const contactoInfo = [
-      this.vecinoRut ? `RUT: ${this.vecinoRut}` : '',
-      this.vecinoTelefono ? `Tel: ${this.vecinoTelefono}` : ''
-    ].filter(Boolean).join(' • ');
-
     const comentarioCompleto = [
       tipoPrefijo,
-      contactoInfo ? `[${contactoInfo}]` : '',
-      this.newPickup.comentarios?.trim() || 'Notificación vecinal para el cuadrante'
+      this.newPickup.comentarios?.trim() || (this.isRetiroEspecial ? 'Solicitud de retiro de voluminosos' : 'Notificación vecinal para el cuadrante')
     ].filter(Boolean).join(' ');
 
     const payload = {
@@ -282,14 +482,10 @@ export class PickupFormComponent implements OnChanges {
         this.newPickup.direccion = '';
         this.newPickup.comentarios = '';
         this.newPickup.pesoEstimadoKg = 5.0;
-        this.vecinoRut = '';
-        this.vecinoTelefono = '';
-        this.rutError = '';
-        this.phoneError = '';
         this.isRetiroEspecial = false;
         this.syncOfficialMaterialForSector();
         this.pickupCreated.emit(res || payload);
-        setTimeout(() => this.submitStatus = 'idle', 5000);
+        setTimeout(() => this.submitStatus = 'idle', 6000);
       },
       error: (err) => {
         this.isSubmitting = false;
@@ -302,7 +498,7 @@ export class PickupFormComponent implements OnChanges {
         }
         setTimeout(() => {
           if (this.submitStatus === 'error') this.submitStatus = 'idle';
-        }, 7000);
+        }, 8000);
       }
     });
   }
