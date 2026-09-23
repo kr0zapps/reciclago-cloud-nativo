@@ -34,12 +34,12 @@ import { RouterModule } from '@angular/router';
       <div class="h-16 sm:h-20 lg:h-24 flex-shrink-0 pointer-events-none"></div>
 
       <!-- 3. Contenido Editorial Principal: Monumental, Centrado e Imponente (Cero Slop, Cero Cuadritos) -->
-      <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 lg:py-12 w-full my-auto text-center flex flex-col items-center justify-center">
+      <div class="relative z-10 max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 lg:py-12 w-full my-auto text-center flex flex-col items-center justify-center">
         
-        <!-- Titular Monumental, Prominente y de Alto Impacto con Clash Display -->
-        <h1 class="hero-title text-white drop-shadow-sm">
+        <!-- Titular Monumental, Prominente y de Alto Impacto con Cabinet Grotesk (Blanco Puro Sólido) -->
+        <h1 class="hero-title text-white">
           <span class="block">Reciclaje Comunal</span>
-          <span class="block text-[#22a652]">Puerto Varas</span>
+          <span class="block">Puerto Varas</span>
         </h1>
 
         <!-- Subtítulo Corto, Directo y Conciso -->
