@@ -29,39 +29,64 @@ import { BffService } from '../../../services/bff.service';
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
           
           <!-- Métrica 1: Kilos -->
-          <div class="bg-slate-50/70 rounded-2xl p-7 text-center border border-slate-200 shadow-2xs hover:shadow-xs hover:border-slate-300 transition-all">
-            <div class="w-12 h-12 mx-auto mb-3.5 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-lg shadow-2xs">
+          <div class="bg-slate-50/70 rounded-2xl p-7 text-center border border-slate-200 shadow-2xs hover:shadow-md hover:-translate-y-1.5 hover:border-slate-300 transition-all duration-300 flex flex-col justify-between items-center group">
+            <div class="w-12 h-12 mx-auto mb-3.5 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-lg shadow-2xs group-hover:scale-110 group-hover:border-emerald-300 transition-all duration-300">
               <i class="fa-solid fa-scale-balanced text-emerald-600"></i>
             </div>
-            <p class="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-1 font-heading">
-              {{ displayKg }} <span class="text-2xl font-bold text-emerald-600">kg</span>
-            </p>
-            <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Kilos Certificados en Báscula</h3>
-            <p class="text-xs text-slate-500">Pesaje digital verificado en ruta</p>
+            <div>
+              <p class="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-1 font-heading tracking-tight">
+                {{ displayKg }} <span class="text-2xl font-bold text-emerald-600">kg</span>
+              </p>
+              <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Kilos Certificados en Báscula</h3>
+              <p class="text-xs text-slate-500">Pesaje digital verificado en ruta</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-200/70 w-full flex items-center justify-center gap-1.5 text-[11px] font-semibold text-emerald-700">
+              <i class="fa-solid fa-arrow-trend-up text-xs"></i>
+              <span>Trazabilidad 100% Digital</span>
+            </div>
           </div>
 
-          <!-- Métrica 2: Vertederos -->
-          <div class="bg-slate-50/70 rounded-2xl p-7 text-center border border-slate-200 shadow-2xs hover:shadow-xs hover:border-slate-300 transition-all">
-            <div class="w-12 h-12 mx-auto mb-3.5 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-lg shadow-2xs">
-              <i class="fa-solid fa-arrow-trend-down text-emerald-600"></i>
+          <!-- Métrica 2: Vertederos con Anillo Circular SVG Animado -->
+          <div class="bg-slate-50/70 rounded-2xl p-7 text-center border border-slate-200 shadow-2xs hover:shadow-md hover:-translate-y-1.5 hover:border-slate-300 transition-all duration-300 flex flex-col justify-between items-center group">
+            <!-- Anillo SVG Circular en Vivo -->
+            <div class="relative w-24 h-24 mx-auto mb-2 flex items-center justify-center">
+              <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="38" stroke="#E2E8F0" stroke-width="7" fill="none" />
+                <circle cx="50" cy="50" r="38" stroke="#16A34A" stroke-width="7" fill="none" stroke-linecap="round"
+                        stroke-dasharray="238.76"
+                        [style.stroke-dashoffset]="238.76 - (238.76 * currentPercent / 100)"
+                        class="transition-all duration-700 ease-out" />
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span class="text-2xl font-extrabold text-slate-900 font-heading leading-none">{{ currentPercent }}%</span>
+                <span class="text-[9px] font-bold text-emerald-700 uppercase tracking-wider mt-0.5">Meta</span>
+              </div>
             </div>
-            <p class="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-1 font-heading">
-              {{ currentPercent }}<span class="text-2xl font-bold text-emerald-600">%</span>
-            </p>
-            <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Desviación de Vertederos</h3>
-            <p class="text-xs text-slate-500">Recuperación y valorización REP</p>
+            <div>
+              <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Desviación de Vertederos</h3>
+              <p class="text-xs text-slate-500">Recuperación y valorización REP</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-200/70 w-full flex items-center justify-center gap-1.5 text-[11px] font-semibold text-slate-500">
+              <span>Evitando saturación comunal</span>
+            </div>
           </div>
 
           <!-- Métrica 3: Flota -->
-          <div class="bg-slate-50/70 rounded-2xl p-7 text-center border border-slate-200 shadow-2xs hover:shadow-xs hover:border-slate-300 transition-all">
-            <div class="w-12 h-12 mx-auto mb-3.5 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-lg shadow-2xs">
-              <i class="fa-solid fa-truck-fast text-slate-700"></i>
+          <div class="bg-slate-50/70 rounded-2xl p-7 text-center border border-slate-200 shadow-2xs hover:shadow-md hover:-translate-y-1.5 hover:border-slate-300 transition-all duration-300 flex flex-col justify-between items-center group">
+            <div class="w-12 h-12 mx-auto mb-3.5 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-lg shadow-2xs group-hover:scale-110 group-hover:border-emerald-300 transition-all duration-300">
+              <i class="fa-solid fa-truck-fast text-slate-800"></i>
             </div>
-            <p class="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-1 font-heading">
-              {{ currentTrucks }} <span class="text-xl font-bold text-emerald-600">camiones</span>
-            </p>
-            <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Flota Activa con GPS</h3>
-            <p class="text-xs text-slate-500">Cobertura en los 4 cuadrantes</p>
+            <div>
+              <p class="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-1 font-heading tracking-tight">
+                {{ currentTrucks }} <span class="text-xl font-bold text-emerald-600">camiones</span>
+              </p>
+              <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Flota Activa con GPS</h3>
+              <p class="text-xs text-slate-500">Cobertura en los 4 cuadrantes</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-200/70 w-full flex items-center justify-center gap-1.5 text-[11px] font-semibold text-emerald-700">
+              <i class="fa-solid fa-satellite-dish text-xs"></i>
+              <span>Monitoreo Satelital</span>
+            </div>
           </div>
 
         </div>

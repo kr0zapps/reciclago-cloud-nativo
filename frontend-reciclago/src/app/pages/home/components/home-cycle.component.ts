@@ -34,15 +34,15 @@ interface CycleStep {
         <!-- 5-Step Process Modern Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5 text-left">
           <div *ngFor="let step of steps; let isLast = last" 
-               class="group bg-slate-50/70 rounded-2xl p-6 border border-slate-200 shadow-2xs hover:bg-white hover:shadow-xs hover:border-slate-300 transition-all duration-300 flex flex-col justify-between">
+               class="group bg-slate-50/70 rounded-2xl p-6 border border-slate-200 shadow-2xs hover:bg-white hover:shadow-md hover:-translate-y-1.5 hover:border-emerald-300/80 transition-all duration-300 flex flex-col justify-between cursor-default">
             
             <div>
               <!-- Top Row: Number + Icon Medallion -->
               <div class="flex items-center justify-between mb-4">
-                <span class="font-heading font-black text-2xl sm:text-3xl text-slate-900">
+                <span class="font-heading font-black text-2xl sm:text-3xl text-slate-900 group-hover:text-emerald-700 transition-colors">
                   0{{ step.stepNumber }}
                 </span>
-                <div class="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-sm shadow-2xs group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-600 transition-colors duration-200">
+                <div class="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-sm shadow-2xs group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-600 group-hover:scale-110 transition-all duration-300">
                   <i [class]="step.iconClass"></i>
                 </div>
               </div>
@@ -64,7 +64,7 @@ interface CycleStep {
             <!-- Bottom Progress Line Indicating Sequence -->
             <div class="mt-4 pt-3 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-slate-400 font-medium">
               <span>Etapa {{ step.stepNumber }}/5</span>
-              <i *ngIf="!isLast" class="fa-solid fa-arrow-right text-slate-400 text-xs group-hover:text-emerald-600 transition-colors"></i>
+              <i *ngIf="!isLast" class="fa-solid fa-arrow-right text-slate-400 text-xs group-hover:text-emerald-600 group-hover:translate-x-1 transition-all"></i>
               <i *ngIf="isLast" class="fa-solid fa-check-circle text-emerald-600 text-xs"></i>
             </div>
           </div>
