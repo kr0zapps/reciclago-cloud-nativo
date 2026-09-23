@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, SimpleChanges, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, OnDestroy, SimpleChanges, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Sector, Camion, Residuo, Pickup, Waypoint, RotacionSemanal } from '../data/sectors.data';
@@ -569,12 +569,10 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
 
                 <!-- Menú Desplegable Flotante Moderno -->
                 <div *ngIf="isMaterialDropdownOpen"
-                     role="listbox"
                      class="absolute left-0 right-0 top-full mt-1.5 bg-white rounded-2xl shadow-2xl border border-[#E2E8F0] p-2 z-[100] anim-modal-backdrop space-y-1">
                   <button
                     *ngFor="let r of residuos"
                     type="button"
-                    role="option"
                     [attr.aria-selected]="nuevoResiduoId === r.id"
                     (click)="selectResiduo(r.id)"
                     class="w-full text-left p-2 rounded-xl transition-all flex items-center justify-between group cursor-pointer"
@@ -624,7 +622,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
     </div>
   `
 })
-export class CoordinadorDashboardComponent implements OnInit, OnChanges, OnDestroy {
+export class CoordinadorDashboardComponent implements OnChanges, OnDestroy {
   @Input() sector: Sector | null = null;
   @Input() sectores: Sector[] = [];
   @Input() pickups: Pickup[] = [];
@@ -650,6 +648,10 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges, OnDestr
     return (this.sectores || []).filter(s => s.diaModificado);
   }
 
+  get pickupsCoordinador(): Pickup[] {
+    return this.pickups.filter(p => p.estado !== 'CANCELADO');
+  }
+
   filterStatus: string = 'ALL';
   filterSector: string = 'ALL';
 
@@ -671,9 +673,7 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges, OnDestr
   mesaError = '';
 
   toggleMaterialDropdown(event?: Event): void {
-    if (event) {
-      event.stopPropagation();
-    }
+    event?.stopPropagation();
     this.isMaterialDropdownOpen = !this.isMaterialDropdownOpen;
   }
 
@@ -703,10 +703,8 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges, OnDestr
     'PV-RC-2028': { name: 'Camino a Ensenada Km 2', detail: 'Traslado a planta de valorización', eta: '18 min', distancia: '3.1 km', x: 75, y: 60, estado: 'En traslado' }
   };
 
-  ngOnInit(): void {}
-
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['residuos'] && this.residuos && this.residuos.length > 0) {
+    if (changes['residuos'] && this.residuos?.length) {
       this.nuevoResiduoId = this.residuos[0].id;
     }
   }
@@ -885,7 +883,7 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges, OnDestr
       direccion: this.nuevaDireccion.trim(),
       comuna: 'Puerto Varas',
       residuoId: Number(this.nuevoResiduoId || 1),
-      residuoNombre: resObj ? resObj.nombre : 'Vidrio',
+      residuoNombre: resObj?.nombre ?? 'Vidrio',
       pesoEstimadoKg: pesoNum,
       comentarios: comentariosCompletos,
       observaciones: comentariosCompletos
