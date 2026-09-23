@@ -517,7 +517,7 @@ export function aplicarSectorOverrides(sectores: Sector[], semana?: number): Sec
 
     if (!diaModificado) {
       const ov = legacyOverrides[s.nombre] || legacyOverrides[s.sector] || legacyOverrides[s.cuadrante];
-      if (ov && ov.dia) {
+      if (ov?.dia) {
         diaActual = ov.dia;
       }
     }
