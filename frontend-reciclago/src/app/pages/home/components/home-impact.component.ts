@@ -9,24 +9,24 @@ import { BffService } from '../../../services/bff.service';
   imports: [CommonModule, RouterModule],
   template: `
     <!-- BEGIN: ImpactSection -->
-    <section class="relative py-14 sm:py-16 bg-white overflow-hidden border-b border-slate-200" id="impacto">
+    <section class="relative py-12 sm:py-16 bg-white overflow-hidden border-b border-slate-200" id="impacto">
       <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Encabezado de Sección Modern Clean -->
         <div class="mb-8 text-center sm:text-left">
           <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-heading mb-1.5">
-            Impacto en la Comuna
+            Impacto en Puerto Varas
           </h2>
           <p class="text-xs sm:text-sm text-slate-500 max-w-xl font-sans">
-            Cada kilogramo recolectado se pesa in situ y se certifica para valorización, evitando su disposición en vertederos provinciales.
+            Seguimiento del programa municipal de retiro selectivo y reciclaje domiciliario.
           </p>
         </div>
 
-        <!-- 3 Tarjetas de Métricas Modernas y Compactas -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 mb-8">
+        <!-- 3 Tarjetas de Métricas Simétricas (Horizontal en Móvil / Grid en Desktop) -->
+        <div class="flex md:grid md:grid-cols-3 gap-3 sm:gap-5 overflow-x-auto md:overflow-visible pb-3 md:pb-0 px-1 snap-x snap-mandatory scroll-smooth no-scrollbar mb-6 md:mb-8">
           
           <!-- Métrica 1: Kilos -->
-          <div class="bg-slate-50/70 rounded-2xl p-5 sm:p-6 text-center border border-slate-200 shadow-2xs hover:shadow-md hover:-translate-y-1 hover:border-slate-300 transition-all duration-300 flex flex-col justify-between items-center group">
+          <div class="w-[240px] sm:w-[260px] md:w-auto shrink-0 snap-center bg-slate-50/70 rounded-2xl p-5 text-center border border-slate-200/90 shadow-2xs hover:shadow-md hover:-translate-y-1 hover:border-slate-300 transition-all duration-300 flex flex-col justify-between items-center group">
             <div class="w-11 h-11 mx-auto mb-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-base shadow-2xs group-hover:scale-105 group-hover:border-emerald-300 transition-all duration-300">
               <i class="fa-solid fa-scale-balanced text-emerald-600"></i>
             </div>
@@ -34,62 +34,61 @@ import { BffService } from '../../../services/bff.service';
               <p class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-1 font-heading tracking-tight">
                 {{ displayKg }} <span class="text-xl font-bold text-emerald-600">kg</span>
               </p>
-              <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Kilos Certificados en Báscula</h3>
-              <p class="text-xs text-slate-500">Pesaje digital verificado en ruta</p>
+              <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Kilos Recolectados</h3>
+              <p class="text-xs text-slate-500">Material clasificado y pesado en ruta</p>
             </div>
-            <div class="mt-3.5 pt-2.5 border-t border-slate-200/70 w-full flex items-center justify-center gap-1.5 text-[11px] font-semibold text-emerald-700">
-              <i class="fa-solid fa-arrow-trend-up text-xs"></i>
-              <span>Trazabilidad 100% Digital</span>
+            <div class="mt-3.5 pt-2.5 border-t border-slate-200/70 w-full flex items-center justify-center gap-1.5 text-[11px] font-medium text-slate-500">
+              <i class="fa-solid fa-check text-emerald-600"></i>
+              <span>Certificado en planta de acopio</span>
             </div>
           </div>
 
-          <!-- Métrica 2: Vertederos con Anillo Circular SVG Animado -->
-          <div class="bg-slate-50/70 rounded-2xl p-5 sm:p-6 text-center border border-slate-200 shadow-2xs hover:shadow-md hover:-translate-y-1 hover:border-slate-300 transition-all duration-300 flex flex-col justify-between items-center group">
-            <!-- Anillo SVG Circular en Vivo -->
-            <div class="relative w-20 h-20 mx-auto mb-2 flex items-center justify-center">
-              <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="34" stroke="#E2E8F0" stroke-width="6.5" fill="none" />
-                <circle cx="50" cy="50" r="34" stroke="#16A34A" stroke-width="6.5" fill="none" stroke-linecap="round"
-                        stroke-dasharray="213.63"
-                        [style.stroke-dashoffset]="213.63 - (213.63 * currentPercent / 100)"
-                        class="transition-all duration-700 ease-out" />
-              </svg>
-              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span class="text-xl font-extrabold text-slate-900 font-heading leading-none">{{ currentPercent }}%</span>
-                <span class="text-[8px] font-bold text-emerald-700 uppercase tracking-wider mt-0.5">Meta</span>
-              </div>
+          <!-- Métrica 2: Meta Comunal (Limpia, Sin Donut) -->
+          <div class="w-[240px] sm:w-[260px] md:w-auto shrink-0 snap-center bg-slate-50/70 rounded-2xl p-5 text-center border border-slate-200/90 shadow-2xs hover:shadow-md hover:-translate-y-1 hover:border-slate-300 transition-all duration-300 flex flex-col justify-between items-center group">
+            <div class="w-11 h-11 mx-auto mb-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-base shadow-2xs group-hover:scale-105 group-hover:border-emerald-300 transition-all duration-300">
+              <i class="fa-solid fa-leaf text-emerald-600"></i>
             </div>
             <div>
-              <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Desviación de Vertederos</h3>
-              <p class="text-xs text-slate-500">Recuperación y valorización REP</p>
+              <p class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-1 font-heading tracking-tight">
+                {{ currentPercent }}%
+              </p>
+              <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Meta Comunal 2024</h3>
+              <p class="text-xs text-slate-500">Reducción de basura hacia vertedero</p>
             </div>
-            <div class="mt-3.5 pt-2.5 border-t border-slate-200/70 w-full flex items-center justify-center gap-1.5 text-[11px] font-semibold text-slate-500">
-              <span>Evitando saturación comunal</span>
+            <div class="mt-3.5 pt-2.5 border-t border-slate-200/70 w-full flex items-center justify-center gap-1.5 text-[11px] font-medium text-slate-500">
+              <i class="fa-solid fa-arrow-trend-up text-emerald-600"></i>
+              <span>Compromiso municipal activo</span>
             </div>
           </div>
 
-          <!-- Métrica 3: Flota -->
-          <div class="bg-slate-50/70 rounded-2xl p-5 sm:p-6 text-center border border-slate-200 shadow-2xs hover:shadow-md hover:-translate-y-1 hover:border-slate-300 transition-all duration-300 flex flex-col justify-between items-center group">
+          <!-- Métrica 3: Cobertura de Cuadrantes -->
+          <div class="w-[240px] sm:w-[260px] md:w-auto shrink-0 snap-center bg-slate-50/70 rounded-2xl p-5 text-center border border-slate-200/90 shadow-2xs hover:shadow-md hover:-translate-y-1 hover:border-slate-300 transition-all duration-300 flex flex-col justify-between items-center group">
             <div class="w-11 h-11 mx-auto mb-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-base shadow-2xs group-hover:scale-105 group-hover:border-emerald-300 transition-all duration-300">
               <i class="fa-solid fa-truck-fast text-slate-800"></i>
             </div>
             <div>
               <p class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-1 font-heading tracking-tight">
-                {{ currentTrucks }} <span class="text-lg font-bold text-emerald-600">camiones</span>
+                4 <span class="text-lg font-bold text-emerald-600">cuadrantes</span>
               </p>
-              <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Flota Activa con GPS</h3>
-              <p class="text-xs text-slate-500">Cobertura en los 4 cuadrantes</p>
+              <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Cobertura Comunal</h3>
+              <p class="text-xs text-slate-500">Recorridos semanales en Puerto Varas</p>
             </div>
-            <div class="mt-3.5 pt-2.5 border-t border-slate-200/70 w-full flex items-center justify-center gap-1.5 text-[11px] font-semibold text-emerald-700">
-              <i class="fa-solid fa-satellite-dish text-xs"></i>
-              <span>Monitoreo Satelital</span>
+            <div class="mt-3.5 pt-2.5 border-t border-slate-200/70 w-full flex items-center justify-center gap-1.5 text-[11px] font-medium text-slate-500">
+              <i class="fa-solid fa-location-dot text-emerald-600"></i>
+              <span>Puerto Chico, Costanera, Ensenada, N. Braunau</span>
             </div>
           </div>
 
         </div>
 
-        <!-- Banner Retiro Especial de Alto Contraste (Legibilidad 100% Garantizada) -->
-        <div class="relative rounded-2xl overflow-hidden shadow-md border border-slate-800 bg-slate-950 min-h-[160px] flex items-center">
+        <!-- Indicador visual de deslizamiento en móvil -->
+        <div class="md:hidden flex items-center justify-center gap-1.5 mb-6 text-[11px] text-slate-400 font-medium">
+          <span>Desliza para ver métricas</span>
+          <i class="fa-solid fa-arrow-right-long text-xs animate-pulse text-slate-500"></i>
+        </div>
+
+        <!-- Banner Retiro Especial (Legibilidad y Lenguaje Claro) -->
+        <div class="relative rounded-2xl overflow-hidden shadow-md border border-slate-800 bg-slate-950 min-h-[150px] flex items-center">
           <img
             src="assets/stitch/cta_lake_flowers.png"
             alt="Paisaje Lago Llanquihue y flores Puerto Varas"
@@ -97,21 +96,20 @@ import { BffService } from '../../../services/bff.service';
           />
           <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/95 to-slate-950/20 sm:to-transparent"></div>
           
-          <div class="relative z-10 p-5 sm:p-8 w-full flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+          <div class="relative z-10 p-5 sm:p-7 w-full flex flex-col md:flex-row md:items-center md:justify-between gap-5">
             <div class="flex items-start gap-3.5 max-w-xl">
               <div class="shrink-0 w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mt-0.5 shadow-2xs">
-                <i class="fa-solid fa-leaf text-base"></i>
+                <i class="fa-solid fa-truck-ramp-box text-base"></i>
               </div>
               <div>
-                <div class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400 mb-1">
-                  <i class="fa-solid fa-truck-ramp-box"></i>
-                  <span>Servicio Municipal DIMAO</span>
-                </div>
+                <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-400 block mb-1">
+                  Retiros Especiales
+                </span>
                 <h3 class="text-lg sm:text-xl font-extrabold text-white tracking-tight mb-1 font-heading">
-                  ¿Necesitas retirar voluminosos o podas?
+                  ¿Muebles viejos, ramas o escombros?
                 </h3>
                 <p class="text-xs sm:text-sm text-slate-300 font-sans leading-relaxed">
-                  Agenda una fecha de recolección especial para muebles en desuso, escombros limpios o ramas directamente desde el portal.
+                  Coordina una fecha de recolección especial a domicilio directamente con el servicio municipal.
                 </p>
               </div>
             </div>
@@ -136,9 +134,9 @@ import { BffService } from '../../../services/bff.service';
 export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output() openInfoModal = new EventEmitter<void>();
 
-  targetKg = 0;
+  targetKg = 14820;
   targetPercent = 25;
-  targetTrucks = 2;
+  targetTrucks = 4;
 
   currentKg = 0;
   currentPercent = 0;
