@@ -1,4 +1,4 @@
-﻿import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, SimpleChanges, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, SimpleChanges, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Sector, Camion, Residuo, Pickup, Waypoint, RotacionSemanal } from '../data/sectors.data';
@@ -11,16 +11,6 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
   imports: [CommonModule, FormsModule],
   template: `
     <div class="space-y-6 sm:space-y-8">
-      <!-- Barra de Acciones y Despacho -->
-      <div class="flex justify-end">
-        <button (click)="openNuevoRetiroModal()"
-                type="button"
-                class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#123F5B] hover:bg-[#0E2E42] text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer w-full sm:w-auto">
-          <i class="fa-solid fa-plus text-xs"></i>
-          <span>Ingresar Solicitud</span>
-        </button>
-      </div>
-
       <!-- Banner de Alerta Operativa DIMAO para Coordinación de Rutas -->
       <div *ngIf="sectoresReprogramados.length > 0"
            class="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border-2 border-amber-300 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -61,80 +51,112 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
       </div>
 
       <!-- ==================== 2. PIPELINE DE DESPACHO EN TIEMPO REAL ==================== -->
-      <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+      <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Tarjeta 1: Solicitudes Entrantes (Por Asignar) -->
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border shadow-xs flex flex-col justify-between"
-             [ngClass]="countPendientes > 0 ? 'border-amber-200 bg-amber-50/20' : 'border-[#E2E8F0]'">
+        <div class="bg-white rounded-xl p-5 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between"
+             [ngClass]="countPendientes > 0 ? 'border-amber-300 bg-amber-50/30' : ''">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-600">Por programar</span>
-            <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-800 flex items-center justify-center text-xs font-bold border border-amber-200">
+            <span class="text-xs font-semibold text-gray-500">Por programar</span>
+            <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center text-xs font-bold border border-amber-200">
               <i class="fa-solid fa-inbox"></i>
             </div>
           </div>
           <div class="mt-3">
-            <div class="text-2xl sm:text-3xl lg:text-4xl font-black font-heading text-slate-900">{{ countPendientes }}</div>
-            <p class="text-[11px] sm:text-xs text-slate-500 mt-1">
-              {{ countPendientes > 0 ? 'Esperando asignación a camión' : 'Bandeja al día' }}
+            <div class="text-3xl font-extrabold font-heading text-[#123F5B]">{{ countPendientes }}</div>
+            <p class="text-xs text-gray-500 mt-1">
+              {{ countPendientes > 0 ? 'Esperando asignación' : 'Bandeja al día' }}
             </p>
           </div>
         </div>
 
         <!-- Tarjeta 2: Listos para Despacho (Programados) -->
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-xl p-5 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-600">Programados</span>
-            <div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center text-xs font-bold border border-sky-200">
+            <span class="text-xs font-semibold text-gray-500">Programados</span>
+            <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center text-xs font-bold border border-sky-200">
               <i class="fa-solid fa-calendar-check"></i>
             </div>
           </div>
           <div class="mt-3">
-            <div class="text-2xl sm:text-3xl lg:text-4xl font-black font-heading text-slate-900">{{ countProgramados }}</div>
-            <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Con fecha y cuadrilla</p>
+            <div class="text-3xl font-extrabold font-heading text-[#123F5B]">{{ countProgramados }}</div>
+            <p class="text-xs text-gray-500 mt-1">Con fecha y cuadrilla</p>
           </div>
         </div>
 
         <!-- Tarjeta 3: Cuadrillas en Ruta -->
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-xl p-5 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-600">En ruta</span>
-            <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center text-xs font-bold border border-indigo-200">
+            <span class="text-xs font-semibold text-gray-500">En ruta</span>
+            <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center text-xs font-bold border border-indigo-200">
               <i class="fa-solid fa-truck-fast"></i>
             </div>
           </div>
           <div class="mt-3">
-            <div class="text-2xl sm:text-3xl lg:text-4xl font-black font-heading text-slate-900">{{ countEnRuta }}</div>
-            <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Recorriendo direcciones</p>
+            <div class="text-3xl font-extrabold font-heading text-[#123F5B]">{{ countEnRuta }}</div>
+            <p class="text-xs text-gray-500 mt-1">Recorriendo sectores</p>
           </div>
         </div>
 
         <!-- Tarjeta 4: Camiones Operables -->
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-xl p-5 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-600">Flota activa</span>
-            <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs font-bold border border-emerald-200">
+            <span class="text-xs font-semibold text-gray-500">Flota activa</span>
+            <div class="w-8 h-8 rounded-lg bg-[#ecf7e6] text-[#22a652] flex items-center justify-center text-xs font-bold border border-[#E2E8F0]">
               <i class="fa-solid fa-truck"></i>
             </div>
           </div>
           <div class="mt-3">
-            <div class="text-2xl sm:text-3xl lg:text-4xl font-black font-heading text-slate-900">
+            <div class="text-3xl font-extrabold font-heading text-[#123F5B]">
               {{ camionesDisponiblesCount }} / {{ camiones.length }}
             </div>
-            <p class="text-[11px] sm:text-xs text-slate-500 mt-1">
-              {{ catalogoDisponible === false ? 'Catálogo no disponible' : 'Unidades operativas hoy' }}
+            <p class="text-xs text-gray-500 mt-1">
+              {{ catalogoDisponible === false ? 'Catálogo desconectado' : 'Unidades operativas' }}
             </p>
           </div>
         </div>
       </section>
 
+      <!-- ==================== SELECTOR DE MÓDULO EJECUTIVO (TABS) ==================== -->
+      <div class="flex items-center justify-between pb-1 border-b border-[#E2E8F0] flex-wrap gap-3">
+        <div class="inline-flex rounded-xl p-1 bg-gray-100 border border-[#E2E8F0] shadow-2xs">
+          <button (click)="activeCoordTab = 'planilla'"
+                  type="button"
+                  [ngClass]="activeCoordTab === 'planilla' ? 'bg-white text-[#123F5B] shadow-2xs font-bold' : 'text-gray-600 hover:text-gray-900 font-medium'"
+                  class="px-4 py-2 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-2">
+            <i class="fa-solid fa-list-check"></i>
+            <span>Planilla de Despacho</span>
+            <span class="text-[11px] font-mono px-1.5 py-0.2 rounded"
+                  [ngClass]="activeCoordTab === 'planilla' ? 'bg-[#123F5B] text-white' : 'bg-gray-200 text-gray-700'">
+              {{ pickups.length }}
+            </span>
+          </button>
+
+          <button (click)="activeCoordTab = 'mapa'"
+                  type="button"
+                  [ngClass]="activeCoordTab === 'mapa' ? 'bg-white text-[#123F5B] shadow-2xs font-bold' : 'text-gray-600 hover:text-gray-900 font-medium'"
+                  class="px-4 py-2 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-2">
+            <i class="fa-solid fa-map-location-dot"></i>
+            <span>Monitoreo en Terreno</span>
+          </button>
+        </div>
+
+        <button (click)="openNuevoRetiroModal()"
+                type="button"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer">
+          <i class="fa-solid fa-plus text-xs"></i>
+          <span>Ingresar Solicitud</span>
+        </button>
+      </div>
+
       <!-- ==================== 3. PLANILLA DE DESPACHO Y ASIGNACIÓN DE RUTAS ==================== -->
-      <section class="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs overflow-hidden">
-        <div class="p-4 sm:p-6 border-b border-[#F8FAF7] space-y-4">
+      <section *ngIf="activeCoordTab === 'planilla'" class="bg-white rounded-xl border border-[#E2E8F0] shadow-2xs overflow-hidden">
+        <div class="p-6 border-b border-[#E2E8F0] space-y-4">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
             <div>
-              <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#123F5B]">
-                Planilla de Despacho y Gestión de Rutas
+              <h3 class="font-heading font-extrabold text-xl text-[#123F5B]">
+                Planilla de Despacho
               </h3>
-              <p class="text-xs text-slate-500 mt-0.5">Control de solicitudes domiciliarias, cuadrillas y báscula municipal.</p>
+              <p class="text-xs text-gray-500 mt-0.5">Control de solicitudes domiciliarias y asignación a cuadrillas</p>
             </div>
 
             <!-- Filtros de Sector y Tamaño de Página -->
@@ -362,13 +384,13 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
       </section>
 
       <!-- ==================== 4. TELEMETRÍA MULTICAMIÓN PARA DESPACHO ==================== -->
-      <section class="bg-white rounded-2xl border border-[#E2E8F0] p-5 sm:p-8 shadow-xs">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-[#F8FAF7]">
+      <section *ngIf="activeCoordTab === 'mapa'" class="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-2xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-[#E2E8F0]">
           <div>
-            <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#123F5B]">
-              Monitoreo de Cuadrillas en Terreno
+            <h3 class="font-heading font-extrabold text-xl text-[#123F5B]">
+              Monitoreo en Terreno
             </h3>
-            <p class="text-xs text-slate-500 mt-0.5">Seguimiento satelital y tiempos estimados de llegada (ETA) por cuadrante.</p>
+            <p class="text-xs text-gray-500 mt-0.5">Seguimiento satelital y tiempos estimados de llegada (ETA) por cuadrante</p>
           </div>
 
           <div class="flex items-center gap-2 flex-wrap">
@@ -622,6 +644,7 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges, OnDestr
 
   Math = Math;
   selectedTruckPatente: string = 'PV-RC-2026';
+  activeCoordTab: 'planilla' | 'mapa' = 'planilla';
 
   get sectoresReprogramados(): Sector[] {
     return (this.sectores || []).filter(s => s.diaModificado);
