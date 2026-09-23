@@ -73,25 +73,17 @@ import { RouterModule } from '@angular/router';
             </div>
           </div>
 
-          <!-- Columna Derecha: Tarjeta Widget de Estado Comunal en Vivo -->
-          <div class="lg:col-span-5 xl:col-span-4 hidden lg:flex justify-end items-center">
-            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 text-white max-w-sm w-full shadow-2xl">
-              <div class="flex items-center justify-between mb-4">
-                <span class="text-xs font-bold uppercase tracking-wider text-[#22a652]">Ciclo de Reciclaje</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-white/20 text-white">DIMAO</span>
-              </div>
-              <div class="text-2xl font-black font-heading text-white mb-1.5">
-                Cuidamos Nuestro Lago
-              </div>
-              <p class="text-xs text-slate-200 leading-relaxed mb-4">
-                Retiro puerta a puerta en los 4 cuadrantes comunales con pesaje digital y certificación municipal.
+          <!-- Columna Derecha: Lema en Cursiva Cálido / Humano que Rellena y Da Identidad Local Única en Desktop -->
+          <div class="lg:col-span-5 xl:col-span-4 hidden lg:flex justify-end items-center pointer-events-none pr-2 xl:pr-6">
+            <div class="text-right rotate-[-4deg] select-none anim-float-subtle">
+              <p class="font-script text-white text-4xl xl:text-[48px] font-bold leading-[1.25] tracking-wide drop-shadow-[0_4px_18px_rgba(0,0,0,0.85)]">
+                Reciclar también es<br />
+                cuidar nuestro<br />
+                <span class="text-[#22a652]">lago</span>
               </p>
-              <div class="pt-3 border-t border-white/15 flex items-center justify-between text-xs">
-                <span class="text-slate-300">Cuenca Llanquihue</span>
-                <span class="font-bold text-[#22a652] flex items-center gap-1">
-                  <i class="fa-solid fa-water text-[10px]"></i>
-                  <span>Protección Activa</span>
-                </span>
+              <div class="mt-3.5 flex items-center justify-end gap-2 text-emerald-300 drop-shadow-md">
+                <i class="fa-solid fa-water text-xs"></i>
+                <p class="font-script text-slate-200 text-xl font-bold tracking-wide m-0">Cuenca Llanquihue</p>
               </div>
             </div>
           </div>
