@@ -7,7 +7,7 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <footer class="bg-[#0D3549] text-white pt-10 pb-8 relative overflow-hidden border-t border-[#123F5B]" role="contentinfo">
+    <footer class="bg-[#041D2D] text-white pt-10 pb-8 relative overflow-hidden border-t-2 border-[#0E5177]" role="contentinfo">
       <!-- SILUETAS VECTORIALES: VOLCÁN OSORNO Y OLAS DEL LAGO LLANQUIHUE -->
       <div class="w-full h-24 sm:h-28 overflow-hidden relative pointer-events-none mb-6 opacity-90 z-0" aria-hidden="true">
         <svg class="w-full h-full" fill="none" preserveAspectRatio="none" viewBox="0 0 1440 100" xmlns="http://www.w3.org/2000/svg">
@@ -17,7 +17,7 @@ import { RouterModule } from '@angular/router';
           <polygon points="1040,38 1010,58 1025,62 1040,56 1055,62 1070,58" fill="#FFFFFF" opacity="0.9"></polygon>
 
           <path d="M0 78 C 300 58, 400 98, 720 78 C 1040 58, 1140 98, 1440 78"
-                fill="transparent" stroke="#123F5B" stroke-width="2.5" opacity="0.6"></path>
+                fill="transparent" stroke="#1F6685" stroke-width="2.5" opacity="0.6"></path>
           <path d="M0 86 C 250 100, 550 70, 800 86 C 1050 100, 1250 70, 1440 86"
                 fill="transparent" stroke="#123F5B" stroke-width="2" opacity="0.5"></path>
           <path d="M0 70 C 400 52, 600 88, 900 70 C 1200 52, 1300 88, 1440 70"
@@ -27,7 +27,7 @@ import { RouterModule } from '@angular/router';
             <linearGradient id="mountainGradVibrant" x1="0%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%" stop-color="#123F5B" stop-opacity="0.9"></stop>
               <stop offset="60%" stop-color="#0c2d42" stop-opacity="0.6"></stop>
-              <stop offset="100%" stop-color="#0D3549" stop-opacity="0.1"></stop>
+              <stop offset="100%" stop-color="#041D2D" stop-opacity="0.1"></stop>
             </linearGradient>
           </defs>
         </svg>
@@ -53,14 +53,14 @@ import { RouterModule } from '@angular/router';
                 <span class="text-white">Recic</span>
                 <span class="text-[#22a652]">LaGo</span>
               </div>
-              <span class="text-xs font-bold uppercase tracking-wider text-gray-300">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-200">
                 Puerto Varas · Cuenca Lago Llanquihue
               </span>
             </div>
           </a>
 
           <!-- Enlaces de Navegación del Footer -->
-          <nav aria-label="Navegación del pie de página" class="flex flex-wrap justify-center items-center gap-x-3 sm:gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-300 font-medium">
+          <nav aria-label="Navegación del pie de página" class="flex flex-wrap justify-center items-center gap-x-3 sm:gap-x-4 gap-y-2 text-xs sm:text-sm text-slate-200 font-medium">
             <a class="hover:text-[#22a652] focus-visible:outline-none focus-visible:text-[#22a652] focus-visible:underline transition-colors py-1 px-1.5" routerLink="/">Inicio</a>
             <span class="text-white/40" aria-hidden="true">|</span>
             <button (click)="openHowItWorks.emit()" type="button" class="hover:text-[#22a652] focus-visible:outline-none focus-visible:text-[#22a652] focus-visible:underline transition-colors cursor-pointer py-1 px-1.5">¿Cómo funciona?</button>
@@ -107,7 +107,7 @@ import { RouterModule } from '@angular/router';
             <div class="flex items-center gap-2.5 border-l border-white/20 pl-3">
               <img src="assets/escudo-puerto-varas.svg" alt="Escudo de la Ilustre Municipalidad de Puerto Varas" class="h-9 w-auto object-contain drop-shadow">
               <div class="text-left leading-tight hidden sm:block">
-                <div class="text-[9.5px] font-medium text-gray-300 uppercase tracking-wider">Ilustre Municipalidad</div>
+                <div class="text-[9.5px] font-medium text-slate-300 uppercase tracking-wider">Ilustre Municipalidad</div>
                 <div class="text-[12.5px] font-bold text-white tracking-tight">Puerto Varas</div>
               </div>
             </div>
@@ -116,7 +116,7 @@ import { RouterModule } from '@angular/router';
 
         <!-- Fila Inferior con Lema Destacado -->
         <div class="pt-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <p class="text-xs text-gray-300">
+          <p class="text-xs text-slate-300">
             © 2026 Municipalidad de Puerto Varas. Todos los derechos reservados.
           </p>
 
