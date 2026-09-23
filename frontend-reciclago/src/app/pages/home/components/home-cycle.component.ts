@@ -1,4 +1,4 @@
-﻿import { Component, ElementRef, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 interface CycleStep {
@@ -15,69 +15,50 @@ interface CycleStep {
   imports: [CommonModule],
   template: `
     <!-- BEGIN: HowItWorks -->
-    <section class="py-14 sm:py-20 bg-[#f7faf7] border-b border-emerald-50 relative overflow-hidden" id="como-funciona">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <!-- Title & Subtitle con Revelación Suave -->
-        <div class="reveal-init" [class.reveal-active]="isVisible">
-          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#123F5B] tracking-tight mb-2.5 font-heading">
+    <section class="py-16 sm:py-24 bg-[#F8FAF7] border-b border-[#E2E8F0] relative overflow-hidden" id="como-funciona">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Encabezado de Sección -->
+        <div class="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
+          <span class="text-xs font-black uppercase tracking-widest text-[#22a652] block mb-2 font-heading">
+            Trazabilidad Paso a Paso
+          </span>
+          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-[#123F5B] tracking-tight font-heading">
             El ciclo de vida del retiro
           </h2>
-          <p class="text-xs sm:text-sm text-slate-600 max-w-xl mx-auto mb-10 sm:mb-14 leading-relaxed">
-            Un proceso simple, ordenado y transparente, desde tu solicitud hasta la certificación del impacto ambiental.
+          <p class="text-xs sm:text-sm text-gray-500 mt-2.5 leading-relaxed">
+            Un proceso certificado y transparente, desde tu solicitud hasta el pesaje digital in situ.
           </p>
         </div>
 
-        <!-- VERSIÓN MÓVIL: Timeline Vertical con Círculos Grandes e Íconos Representativos (md:hidden) -->
-        <div class="md:hidden max-w-md mx-auto text-left relative pl-10 border-l-2 border-emerald-300 space-y-8 my-4">
-          <div *ngFor="let step of steps; let i = index"
-               class="relative reveal-init"
-               [class.reveal-active]="isVisible"
-               [style.transition-delay]="(i * 90) + 'ms'">
-            <!-- Círculo Grande con Ícono -->
-            <div class="absolute -left-[57px] top-0 w-11 h-11 rounded-2xl bg-white border-2 border-emerald-400 shadow-sm flex items-center justify-center text-[#22a652] flex-shrink-0 transition-transform duration-300 hover:scale-105">
-              <i [class]="step.iconClass + ' text-base'"></i>
-              <span class="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 rounded-full bg-[#22a652] text-white text-[10px] font-black flex items-center justify-center border border-white">
-                {{ step.stepNumber }}
-              </span>
-            </div>
-
-            <!-- Contenido del Paso con Elevación Suave (Sin Spans Redundantes) -->
-            <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow duration-300">
-              <h3 class="font-extrabold text-sm text-[#123F5B] font-heading mb-1">{{ step.title }}</h3>
-              <p class="text-xs text-slate-600 leading-relaxed">{{ step.description }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- VERSIÓN DESKTOP / TABLET: 5 Pasos Horizontales con Conectores Flotantes y Micro-interacciones -->
-        <div class="hidden md:grid md:grid-cols-5 gap-3.5 lg:gap-4 relative items-start">
-          <div *ngFor="let step of steps; let i = index"
-               class="flex flex-col items-center text-center relative group p-3.5 rounded-2xl reveal-init hover-lift hover:bg-white cursor-default"
-               [class.reveal-active]="isVisible"
-               [style.transition-delay]="(i * 95) + 'ms'">
-            
-            <!-- Contenedor Circular Amplio con Ícono e Interacción de Giro Sutil -->
-            <div class="relative mb-4">
-              <div class="w-16 h-16 lg:w-18 lg:h-18 rounded-2xl bg-[#ecf7e6] group-hover:bg-[#22a652] group-hover:text-white flex items-center justify-center text-[#22a652] shadow-xs transition-all duration-300 transform group-hover:scale-110 group-hover:rotate-3">
-                <i [class]="step.iconClass + ' text-xl lg:text-2xl transition-colors duration-300'"></i>
+        <!-- Grid de Pasos Modernos (5 cards ejecutivas) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-5">
+          <div *ngFor="let step of steps"
+               class="bg-white rounded-2xl p-5 sm:p-6 border border-[#E2E8F0] shadow-2xs hover:border-[#22a652] hover:shadow-md transition-all duration-300 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="font-mono text-xs font-black px-2 py-0.5 rounded-lg bg-[#F8FAF7] text-[#123F5B] border border-[#E2E8F0] group-hover:bg-[#ecf7e6] group-hover:text-[#22a652] group-hover:border-[#22a652]/30 transition-colors">
+                  0{{ step.stepNumber }}
+                </span>
+                <div class="w-9 h-9 rounded-xl bg-[#ecf7e6] text-[#22a652] flex items-center justify-center text-sm shadow-2xs group-hover:scale-105 transition-transform">
+                  <i [class]="step.iconClass"></i>
+                </div>
               </div>
-              <!-- Badge de Número -->
-              <span class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-[#22a652] group-hover:bg-[#123F5B] text-white text-xs font-bold flex items-center justify-center border-2 border-white shadow-2xs transition-all duration-300">
-                {{ step.stepNumber }}
+
+              <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-1">
+                {{ step.role }}
               </span>
+              <h3 class="font-extrabold text-[#123F5B] text-base font-heading mb-2">
+                {{ step.title }}
+              </h3>
+              <p class="text-xs text-gray-500 leading-relaxed">
+                {{ step.description }}
+              </p>
             </div>
 
-            <h3 class="font-extrabold text-[#123F5B] text-sm lg:text-base mb-1.5 font-heading group-hover:text-[#22a652] transition-colors duration-200">
-              {{ step.title }}
-            </h3>
-            <p class="text-xs text-slate-600 leading-relaxed max-w-[170px]">
-              {{ step.description }}
-            </p>
-
-            <!-- Conector de Flecha entre Pasos con Traslación en Hover -->
-            <div *ngIf="i < steps.length - 1"
-                 class="hidden lg:flex absolute top-12 -right-3 transform -translate-y-1/2 text-emerald-300 group-hover:text-emerald-500 font-black text-xl select-none pointer-events-none transition-all duration-300">
-              <i class="fa-solid fa-arrow-right text-xs text-emerald-400/80 group-hover:translate-x-1 transition-transform duration-300"></i>
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center gap-1.5 text-[11px] font-bold text-[#22a652]">
+              <i class="fa-solid fa-check text-[10px]"></i>
+              <span>Garantizado</span>
             </div>
           </div>
         </div>

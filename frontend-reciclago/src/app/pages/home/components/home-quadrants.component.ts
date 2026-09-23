@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, OnDestroy, Output, EventEmitter, ChangeDetectorRef, ElementRef, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter, ChangeDetectorRef, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BffService } from '../../../services/bff.service';
 import { QuadrantCardInfo, INITIAL_QUADRANTS } from '../data/home-sectors.data';
@@ -64,30 +64,30 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
             </p>
           </div>
 
-          <!-- Selector / Indicador Reactivo de Rotación Municipal con Feedback Táctil -->
-          <div class="inline-flex items-center gap-1 bg-[#ecf7e6] p-1.5 rounded-2xl border border-emerald-200/80 self-start md:self-auto shadow-xs">
+          <!-- Selector de Semana Ejecutivo -->
+          <div class="inline-flex rounded-xl p-1 bg-gray-100 border border-[#E2E8F0] shadow-2xs self-start md:self-auto">
             <button
               type="button"
               (click)="selectWeek(1)"
               [class.bg-white]="activeWeek === 1"
-              [class.text-[#22a652]]="activeWeek === 1"
-              [class.shadow-sm]="activeWeek === 1"
+              [class.text-[#123F5B]]="activeWeek === 1"
+              [class.shadow-2xs]="activeWeek === 1"
               [class.font-bold]="activeWeek === 1"
-              [class.text-slate-600]="activeWeek !== 1"
-              class="px-4 py-2 rounded-xl text-xs font-medium transition-all duration-200 cursor-pointer flex items-center gap-1.5 active:scale-95">
-              <i class="fa-solid fa-calendar-check text-xs" [class.text-emerald-600]="activeWeek === 1" [class.text-slate-400]="activeWeek !== 1"></i>
+              [class.text-gray-600]="activeWeek !== 1"
+              class="px-4 py-2 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-2">
+              <i class="fa-solid fa-calendar-check" [class.text-[#22a652]]="activeWeek === 1"></i>
               <span>Semana Actual</span>
             </button>
             <button
               type="button"
               (click)="selectWeek(2)"
               [class.bg-white]="activeWeek === 2"
-              [class.text-[#22a652]]="activeWeek === 2"
-              [class.shadow-sm]="activeWeek === 2"
+              [class.text-[#123F5B]]="activeWeek === 2"
+              [class.shadow-2xs]="activeWeek === 2"
               [class.font-bold]="activeWeek === 2"
-              [class.text-slate-600]="activeWeek !== 2"
-              class="px-4 py-2 rounded-xl text-xs font-medium transition-all duration-200 cursor-pointer flex items-center gap-1.5 active:scale-95">
-              <i class="fa-solid fa-calendar-plus text-xs" [class.text-emerald-600]="activeWeek === 2" [class.text-slate-400]="activeWeek !== 2"></i>
+              [class.text-gray-600]="activeWeek !== 2"
+              class="px-4 py-2 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-2">
+              <i class="fa-solid fa-calendar-plus" [class.text-[#22a652]]="activeWeek === 2"></i>
               <span>Próxima Semana</span>
             </button>
           </div>
@@ -266,18 +266,18 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
           </article>
         </div>
 
-        <!-- Desktop View: 4 Quadrants Grid con Acordeón Fluido y Micro-interacciones -->
-        <div class="hidden md:grid md:grid-cols-2 gap-7 lg:gap-8">
+        <!-- Desktop View: 4 Quadrants Grid Moderno y Elegante -->
+        <div class="hidden md:grid md:grid-cols-2 gap-6 lg:gap-8">
           <article
             *ngFor="let q of quadrants; let i = index"
-            class="group bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-xs hover-lift hover:border-emerald-300/80 hover:shadow-lg transition-all duration-300 flex flex-col justify-between reveal-init"
+            class="group bg-white rounded-2xl overflow-hidden border border-[#E2E8F0] shadow-2xs hover:border-[#22a652] hover:shadow-md transition-all duration-300 flex flex-col justify-between reveal-init"
             [class.reveal-active]="isVisible"
             [style.transition-delay]="(i * 100) + 'ms'"
             [ngClass]="{ 'opacity-0 translate-y-3 scale-[0.98] pointer-events-none': isFadingOut, 'anim-week-switch': !isFadingOut && isVisible }">
             
             <div>
               <!-- Imagen Paisajística del Sector con Zoom Sutil -->
-              <div class="relative h-44 sm:h-48 w-full overflow-hidden bg-slate-100">
+              <div class="relative h-44 sm:h-52 w-full overflow-hidden bg-slate-100">
                 <img
                   [src]="q.image"
                   [alt]="'Sector ' + q.name + ' - Puerto Varas'"
@@ -285,7 +285,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                   loading="lazy"
                 />
                 <span
-                  class="absolute bottom-3 left-4 bg-[#22a652] text-white text-xs font-bold px-3 py-1 rounded-md shadow-md tracking-wide">
+                  class="absolute bottom-3 left-4 bg-[#123F5B] text-white text-xs font-black px-3 py-1 rounded-lg shadow-md tracking-wide">
                   Cuadrante {{ q.cuadranteNumber }}
                 </span>
                 
@@ -295,115 +295,89 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                 </span>
 
                 <!-- Badge Catálogo Live -->
-                <span *ngIf="catalogLoaded" class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-[10px] font-bold text-emerald-800 px-2 py-0.5 rounded shadow-2xs border border-emerald-200">
+                <span *ngIf="catalogLoaded" class="absolute top-3 right-3 bg-white/95 backdrop-blur-sm text-[10px] font-bold text-emerald-800 px-2.5 py-0.5 rounded shadow-2xs border border-emerald-200">
                   <i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i>Catálogo Activo
                 </span>
               </div>
 
               <!-- Contenido Informativo de la Tarjeta -->
               <div class="p-5 sm:p-6">
-                <div class="flex items-baseline justify-between mb-4">
-                  <h3 class="text-xl sm:text-2xl font-extrabold text-[#123F5B] tracking-tight font-heading group-hover:text-[#22a652] transition-colors duration-200">
+                <div class="flex items-baseline justify-between mb-3">
+                  <h3 class="text-xl sm:text-2xl font-black text-[#123F5B] tracking-tight font-heading group-hover:text-[#22a652] transition-colors duration-200">
                     {{ q.name }}
                   </h3>
-                  <span class="text-xs text-slate-400 font-medium">{{ q.hours }}</span>
+                  <span class="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-0.5 rounded-md">{{ q.hours }}</span>
                 </div>
 
-                <!-- Grilla de Día de Retiro y Requisitos -->
-                <div class="grid grid-cols-2 gap-4 pb-4 border-b border-slate-100">
-                  <div class="flex items-start gap-2.5">
-                    <svg class="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <rect height="18" rx="2" ry="2" stroke-width="2" width="18" x="3" y="4"></rect>
-                      <line stroke-width="2" x1="16" x2="16" y1="2" y2="6"></line>
-                      <line stroke-width="2" x1="8" x2="8" y1="2" y2="6"></line>
-                      <line stroke-width="2" x1="3" x2="21" y1="10" y2="10"></line>
-                    </svg>
-                    <div>
-                      <span class="block text-[11px] text-slate-500 font-medium">Día de retiro</span>
-                      <div class="flex items-center gap-1.5 flex-wrap">
-                        <span class="text-sm font-extrabold" [ngClass]="q.diaModificado ? 'text-amber-900' : 'text-slate-800'">{{ q.day }}</span>
-                        <span *ngIf="q.diaModificado" class="text-[9px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-300 inline-flex items-center gap-1">
-                          <i class="fa-solid fa-circle-exclamation text-[9px] text-amber-600"></i>
-                          <span>Reprogramado</span>
-                        </span>
-                      </div>
-                      <span *ngIf="q.diaModificado && q.motivoModificacion" class="block text-[10px] text-amber-700 font-medium mt-0.5">
-                        {{ q.motivoModificacion }}
-                      </span>
-                    </div>
-                  </div>
+                <!-- Grilla de Día de Retiro y Requisitos en Pills Elegantes -->
+                <div class="flex items-center gap-2 flex-wrap mb-4">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-50 border border-[#E2E8F0] text-xs font-bold text-[#123F5B]">
+                    <i class="fa-regular fa-calendar text-[#22a652]"></i>
+                    <span>Día: <strong class="text-[#123F5B]">{{ q.day }}</strong></span>
+                    <span *ngIf="q.diaModificado" class="text-[9px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-300">
+                      Reprogramado
+                    </span>
+                  </span>
 
-                  <div class="flex items-start gap-2.5">
-                    <div class="w-5 h-5 rounded-full bg-[#22a652] flex items-center justify-center text-white shrink-0 mt-0.5 shadow-2xs">
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
-                    </div>
-                    <div>
-                      <span class="block text-[11px] text-slate-500 font-medium">Requisitos de entrega</span>
-                      <span class="block text-xs font-bold text-slate-800">{{ q.requisitos }}</span>
-                    </div>
-                  </div>
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#ecf7e6] border border-emerald-200 text-xs font-bold text-[#22a652]">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>{{ q.requisitos }}</span>
+                  </span>
                 </div>
 
-                <!-- Fila Inferior: Material Asignado con Micro-interacción en el Bin -->
-                <div class="pt-4 flex items-center justify-between">
+                <div *ngIf="q.diaModificado && q.motivoModificacion" class="mb-3 p-2 rounded-lg bg-amber-50 border border-amber-200 text-[11px] text-amber-900">
+                  <i class="fa-solid fa-triangle-exclamation text-amber-600 mr-1"></i>
+                  {{ q.motivoModificacion }}
+                </div>
+
+                <!-- Bloque Destacado de Material Asignado -->
+                <div class="p-4 rounded-xl bg-[#F8FAF7] border border-[#E2E8F0] flex items-center justify-between gap-4">
                   <div>
-                    <span class="block text-[11px] text-slate-500 font-medium">{{ activeWeek === 1 ? 'Material esta semana' : 'Material próxima semana' }}</span>
-                    <div class="mt-0.5">
-                      <span class="block text-base sm:text-lg font-extrabold text-[#11324d]">
-                        {{ q.materialNombre }}
-                      </span>
-                    </div>
-                    <span *ngIf="q.materialDescripcion" class="block text-[11px] text-slate-500 mt-1 line-clamp-1 max-w-xs">
+                    <span class="block text-[10px] font-extrabold uppercase tracking-wider text-gray-400">
+                      {{ activeWeek === 1 ? 'Material esta semana' : 'Material próxima semana' }}
+                    </span>
+                    <span class="block text-lg font-black text-[#123F5B] mt-0.5">
+                      {{ q.materialNombre }}
+                    </span>
+                    <span *ngIf="q.materialDescripcion" class="block text-xs text-gray-500 mt-0.5 line-clamp-1 max-w-xs">
                       {{ q.materialDescripcion }}
                     </span>
                   </div>
 
-                  <!-- Ilustración de Material / Bin con Flotación Suave -->
-                  <div class="flex items-center gap-2 pl-2">
+                  <!-- Imagen del contenedor -->
+                  <div class="w-14 h-14 rounded-xl bg-white border border-[#E2E8F0] p-1.5 flex items-center justify-center flex-shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                     <img
                       [src]="q.binImage"
                       [alt]="q.materialNombre"
-                      class="h-16 w-auto object-contain drop-shadow-sm group-hover:scale-110 group-hover:-translate-y-1.5 transition-all duration-300 ease-out"
+                      class="h-full w-auto object-contain"
                     />
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <!-- Acordeón interactivo inline: Ver preparación para la entrega -->
-            <button
-              type="button"
-              (click)="toggleAccordion(q.id)"
-              class="px-5 sm:px-6 py-3.5 flex items-center justify-between text-xs text-emerald-700 font-bold border-t border-slate-100 hover:bg-emerald-50/50 transition-colors cursor-pointer"
-              [attr.aria-expanded]="expandedAccordionId === q.id">
-              <span class="inline-flex items-center gap-2">
-                <i class="fa-solid fa-circle-info text-emerald-600"></i>
-                <span>{{ expandedAccordionId === q.id ? 'Ocultar instrucciones de preparación' : 'Ver preparación para la entrega' }}</span>
-              </span>
-              <i class="fa-solid fa-chevron-down text-xs transition-transform duration-300 ease-out" [class.rotate-180]="expandedAccordionId === q.id"></i>
-            </button>
+                <!-- Acordeón interactivo inline: Ver preparación para la entrega -->
+                <button
+                  type="button"
+                  (click)="toggleAccordion(q.id)"
+                  class="w-full mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-[#123F5B] hover:text-[#22a652] transition-colors cursor-pointer"
+                  [attr.aria-expanded]="expandedAccordionId === q.id">
+                  <span class="inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-info text-[#22a652]"></i>
+                    <span>{{ expandedAccordionId === q.id ? 'Ocultar instrucciones' : 'Ver preparación para la entrega' }}</span>
+                  </span>
+                  <i class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200" [class.rotate-180]="expandedAccordionId === q.id"></i>
+                </button>
 
-            <!-- Panel Expandido del Acordeón en Desktop con Grid Animado -->
-            <div class="grid transition-all duration-300 ease-out"
-                 [class.grid-rows-[1fr]]="expandedAccordionId === q.id"
-                 [class.grid-rows-[0fr]]="expandedAccordionId !== q.id">
-              <div class="overflow-hidden">
-                <div class="px-5 sm:px-6 py-4 bg-emerald-50/50 border-t border-emerald-100/80 text-xs text-slate-700 leading-relaxed">
-                  <div class="font-bold text-[#22a652] mb-1 flex items-center gap-1.5">
-                    <i class="fa-solid fa-list-check"></i>
-                    <span>Instrucciones oficiales de entrega DIMAO:</span>
+                <!-- Panel Expandido del Acordeón en Desktop -->
+                <div *ngIf="expandedAccordionId === q.id"
+                     class="mt-3 p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200 text-xs text-gray-700 leading-relaxed space-y-1">
+                  <div class="font-bold text-[#123F5B] flex items-center gap-1.5">
+                    <i class="fa-solid fa-list-check text-[#22a652]"></i>
+                    <span>Instrucciones oficiales DIMAO:</span>
                   </div>
-                  <p class="mb-2">{{ q.materialInstrucciones || 'Enjuagar y secar botellas y envases antes de depositar. Aplanar cajas de cartón.' }}</p>
-                  <div class="text-[11px] font-semibold text-slate-600 flex items-center gap-1">
-                    <i class="fa-solid fa-circle-check text-emerald-600"></i>
-                    <span>Entrega: {{ q.requisitos }} · Frente a frontis domiciliario</span>
-                  </div>
+                  <p class="text-xs text-gray-600">{{ q.materialInstrucciones || 'Enjuagar y secar botellas y envases antes de depositar. Aplanar cajas de cartón.' }}</p>
                 </div>
               </div>
             </div>
-
           </article>
         </div>
 
