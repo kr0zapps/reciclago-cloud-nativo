@@ -74,7 +74,8 @@ jobs:
         run: |
           BUCKET="${{ secrets.S3_BUCKET_NAME || 'reciclago-frontend-puertovaras' }}"
           aws s3 sync ./frontend-reciclago/dist/frontend-reciclago/browser s3://$BUCKET --delete
+          aws s3 cp ./frontend-reciclago/dist/frontend-reciclago/browser/index.html s3://$BUCKET/index.html --cache-control "no-cache, no-store, must-revalidate" --content-type text/html
           for route in dashboard login pickups catalog reports audit auth; do
-            aws s3 cp ./frontend-reciclago/dist/frontend-reciclago/browser/index.html s3://$BUCKET/$route --content-type text/html
+            aws s3 cp ./frontend-reciclago/dist/frontend-reciclago/browser/index.html s3://$BUCKET/$route --cache-control "no-cache, no-store, must-revalidate" --content-type text/html
           done
           echo "✅ Despliegue a S3 completado con éxito."

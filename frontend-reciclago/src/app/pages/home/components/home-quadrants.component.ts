@@ -105,9 +105,9 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                 *ngFor="let q of quadrants; let i = index"
                 type="button"
                 (click)="setMobileQuadrant(i)"
-                [class.bg-[#236836]]="selectedMobileIndex === i"
+                [class.bg-[#22a652]]="selectedMobileIndex === i"
                 [class.text-white]="selectedMobileIndex === i"
-                [class.border-[#236836]]="selectedMobileIndex === i"
+                [class.border-[#22a652]]="selectedMobileIndex === i"
                 [class.shadow-2xs]="selectedMobileIndex === i"
                 [class.bg-white]="selectedMobileIndex !== i"
                 [class.text-slate-700]="selectedMobileIndex !== i"
@@ -135,7 +135,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
               <div class="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent pointer-events-none"></div>
 
               <span
-                class="absolute bottom-3 left-3 bg-[#236836] text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-md tracking-wide">
+                class="absolute bottom-3 left-3 bg-[#22a652] text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-md tracking-wide">
                 Cuadrante {{ q.cuadranteNumber }} · {{ q.name }}
               </span>
 
@@ -285,7 +285,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                   loading="lazy"
                 />
                 <span
-                  class="absolute bottom-3 left-4 bg-[#236836] text-white text-xs font-bold px-3 py-1 rounded-md shadow-md tracking-wide">
+                  class="absolute bottom-3 left-4 bg-[#22a652] text-white text-xs font-bold px-3 py-1 rounded-md shadow-md tracking-wide">
                   Cuadrante {{ q.cuadranteNumber }}
                 </span>
                 
@@ -571,4 +571,5 @@ export class HomeQuadrantsComponent implements OnInit, OnDestroy {
     this.quadrantSelected.emit(q);
   }
 }
+
 
