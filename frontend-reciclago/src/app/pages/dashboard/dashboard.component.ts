@@ -162,6 +162,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return activeP?.camionPatente || this.currentSectorInfo?.patente || 'PV-RC-2026';
   }
 
+  get totalKilosReciclados(): number {
+    return this.pickups
+      .filter(p => (p.estado === 'completado' || p.estado === 'PESADO' || p.estado === 'RETIRADO') && p.kilosRecolectados)
+      .reduce((sum, p) => sum + (Number(p.kilosRecolectados) || 0), 0);
+  }
+
   /**
    * Nombre del residuo que se recolecta esta semana según la rotación municipal.
    * Usa el dato real del catálogo; si no está disponible, usa el fallback local.

@@ -8,18 +8,18 @@ import { Sector, Pickup } from '../data/sectors.data';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-7 shadow-2xs">
+    <div class="bg-white border border-[#E2E8F0] rounded-2xl p-4 sm:p-6 shadow-2xs">
       
       <!-- ==================== CASO 1: TIENE SOLICITUDES ACTIVAS ==================== -->
       <div *ngIf="activePickup">
         
         <!-- Barra de Encabezado: Título y Selector de Pedido -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-6 border-b border-[#E2E8F0]">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 mb-4 border-b border-[#E2E8F0]">
           <div>
-            <span class="text-xs font-black uppercase tracking-wider text-[#22a652] block mb-1">
+            <span class="text-[11px] font-black uppercase tracking-wider text-[#22a652] block">
               Rastreo en Vivo DIMAO
             </span>
-            <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#123F5B]">
+            <h3 class="font-heading font-extrabold text-lg sm:text-xl text-[#123F5B]">
               Estado de tu Retiro
             </h3>
           </div>
@@ -30,7 +30,7 @@ import { Sector, Pickup } from '../data/sectors.data';
             <select
               [ngModel]="activePickup.id"
               (ngModelChange)="onSelectPickupId($event)"
-              class="bg-[#F8FAF7] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs font-bold text-[#123F5B] focus:outline-none focus:border-[#22a652]">
+              class="bg-[#F8FAF7] border border-[#E2E8F0] rounded-xl px-2.5 py-1.5 text-xs font-bold text-[#123F5B] focus:outline-none focus:border-[#22a652]">
               <option *ngFor="let p of userPickups" [value]="p.id">
                 #{{ p.id }} · {{ p.residuoNombre || 'Reciclaje' }} ({{ p.estado }})
               </option>
@@ -39,9 +39,9 @@ import { Sector, Pickup } from '../data/sectors.data';
         </div>
 
         <!-- Tarjeta Informativa del Pedido que se está Rastreando -->
-        <div class="p-4 rounded-xl bg-[#F8FAF7] border border-[#E2E8F0] mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="p-3 sm:p-4 rounded-xl bg-[#F8FAF7] border border-[#E2E8F0] mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-white border border-[#E2E8F0] text-[#22a652] flex items-center justify-center text-lg shadow-2xs flex-shrink-0">
+            <div class="w-9 h-9 rounded-xl bg-white border border-[#E2E8F0] text-[#22a652] flex items-center justify-center text-base shadow-2xs flex-shrink-0">
               <i class="fa-solid fa-recycle"></i>
             </div>
             <div>
@@ -49,7 +49,7 @@ import { Sector, Pickup } from '../data/sectors.data';
                 <span class="font-mono text-xs font-black px-2 py-0.5 rounded bg-white border border-[#E2E8F0] text-[#123F5B]">
                   #{{ activePickup.id }}
                 </span>
-                <span class="font-heading font-black text-sm text-[#123F5B]">
+                <span class="font-heading font-black text-xs sm:text-sm text-[#123F5B]">
                   {{ activePickup.direccion }}
                 </span>
               </div>
@@ -61,15 +61,16 @@ import { Sector, Pickup } from '../data/sectors.data';
             </div>
           </div>
 
-          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider self-start sm:self-center"
-                [ngClass]="getStatusBadgeClass(activePickup.estado)">
-            <i class="fa-solid fa-circle text-[8px]"></i>
-            <span>{{ activePickup.estado }}</span>
-          </span>
+          <!-- Chip de Estado Oficial -->
+          <div class="flex items-center gap-2 self-start sm:self-auto flex-shrink-0">
+            <span class="px-3 py-1 rounded-full text-xs font-black tracking-wide" [ngClass]="getStatusBadgeClass(activePickup.estado)">
+              {{ activePickup.estado }}
+            </span>
+          </div>
         </div>
 
         <!-- ==================== BARRA DE PROGRESO ACCESIBLE Y GRANDE ==================== -->
-        <div class="py-4 sm:py-6 px-2 sm:px-6">
+        <div class="py-2 sm:py-4 px-1 sm:px-4">
           <div class="relative flex items-center justify-between">
             <!-- Línea de Fondo -->
             <div class="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-2 bg-gray-200 rounded-full z-0"></div>
@@ -80,13 +81,13 @@ import { Sector, Pickup } from '../data/sectors.data';
             <!-- Pasos -->
             <div *ngFor="let step of steps; let i = index" class="relative z-10 flex flex-col items-center group cursor-default">
               <!-- Círculo Grande con Ícono -->
-              <div class="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl flex items-center justify-center text-sm sm:text-base font-black transition-all duration-300 shadow-2xs"
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center text-xs sm:text-sm font-black transition-all duration-300 shadow-2xs"
                    [ngClass]="getStepClass(i)">
                 <i [class]="step.icon"></i>
               </div>
 
               <!-- Etiqueta del Paso -->
-              <span class="text-xs sm:text-sm font-bold mt-2.5 text-center transition-colors"
+              <span class="text-[11px] sm:text-xs font-bold mt-2 text-center transition-colors"
                     [ngClass]="getTextClass(i)">
                 {{ step.label }}
               </span>
@@ -98,18 +99,18 @@ import { Sector, Pickup } from '../data/sectors.data';
         </div>
 
         <!-- ==================== MENSAJE EXPLICATIVO PARA ABUELOS / CIUDADANOS ==================== -->
-        <div class="mt-8 p-4 sm:p-5 rounded-2xl border transition-all"
+        <div class="mt-4 sm:mt-5 p-3.5 sm:p-4 rounded-xl border transition-all"
              [ngClass]="getFeedbackBoxClass()">
-          <div class="flex items-start gap-3.5">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
+          <div class="flex items-start gap-3">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0"
                  [ngClass]="getFeedbackIconBoxClass()">
               <i [class]="getFeedbackIcon()"></i>
             </div>
             <div>
-              <h4 class="font-heading font-black text-sm sm:text-base" [ngClass]="getFeedbackTitleClass()">
+              <h4 class="font-heading font-black text-xs sm:text-sm" [ngClass]="getFeedbackTitleClass()">
                 {{ getFeedbackTitle() }}
               </h4>
-              <p class="text-xs sm:text-sm mt-1 leading-relaxed" [ngClass]="getFeedbackTextClass()">
+              <p class="text-xs mt-0.5 leading-relaxed" [ngClass]="getFeedbackTextClass()">
                 {{ getFeedbackMessage() }}
               </p>
             </div>
@@ -119,24 +120,24 @@ import { Sector, Pickup } from '../data/sectors.data';
       </div>
 
       <!-- ==================== CASO 2: NO TIENE NINGÚN RETIRO SOLICITADO ==================== -->
-      <div *ngIf="!activePickup" class="py-8 px-4 text-center">
-        <div class="w-16 h-16 rounded-2xl bg-[#ecf7e6] text-[#22a652] flex items-center justify-center text-2xl mx-auto mb-4 shadow-2xs">
+      <div *ngIf="!activePickup" class="py-5 px-3 text-center">
+        <div class="w-12 h-12 rounded-2xl bg-[#ecf7e6] text-[#22a652] flex items-center justify-center text-xl mx-auto mb-3 shadow-2xs">
           <i class="fa-solid fa-calendar-check"></i>
         </div>
 
-        <h3 class="font-heading font-black text-2xl text-[#123F5B] mb-2">
+        <h3 class="font-heading font-black text-lg sm:text-xl text-[#123F5B] mb-1.5">
           No tienes ningún retiro activo para rastrear
         </h3>
         
-        <p class="text-xs sm:text-sm text-gray-500 max-w-lg mx-auto mb-6 leading-relaxed">
-          El camión de reciclaje municipal pasa por tu sector (<strong>{{ sector?.nombre }}</strong>) los días <strong class="text-[#22a652]">{{ sector?.dia }}</strong>. Para que la cuadrilla pase a retirar a la puerta de tu casa y puedas ver el camión en tiempo real, ingresa tu solicitud.
+        <p class="text-xs text-gray-500 max-w-md mx-auto mb-4 leading-relaxed">
+          El camión municipal pasa por <strong>{{ sector?.nombre }}</strong> los <strong class="text-[#22a652]">{{ sector?.dia }}</strong>. Agenda tu retiro para monitorear el camión en vivo.
         </p>
 
         <button
           type="button"
           (click)="requestRetiroClick.emit()"
-          class="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white font-black text-sm uppercase tracking-wider cursor-pointer shadow-md transition-all">
-          <i class="fa-solid fa-circle-plus text-base"></i>
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white font-black text-xs uppercase tracking-wider cursor-pointer shadow-sm transition-all">
+          <i class="fa-solid fa-circle-plus text-sm"></i>
           <span>Pedir Retiro de Reciclaje Ahora</span>
         </button>
       </div>
