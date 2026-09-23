@@ -78,15 +78,16 @@
 .hero-title {
   font-family: 'Cabinet Grotesk', 'Outfit', sans-serif;
   font-weight: 800;
-  letter-spacing: -0.04em;
-  font-size: clamp(2.55rem, 9.2vw, 6.8rem);
-  line-height: 0.97;
-  text-shadow: 0 2px 14px rgba(2, 13, 23, 0.8), 0 1px 3px rgba(2, 13, 23, 0.95);
+  letter-spacing: -0.015em;
+  font-size: clamp(2.4rem, 8.8vw, 6.5rem);
+  line-height: 1.05;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 @media (min-width: 640px) {
   .hero-title {
-    letter-spacing: -0.045em;
-    line-height: 0.92;
+    letter-spacing: -0.025em;
+    line-height: 0.98;
+    text-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
   }
 }
 .font-serif {
@@ -451,9 +452,9 @@
 .hero-overlay-mobile {
   background: linear-gradient(
     180deg,
-    rgba(4, 22, 36, 0.82) 0%,
-    rgba(4, 22, 36, 0.48) 28%,
-    rgba(4, 22, 36, 0.72) 65%,
+    rgba(4, 22, 36, 0.88) 0%,
+    rgba(4, 22, 36, 0.58) 30%,
+    rgba(4, 22, 36, 0.74) 65%,
     rgba(4, 22, 36, 0.96) 100%
   );
 }

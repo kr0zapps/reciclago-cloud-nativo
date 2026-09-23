@@ -43,15 +43,15 @@ import { RouterModule } from '@angular/router';
         </h1>
 
         <!-- Subtítulo Corto, Directo y Conciso -->
-        <p class="text-sm sm:text-lg md:text-xl text-slate-200 font-medium max-w-xl mx-auto mt-3 sm:mt-5 mb-5 sm:mb-8 drop-shadow-sm leading-snug">
+        <p class="text-sm sm:text-lg md:text-xl text-white/90 font-medium max-w-xl mx-auto mt-3 sm:mt-5 mb-5 sm:mb-8 drop-shadow-sm leading-snug">
           Retiro domiciliario y pesaje digital para proteger nuestro lago.
         </p>
 
         <!-- Botones de Acción Centrados, Ergonómicos y con Colores Sólidos -->
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 w-full sm:w-auto">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-sm sm:max-w-none mx-auto">
           <a
             routerLink="/dashboard"
-            class="inline-flex items-center justify-center gap-2.5 min-h-[48px] sm:min-h-[54px] px-7 sm:px-9 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white font-extrabold text-sm sm:text-base tracking-wide shadow-xl shadow-emerald-950/50 border-none transition-all active:scale-[0.98] cursor-pointer">
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 min-h-[48px] sm:min-h-[54px] px-7 sm:px-9 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white font-extrabold text-sm sm:text-base tracking-wide shadow-xl shadow-emerald-950/50 border-none transition-all active:scale-[0.98] cursor-pointer">
             <span>Ingresar al Portal Vecinal</span>
             <i class="fa-solid fa-arrow-right text-xs"></i>
           </a>
@@ -59,7 +59,7 @@ import { RouterModule } from '@angular/router';
           <a
             href="#cuadrantes"
             (click)="scrollToSection($event, 'cuadrantes')"
-            class="inline-flex items-center justify-center gap-2.5 min-h-[48px] sm:min-h-[54px] px-6 sm:px-8 rounded-xl bg-[#092232]/85 hover:bg-[#123F5B] text-white font-bold text-sm sm:text-base border border-white/20 backdrop-blur-md shadow-lg transition-all active:scale-[0.98] cursor-pointer">
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 min-h-[48px] sm:min-h-[54px] px-6 sm:px-8 rounded-xl bg-[#092232]/85 hover:bg-[#123F5B] text-white font-bold text-sm sm:text-base border border-white/20 backdrop-blur-md shadow-lg transition-all active:scale-[0.98] cursor-pointer">
             <i class="fa-solid fa-calendar-days text-[#22a652]"></i>
             <span>Ver Cuadrantes y Días</span>
           </a>
@@ -67,7 +67,7 @@ import { RouterModule } from '@angular/router';
 
         <!-- Lema Cálido / Humano con Amplio Espaciado y Cero Emojis -->
         <div class="mt-8 sm:mt-14 text-center">
-          <p class="font-script text-base sm:text-xl md:text-2xl text-slate-300/80 tracking-wide select-none m-0">
+          <p class="font-script text-base sm:text-xl md:text-2xl text-emerald-100/90 font-bold tracking-wide select-none m-0 drop-shadow-sm">
             Reciclar también es cuidar nuestro lago
           </p>
         </div>
