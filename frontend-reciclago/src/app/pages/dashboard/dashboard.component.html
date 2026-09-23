@@ -27,54 +27,17 @@
         </div>
       </div>
 
-      <!-- Selector de Sector Personalizado Cívico (Cero select nativo feo) -->
-      <div class="relative sector-dropdown-container self-start sm:self-auto">
-        <button
-          type="button"
-          (click)="toggleSectorDropdown($event)"
-          class="flex items-center gap-2 bg-white hover:bg-gray-50 border border-gray-300 hover:border-[#22a652] rounded-xl px-3 py-1.5 text-xs font-extrabold text-[#123F5B] shadow-2xs transition cursor-pointer">
-          <i class="fa-solid fa-location-dot text-[#22a652]"></i>
-          <span class="max-w-[130px] sm:max-w-[200px] truncate">{{ currentSectorInfo?.nombre || selectedSector }}</span>
-          <span class="px-1.5 py-0.5 rounded bg-[#ecf7e6] text-[#22a652] text-[10px] font-black">
-            {{ currentSectorInfo?.dia?.slice(0, 3) || 'Día' }}
-          </span>
-          <i class="fa-solid fa-chevron-down text-gray-400 text-[10px] transition-transform" [class.rotate-180]="isSectorDropdownOpen"></i>
-        </button>
-
-        <!-- Dropdown flotante elegante -->
-        <div
-          *ngIf="isSectorDropdownOpen"
-          class="absolute right-0 top-full mt-1.5 w-72 sm:w-80 bg-white border border-[#E2E8F0] rounded-2xl shadow-xl z-50 p-2 space-y-1 anim-fade-up">
-          <div class="px-2.5 py-1.5 text-[11px] font-black uppercase tracking-wider text-gray-400 border-b border-gray-100 flex items-center justify-between">
-            <span>Cuadrantes de Puerto Varas</span>
-            <span class="text-emerald-600 font-bold">4 sectores</span>
-          </div>
-          <button
-            *ngFor="let s of sectores"
-            type="button"
-            (click)="selectSector(s.nombre, $event)"
-            class="w-full text-left p-2.5 rounded-xl transition flex items-center justify-between gap-3 cursor-pointer group"
-            [ngClass]="s.nombre === selectedSector ? 'bg-[#123F5B] text-white shadow-xs' : 'hover:bg-gray-50 text-gray-700'">
-            <div class="min-w-0">
-              <div class="flex items-center gap-2">
-                <span class="text-[10px] font-black px-1.5 py-0.5 rounded"
-                  [ngClass]="s.nombre === selectedSector ? 'bg-white/20 text-emerald-300' : 'bg-gray-100 text-gray-600'">
-                  C{{ s.numero || s.id }}
-                </span>
-                <span class="text-xs font-bold truncate" [class.text-white]="s.nombre === selectedSector">
-                  {{ s.nombre }}
-                </span>
-              </div>
-              <div class="text-[11px] mt-0.5 flex items-center gap-2"
-                [ngClass]="s.nombre === selectedSector ? 'text-gray-300' : 'text-gray-400'">
-                <span>{{ s.dia }}</span>
-                <span>&bull;</span>
-                <span class="truncate">{{ s.materialPrincipal || s.material }}</span>
-              </div>
-            </div>
-            <i *ngIf="s.nombre === selectedSector" class="fa-solid fa-circle-check text-emerald-400 text-sm flex-shrink-0"></i>
-          </button>
-        </div>
+      <!-- Selector de Sector Nativo Limpio -->
+      <div class="self-start sm:self-auto">
+        <select
+          [ngModel]="selectedSector"
+          (ngModelChange)="selectSector($event)"
+          class="bg-white border border-gray-300 hover:border-[#22a652] focus:border-[#22a652] focus:ring-1 focus:ring-[#22a652]/30 rounded-lg px-3 py-1.5 text-xs font-bold text-[#123F5B] shadow-2xs transition cursor-pointer outline-none appearance-none pr-8"
+          style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22%23123F5B%22%3E%3Cpath fill-rule=%22evenodd%22 d=%22M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z%22 clip-rule=%22evenodd%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 0.5rem center; background-size: 1rem;">
+          <option *ngFor="let s of sectores" [value]="s.nombre">
+            {{ s.nombre }} — {{ s.dia }}
+          </option>
+        </select>
       </div>
     </div>
   </section>

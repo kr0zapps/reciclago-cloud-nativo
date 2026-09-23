@@ -273,9 +273,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.isSectorDropdownOpen = !this.isSectorDropdownOpen;
   }
 
-  selectSector(sectorNombre: string, event?: Event): void {
-    event?.stopPropagation();
-    event?.preventDefault();
+  selectSector(sectorNombre: string): void {
     this.selectedSector = sectorNombre;
     this.isSectorDropdownOpen = false;
     this.onHeaderSectorChange();
