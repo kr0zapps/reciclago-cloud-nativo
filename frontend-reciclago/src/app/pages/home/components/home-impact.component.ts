@@ -14,9 +14,6 @@ import { BffService } from '../../../services/bff.service';
         
         <!-- Encabezado de Sección Modern Clean -->
         <div class="mb-10 text-center sm:text-left">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200/70 mb-3 shadow-2xs">
-            <i class="fa-solid fa-chart-simple text-[11px]"></i> Trazabilidad y Metas Ambientales
-          </span>
           <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-heading mb-2">
             Impacto en la Comuna
           </h2>

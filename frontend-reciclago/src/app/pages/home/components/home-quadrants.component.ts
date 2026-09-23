@@ -61,9 +61,6 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
         <div class="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-5 reveal-init"
              [class.reveal-active]="isVisible">
           <div>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200/70 mb-3 shadow-2xs">
-              <i class="fa-solid fa-calendar-check text-[11px]"></i> Calendario Oficial de Retiros
-            </span>
             <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-heading mb-2">
               Cuadrantes y Residuos Semanales
             </h2>
@@ -209,20 +206,20 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
               </div>
 
               <!-- Placa Material Asignado Modern -->
-              <div class="p-4 rounded-xl border border-emerald-200/80 bg-emerald-50/40 flex items-center justify-between mb-4">
+              <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between mb-4">
                 <div>
-                  <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 block mb-0.5">
+                  <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-500 block mb-0.5">
                     {{ activeWeek === 1 ? 'Esta Semana' : 'Próxima Semana' }}
                   </span>
                   <h4 class="font-heading font-extrabold text-base text-slate-900">{{ q.materialNombre }}</h4>
-                  <p class="text-xs text-slate-600 mt-0.5 line-clamp-1">{{ q.materialDescripcion }}</p>
+                  <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">{{ q.materialDescripcion }}</p>
                 </div>
 
-                <div class="w-11 h-11 rounded-xl bg-white border border-emerald-200 flex items-center justify-center text-lg shrink-0 shadow-2xs text-emerald-600">
-                  <svg *ngIf="q.categoryKey === 'VIDRIO'" class="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 2h8v4l-2 3v13H10V9L8 6V2z"></path><line stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="10" x2="14" y1="2" y2="2"></line></svg>
-                  <svg *ngIf="q.categoryKey === 'CARTON'" class="w-5 h-5 text-amber-700" fill="currentColor" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                  <svg *ngIf="q.categoryKey === 'PLASTICO'" class="w-5 h-5 text-sky-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 2h8v2H8V2zm1 3h6v2.5l2 3.5v11H7V11l2-3.5V5z"></path></svg>
-                  <svg *ngIf="q.categoryKey === 'LATAS'" class="w-5 h-5 text-slate-600" fill="currentColor" viewBox="0 0 24 24"><rect height="16" rx="2" width="10" x="7" y="4"></rect><path d="M9 2h6v2H9z"></path></svg>
+                <div class="w-11 h-11 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-lg shrink-0 shadow-2xs text-slate-700">
+                  <svg *ngIf="q.categoryKey === 'VIDRIO'" class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 2h8v4l-2 3v13H10V9L8 6V2z"></path><line stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="10" x2="14" y1="2" y2="2"></line></svg>
+                  <svg *ngIf="q.categoryKey === 'CARTON'" class="w-5 h-5 text-slate-700" fill="currentColor" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                  <svg *ngIf="q.categoryKey === 'PLASTICO'" class="w-5 h-5 text-slate-700" fill="currentColor" viewBox="0 0 24 24"><path d="M8 2h8v2H8V2zm1 3h6v2.5l2 3.5v11H7V11l2-3.5V5z"></path></svg>
+                  <svg *ngIf="q.categoryKey === 'LATAS'" class="w-5 h-5 text-slate-700" fill="currentColor" viewBox="0 0 24 24"><rect height="16" rx="2" width="10" x="7" y="4"></rect><path d="M9 2h6v2H9z"></path></svg>
                 </div>
               </div>
 
@@ -320,20 +317,20 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                 </div>
 
                 <!-- Material Row Modern -->
-                <div class="p-4 rounded-xl border border-emerald-200/80 bg-emerald-50/40 flex items-center justify-between mb-4">
+                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between mb-4">
                   <div>
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 block mb-0.5">
+                    <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-500 block mb-0.5">
                       {{ activeWeek === 1 ? 'Esta Semana' : 'Próxima Semana' }}
                     </span>
                     <h4 class="font-heading font-extrabold text-base sm:text-lg text-slate-900">{{ q.materialNombre }}</h4>
-                    <p class="text-xs text-slate-600 mt-0.5 line-clamp-1">{{ q.materialDescripcion }}</p>
+                    <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">{{ q.materialDescripcion }}</p>
                   </div>
 
-                  <div class="w-12 h-12 rounded-xl bg-white border border-emerald-200 flex items-center justify-center text-lg shrink-0 shadow-2xs">
-                    <svg *ngIf="q.categoryKey === 'VIDRIO'" class="w-6 h-6 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 2h8v4l-2 3v13H10V9L8 6V2z"></path><line stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="10" x2="14" y1="2" y2="2"></line></svg>
-                    <svg *ngIf="q.categoryKey === 'CARTON'" class="w-6 h-6 text-amber-700" fill="currentColor" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                    <svg *ngIf="q.categoryKey === 'PLASTICO'" class="w-6 h-6 text-sky-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 2h8v2H8V2zm1 3h6v2.5l2 3.5v11H7V11l2-3.5V5z"></path></svg>
-                    <svg *ngIf="q.categoryKey === 'LATAS'" class="w-6 h-6 text-slate-600" fill="currentColor" viewBox="0 0 24 24"><rect height="16" rx="2" width="10" x="7" y="4"></rect><path d="M9 2h6v2H9z"></path></svg>
+                  <div class="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-lg shrink-0 shadow-2xs">
+                    <svg *ngIf="q.categoryKey === 'VIDRIO'" class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 2h8v4l-2 3v13H10V9L8 6V2z"></path><line stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="10" x2="14" y1="2" y2="2"></line></svg>
+                    <svg *ngIf="q.categoryKey === 'CARTON'" class="w-6 h-6 text-slate-700" fill="currentColor" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                    <svg *ngIf="q.categoryKey === 'PLASTICO'" class="w-6 h-6 text-slate-700" fill="currentColor" viewBox="0 0 24 24"><path d="M8 2h8v2H8V2zm1 3h6v2.5l2 3.5v11H7V11l2-3.5V5z"></path></svg>
+                    <svg *ngIf="q.categoryKey === 'LATAS'" class="w-6 h-6 text-slate-700" fill="currentColor" viewBox="0 0 24 24"><rect height="16" rx="2" width="10" x="7" y="4"></rect><path d="M9 2h6v2H9z"></path></svg>
                   </div>
                 </div>
 
