@@ -1,4 +1,4 @@
-﻿import { Component, HostListener } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -40,60 +40,58 @@ import { RouterModule } from '@angular/router';
       <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 w-full my-auto">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          <!-- Columna Izquierda: Titular, Subtítulo y CTAs Limpios (Sin pills, sin pings, sin spans redundantes) -->
+          <!-- Columna Izquierda: Titular Limpio, Subtítulo y Botones Directos -->
           <div class="lg:col-span-7 xl:col-span-8 max-w-2xl xl:max-w-3xl">
 
-            <!-- Titular Principal (Izquierda): Blanco puro, bold sans-serif grande con leve text-shadow -->
-            <h1 class="anim-fade-up text-3xl sm:text-4xl md:text-5xl lg:text-[54px] xl:text-[62px] font-extrabold text-white tracking-tight uppercase leading-[1.08] mb-5 font-heading break-words hero-text-shadow">
-              JUNTOS CUIDAMOS<br class="hidden sm:block" /> PUERTO VARAS
+            <!-- Titular Principal -->
+            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.1] mb-5 font-heading">
+              Reciclaje Comunal<br />
+              <span class="text-[#22a652]">Puerto Varas</span>
             </h1>
 
-            <!-- Subtítulo: Una línea de apoyo clara y corta sobre el impacto en la comuna y la cuenca del lago -->
-            <p class="anim-fade-up anim-delay-1 text-base sm:text-lg lg:text-[19px] text-white/95 font-medium leading-relaxed max-w-xl mb-8 break-words hero-subtext-shadow font-heading">
-              El sistema municipal de reciclaje comunitario que protege nuestra comuna y preserva las aguas del Lago Llanquihue.
+            <!-- Subtítulo -->
+            <p class="text-base sm:text-lg text-slate-200 font-medium leading-relaxed max-w-xl mb-8">
+              Sistema de trazabilidad, retiro domiciliario y pesaje digital para proteger la cuenca del Lago Llanquihue bajo la Ley REP.
             </p>
 
-            <!-- CTAs: Primario Verde Sólido + Secundario Outline con fondo blanco/10% -->
-            <div class="anim-fade-up anim-delay-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 w-full sm:w-auto">
-              <!-- CTA Primario: Botón verde sólido dominante con ícono -->
+            <!-- CTAs Modernos y Equilibrados -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 w-full sm:w-auto">
               <a
                 routerLink="/dashboard"
-                class="group btn-interactive w-full sm:w-auto inline-flex items-center justify-center gap-2.5 min-h-[48px] h-12 sm:h-[50px] px-7 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] active:bg-[#1e6c36] text-white font-bold text-sm uppercase tracking-wider cursor-pointer text-center shadow-lg shadow-emerald-950/30 transition-all font-heading">
-                <i class="fa-solid fa-arrow-right-to-bracket text-sm group-hover:translate-x-0.5 transition-transform duration-200"></i>
-                Ingresar al Portal Vecinal
+                class="inline-flex items-center justify-center gap-2.5 min-h-[48px] px-7 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white font-bold text-sm uppercase tracking-wider cursor-pointer shadow-lg shadow-emerald-950/40 transition-all font-heading">
+                <span>Ingresar al Portal Vecinal</span>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
               </a>
 
-              <!-- CTA Secundario: Botón outline con fondo blanco/10%, mismo tamaño pero menor jerarquía -->
               <a
                 href="#cuadrantes"
                 (click)="scrollToSection($event, 'cuadrantes')"
-                class="group btn-interactive w-full sm:w-auto inline-flex items-center justify-center gap-2.5 min-h-[48px] h-12 sm:h-[50px] px-7 rounded-xl bg-white/10 hover:bg-white/20 active:bg-white/25 text-white font-bold text-sm uppercase tracking-wider border border-white/30 hover:border-white/60 cursor-pointer text-center backdrop-blur-sm shadow-sm transition-all font-heading">
-                <i class="fa-solid fa-map-location-dot text-sm text-[#4ade80] group-hover:-translate-y-0.5 transition-transform duration-200"></i>
-                Ver Cuadrantes de Reciclaje
+                class="inline-flex items-center justify-center gap-2.5 min-h-[48px] px-7 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm uppercase tracking-wider border border-white/25 cursor-pointer backdrop-blur-sm shadow-sm transition-all font-heading">
+                <i class="fa-solid fa-calendar-days text-[#22a652]"></i>
+                <span>Ver Cuadrantes y Días</span>
               </a>
             </div>
-
-            <!-- Línea de Contacto Alternativo Pequeña debajo de los botones -->
-            <p class="anim-fade-up anim-delay-3 mt-4 text-xs sm:text-[13px] text-slate-300 font-medium flex items-center gap-2 flex-wrap font-heading">
-              <i class="fa-solid fa-phone text-[#4ade80] text-xs"></i>
-              ¿Necesitas asistencia o agendamiento telefónico?
-              <a href="tel:+56652361200" class="text-white font-bold hover:text-[#4ade80] underline underline-offset-2 transition-colors">
-                Llama al 65 236 1200
-              </a>
-            </p>
           </div>
 
-          <!-- Columna Derecha: Lema en Cursiva Cálido / Humano que Rellena y Da Identidad Local Única en Desktop -->
-          <div class="lg:col-span-5 xl:col-span-4 hidden lg:flex justify-end items-center pointer-events-none pr-2 xl:pr-6 anim-fade-up anim-delay-2">
-            <div class="text-right rotate-[-4deg] select-none anim-float-subtle">
-              <p class="font-script text-white text-4xl xl:text-[48px] font-bold leading-[1.25] tracking-wide drop-shadow-[0_4px_18px_rgba(0,0,0,0.85)]">
-                Reciclar también es<br />
-                cuidar nuestro<br />
-                <span class="text-[#4ade80]">lago</span>
+          <!-- Columna Derecha: Tarjeta Widget de Estado Comunal en Vivo -->
+          <div class="lg:col-span-5 xl:col-span-4 hidden lg:flex justify-end items-center">
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 text-white max-w-sm w-full shadow-2xl">
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-bold uppercase tracking-wider text-[#22a652]">Ciclo de Reciclaje</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-white/20 text-white">DIMAO</span>
+              </div>
+              <div class="text-2xl font-black font-heading text-white mb-1.5">
+                Cuidamos Nuestro Lago
+              </div>
+              <p class="text-xs text-slate-200 leading-relaxed mb-4">
+                Retiro puerta a puerta en los 4 cuadrantes comunales con pesaje digital y certificación municipal.
               </p>
-              <div class="mt-3.5 flex items-center justify-end gap-2 text-emerald-300 drop-shadow-md">
-                <i class="fa-solid fa-water text-xs"></i>
-                <p class="font-script text-slate-200 text-xl font-bold tracking-wide m-0">Cuenca Llanquihue</p>
+              <div class="pt-3 border-t border-white/15 flex items-center justify-between text-xs">
+                <span class="text-slate-300">Cuenca Llanquihue</span>
+                <span class="font-bold text-[#22a652] flex items-center gap-1">
+                  <i class="fa-solid fa-water text-[10px]"></i>
+                  <span>Protección Activa</span>
+                </span>
               </div>
             </div>
           </div>

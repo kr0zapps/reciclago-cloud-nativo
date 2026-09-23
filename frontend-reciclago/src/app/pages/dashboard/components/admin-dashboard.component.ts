@@ -117,8 +117,57 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
         </div>
       </section>
 
+      <!-- ==================== SELECTOR DE MÓDULO EJECUTIVO (TABS) ==================== -->
+      <div class="flex items-center justify-between pb-1 border-b border-[#E2E8F0] flex-wrap gap-3">
+        <div class="inline-flex rounded-xl p-1 bg-gray-100 border border-[#E2E8F0] shadow-2xs">
+          <button (click)="activeAdminTab = 'planilla'"
+                  type="button"
+                  [ngClass]="activeAdminTab === 'planilla' ? 'bg-white text-[#123F5B] shadow-2xs font-bold' : 'text-gray-600 hover:text-gray-900 font-medium'"
+                  class="px-4 py-2 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-2">
+            <i class="fa-solid fa-list-check"></i>
+            <span>Planilla de Retiros</span>
+            <span class="text-[11px] font-mono px-1.5 py-0.2 rounded"
+                  [ngClass]="activeAdminTab === 'planilla' ? 'bg-[#123F5B] text-white' : 'bg-gray-200 text-gray-700'">
+              {{ pickups.length }}
+            </span>
+          </button>
+
+          <button (click)="activeAdminTab = 'rotacion'"
+                  type="button"
+                  [ngClass]="activeAdminTab === 'rotacion' ? 'bg-white text-[#123F5B] shadow-2xs font-bold' : 'text-gray-600 hover:text-gray-900 font-medium'"
+                  class="px-4 py-2 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-2">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Rotación Semanal</span>
+          </button>
+
+          <button (click)="activeAdminTab = 'flota'"
+                  type="button"
+                  [ngClass]="activeAdminTab === 'flota' ? 'bg-white text-[#123F5B] shadow-2xs font-bold' : 'text-gray-600 hover:text-gray-900 font-medium'"
+                  class="px-4 py-2 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-2">
+            <i class="fa-solid fa-truck"></i>
+            <span>Flota de Camiones</span>
+            <span class="text-[11px] font-mono px-1.5 py-0.2 rounded"
+                  [ngClass]="activeAdminTab === 'flota' ? 'bg-[#123F5B] text-white' : 'bg-gray-200 text-gray-700'">
+              {{ camiones.length }}
+            </span>
+          </button>
+
+          <button (click)="activeAdminTab = 'mapa'"
+                  type="button"
+                  [ngClass]="activeAdminTab === 'mapa' ? 'bg-white text-[#123F5B] shadow-2xs font-bold' : 'text-gray-600 hover:text-gray-900 font-medium'"
+                  class="px-4 py-2 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-2">
+            <i class="fa-solid fa-map-location-dot"></i>
+            <span>Mapa en Vivo</span>
+          </button>
+        </div>
+
+        <span class="text-xs text-gray-400 font-medium hidden sm:inline">
+          Vista: <strong class="text-[#123F5B] capitalize">{{ activeAdminTab }}</strong>
+        </span>
+      </div>
+
       <!-- ==================== 3. GESTIÓN Y DISPONIBILIDAD DE FLOTA ==================== -->
-      <section class="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-2xs">
+      <section *ngIf="activeAdminTab === 'flota'" class="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-2xs">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-5 border-b border-[#E2E8F0]">
           <div>
             <h3 class="font-heading font-extrabold text-xl text-[#123F5B]">
@@ -185,7 +234,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
       </section>
 
       <!-- ==================== GESTIÓN Y REPROGRAMACIÓN DE RECORRIDOS ==================== -->
-      <section class="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-2xs space-y-6">
+      <section *ngIf="activeAdminTab === 'rotacion'" class="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-2xs space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E2E8F0]">
           <div>
             <h3 class="font-heading font-extrabold text-xl text-[#123F5B]">
@@ -433,7 +482,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
       </section>
 
       <!-- ==================== 4. PLANILLA DE RETIROS ==================== -->
-      <section class="bg-white rounded-xl border border-[#E2E8F0] shadow-2xs overflow-hidden">
+      <section *ngIf="activeAdminTab === 'planilla'" class="bg-white rounded-xl border border-[#E2E8F0] shadow-2xs overflow-hidden">
         <div class="p-6 border-b border-[#E2E8F0] space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -675,7 +724,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
       </section>
 
       <!-- ==================== 5. MAPA DE FLOTA EN RUTA ==================== -->
-      <section class="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-2xs">
+      <section *ngIf="activeAdminTab === 'mapa'" class="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-2xs">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-[#E2E8F0]">
           <div>
             <h3 class="font-heading font-extrabold text-xl text-[#123F5B]">
@@ -944,6 +993,9 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
 
   Math = Math;
   selectedTruckPatente: string = 'PV-RC-2026';
+
+  /** Pestaña activa en la consola de administración */
+  activeAdminTab: 'planilla' | 'rotacion' | 'flota' | 'mapa' = 'planilla';
 
   rotacionModo: 'AUTOMATICO' | 'MANUAL' = 'AUTOMATICO';
   overrideMaterialCodigo: string = 'VIDRIO';
