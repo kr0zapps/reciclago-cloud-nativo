@@ -107,6 +107,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   /** Pickup seleccionado por el vecino desde el historial para ver en el tracker */
   selectedTrackingPickup: Pickup | null = null;
+  activeVecinoTab: 'seguimiento' | 'solicitar' | 'historial' = 'seguimiento';
 
   truckSimulationRunning = true;
   truckSpeed = 1;
@@ -470,12 +471,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   onPickupSelectedForTracking(pickup: Pickup): void {
-    // Toggle: si el vecino clickea el mismo pickup, deselecciona
-    if (this.selectedTrackingPickup?.id === pickup.id) {
-      this.selectedTrackingPickup = null;
-    } else {
-      this.selectedTrackingPickup = pickup;
-    }
+    this.selectedTrackingPickup = pickup;
+    this.activeVecinoTab = 'seguimiento';
   }
 
   onCamionEstadoCambiado(camionActualizado: Camion): void {
@@ -522,6 +519,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (nuevo.direccion) {
       this.userActiveAddress = nuevo.direccion;
     }
+    this.selectedTrackingPickup = nuevo;
+    this.activeVecinoTab = 'seguimiento';
     this.loadPickups();
   }
 

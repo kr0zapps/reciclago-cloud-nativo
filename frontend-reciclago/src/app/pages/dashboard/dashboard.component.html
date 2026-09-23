@@ -131,40 +131,133 @@
       </div>
     </div>
 
-    <!-- 1. HERO PRINCIPAL + SEGUIMIENTO CAMION -->
-    <app-hero-pickup [sector]="currentSectorInfo" [userAddress]="userActiveAddress"></app-hero-pickup>
+    <!-- ==================== MENÚ INTUITIVO PARA VECINOS (ACCESIBLE PARA ADULTOS MAYORES) ==================== -->
+    <div class="my-6">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        
+        <!-- Pestaña 1: Estado y Rastreo -->
+        <button
+          type="button"
+          (click)="activeVecinoTab = 'seguimiento'"
+          class="flex items-center gap-4 p-4 sm:p-5 rounded-2xl border-2 transition-all cursor-pointer text-left shadow-2xs"
+          [ngClass]="activeVecinoTab === 'seguimiento' 
+            ? 'bg-[#123F5B] text-white border-[#123F5B] ring-4 ring-[#123F5B]/15 shadow-md' 
+            : 'bg-white text-gray-700 border-[#E2E8F0] hover:border-[#123F5B]/40 hover:bg-[#F8FAF7]'">
+          <div 
+            class="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 font-black shadow-inner"
+            [ngClass]="activeVecinoTab === 'seguimiento' ? 'bg-[#22a652] text-white' : 'bg-[#ecf7e6] text-[#22a652]'">
+            <i class="fa-solid fa-truck-fast"></i>
+          </div>
+          <div class="min-w-0">
+            <span class="text-xs uppercase font-extrabold tracking-wider block opacity-80">
+              Paso 1
+            </span>
+            <h4 class="font-heading font-extrabold text-base sm:text-lg leading-tight">
+              1. Estado y Rastreo
+            </h4>
+            <p class="text-xs mt-0.5 truncate opacity-75">
+              ¿Dónde viene mi reciclaje?
+            </p>
+          </div>
+        </button>
 
-    <app-truck-tracking
-      [isCamionEnRuta]="isCamionEnRuta"
-      [sector]="currentSectorInfo"
-      [pickups]="pickups"
-      [userEmail]="userEmail"
-      [selectedPickup]="selectedTrackingPickup">
-    </app-truck-tracking>
+        <!-- Pestaña 2: Pedir Retiro -->
+        <button
+          type="button"
+          (click)="activeVecinoTab = 'solicitar'"
+          class="flex items-center gap-4 p-4 sm:p-5 rounded-2xl border-2 transition-all cursor-pointer text-left shadow-2xs"
+          [ngClass]="activeVecinoTab === 'solicitar' 
+            ? 'bg-[#123F5B] text-white border-[#123F5B] ring-4 ring-[#123F5B]/15 shadow-md' 
+            : 'bg-white text-gray-700 border-[#E2E8F0] hover:border-[#123F5B]/40 hover:bg-[#F8FAF7]'">
+          <div 
+            class="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 font-black shadow-inner"
+            [ngClass]="activeVecinoTab === 'solicitar' ? 'bg-[#22a652] text-white' : 'bg-[#ecf7e6] text-[#22a652]'">
+            <i class="fa-solid fa-circle-plus"></i>
+          </div>
+          <div class="min-w-0">
+            <span class="text-xs uppercase font-extrabold tracking-wider block opacity-80">
+              Paso 2
+            </span>
+            <h4 class="font-heading font-extrabold text-base sm:text-lg leading-tight">
+              2. Pedir Retiro
+            </h4>
+            <p class="text-xs mt-0.5 truncate opacity-75">
+              Programar retiro en mi puerta
+            </p>
+          </div>
+        </button>
 
-    <!-- 2. FORMULARIO DE AVISO DE RETIRO -->
-    <app-pickup-form
-      [sector]="currentSectorInfo"
-      [residuos]="residuos"
-      [userEmail]="userEmail"
-      [userName]="userName"
-      (pickupCreated)="onPickupCreated($event)">
-    </app-pickup-form>
+        <!-- Pestaña 3: Mis Retiros -->
+        <button
+          type="button"
+          (click)="activeVecinoTab = 'historial'"
+          class="flex items-center gap-4 p-4 sm:p-5 rounded-2xl border-2 transition-all cursor-pointer text-left shadow-2xs"
+          [ngClass]="activeVecinoTab === 'historial' 
+            ? 'bg-[#123F5B] text-white border-[#123F5B] ring-4 ring-[#123F5B]/15 shadow-md' 
+            : 'bg-white text-gray-700 border-[#E2E8F0] hover:border-[#123F5B]/40 hover:bg-[#F8FAF7]'">
+          <div 
+            class="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 font-black shadow-inner"
+            [ngClass]="activeVecinoTab === 'historial' ? 'bg-[#22a652] text-white' : 'bg-[#ecf7e6] text-[#22a652]'">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+          </div>
+          <div class="min-w-0">
+            <span class="text-xs uppercase font-extrabold tracking-wider block opacity-80">
+              Paso 3
+            </span>
+            <h4 class="font-heading font-extrabold text-base sm:text-lg leading-tight">
+              3. Mis Retiros
+            </h4>
+            <p class="text-xs mt-0.5 truncate opacity-75">
+              Historial y comprobantes
+            </p>
+          </div>
+        </button>
 
-    <!-- 3. HISTORIAL DE RETIROS VECINALES -->
-    <app-pickup-history
-      [pickups]="pickups"
-      [isStaff]="isStaff"
-      [userEmail]="userEmail"
-      [selectedPickupId]="selectedTrackingPickup?.id ?? null"
-      (actionRequested)="openActionModal($event)"
-      (pickupSelected)="onPickupSelectedForTracking($event)">
-    </app-pickup-history>
+      </div>
+    </div>
 
-    <div class="mt-4 text-center sm:text-left">
-      <a (click)="showRutaModal = true" class="text-sm text-[#123F5B] hover:underline cursor-pointer">
-        <i class="fa-solid fa-map-location-dot mr-1"></i>Ver mapa de recorrido comunal
-      </a>
+    <!-- 1. VISTA: ESTADO Y RASTREO (HERO + TRACKER DEL PEDIDO SELECCIONADO) -->
+    <div *ngIf="activeVecinoTab === 'seguimiento'" class="space-y-6">
+      <app-hero-pickup [sector]="currentSectorInfo" [userAddress]="userActiveAddress"></app-hero-pickup>
+
+      <app-truck-tracking
+        [isCamionEnRuta]="isCamionEnRuta"
+        [sector]="currentSectorInfo"
+        [pickups]="pickups"
+        [userEmail]="userEmail"
+        [selectedPickup]="selectedTrackingPickup"
+        (pickupSelected)="onPickupSelectedForTracking($event)"
+        (requestRetiroClick)="activeVecinoTab = 'solicitar'">
+      </app-truck-tracking>
+    </div>
+
+    <!-- 2. VISTA: FORMULARIO DE AVISO DE RETIRO -->
+    <div *ngIf="activeVecinoTab === 'solicitar'">
+      <app-pickup-form
+        [sector]="currentSectorInfo"
+        [residuos]="residuos"
+        [userEmail]="userEmail"
+        [userName]="userName"
+        (pickupCreated)="onPickupCreated($event)">
+      </app-pickup-form>
+    </div>
+
+    <!-- 3. VISTA: HISTORIAL DE RETIROS VECINALES -->
+    <div *ngIf="activeVecinoTab === 'historial'" class="space-y-4">
+      <app-pickup-history
+        [pickups]="pickups"
+        [isStaff]="isStaff"
+        [userEmail]="userEmail"
+        [selectedPickupId]="selectedTrackingPickup?.id ?? null"
+        (actionRequested)="openActionModal($event)"
+        (pickupSelected)="onPickupSelectedForTracking($event)">
+      </app-pickup-history>
+
+      <div class="mt-4 text-center sm:text-left">
+        <a (click)="showRutaModal = true" class="text-sm font-bold text-[#123F5B] hover:text-[#22a652] hover:underline cursor-pointer inline-flex items-center gap-2">
+          <i class="fa-solid fa-map-location-dot"></i>Ver mapa de recorrido comunal
+        </a>
+      </div>
     </div>
   </ng-container>
 
