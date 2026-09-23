@@ -14,7 +14,7 @@ import { RouterModule } from '@angular/router';
       <div class="absolute inset-0 -bottom-2 z-0 pointer-events-none overflow-hidden">
         <img
           alt="Lago Llanquihue y Volcán Osorno al atardecer - Puerto Varas"
-          class="w-full h-full object-cover object-[60%_28%] sm:object-[64%_32%] lg:object-[center_38%] scale-105 select-none pointer-events-none transition-transform duration-100 ease-out will-change-transform"
+          class="w-full h-full object-cover object-[center_35%] sm:object-[center_38%] lg:object-[center_42%] scale-105 select-none pointer-events-none transition-transform duration-100 ease-out will-change-transform"
           [ngStyle]="{ transform: 'translate3d(0, ' + parallaxOffset + 'px, 0)' }"
           src="assets/ultrawide.jpg"
         />
@@ -22,95 +22,61 @@ import { RouterModule } from '@angular/router';
         <!-- Viñeta Superior para Contraste Impecable del Header Transparente -->
         <div class="absolute top-0 inset-x-0 h-36 bg-gradient-to-b from-[#041624]/90 via-[#041624]/50 to-transparent"></div>
 
-        <!-- Overlay Direccional Desktop: de izquierda a derecha, más oscuro a la izquierda para contraste AA garantizado -->
+        <!-- Overlays Fotográficos Limpios (Cero neón, contraste natural y uniforme) -->
         <div class="hidden lg:block absolute inset-0 hero-overlay-desktop"></div>
-        <div class="hidden lg:block absolute inset-0 hero-overlay-spotlight"></div>
-
-        <!-- Overlay Direccional Móvil / Tablet: Contraste vertical robusto con legibilidad AA garantizada -->
         <div class="lg:hidden absolute inset-0 hero-overlay-mobile"></div>
 
         <!-- Sombra de anclaje inferior hacia el fondo de la página -->
         <div class="absolute -bottom-2 inset-x-0 h-28 sm:h-36 bg-gradient-to-t from-[#041624] via-[#041624]/80 to-transparent"></div>
       </div>
 
-      <!-- 2. Espaciador Superior para Compensar el Header Sticky con Padding Generoso (min. 24px vertical = 96px) -->
-      <div class="h-24 flex-shrink-0 pointer-events-none"></div>
+      <!-- 2. Espaciador Superior para Compensar el Header Sticky -->
+      <div class="h-20 sm:h-24 flex-shrink-0 pointer-events-none"></div>
 
-      <!-- 3. Contenido Editorial Principal -->
-      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 w-full my-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-          
-          <!-- Columna Izquierda: Titular Imponente, Subtítulo y Botones Directos -->
-          <div class="lg:col-span-7 xl:col-span-8 max-w-2xl xl:max-w-3xl relative">
-            <!-- Aura luminosa ambiental en verde esmeralda (profundidad de alta gama) -->
-            <div class="absolute -top-12 -left-8 w-64 h-64 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+      <!-- 3. Contenido Editorial Principal: Monumental, Centrado e Imponente (Cero Slop, Cero Cuadritos) -->
+      <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-14 w-full my-auto text-center flex flex-col items-center justify-center">
+        
+        <!-- Titular Monumental, Grande e Imponente -->
+        <h1 class="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[90px] font-black tracking-tight leading-[0.98] sm:leading-[1.02] text-white drop-shadow-[0_4px_30px_rgba(0,0,0,0.9)] font-heading">
+          Reciclaje Comunal<br />
+          <span class="text-[#22a652] drop-shadow-[0_4px_25px_rgba(0,0,0,0.8)]">Puerto Varas</span>
+        </h1>
 
-            <!-- Titular Principal con Gradiente y Tipografía Imponente -->
-            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.08] mb-4 sm:mb-5 font-heading drop-shadow-md">
-              Reciclaje Comunal<br />
-              <span class="bg-gradient-to-r from-emerald-400 via-emerald-300 to-teal-200 bg-clip-text text-transparent">Puerto Varas</span>
-            </h1>
+        <!-- Subtítulo Corto, Directo y Conciso (Cero relleno burocrático) -->
+        <p class="text-base sm:text-xl md:text-2xl text-slate-100 font-medium max-w-2xl mx-auto mt-4 sm:mt-6 mb-7 sm:mb-9 drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] leading-snug">
+          Retiro domiciliario y pesaje digital para proteger nuestro lago.
+        </p>
 
-            <!-- Subtítulo -->
-            <p class="text-sm sm:text-lg text-slate-200/90 font-medium leading-relaxed max-w-xl mb-6 sm:mb-8 drop-shadow-sm">
-              Sistema de trazabilidad, retiro domiciliario y pesaje digital para proteger la cuenca del Lago Llanquihue bajo la Ley REP.
-            </p>
+        <!-- Botones de Acción Centrados, Ergonómicos y con Colores Sólidos -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 w-full sm:w-auto">
+          <a
+            routerLink="/dashboard"
+            class="inline-flex items-center justify-center gap-2.5 min-h-[52px] sm:min-h-[56px] px-8 sm:px-10 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white font-extrabold text-sm sm:text-base tracking-wide shadow-2xl shadow-emerald-950/70 border-none transition-all active:scale-[0.98] cursor-pointer">
+            <span>Ingresar al Portal Vecinal</span>
+            <i class="fa-solid fa-arrow-right text-xs"></i>
+          </a>
 
-            <!-- CTAs Modernos, Imponentes y de Alta Gama -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-              <a
-                routerLink="/dashboard"
-                class="relative group overflow-hidden inline-flex items-center justify-center gap-2.5 min-h-[50px] px-6 rounded-2xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 hover:from-emerald-400 hover:to-emerald-600 text-white font-bold text-sm tracking-wide shadow-xl shadow-emerald-950/60 ring-1 ring-white/20 active:scale-[0.98] transition-all cursor-pointer">
-                <span class="relative z-10">Ingresar al Portal Vecinal</span>
-                <i class="fa-solid fa-arrow-right text-xs relative z-10 group-hover:translate-x-1 transition-transform"></i>
-              </a>
-
-              <a
-                href="#cuadrantes"
-                (click)="scrollToSection($event, 'cuadrantes')"
-                class="inline-flex items-center justify-center gap-2.5 min-h-[50px] px-6 rounded-2xl bg-slate-900/60 hover:bg-slate-900/80 text-white font-semibold text-sm border border-white/20 cursor-pointer backdrop-blur-md shadow-lg active:scale-[0.98] transition-all">
-                <i class="fa-solid fa-calendar-days text-emerald-400"></i>
-                <span>Ver Cuadrantes y Días</span>
-              </a>
-            </div>
-
-            <!-- Micro-Widgets Flotantes de Métricas Rápidas (Exclusivo móvil: da densidad, prestigio e impacto visual) -->
-            <div class="mt-6 pt-5 border-t border-white/15 grid grid-cols-3 gap-2 text-center lg:hidden">
-              <div class="py-2.5 px-1.5 rounded-xl bg-slate-950/50 backdrop-blur-md border border-white/10 shadow-xs">
-                <span class="block text-emerald-400 font-extrabold text-xs">4 Sectores</span>
-                <span class="block text-[10px] text-slate-300 font-medium mt-0.5">Cuadrantes</span>
-              </div>
-              <div class="py-2.5 px-1.5 rounded-xl bg-slate-950/50 backdrop-blur-md border border-white/10 shadow-xs">
-                <span class="block text-emerald-400 font-extrabold text-xs">100% Gratis</span>
-                <span class="block text-[10px] text-slate-300 font-medium mt-0.5">En tu puerta</span>
-              </div>
-              <div class="py-2.5 px-1.5 rounded-xl bg-slate-950/50 backdrop-blur-md border border-white/10 shadow-xs">
-                <span class="block text-emerald-400 font-extrabold text-xs">Digital</span>
-                <span class="block text-[10px] text-slate-300 font-medium mt-0.5">Balanza INN</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Columna Derecha: Lema en Cursiva Cálido / Humano que Rellena y Da Identidad Local Única en Desktop -->
-          <div class="lg:col-span-5 xl:col-span-4 hidden lg:flex justify-end items-center pointer-events-none pr-2 xl:pr-6">
-            <div class="text-right rotate-[-4deg] select-none anim-float-subtle">
-              <p class="font-script text-white text-4xl xl:text-[48px] font-bold leading-[1.25] tracking-wide drop-shadow-[0_4px_18px_rgba(0,0,0,0.85)]">
-                Reciclar también es<br />
-                cuidar nuestro<br />
-                <span class="text-[#22a652]">lago</span>
-              </p>
-              <div class="mt-3.5 flex items-center justify-end gap-2 text-emerald-300 drop-shadow-md">
-                <i class="fa-solid fa-water text-xs"></i>
-                <p class="font-script text-slate-200 text-xl font-bold tracking-wide m-0">Cuenca Llanquihue</p>
-              </div>
-            </div>
-          </div>
-
+          <a
+            href="#cuadrantes"
+            (click)="scrollToSection($event, 'cuadrantes')"
+            class="inline-flex items-center justify-center gap-2.5 min-h-[52px] sm:min-h-[56px] px-7 sm:px-9 rounded-xl bg-[#092232]/85 hover:bg-[#123F5B] text-white font-bold text-sm sm:text-base border border-white/20 backdrop-blur-md shadow-xl transition-all active:scale-[0.98] cursor-pointer">
+            <i class="fa-solid fa-calendar-days text-[#22a652]"></i>
+            <span>Ver Cuadrantes y Días</span>
+          </a>
         </div>
+
+        <!-- Lema Cálido / Humano Centrado y Sobrio -->
+        <div class="mt-7 sm:mt-9 flex items-center justify-center gap-2 text-white/80 drop-shadow-md">
+          <i class="fa-solid fa-water text-xs text-[#22a652]"></i>
+          <span class="font-script text-xl sm:text-2xl text-slate-200 tracking-wide font-bold">
+            Reciclar también es cuidar nuestro lago 🍃
+          </span>
+        </div>
+
       </div>
 
-      <!-- 4. Scroll Indicator Abajo al Centro: "Conoce el ciclo" + chevron animado sutil -->
-      <div class="relative z-10 pb-6 sm:pb-8 flex justify-center pointer-events-auto anim-fade-up anim-delay-3">
+      <!-- 4. Scroll Indicator Abajo al Centro -->
+      <div class="relative z-10 pb-5 sm:pb-7 flex justify-center pointer-events-auto anim-fade-up">
         <a
           href="#como-funciona"
           (click)="scrollToSection($event, 'como-funciona')"
@@ -152,4 +118,3 @@ export class HomeHeroComponent {
     }
   }
 }
-
