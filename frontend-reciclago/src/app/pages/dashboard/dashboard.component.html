@@ -247,11 +247,9 @@
     <div *ngIf="activeVecinoTab === 'solicitar'" class="anim-tab-enter">
       <app-pickup-form
         [sector]="currentSectorInfo"
-        [sectores]="sectores"
         [residuos]="residuos"
         [userEmail]="userEmail"
         [userName]="userName"
-        (sectorChange)="onSectorSelect($event)"
         (pickupCreated)="onPickupCreated($event)">
       </app-pickup-form>
     </div>
