@@ -54,14 +54,14 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
   imports: [CommonModule],
   template: `
     <!-- BEGIN: QuadrantsSection -->
-    <section class="py-14 sm:py-16 bg-slate-50/70 relative overflow-hidden border-b border-slate-200" id="cuadrantes">
+    <section class="py-10 sm:py-16 bg-slate-50/70 relative overflow-hidden border-b border-slate-200" id="cuadrantes">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <!-- Section Header Modern Clean -->
-        <div class="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4 reveal-init"
+        <div class="mb-5 sm:mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-3 sm:gap-4 reveal-init"
              [class.reveal-active]="isVisible">
           <div>
-            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-heading mb-1.5">
+            <h2 class="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-heading mb-1">
               Cuadrantes y Residuos Semanales
             </h2>
             <p class="text-xs sm:text-sm text-slate-500 max-w-xl font-sans">

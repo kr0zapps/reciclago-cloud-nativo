@@ -14,12 +14,12 @@ interface CycleStep {
   imports: [CommonModule],
   template: `
     <!-- BEGIN: HowItWorks -->
-    <section class="py-12 sm:py-16 bg-white border-b border-slate-200 relative overflow-hidden" id="como-funciona">
+    <section class="py-10 sm:py-16 bg-white border-b border-slate-200 relative overflow-hidden" id="como-funciona">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <!-- Title & Subtitle Header -->
-        <div class="text-center mb-8 sm:mb-10">
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-heading mb-1.5">
+        <div class="text-center mb-6 sm:mb-10">
+          <h2 class="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-heading mb-1">
             El Ciclo de Vida del Retiro
           </h2>
           <p class="text-xs sm:text-sm text-slate-500 max-w-lg mx-auto font-sans">
@@ -27,24 +27,51 @@ interface CycleStep {
           </p>
         </div>
 
-        <!-- 5-Step Process Container -->
-        <div class="relative">
+        <!-- Mobile View (lg:hidden): Stepper Vertical Conectado en 1 Sola Pantalla (CERO DESLIZAR) -->
+        <div class="lg:hidden max-w-sm mx-auto space-y-2 relative text-left">
+          <div *ngFor="let step of steps; let isLast = last" class="flex items-center gap-2.5 relative">
+            <!-- Línea vertical conectora -->
+            <div *ngIf="!isLast" class="absolute left-3.5 top-6 bottom-[-8px] w-0.5 bg-slate-200 -z-0"></div>
+
+            <!-- Número del Paso -->
+            <div class="w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center text-[10px] font-mono font-bold shrink-0 z-10 shadow-2xs">
+              0{{ step.stepNumber }}
+            </div>
+
+            <!-- Fila Compacta del Paso -->
+            <div class="flex-1 bg-slate-50/90 border border-slate-200/90 rounded-xl px-3 py-1.5 flex items-center justify-between shadow-2xs">
+              <div class="min-w-0 pr-2">
+                <h3 class="font-heading font-bold text-xs text-slate-900 leading-tight truncate">
+                  {{ step.title }}
+                </h3>
+                <p class="text-[11px] text-slate-500 leading-tight truncate">
+                  {{ step.summary }}
+                </p>
+              </div>
+              <div class="w-6 h-6 rounded-md bg-white border border-slate-200 flex items-center justify-center text-slate-600 text-[10px] shrink-0">
+                <i [class]="step.iconClass"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop View (hidden lg:block): Grilla Horizontal de 5 Pasos con Línea Conectora -->
+        <div class="hidden lg:block relative">
           
           <!-- Línea de Conexión de Fondo Animada (Desktop) -->
-          <div class="hidden lg:block absolute top-9 left-10 right-10 h-0.5 bg-slate-200 -z-0">
+          <div class="absolute top-9 left-10 right-10 h-0.5 bg-slate-200 -z-0">
             <div 
               class="h-full bg-slate-900 transition-all duration-500 ease-out"
               [style.width]="((hoveredStep || 1) / 5 * 100) + '%'">
             </div>
           </div>
 
-          <!-- Horizontal Scroll on Mobile (Lineal a la derecha) / Grid on Desktop -->
-          <div class="flex lg:grid lg:grid-cols-5 gap-2.5 sm:gap-3.5 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 px-1 snap-x snap-mandatory scroll-smooth no-scrollbar text-left relative z-10">
+          <div class="grid grid-cols-5 gap-3.5 text-left relative z-10">
             <div 
               *ngFor="let step of steps; let isLast = last" 
               (mouseenter)="hoveredStep = step.stepNumber"
               (mouseleave)="hoveredStep = 0"
-              class="w-[200px] sm:w-[220px] lg:w-auto shrink-0 snap-center group bg-slate-50/90 rounded-xl p-3.5 sm:p-4 border border-slate-200/90 shadow-2xs hover:bg-white hover:shadow-md hover:-translate-y-1 hover:border-slate-400 transition-all duration-300 flex flex-col justify-between cursor-pointer">
+              class="group bg-slate-50/90 rounded-xl p-4 border border-slate-200/90 shadow-2xs hover:bg-white hover:shadow-md hover:-translate-y-1 hover:border-slate-400 transition-all duration-300 flex flex-col justify-between cursor-pointer">
               
               <!-- Top Row: Number + Icon Medallion -->
               <div class="flex items-center justify-between mb-2">
@@ -68,13 +95,6 @@ interface CycleStep {
 
             </div>
           </div>
-
-          <!-- Indicador visual sutil en móvil -->
-          <div class="lg:hidden flex items-center justify-center gap-1.5 mt-1.5 text-[10px] text-slate-400 font-medium">
-            <span>Desliza para ver los 5 pasos</span>
-            <i class="fa-solid fa-arrow-right-long text-[10px] animate-pulse text-slate-500"></i>
-          </div>
-
         </div>
 
       </div>

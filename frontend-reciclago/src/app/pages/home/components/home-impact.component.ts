@@ -22,51 +22,45 @@ import { BffService } from '../../../services/bff.service';
           </p>
         </div>
 
-        <!-- 3 Tarjetas de Métricas Simétricas (Horizontal en Móvil / Grid en Desktop) -->
-        <div class="flex md:grid md:grid-cols-3 gap-2.5 sm:gap-4 overflow-x-auto md:overflow-visible pb-2 md:pb-0 px-1 snap-x snap-mandatory scroll-smooth no-scrollbar mb-4 md:mb-6">
+        <!-- 3 Métricas en 1 Sola Fila (CERO DESLIZAR en Móvil y Desktop) -->
+        <div class="grid grid-cols-3 gap-1.5 sm:gap-4 mb-4 sm:mb-6">
           
           <!-- Métrica 1: Kilos -->
-          <div class="w-[200px] sm:w-[220px] md:w-auto shrink-0 snap-start bg-slate-50/80 rounded-xl p-3.5 sm:p-4 text-center border border-slate-200/90 shadow-2xs hover:bg-white hover:shadow-md hover:-translate-y-1 hover:border-slate-300 transition-all duration-300 flex flex-col justify-center items-center group">
-            <div class="w-8 h-8 mx-auto mb-1.5 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs shadow-2xs group-hover:scale-105 transition-transform">
+          <div class="bg-slate-50/80 rounded-xl p-2 sm:p-4 text-center border border-slate-200/90 shadow-2xs hover:bg-white transition-all flex flex-col justify-center items-center group">
+            <div class="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 rounded-md sm:rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-[10px] sm:text-xs shadow-2xs">
               <i class="fa-solid fa-scale-balanced"></i>
             </div>
-            <p class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-0.5 font-heading tracking-tight">
-              {{ displayKg }} <span class="text-sm font-bold text-emerald-600">kg</span>
+            <p class="text-sm sm:text-2xl md:text-3xl font-extrabold text-slate-900 mb-0.5 font-heading tracking-tight">
+              {{ displayKg }} <span class="text-[10px] sm:text-sm font-bold text-emerald-600">kg</span>
             </p>
-            <h3 class="text-xs sm:text-sm font-heading font-bold text-slate-800 leading-snug">Kilos Recolectados</h3>
-            <p class="text-[11px] text-slate-500 mt-0.5 leading-tight">Pesado y retirado en ruta</p>
+            <h3 class="text-[10px] sm:text-xs md:text-sm font-heading font-bold text-slate-800 leading-tight">Kilos Recolectados</h3>
+            <p class="hidden sm:block text-[11px] text-slate-500 mt-0.5 leading-tight">Pesado y retirado en ruta</p>
           </div>
 
           <!-- Métrica 2: Meta Comunal (Opción A) -->
-          <div class="w-[200px] sm:w-[220px] md:w-auto shrink-0 snap-start bg-slate-50/80 rounded-xl p-3.5 sm:p-4 text-center border border-slate-200/90 shadow-2xs hover:bg-white hover:shadow-md hover:-translate-y-1 hover:border-slate-300 transition-all duration-300 flex flex-col justify-center items-center group">
-            <div class="w-8 h-8 mx-auto mb-1.5 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs shadow-2xs group-hover:scale-105 transition-transform">
+          <div class="bg-slate-50/80 rounded-xl p-2 sm:p-4 text-center border border-slate-200/90 shadow-2xs hover:bg-white transition-all flex flex-col justify-center items-center group">
+            <div class="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 rounded-md sm:rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-[10px] sm:text-xs shadow-2xs">
               <i class="fa-solid fa-leaf"></i>
             </div>
-            <p class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-0.5 font-heading tracking-tight">
+            <p class="text-sm sm:text-2xl md:text-3xl font-extrabold text-slate-900 mb-0.5 font-heading tracking-tight">
               {{ currentPercent }}%
             </p>
-            <h3 class="text-xs sm:text-sm font-heading font-bold text-slate-800 leading-snug">Meta de Reciclaje</h3>
-            <p class="text-[11px] text-slate-500 mt-0.5 leading-tight">Menos residuos al vertedero</p>
+            <h3 class="text-[10px] sm:text-xs md:text-sm font-heading font-bold text-slate-800 leading-tight">Meta de Reciclaje</h3>
+            <p class="hidden sm:block text-[11px] text-slate-500 mt-0.5 leading-tight">Menos residuos a vertedero</p>
           </div>
 
           <!-- Métrica 3: Cobertura Comunal (Opción A) -->
-          <div class="w-[200px] sm:w-[220px] md:w-auto shrink-0 snap-start bg-slate-50/80 rounded-xl p-3.5 sm:p-4 text-center border border-slate-200/90 shadow-2xs hover:bg-white hover:shadow-md hover:-translate-y-1 hover:border-slate-300 transition-all duration-300 flex flex-col justify-center items-center group">
-            <div class="w-8 h-8 mx-auto mb-1.5 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs shadow-2xs group-hover:scale-105 transition-transform">
+          <div class="bg-slate-50/80 rounded-xl p-2 sm:p-4 text-center border border-slate-200/90 shadow-2xs hover:bg-white transition-all flex flex-col justify-center items-center group">
+            <div class="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 rounded-md sm:rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-[10px] sm:text-xs shadow-2xs">
               <i class="fa-solid fa-truck-fast"></i>
             </div>
-            <p class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-0.5 font-heading tracking-tight">
-              4 <span class="text-sm font-bold text-emerald-600">sectores</span>
+            <p class="text-sm sm:text-2xl md:text-3xl font-extrabold text-slate-900 mb-0.5 font-heading tracking-tight">
+              4 <span class="text-[10px] sm:text-sm font-bold text-emerald-600">sectores</span>
             </p>
-            <h3 class="text-xs sm:text-sm font-heading font-bold text-slate-800 leading-snug">Cobertura Comunal</h3>
-            <p class="text-[11px] text-slate-500 mt-0.5 leading-tight">Rutas semanales activas</p>
+            <h3 class="text-[10px] sm:text-xs md:text-sm font-heading font-bold text-slate-800 leading-tight">Cobertura Comunal</h3>
+            <p class="hidden sm:block text-[11px] text-slate-500 mt-0.5 leading-tight">Rutas semanales activas</p>
           </div>
 
-        </div>
-
-        <!-- Indicador visual sutil en móvil -->
-        <div class="md:hidden flex items-center justify-center gap-1.5 mb-4 text-[10px] text-slate-400 font-medium">
-          <span>Desliza para ver métricas</span>
-          <i class="fa-solid fa-arrow-right-long text-[10px] animate-pulse text-slate-500"></i>
         </div>
 
         <!-- Banner Retiro Especial Compacto -->
