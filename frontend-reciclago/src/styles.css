@@ -4,19 +4,19 @@
 
 @layer base {
   :root {
-    --color-primary: #1F3D2C;
-    --color-primary-hover: #14261C;
-    --color-primary-light: #EDEFEA;
-    --color-forest: #0E1A14;
-    --color-navy: #0E1A14;
-    --color-navy-dark: #070D0A;
-    --color-bg: #EDEFEA;
-    --color-surface: #F5F6F3;
-    --color-border: #DFE2DA;
-    --color-text-primary: #0E1A14;
-    --color-text-secondary: #4A5A63;
-    --color-brand-green: #1F3D2C;
-    --color-brand-navy: #0E1A14;
+    --color-primary: #16A34A;
+    --color-primary-hover: #15803D;
+    --color-primary-light: #F0FDF4;
+    --color-forest: #0F172A;
+    --color-navy: #0F172A;
+    --color-navy-dark: #020617;
+    --color-bg: #F8FAFC;
+    --color-surface: #FFFFFF;
+    --color-border: #E2E8F0;
+    --color-text-primary: #0F172A;
+    --color-text-secondary: #64748B;
+    --color-brand-green: #16A34A;
+    --color-brand-navy: #0F172A;
 
     /* Escala de espaciado estándar */
     --space-1: 4px;
