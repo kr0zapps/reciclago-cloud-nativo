@@ -9,105 +9,97 @@ import { BffService } from '../../../services/bff.service';
   imports: [CommonModule, RouterModule],
   template: `
     <!-- BEGIN: ImpactSection -->
-    <section class="relative py-16 sm:py-24 bg-[#F9F8F5] overflow-hidden border-b border-[#E7E4DC]" id="impacto">
-      
-      <!-- Watermarked volcano silhouette background -->
-      <div class="absolute inset-0 opacity-10 pointer-events-none flex items-end justify-center">
-        <svg class="w-full h-auto text-[#163828] max-h-96" fill="currentColor" viewBox="0 0 1200 350">
-          <path d="M0,350 L350,140 L450,220 L650,40 L850,230 L1000,160 L1200,350 Z"></path>
-        </svg>
-      </div>
-
+    <section class="relative py-16 sm:py-20 bg-white overflow-hidden border-b border-slate-200" id="impacto">
       <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <!-- Encabezado de Sección Gazette -->
-        <div class="mb-12 text-center sm:text-left">
-          <span class="font-mono text-[11px] font-bold uppercase tracking-widest text-[#8C5D19] bg-[#FAF0DC] px-3 py-1 rounded border border-[#EADBCA] inline-flex items-center gap-1.5 mb-3 shadow-2xs">
-            <i class="fa-solid fa-chart-pie text-[10px]"></i> Indicadores Oficiales DIMAO
+        <!-- Encabezado de Sección Modern Clean -->
+        <div class="mb-10 text-center sm:text-left">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200/70 mb-3 shadow-2xs">
+            <i class="fa-solid fa-chart-simple text-[11px]"></i> Trazabilidad y Metas Ambientales
           </span>
-          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#163828] tracking-tight font-serif">
-            Impacto Comunal y Trazabilidad
+          <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-heading mb-2">
+            Impacto en la Comuna
           </h2>
-          <p class="text-sm sm:text-base text-[#6B726D] mt-2 max-w-2xl font-sans">
-            Cada kilogramo reciclado es certificado digitalmente bajo la Ley REP, desviando toneladas de residuos de los vertederos de la Provincia de Llanquihue.
+          <p class="text-xs sm:text-sm text-slate-500 max-w-xl font-sans">
+            Cada kilogramo recolectado se pesa in situ y se certifica para valorización, evitando su disposición en vertederos provinciales.
           </p>
         </div>
 
-        <!-- 3 Tarjetas de Métricas Verticales Gazette -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <!-- 3 Tarjetas de Métricas Modernas -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
           
           <!-- Métrica 1: Kilos -->
-          <div class="bg-white rounded-2xl p-7 text-center border border-[#E7E4DC] shadow-[0_2px_8px_rgba(22,56,40,0.03)] hover:border-[#C98A2C] hover:shadow-[0_8px_24px_rgba(22,56,40,0.08)] transition-all">
-            <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-[#FAF9F6] border border-[#E7E4DC] flex items-center justify-center text-[#163828]">
-              <i class="fa-solid fa-scale-balanced text-xl text-[#C98A2C]"></i>
+          <div class="bg-slate-50/70 rounded-2xl p-7 text-center border border-slate-200 shadow-2xs hover:shadow-xs hover:border-slate-300 transition-all">
+            <div class="w-12 h-12 mx-auto mb-3.5 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-lg shadow-2xs">
+              <i class="fa-solid fa-scale-balanced text-emerald-600"></i>
             </div>
-            <p class="text-4xl sm:text-5xl font-bold text-[#163828] mb-1 font-serif">
-              {{ displayKg }} <span class="text-2xl font-bold text-[#C98A2C]">kg</span>
+            <p class="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-1 font-heading">
+              {{ displayKg }} <span class="text-2xl font-bold text-emerald-600">kg</span>
             </p>
-            <h3 class="text-sm font-serif font-bold text-[#163828] mb-1">Kilos Certificados en Báscula</h3>
-            <p class="text-[11px] font-mono text-[#6B726D]">Pesaje digital verificado en ruta</p>
+            <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Kilos Certificados en Báscula</h3>
+            <p class="text-xs text-slate-500">Pesaje digital verificado en ruta</p>
           </div>
 
           <!-- Métrica 2: Vertederos -->
-          <div class="bg-white rounded-2xl p-7 text-center border border-[#E7E4DC] shadow-[0_2px_8px_rgba(22,56,40,0.03)] hover:border-[#C98A2C] hover:shadow-[0_8px_24px_rgba(22,56,40,0.08)] transition-all">
-            <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-[#FAF9F6] border border-[#E7E4DC] flex items-center justify-center text-[#163828]">
-              <i class="fa-solid fa-arrow-trend-down text-xl text-[#22a652]"></i>
+          <div class="bg-slate-50/70 rounded-2xl p-7 text-center border border-slate-200 shadow-2xs hover:shadow-xs hover:border-slate-300 transition-all">
+            <div class="w-12 h-12 mx-auto mb-3.5 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-lg shadow-2xs">
+              <i class="fa-solid fa-arrow-trend-down text-emerald-600"></i>
             </div>
-            <p class="text-4xl sm:text-5xl font-bold text-[#163828] mb-1 font-serif">
-              {{ currentPercent }}<span class="text-2xl font-bold text-[#C98A2C]">%</span>
+            <p class="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-1 font-heading">
+              {{ currentPercent }}<span class="text-2xl font-bold text-emerald-600">%</span>
             </p>
-            <h3 class="text-sm font-serif font-bold text-[#163828] mb-1">Desviación de Vertederos</h3>
-            <p class="text-[11px] font-mono text-[#6B726D]">Recuperación y valorización REP</p>
+            <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Desviación de Vertederos</h3>
+            <p class="text-xs text-slate-500">Recuperación y valorización REP</p>
           </div>
 
           <!-- Métrica 3: Flota -->
-          <div class="bg-white rounded-2xl p-7 text-center border border-[#E7E4DC] shadow-[0_2px_8px_rgba(22,56,40,0.03)] hover:border-[#C98A2C] hover:shadow-[0_8px_24px_rgba(22,56,40,0.08)] transition-all">
-            <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-[#FAF9F6] border border-[#E7E4DC] flex items-center justify-center text-[#163828]">
-              <i class="fa-solid fa-truck-fast text-xl text-[#163828]"></i>
+          <div class="bg-slate-50/70 rounded-2xl p-7 text-center border border-slate-200 shadow-2xs hover:shadow-xs hover:border-slate-300 transition-all">
+            <div class="w-12 h-12 mx-auto mb-3.5 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-lg shadow-2xs">
+              <i class="fa-solid fa-truck-fast text-slate-700"></i>
             </div>
-            <p class="text-4xl sm:text-5xl font-bold text-[#163828] mb-1 font-serif">
-              {{ currentTrucks }} <span class="text-xl font-bold text-[#C98A2C]">camiones</span>
+            <p class="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-1 font-heading">
+              {{ currentTrucks }} <span class="text-xl font-bold text-emerald-600">camiones</span>
             </p>
-            <h3 class="text-sm font-serif font-bold text-[#163828] mb-1">Flota Activa con GPS</h3>
-            <p class="text-[11px] font-mono text-[#6B726D]">Cobertura en los 4 cuadrantes</p>
+            <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Flota Activa con GPS</h3>
+            <p class="text-xs text-slate-500">Cobertura en los 4 cuadrantes</p>
           </div>
 
         </div>
 
-        <!-- Banner Retiro Especial Panorámico Gazette con cta_lake_flowers.png -->
-        <div class="relative rounded-2xl overflow-hidden shadow-md border border-[#E7E4DC] min-h-[220px] flex items-center">
+        <!-- Banner Retiro Especial de Alto Contraste (Legibilidad 100% Garantizada) -->
+        <div class="relative rounded-3xl overflow-hidden shadow-lg border border-slate-800 bg-slate-950 min-h-[200px] flex items-center">
           <img
             src="assets/stitch/cta_lake_flowers.png"
             alt="Paisaje Lago Llanquihue y flores Puerto Varas"
-            class="absolute inset-0 w-full h-full object-cover object-center"
+            class="absolute right-0 inset-y-0 w-full md:w-3/5 h-full object-cover object-center opacity-65"
           />
-          <div class="absolute inset-0 bg-gradient-to-r from-[#F9F8F5]/98 via-[#F9F8F5]/92 to-[#F9F8F5]/30 sm:to-transparent"></div>
+          <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/95 to-slate-950/20 sm:to-transparent"></div>
           
           <div class="relative z-10 p-6 sm:p-10 w-full flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div class="flex items-start gap-4 max-w-xl">
-              <div class="shrink-0 w-12 h-12 rounded-xl bg-white border border-[#E7E4DC] flex items-center justify-center text-[#163828] mt-1 shadow-2xs">
-                <i class="fa-solid fa-leaf text-xl text-[#22a652]"></i>
+              <div class="shrink-0 w-11 h-11 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mt-1 shadow-2xs">
+                <i class="fa-solid fa-leaf text-lg"></i>
               </div>
               <div>
-                <div class="inline-flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-[#8C5D19] mb-1">
+                <div class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-400 mb-1">
                   <i class="fa-solid fa-truck-ramp-box"></i>
                   <span>Servicio Municipal DIMAO</span>
                 </div>
-                <h3 class="text-2xl sm:text-3xl font-bold text-[#163828] tracking-tight mb-1.5 font-serif">
-                  Tu compromiso cuida nuestro lago
+                <h3 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight mb-1 font-heading">
+                  ¿Necesitas retirar voluminosos o podas?
                 </h3>
-                <p class="text-xs sm:text-sm text-[#6B726D] font-sans leading-relaxed">
-                  ¿Necesitas recolección especial para podas, escombros limpios o enseres mayores? Agenda tu visita domiciliaria en la plataforma.
+                <p class="text-xs sm:text-sm text-slate-300 font-sans leading-relaxed">
+                  Agenda una fecha de recolección especial para muebles en desuso, escombros limpios o ramas directamente desde el portal.
                 </p>
               </div>
             </div>
 
             <div class="flex flex-col sm:flex-row items-center gap-3 shrink-0">
-              <a routerLink="/dashboard" class="w-full sm:w-auto text-center inline-flex items-center justify-center gap-2.5 bg-[#163828] hover:bg-[#1b5e37] text-white font-mono text-xs font-bold uppercase tracking-wider py-3.5 px-6 rounded-xl transition shadow-sm cursor-pointer">
+              <a routerLink="/dashboard" class="w-full sm:w-auto text-center inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs py-3 px-5 rounded-xl transition shadow-sm cursor-pointer font-heading">
                 <span>Agendar Retiro Especial</span>
-                <i class="fa-solid fa-arrow-right text-xs"></i>
+                <i class="fa-solid fa-arrow-right text-[11px]"></i>
               </a>
-              <button type="button" (click)="openInfoModal.emit()" class="w-full sm:w-auto text-center px-5 py-3.5 rounded-xl bg-white hover:bg-[#FAF9F6] text-[#163828] font-mono text-xs font-bold uppercase tracking-wider transition border border-[#E7E4DC] shadow-2xs cursor-pointer">
+              <button type="button" (click)="openInfoModal.emit()" class="w-full sm:w-auto text-center px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition border border-white/20 shadow-2xs cursor-pointer font-heading">
                 Preguntas Frecuentes
               </button>
             </div>

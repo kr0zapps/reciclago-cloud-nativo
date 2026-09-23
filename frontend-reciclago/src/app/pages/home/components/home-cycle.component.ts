@@ -15,57 +15,57 @@ interface CycleStep {
   imports: [CommonModule],
   template: `
     <!-- BEGIN: HowItWorks -->
-    <section class="py-16 sm:py-24 bg-[#FAF9F6] border-b border-[#E7E4DC]" id="como-funciona">
+    <section class="py-16 sm:py-20 bg-white border-b border-slate-200" id="como-funciona">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         
-        <!-- Section Tag Gazette -->
-        <span class="font-mono text-[11px] font-bold uppercase tracking-widest text-[#8C5D19] bg-[#FAF0DC] px-3 py-1 rounded border border-[#EADBCA] inline-flex items-center gap-1.5 mb-3 shadow-2xs">
+        <!-- Section Tag Modern -->
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200/70 mb-3 shadow-2xs">
           <i class="fa-solid fa-arrows-spin text-[10px]"></i> Trazabilidad Paso a Paso
         </span>
 
         <!-- Title & Subtitle -->
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#163828] tracking-tight mb-3 font-serif">
+        <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-heading mb-2">
           El Ciclo de Vida del Retiro
         </h2>
-        <p class="text-sm sm:text-base text-[#6B726D] max-w-2xl mx-auto mb-12 sm:mb-16 font-sans">
-          Un proceso transparente y regulado bajo la Ley REP, desde tu hogar hasta la báscula y certificación digital.
+        <p class="text-xs sm:text-sm text-slate-500 max-w-xl mx-auto mb-10 sm:mb-12 font-sans">
+          Un proceso simple, ordenado y transparente regulado bajo la Ley REP, desde tu puerta hasta la báscula y certificación digital.
         </p>
 
-        <!-- 5-Step Process Editorial Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 sm:gap-6 relative text-left">
+        <!-- 5-Step Process Modern Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5 text-left">
           <div *ngFor="let step of steps; let isLast = last" 
-               class="group bg-white rounded-2xl p-6 border border-[#E7E4DC] shadow-[0_2px_8px_rgba(22,56,40,0.03)] hover:border-[#C98A2C] hover:shadow-[0_8px_24px_rgba(22,56,40,0.08)] transition-all duration-300 flex flex-col justify-between">
+               class="group bg-slate-50/70 rounded-2xl p-6 border border-slate-200 shadow-2xs hover:bg-white hover:shadow-xs hover:border-slate-300 transition-all duration-300 flex flex-col justify-between">
             
             <div>
               <!-- Top Row: Number + Icon Medallion -->
               <div class="flex items-center justify-between mb-4">
-                <span class="font-serif text-2xl sm:text-3xl font-bold text-[#C98A2C]">
+                <span class="font-heading font-black text-2xl sm:text-3xl text-slate-900">
                   0{{ step.stepNumber }}
                 </span>
-                <div class="w-11 h-11 rounded-xl bg-[#FAF9F6] border border-[#E7E4DC] flex items-center justify-center text-[#163828] text-base shadow-2xs group-hover:bg-[#163828] group-hover:text-white transition-colors duration-200">
+                <div class="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-sm shadow-2xs group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-600 transition-colors duration-200">
                   <i [class]="step.iconClass"></i>
                 </div>
               </div>
 
               <!-- Step Title & Actor -->
-              <h3 class="font-serif text-lg font-bold text-[#163828] mb-0.5 leading-snug">
+              <h3 class="font-heading font-bold text-base text-slate-900 mb-0.5 leading-snug">
                 {{ step.title }}
               </h3>
-              <span class="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5D19] mb-2.5 block">
+              <span class="text-xs font-semibold text-emerald-600 mb-2 block">
                 {{ step.subtitle }}
               </span>
 
               <!-- Description -->
-              <p class="font-sans text-xs text-[#6B726D] leading-relaxed">
+              <p class="text-xs text-slate-500 leading-relaxed font-sans">
                 {{ step.description }}
               </p>
             </div>
 
             <!-- Bottom Progress Line Indicating Sequence -->
-            <div class="mt-4 pt-3 border-t border-[#E7E4DC] flex items-center justify-between text-[10px] font-mono text-[#6B726D]">
+            <div class="mt-4 pt-3 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-slate-400 font-medium">
               <span>Etapa {{ step.stepNumber }}/5</span>
-              <i *ngIf="!isLast" class="fa-solid fa-arrow-right text-[#C98A2C] text-xs"></i>
-              <i *ngIf="isLast" class="fa-solid fa-certificate text-[#22a652] text-xs"></i>
+              <i *ngIf="!isLast" class="fa-solid fa-arrow-right text-slate-400 text-xs group-hover:text-emerald-600 transition-colors"></i>
+              <i *ngIf="isLast" class="fa-solid fa-check-circle text-emerald-600 text-xs"></i>
             </div>
           </div>
         </div>
