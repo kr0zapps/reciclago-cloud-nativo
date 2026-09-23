@@ -35,8 +35,7 @@ export interface TimeSlot {
            class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel p-6 sm:p-7 text-slate-800 my-auto">
         
         <!-- Franja de acento superior institucional -->
-        <div class="h-1.5 -mx-7 -mt-7 mb-5"
-             [ngClass]="isRetiroEspecial ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600' : 'bg-gradient-to-r from-[#1F6685] via-[#38BDF8] to-[#4F8A3D]'"></div>
+        <div class="h-1.5 -mx-7 -mt-7 mb-5 bg-[#123F5B] rounded-t-2xl"></div>
 
         <!-- Encabezado del modal -->
         <div class="flex items-center justify-between mb-3">
@@ -48,7 +47,7 @@ export interface TimeSlot {
             <div>
               <span class="text-[10px] font-black uppercase tracking-wider block"
                     [ngClass]="isRetiroEspecial ? 'text-amber-800' : 'text-[#1F6685]'">
-                {{ isEditMode ? 'Modificación de Agenda (Antes de Iniciar Ruta)' : (isRetiroEspecial ? 'Despacho de Servicio Especial' : 'Planificación Logística Comunal') }}
+                {{ isEditMode ? 'Editar programación' : (isRetiroEspecial ? 'Retiro especial' : 'Coordinación DIMAO') }}
               </span>
               <h3 id="modal-programar-title" class="font-heading font-extrabold text-lg sm:text-xl text-[#123F5B]">
                 {{ isEditMode ? 'Editar Programación' : 'Despachar / Programar Retiro' }} #{{ pickup?.id }}
@@ -137,7 +136,7 @@ export interface TimeSlot {
                     (click)="seleccionarFecha(d.value)"
                     type="button"
                     class="p-2.5 rounded-2xl text-left border-2 transition-all cursor-pointer flex flex-col justify-between"
-                    [ngClass]="selectedFecha === d.value ? (isRetiroEspecial ? 'bg-amber-500 text-white border-amber-600 shadow-md ring-2 ring-amber-300 font-bold' : 'bg-[#123F5B] text-white border-[#123F5B] shadow-md ring-2 ring-sky-300 font-bold') : 'bg-[#F8FAF7] text-slate-700 border-[#E2E9E4] hover:bg-slate-100 hover:border-slate-300'">
+                    [ngClass]="selectedFecha === d.value ? 'bg-[#ecf7e6] border-[#22a652]' : 'bg-white border-gray-200'">
               <div>
                 <div class="flex items-center justify-between">
                   <span class="text-[10px] font-black uppercase tracking-wider opacity-85">{{ d.diaSemana }}</span>
@@ -167,7 +166,7 @@ export interface TimeSlot {
                     (click)="seleccionarHora(slot.value)"
                     type="button"
                     class="py-2 px-1.5 rounded-xl text-center border-2 transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5"
-                    [ngClass]="selectedHora === slot.value ? (isRetiroEspecial ? 'bg-amber-600 text-white border-amber-700 shadow-md ring-2 ring-amber-300 font-black' : 'bg-[#4F8A3D] text-white border-[#4F8A3D] shadow-md ring-2 ring-emerald-300 font-black') : 'bg-[#F8FAF7] text-slate-700 border-[#E2E9E4] hover:bg-slate-100 hover:border-slate-300'">
+                    [ngClass]="selectedHora === slot.value ? 'bg-[#ecf7e6] border-[#22a652]' : 'bg-white border-gray-200'">
               <div class="flex items-center gap-1">
                 <span class="text-xs font-black">{{ slot.label }}</span>
                 <i *ngIf="selectedHora === slot.value" class="fa-solid fa-circle-check text-[10px]"></i>
@@ -198,8 +197,8 @@ export interface TimeSlot {
                     [ngClass]="c.estado === 'MANTENIMIENTO'
                       ? 'bg-slate-50 border-slate-200 opacity-50 cursor-not-allowed text-slate-400'
                       : (actionCamionPatente === c.patente
-                        ? (isRetiroEspecial ? 'bg-amber-50/90 border-amber-600 ring-2 ring-amber-300 text-amber-950 shadow-xs cursor-pointer' : 'bg-[#EEF5EB] border-[#4F8A3D] ring-2 ring-emerald-300 text-emerald-950 shadow-xs cursor-pointer')
-                        : 'bg-white border-[#E2E9E4] hover:border-slate-300 hover:bg-slate-50/80 text-slate-700 cursor-pointer')">
+                        ? 'bg-[#ecf7e6] border-[#22a652] cursor-pointer'
+                        : 'bg-white border-gray-200 hover:border-slate-300 hover:bg-slate-50/80 text-slate-700 cursor-pointer')">
               <div class="flex items-center justify-between gap-1">
                 <div class="flex items-center gap-1.5">
                   <i class="fa-solid fa-truck-front text-xs"

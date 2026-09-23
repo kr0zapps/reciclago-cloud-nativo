@@ -11,247 +11,99 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <section id="solicitud-retiro" class="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-9 shadow-xs card-hover anim-fade-up anim-delay-5 mt-8">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-[#EAEFE8] gap-2">
-        <div>
-          <h3 class="font-heading font-extrabold text-2xl sm:text-3xl text-[#123F5B]">
-            {{ isRetiroEspecial ? 'Solicitud de Retiro Especial a Domicilio' : 'Aviso de Retiro Domiciliario' }}
-          </h3>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1">
-            {{ isRetiroEspecial ? 'Coordina la recolección de residuos fuera del calendario regular o de gran volumen.' : 'Informa a la cuadrilla municipal si dejarás material en tu puerta para el recorrido de este ' + (sector?.fechaTexto || sector?.dia) + '.' }}
-          </p>
-        </div>
+    <section id="solicitud-retiro" class="bg-white border border-[#E2E8F0] rounded-xl p-6 sm:p-8 mt-8">
+      <div class="pb-6 mb-6 border-b border-[#E2E8F0]">
+        <h3 class="font-heading font-extrabold text-2xl sm:text-3xl text-[#123F5B]">
+          {{ isRetiroEspecial ? 'Retiro especial' : 'Solicitar retiro' }}
+        </h3>
       </div>
 
-      <!-- Formulario interactivo -->
-      <form (ngSubmit)="onSubmit()" class="space-y-6">
-        <!-- Mensajes de estado -->
-        <div *ngIf="submitStatus === 'success'" role="alert" aria-live="polite" class="bg-[#EEF5EB] border border-[#CDE5C8] text-[#3B6E2C] px-4 py-3 rounded-2xl flex items-center gap-3 mb-6">
-          <i class="fa-solid fa-circle-check text-xl"></i>
-          <div>
-            <span class="block font-bold text-sm">¡Solicitud recibida con éxito!</span>
-            <span class="text-xs">Hemos registrado tu solicitud en el sistema para el próximo recorrido municipal.</span>
-          </div>
+      <form (ngSubmit)="onSubmit()" class="space-y-6 text-gray-700">
+        <!-- Banners -->
+        <div *ngIf="submitStatus === 'success'" class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6 text-sm">
+          <strong>¡Éxito!</strong> Solicitud recibida.
         </div>
         
-        <div *ngIf="submitStatus === 'error'" role="alert" aria-live="polite" class="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-2xl flex items-center gap-3 mb-6">
-          <i class="fa-solid fa-circle-exclamation text-xl"></i>
-          <div>
-            <span class="block font-bold text-sm">Error al solicitar</span>
-            <span class="text-xs">{{ errorMessage || 'Hubo un problema al procesar tu solicitud con el microservicio. Por favor intenta de nuevo.' }}</span>
-          </div>
+        <div *ngIf="submitStatus === 'error'" class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 text-sm">
+          <strong>Error:</strong> {{ errorMessage || 'Hubo un problema.' }}
         </div>
 
-        <div *ngIf="generalError" role="alert" aria-live="polite" class="bg-amber-50 border border-amber-300 text-amber-900 px-4 py-3 rounded-2xl flex items-center gap-3 mb-6">
-          <i class="fa-solid fa-circle-exclamation text-xl text-amber-600"></i>
-          <div>
-            <span class="block font-bold text-sm">Verifica los datos requeridos</span>
-            <span class="text-xs">{{ generalError }}</span>
-          </div>
+        <div *ngIf="generalError" class="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg mb-6 text-sm">
+          <strong>Aviso:</strong> {{ generalError }}
         </div>
 
-        <!-- Datos de Identificación y Contacto (RUT y Teléfono) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-[#F8FAF7] border border-[#E2E9E4] rounded-2xl">
-          <div class="space-y-1.5 text-left">
-            <div class="flex items-center justify-between">
-              <label for="vecinoRutInput" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] ml-1">
-                RUT del Vecino (Opcional)
-              </label>
-              <span class="text-[10px] text-slate-400 font-medium">Validación Módulo 11</span>
-            </div>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                <i class="fa-solid fa-id-card text-xs"></i>
-              </div>
-              <input id="vecinoRutInput"
-                     type="text"
-                     [value]="vecinoRut"
-                     (input)="onRutInput($event)"
-                     placeholder="Ej: 12.345.678-K"
-                     maxlength="12"
-                     class="input-stitch has-icon !pl-10 text-xs font-semibold"
-                     [ngClass]="rutError ? '!border-rose-400 !bg-rose-50/50' : ''"
-                     aria-describedby="rut-error-desc">
-            </div>
-            <p id="rut-error-desc" *ngIf="rutError" class="text-[10px] text-rose-600 font-bold ml-1 flex items-center gap-1">
-              <i class="fa-solid fa-circle-exclamation text-[10px]"></i> {{ rutError }}
-            </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="space-y-1 text-left">
+            <label for="vecinoRutInput" class="block text-sm font-semibold text-[#123F5B]">RUT (Opcional)</label>
+            <input id="vecinoRutInput" type="text" [value]="vecinoRut" (input)="onRutInput($event)" placeholder="Ej: 12.345.678-K" maxlength="12" class="input-stitch w-full text-sm p-2 border border-[#E2E8F0] rounded-lg">
+            <p *ngIf="rutError" class="text-sm text-red-600 mt-1">{{ rutError }}</p>
           </div>
 
-          <div class="space-y-1.5 text-left">
-            <div class="flex items-center justify-between">
-              <label for="vecinoTelefonoInput" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] ml-1">
-                Teléfono Celular (Opcional)
-              </label>
-              <span class="text-[10px] text-slate-400 font-medium">+56 9 XXXX XXXX</span>
-            </div>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                <i class="fa-solid fa-phone text-xs"></i>
-              </div>
-              <input id="vecinoTelefonoInput"
-                     type="text"
-                     [value]="vecinoTelefono"
-                     (input)="onPhoneInput($event)"
-                     placeholder="Ej: +56 9 8765 4321"
-                     maxlength="16"
-                     class="input-stitch has-icon !pl-10 text-xs font-semibold"
-                     [ngClass]="phoneError ? '!border-rose-400 !bg-rose-50/50' : ''"
-                     aria-describedby="phone-error-desc">
-            </div>
-            <p id="phone-error-desc" *ngIf="phoneError" class="text-[10px] text-rose-600 font-bold ml-1 flex items-center gap-1">
-              <i class="fa-solid fa-circle-exclamation text-[10px]"></i> {{ phoneError }}
-            </p>
+          <div class="space-y-1 text-left">
+            <label for="vecinoTelefonoInput" class="block text-sm font-semibold text-[#123F5B]">Teléfono (Opcional)</label>
+            <input id="vecinoTelefonoInput" type="text" [value]="vecinoTelefono" (input)="onPhoneInput($event)" placeholder="Ej: +56 9 8765 4321" maxlength="16" class="input-stitch w-full text-sm p-2 border border-[#E2E8F0] rounded-lg">
+            <p *ngIf="phoneError" class="text-sm text-red-600 mt-1">{{ phoneError }}</p>
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <!-- 1. Sector activo confirmado -->
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] ml-1">Sector y Cuadrante</label>
-              <span class="text-xs text-slate-500 font-medium">
-                Pasa el {{ sector?.dia }}
-              </span>
-            </div>
-            <div class="p-3 bg-[#F8FAF7] border border-[#E2E9E4] rounded-2xl flex items-center justify-between min-h-[50px]">
-              <div class="flex items-center gap-3 overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-white text-[#4F8A3D] flex items-center justify-center text-sm shadow-2xs border border-[#CCE2C9] flex-shrink-0">
-                  <i class="fa-solid fa-map-location-dot"></i>
-                </div>
-                <div class="min-w-0">
-                  <span class="text-xs font-extrabold text-[#123F5B] block truncate">{{ sector?.nombre }}</span>
-                  <span class="text-[11px] text-[#61717A] block truncate">{{ sector?.cuadrante }}</span>
-                </div>
-              </div>
+          <div class="space-y-1">
+            <label class="block text-sm font-semibold text-[#123F5B]">Sector</label>
+            <div class="p-2 border border-[#E2E8F0] rounded-lg bg-gray-50 min-h-[42px] flex items-center">
+              <span class="text-sm text-gray-700">{{ sector?.nombre }} - {{ sector?.cuadrante }}</span>
             </div>
           </div>
 
-          <!-- 2. Dirección exacta con Detector de Cuadrante -->
-          <div class="space-y-2">
+          <div class="space-y-1">
             <div class="flex items-center justify-between">
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] ml-1" for="direccion">Calle y número</label>
-              <button (click)="detectarCuadrante()" type="button" class="text-[11px] font-bold text-[#4F8A3D] hover:underline flex items-center gap-1 cursor-pointer">
-                <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i>
-                <span *ngIf="!isDetectingCuadrante">Detectar cuadrante</span>
-                <span *ngIf="isDetectingCuadrante">Detectando...</span>
+              <label class="block text-sm font-semibold text-[#123F5B]" for="direccion">Dirección</label>
+              <button (click)="detectarCuadrante()" type="button" class="text-xs text-[#22a652] hover:underline cursor-pointer">
+                {{ isDetectingCuadrante ? 'Detectando...' : 'Detectar' }}
               </button>
             </div>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-10">
-                <i class="fa-solid fa-location-dot text-[#61717A] text-sm"></i>
-              </div>
-              <input [(ngModel)]="newPickup.direccion" (blur)="detectarCuadrante()" class="input-stitch has-icon !pl-11 pr-4" id="direccion" name="direccion" placeholder="Ej: Calle Los Guindos 450" required type="text" />
-            </div>
-            <p *ngIf="detectedCuadrante" class="text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200/60 flex items-center gap-1.5 mt-1">
-              <i class="fa-solid fa-circle-check text-[11px] text-emerald-600"></i>
-              <span>{{ detectedCuadrante }}</span>
-            </p>
+            <input [(ngModel)]="newPickup.direccion" (blur)="detectarCuadrante()" class="input-stitch w-full text-sm p-2 border border-[#E2E8F0] rounded-lg" id="direccion" name="direccion" placeholder="Calle y número" required type="text" />
+            <p *ngIf="detectedCuadrante" class="text-xs text-green-800 mt-1">{{ detectedCuadrante }}</p>
           </div>
 
-          <!-- 3. Material a reciclar -->
-          <div class="space-y-2">
+          <div class="space-y-1">
             <div class="flex items-center justify-between">
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] ml-1">Material a reciclar</label>
-              <button type="button" (click)="toggleRetiroEspecial()" class="text-[11px] font-bold text-[#123F5B] hover:text-[#4F8A3D] hover:underline cursor-pointer">
-                <span *ngIf="!isRetiroEspecial">¿Otro material? (Especial)</span>
-                <span *ngIf="isRetiroEspecial">← Volver al material del día</span>
+              <label class="block text-sm font-semibold text-[#123F5B]">Material</label>
+              <button type="button" (click)="toggleRetiroEspecial()" class="text-xs text-[#22a652] hover:underline cursor-pointer">
+                {{ isRetiroEspecial ? 'Volver' : 'Especial' }}
               </button>
             </div>
-
-            <!-- Caso regular: Material asignado del día -->
-            <div *ngIf="!isRetiroEspecial" class="p-3 bg-gradient-to-r from-[#EEF7EC] to-[#F8FAF7] border border-[#CCE2C9] rounded-2xl flex items-center justify-between shadow-2xs min-h-[50px]">
-              <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-white text-[#4F8A3D] flex items-center justify-center text-sm shadow-2xs border border-[#CCE2C9] flex-shrink-0">
-                  <i class="fa-solid fa-recycle"></i>
-                </div>
-                <div>
-                  <span class="text-[10px] font-bold uppercase text-[#4F8A3D] tracking-wider block">Oficial para este {{ sector?.dia }}</span>
-                  <span class="text-xs font-extrabold text-[#123F5B] block">{{ newPickup.residuoNombre || sector?.materialPrincipal || 'Vidrio' }}</span>
-                </div>
-              </div>
-              <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-md">
-                Designado
-              </span>
+            <div *ngIf="!isRetiroEspecial" class="p-2 border border-[#E2E8F0] rounded-lg bg-gray-50 min-h-[42px] flex items-center">
+              <span class="text-sm text-gray-700">{{ newPickup.residuoNombre || sector?.materialPrincipal || 'Vidrio' }}</span>
             </div>
-
-            <!-- Caso especial: Selección libre de material fuera de fecha -->
-            <div *ngIf="isRetiroEspecial" class="space-y-1">
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-10">
-                  <i class="fa-solid fa-truck-ramp-box text-amber-600 text-sm"></i>
-                </div>
-                <select [(ngModel)]="newPickup.residuoNombre" class="select-stitch has-icon !pl-11 !pr-10 appearance-none text-xs font-semibold" id="residuoNombre" name="residuoNombre" required>
-                  <option value="">Selecciona material especial</option>
-                  <option *ngFor="let res of residuos" [value]="res.nombre">{{ res.nombre }}</option>
-                </select>
-                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none z-10">
-                  <i class="fa-solid fa-chevron-down text-[#61717A] text-xs"></i>
-                </div>
-              </div>
-              <p class="text-[10px] text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/60 mt-1">
-                <i class="fa-solid fa-info-circle mr-1"></i> Sujeto a coordinación especial DIMAO.
-              </p>
-            </div>
+            <select *ngIf="isRetiroEspecial" [(ngModel)]="newPickup.residuoNombre" class="select-stitch w-full text-sm p-2 border border-[#E2E8F0] rounded-lg" id="residuoNombre" name="residuoNombre" required>
+              <option value="">Selecciona material</option>
+              <option *ngFor="let res of residuos" [value]="res.nombre">{{ res.nombre }}</option>
+            </select>
           </div>
         </div>
 
-        <!-- 4. Estimación de Kilos (Vecino) -->
-        <div class="p-4 bg-[#F8FAF7] border border-[#E2E9E4] rounded-2xl space-y-2">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-            <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] ml-1" for="pesoEstimado">
-              <i class="fa-solid fa-weight-scale text-[#4F8A3D] mr-1.5"></i> Kilos Estimados de Residuos (Aprox.)
-            </label>
-            <span class="text-[11px] font-semibold text-slate-500">
-              Selecciona una cantidad sugerida o escribe tu peso estimado
-            </span>
-          </div>
-
-          <div class="flex flex-col sm:flex-row items-center gap-3">
-            <div class="relative w-full sm:w-44">
-              <input [(ngModel)]="newPickup.pesoEstimadoKg"
-                     class="input-stitch !py-2.5 !px-3 font-extrabold text-base text-[#123F5B] text-center"
-                     id="pesoEstimado"
-                     name="pesoEstimado"
-                     type="number"
-                     step="0.5"
-                     min="0.5"
-                     max="500"
-                     placeholder="Ej: 5.0"
-                     required />
-              <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">kg</span>
-            </div>
-
-            <!-- Chips de acceso rápido -->
-            <div class="flex items-center gap-1.5 flex-wrap w-full sm:w-auto">
-              <button type="button"
-                      *ngFor="let k of [2, 5, 10, 15, 25]"
-                      (click)="setQuickWeight(k)"
-                      class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border"
-                      [ngClass]="newPickup.pesoEstimadoKg === k ? 'bg-[#4F8A3D] text-white border-[#4F8A3D] shadow-2xs' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'">
-                {{ k }} kg
+        <div class="space-y-1">
+          <label class="block text-sm font-semibold text-[#123F5B]" for="pesoEstimado">Peso Estimado (kg)</label>
+          <div class="flex items-center gap-3">
+            <input [(ngModel)]="newPickup.pesoEstimadoKg" class="input-stitch w-24 text-sm p-2 border border-[#E2E8F0] rounded-lg" id="pesoEstimado" name="pesoEstimado" type="number" step="0.5" min="0.5" max="500" placeholder="Ej: 5.0" required />
+            <div class="flex items-center gap-2">
+              <button type="button" *ngFor="let k of [2, 5, 10, 15, 25]" (click)="setQuickWeight(k)"
+                      class="px-2 py-1 rounded text-xs border cursor-pointer"
+                      [ngClass]="newPickup.pesoEstimadoKg === k ? 'bg-[#22a652] text-white border-[#22a652]' : 'bg-white text-gray-700 border-gray-300'">
+                {{ k }}
               </button>
             </div>
           </div>
         </div>
 
-        <div class="space-y-2">
-          <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] ml-1" for="comentarios">
-            {{ isRetiroEspecial ? 'Detalles de la solicitud especial (volumen, tipo de residuo o instrucciones)' : 'Comentarios adicionales (opcional)' }}
-          </label>
-          <div class="relative">
-            <textarea [(ngModel)]="newPickup.comentarios" class="input-stitch min-h-[85px] resize-y pt-3" id="comentarios" name="comentarios" placeholder="Instrucciones para llegar, cantidad aproximada, etc."></textarea>
-          </div>
+        <div class="space-y-1">
+          <label class="block text-sm font-semibold text-[#123F5B]" for="comentarios">Comentarios</label>
+          <textarea [(ngModel)]="newPickup.comentarios" class="input-stitch w-full text-sm p-2 border border-[#E2E8F0] rounded-lg" id="comentarios" name="comentarios" placeholder="Opcional"></textarea>
         </div>
 
-        <div class="pt-2 flex justify-end">
-          <button [disabled]="isSubmitting" class="btn-stitch-primary w-full md:w-auto px-8 py-3.5 text-base shadow-sm cursor-pointer" type="submit">
-            <span *ngIf="!isSubmitting">
-              {{ isRetiroEspecial ? 'Solicitar retiro especial a DIMAO' : 'Notificar aviso para este ' + (sector?.dia || '') }}
-            </span>
-            <span *ngIf="isSubmitting" class="flex items-center gap-2">
-              <i class="fa-solid fa-circle-notch fa-spin"></i> Procesando...
-            </span>
+        <div class="pt-4 flex justify-end">
+          <button [disabled]="isSubmitting" class="btn-stitch-primary px-6 py-2 bg-[#22a652] hover:bg-[#1b8e45] text-white rounded-lg font-semibold text-sm cursor-pointer border-none" type="submit">
+            {{ isSubmitting ? 'Procesando...' : 'Solicitar Retiro' }}
           </button>
         </div>
       </form>

@@ -20,7 +20,7 @@ import { Pickup } from '../../data/sectors.data';
            class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel p-6 sm:p-7 text-slate-800 my-auto">
         
         <!-- Franja de acento superior institucional -->
-        <div class="h-1.5 -mx-7 -mt-7 mb-5 bg-gradient-to-r from-rose-500 via-rose-400 to-amber-500"></div>
+        <div class="h-1.5 -mx-7 -mt-7 mb-5 bg-red-600"></div>
 
         <!-- Encabezado del modal -->
         <div class="flex items-center justify-between mb-3">
@@ -29,7 +29,6 @@ import { Pickup } from '../../data/sectors.data';
               <i class="fa-solid fa-ban"></i>
             </div>
             <div>
-              <span class="text-[10px] font-black uppercase tracking-wider text-rose-600 block">Gestión de Excepciones</span>
               <h3 id="modal-cancelar-title" class="font-heading font-extrabold text-lg sm:text-xl text-[#123F5B]">
                 Cancelar Solicitud #{{ pickup?.id }}
               </h3>

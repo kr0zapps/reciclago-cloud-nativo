@@ -7,14 +7,13 @@
     --color-primary: #22a652;
     --color-primary-hover: #1b8e45;
     --color-primary-light: #ecf7e6;
-    --color-forest: #163828;
     --color-navy: #123F5B;
-    --color-navy-dark: #072435;
+    --color-navy-dark: #0D3549;
     --color-bg: #F9F8F5;
     --color-surface: #FFFFFF;
     --color-border: #E2E8F0;
-    --color-text-primary: #232826;
-    --color-text-secondary: #61717A;
+    --color-text-primary: #374151;
+    --color-text-secondary: #6B7280;
     --color-brand-green: #22a652;
     --color-brand-navy: #123F5B;
 
@@ -90,8 +89,8 @@
   border-radius: 1rem;
 }
 .civic-card-tint {
-  background: #F4F8F4;
-  border: 1px solid #DFE8E1;
+  background: #F8FAF7;
+  border: 1px solid #E2E8F0;
   border-radius: 1rem;
 }
 .card-stitch {
@@ -181,7 +180,7 @@
   font-size: 0.875rem;
   color: #183247;
   background-color: #F8FAF7;
-  border: 1px solid #DFE8E1;
+  border: 1px solid #E2E8F0;
   border-radius: 0.75rem;
   transition: all 0.2s;
 }
@@ -192,49 +191,8 @@
 .input-stitch:focus,
 .select-stitch:focus {
   outline: none;
-  border-color: #4F8A3D;
-  box-shadow: 0 0 0 3px rgba(79, 138, 61, 0.15);
-}
-
-/* Animaciones del camión y tracking GPS Stitch */
-@keyframes truckDriveSmooth {
-  0%, 100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
-  25% { transform: translateY(-1.5px) translateX(2px) rotate(0.8deg); }
-  50% { transform: translateY(0.5px) translateX(3.5px) rotate(-0.5deg); }
-  75% { transform: translateY(-1px) translateX(1px) rotate(0.5deg); }
-}
-@keyframes gpsSignalWave {
-  0% { transform: scale(0.8); opacity: 0.7; }
-  100% { transform: scale(1.7); opacity: 0; }
-}
-@keyframes shimmerSweep {
-  0% { transform: translateX(-100%) rotate(25deg); }
-  100% { transform: translateX(250%) rotate(25deg); }
-}
-
-.anim-truck-drive {
-  animation: truckDriveSmooth 2.8s ease-in-out infinite;
-}
-.anim-gps-wave {
-  animation: gpsSignalWave 2s ease-out infinite;
-}
-.anim-shimmer {
-  animation: shimmerSweep 4.5s ease-in-out infinite;
-}
-
-/* Animaciones orgánicas naturales para el Index */
-@keyframes leafFloat {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-6px) rotate(8deg); }
-}
-@keyframes pulseGentle {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.04); opacity: 0.92; }
-}
-
-/* Microinteracciones intencionales y sobrias */
-.anim-leaf {
-  display: inline-block;
+  border-color: #22a652;
+  box-shadow: 0 0 0 3px rgba(34, 166, 82, 0.15);
 }
 
 /* Animaciones orgánicas de silueta de montañas y lago del dashboard */
@@ -539,5 +497,3 @@
     transition: none !important;
   }
 }
-
-

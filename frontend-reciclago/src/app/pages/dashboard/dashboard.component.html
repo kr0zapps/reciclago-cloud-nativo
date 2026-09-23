@@ -1,67 +1,7 @@
 <main class="relative pb-16 pt-2 z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6 sm:space-y-8">
   
-  <!-- ==================== ILUSTRACIÓN MULTICAPA DE MONTAÑAS, VOLCÁN OSORNO Y LAGO ==================== -->
-  <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-screen h-[460px] sm:h-[490px] pointer-events-none overflow-hidden -z-10 select-none [mask-image:linear-gradient(to_bottom,black_45%,transparent_98%)] [-webkit-mask-image:linear-gradient(to_bottom,black_45%,transparent_98%)]">
-    <!-- VISTA MÓVIL (< md) -->
-    <svg class="w-full h-full block md:hidden" preserveAspectRatio="xMidYMin slice" viewBox="820 30 580 370" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="osornoSnowGradMob" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.98"></stop>
-          <stop offset="100%" stop-color="#E3F0F5" stop-opacity="0.8"></stop>
-        </linearGradient>
-        <linearGradient id="osornoBodyGradMob" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stop-color="#8EB9C9" stop-opacity="0.58"></stop>
-          <stop offset="60%" stop-color="#5E91A7" stop-opacity="0.4"></stop>
-          <stop offset="100%" stop-color="#F8FAF7" stop-opacity="0"></stop>
-        </linearGradient>
-      </defs>
-      <g class="anim-mtn-1" opacity="0.45">
-        <path d="M 700 240 Q 920 180 1100 210 T 1500 200 L 1500 400 L 700 400 Z" fill="#DCEAF0"></path>
-      </g>
-      <g class="anim-mtn-3">
-        <path d="M 880 325 L 1090 95 Q 1105 82 1120 95 L 1330 325 Z" fill="url(#osornoBodyGradMob)"></path>
-        <path d="M 940 325 L 1105 84 L 1270 325 Z" fill="#5E91A7" opacity="0.22"></path>
-        <path d="M 1070 120 L 1105 84 L 1140 120 Q 1130 134 1122 126 Q 1114 138 1105 125 Q 1096 138 1088 126 Q 1080 134 1070 120 Z" fill="url(#osornoSnowGradMob)"></path>
-      </g>
-      <g class="anim-lake-wave">
-        <path d="M 700 325 C 900 310, 1100 340, 1300 318 C 1400 312, 1500 325, 1500 325 L 1500 400 L 700 400 Z" fill="#DDE9D8" opacity="0.35"></path>
-      </g>
-    </svg>
-
-    <!-- VISTA PANORÁMICA DESKTOP (>= md) -->
-    <svg class="w-full h-full hidden md:block" preserveAspectRatio="xMidYMid slice" viewBox="0 0 1440 400" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="osornoSnowGrad" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.98"></stop>
-          <stop offset="100%" stop-color="#E3F0F5" stop-opacity="0.75"></stop>
-        </linearGradient>
-        <linearGradient id="osornoBodyGrad" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stop-color="#8EB9C9" stop-opacity="0.52"></stop>
-          <stop offset="60%" stop-color="#5E91A7" stop-opacity="0.35"></stop>
-          <stop offset="100%" stop-color="#F8FAF7" stop-opacity="0"></stop>
-        </linearGradient>
-        <linearGradient id="calbucoBodyGrad" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stop-color="#A5C4D4" stop-opacity="0.45"></stop>
-          <stop offset="100%" stop-color="#F8FAF7" stop-opacity="0"></stop>
-        </linearGradient>
-      </defs>
-      <g class="anim-mtn-1" opacity="0.5">
-        <path d="M-80 270 Q 80 185 240 225 T 580 170 T 920 200 T 1240 160 T 1540 240 L 1540 400 L -80 400 Z" fill="#DCEAF0"></path>
-      </g>
-      <g class="anim-mtn-2" opacity="0.45">
-        <path d="M-40 310 Q 140 210 320 250 T 640 205 T 1000 220 T 1360 190 T 1500 260 L 1500 400 L -40 400 Z" fill="#8EB9C9"></path>
-        <path d="M 460 320 L 560 165 L 660 320 Z" fill="url(#calbucoBodyGrad)"></path>
-      </g>
-      <g class="anim-mtn-3">
-        <path d="M 880 325 L 1090 95 Q 1105 82 1120 95 L 1330 325 Z" fill="url(#osornoBodyGrad)"></path>
-        <path d="M 1070 120 L 1105 84 L 1140 120 Q 1130 134 1122 126 Q 1114 138 1105 125 Q 1096 138 1088 126 Q 1080 134 1070 120 Z" fill="url(#osornoSnowGrad)"></path>
-      </g>
-      <g class="anim-lake-wave">
-        <path d="M -60 330 C 180 310, 360 345, 600 320 C 840 295, 1080 335, 1320 315 C 1410 310, 1470 320, 1500 325 L 1500 400 L -60 400 Z" fill="#DDE9D8" opacity="0.35"></path>
-        <path d="M 0 348 C 240 332, 480 365, 720 346 C 960 326, 1200 358, 1440 342" fill="none" stroke="#1F6685" stroke-linecap="round" stroke-opacity="0.18" stroke-width="2.5"></path>
-      </g>
-    </svg>
-  </div>
+  <!-- ==================== BARRA DECORATIVA SUPERIOR ==================== -->
+  <div class="absolute top-0 left-0 w-full h-2 bg-[#123F5B]"></div>
 
   <!-- 1. ENCABEZADO CON IDENTIDAD DE PUERTO VARAS Y SELECTOR CÍVICO -->
   <section class="relative z-40 pt-2 pb-2 anim-fade-up anim-delay-1">
@@ -69,81 +9,30 @@
       <!-- Columna Izquierda: Título y Bienvenida -->
       <div class="max-w-2xl">
         <div *ngIf="isStaff">
-          <h1 class="font-heading font-extrabold text-2xl sm:text-3xl text-brand-navy tracking-tight">
+          <h1 class="font-heading font-extrabold text-2xl sm:text-3xl text-[#123F5B] tracking-tight">
             {{ activeStaffRole === 'Admin' ? 'Panel de Administración' : (activeStaffRole === 'Coordinador' ? 'Panel de Coordinación' : 'Panel de Chofer') }}
           </h1>
         </div>
 
-        <div *ngIf="!isStaff">
-          <h1 class="font-heading font-extrabold text-3xl sm:text-4xl lg:text-5xl text-brand-navy tracking-tight leading-tight">
+        <div *ngIf="!isStaff" class="mb-6">
+          <h1 class="text-2xl font-heading font-bold text-[#123F5B]">
             Hola, {{ userName || 'Vecino/a' }}
           </h1>
-          <p class="text-sm sm:text-base text-brand-muted leading-relaxed font-normal mt-1">
-            Planificación y seguimiento del retiro diferenciado en Puerto Varas.
+          <p class="text-sm text-gray-500 mt-1 mb-4">
+            {{ currentSectorInfo?.nombre }} &middot; {{ currentSectorInfo?.dia }} &middot; {{ currentSectorInfo?.horario }}
           </p>
+          <app-impact-metrics [pickups]="pickups" [userAddress]="userActiveAddress" [sector]="currentSectorInfo"></app-impact-metrics>
         </div>
       </div>
 
-      <!-- Columna Derecha: Selector de Cuadrante para Vecinos (Elegante, Personalizado y Visible) -->
-      <div *ngIf="!isStaff" class="relative z-50 sector-dropdown-container flex-shrink-0 w-full sm:w-auto">
-        <button
-          type="button"
-          (click)="toggleSectorDropdown($event)"
-          [attr.aria-expanded]="isSectorDropdownOpen"
-          aria-haspopup="listbox"
-          class="w-full sm:w-[350px] bg-white rounded-xl border border-[#D5E2D9] hover:border-[#123F5B]/50 focus:outline-none focus:ring-2 focus:ring-[#123F5B]/20 px-3.5 py-2.5 shadow-xs transition-all flex items-center justify-between gap-3 text-left cursor-pointer">
-          <div class="flex items-center gap-3 min-w-0">
-            <div class="w-8 h-8 rounded-lg bg-[#EEF5EB] text-[#4F8A3D] flex items-center justify-center text-sm flex-shrink-0">
-              <i class="fa-solid fa-location-dot"></i>
-            </div>
-            <div class="min-w-0">
-              <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1">
-                Sector de Recolección
-              </span>
-              <span class="block text-xs sm:text-sm font-bold text-[#123F5B] truncate">
-                {{ currentSectorInfo?.nombre || selectedSector }}
-              </span>
-            </div>
-          </div>
-          <div class="flex items-center gap-2 flex-shrink-0">
-            <span class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
-              {{ currentSectorInfo?.dia }}
-            </span>
-            <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform duration-200"
-               [class.rotate-180]="isSectorDropdownOpen"></i>
-          </div>
-        </button>
-
-        <!-- Menú Desplegable con Alta Elevación (z-50) y Visual Limpia -->
-        <div *ngIf="isSectorDropdownOpen"
-             role="listbox"
-             class="absolute right-0 top-full mt-2 w-full sm:w-[350px] bg-white rounded-xl shadow-2xl border border-slate-200/90 py-1.5 z-50 anim-fade-in overflow-hidden divide-y divide-slate-100">
-          <button
-            *ngFor="let s of sectores"
-            type="button"
-            (click)="selectSector(s.nombre, $event)"
-            role="option"
-            [attr.aria-selected]="selectedSector === s.nombre"
-            class="w-full px-4 py-2.5 text-left flex items-center justify-between gap-3 transition-colors cursor-pointer"
-            [ngClass]="selectedSector === s.nombre ? 'bg-[#EEF5EB] text-[#123F5B]' : 'hover:bg-slate-50 text-slate-700'">
-            <div class="min-w-0">
-              <div class="text-xs sm:text-sm font-semibold truncate"
-                   [ngClass]="selectedSector === s.nombre ? 'font-extrabold text-[#123F5B]' : 'text-slate-800'">
-                {{ s.nombre }}
-              </div>
-              <div class="text-[11px] text-slate-400 mt-0.5">
-                {{ s.horario }}
-              </div>
-            </div>
-            <div class="flex items-center gap-2 flex-shrink-0">
-              <span class="text-[11px] font-bold px-2 py-0.5 rounded-md"
-                    [ngClass]="selectedSector === s.nombre ? 'bg-[#4F8A3D] text-white' : 'bg-slate-100 text-slate-600'">
-                {{ s.dia }}
-              </span>
-              <i *ngIf="selectedSector === s.nombre" class="fa-solid fa-check text-xs text-[#4F8A3D]"></i>
-            </div>
-          </button>
-        </div>
+      <div *ngIf="!isStaff" class="flex-shrink-0 w-full sm:w-auto">
+        <select
+          [ngModel]="selectedSector"
+          (ngModelChange)="onSectorSelect($event)"
+          class="w-full sm:w-auto bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm text-[#123F5B] focus:outline-none focus:border-[#22a652] focus:ring-1 focus:ring-[#22a652]"
+        >
+          <option *ngFor="let s of sectores" [value]="s.nombre">{{ s.nombre }} ({{ s.dia }})</option>
+        </select>
       </div>
     </div>
   </section>
@@ -210,9 +99,9 @@
   <ng-container *ngIf="!isStaff">
     <!-- BANNER DE AVISO MUNICIPAL DIMAO: REPROGRAMACIÓN DE DÍA EN EL SECTOR DEL VECINO -->
     <div *ngIf="avisoSectorActivo"
-         class="rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-amber-500/15 via-amber-50 to-emerald-50 border-2 border-amber-300 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 anim-fade-up">
+         class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
       <div class="flex items-start sm:items-center gap-3.5">
-        <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center text-lg flex-shrink-0 shadow-xs">
+        <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center text-lg flex-shrink-0">
           <i class="fa-solid fa-bullhorn"></i>
         </div>
         <div>
@@ -236,61 +125,47 @@
         </div>
       </div>
       <div class="flex items-center gap-2 self-end sm:self-center flex-shrink-0">
-        <span class="px-3 py-1.5 rounded-xl bg-white border border-amber-300 text-xs font-extrabold text-[#123F5B] shadow-2xs">
+        <span class="px-3 py-1.5 rounded-xl bg-white border border-amber-300 text-xs font-extrabold text-[#123F5B]">
           Nuevo día: {{ avisoSectorActivo.nuevoDia }}
         </span>
       </div>
     </div>
 
-    <!-- 2. HERO PRINCIPAL: PRÓXIMO RETIRO + MATERIAL DE LA SEMANA -->
+    <!-- 1. HERO PRINCIPAL + SEGUIMIENTO CAMION -->
     <app-hero-pickup [sector]="currentSectorInfo" [userAddress]="userActiveAddress"></app-hero-pickup>
 
-  <!-- 3. SEGUIMIENTO DEL CAMIÓN: LÍNEA DE TIEMPO 3 PASOS EN TIEMPO REAL -->
-  <app-truck-tracking
-    [isCamionEnRuta]="isCamionEnRuta"
-    [sector]="currentSectorInfo"
-    [pickups]="pickups"
-    [userEmail]="userEmail">
-  </app-truck-tracking>
-
-  <!-- 4. MÉTRICAS COMUNITARIAS -->
-  <app-impact-metrics [pickups]="pickups" [userAddress]="userActiveAddress" [sector]="currentSectorInfo"></app-impact-metrics>
-
-  <!-- 5. RETIRO ESPECIAL & MAPA DE RECORRIDO VECINAL INTERACTIVO (MODULARIZADO) -->
-  <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch anim-fade-up anim-delay-5">
-    <!-- Card Retiro Especial Modularizada -->
-    <app-special-service-card (scheduleRequested)="scrollToSolicitud()"></app-special-service-card>
-
-    <!-- Card Mapa Interactivo Modularizada -->
-    <app-interactive-map
+    <app-truck-tracking
+      [isCamionEnRuta]="isCamionEnRuta"
       [sector]="currentSectorInfo"
-      [activeWaypoint]="activeWaypoint"
-      [truckSimulationRunning]="truckSimulationRunning"
-      [truckSpeed]="truckSpeed"
-      [activeCamionPatente]="activeCamionPatente"
-      (toggleSimulation)="toggleTruckSimulation()"
-      (toggleSpeed)="toggleTruckSpeed()"
-      (resetSimulation)="resetTruckSimulation()"
-      (openRutaModal)="openRutaModal()">
-    </app-interactive-map>
-  </section>
+      [pickups]="pickups"
+      [userEmail]="userEmail"
+      [selectedPickup]="selectedTrackingPickup">
+    </app-truck-tracking>
 
-  <!-- 6. HISTORIAL DE RETIROS VECINALES / TRAZABILIDAD STAFF -->
-  <app-pickup-history
-    [pickups]="pickups"
-    [isStaff]="isStaff"
-    [userEmail]="userEmail"
-    (actionRequested)="openActionModal($event)">
-  </app-pickup-history>
+    <!-- 2. FORMULARIO DE AVISO DE RETIRO -->
+    <app-pickup-form
+      [sector]="currentSectorInfo"
+      [residuos]="residuos"
+      [userEmail]="userEmail"
+      [userName]="userName"
+      (pickupCreated)="onPickupCreated($event)">
+    </app-pickup-form>
 
-  <!-- 7. FORMULARIO DE AVISO DE RETIRO -->
-  <app-pickup-form
-    [sector]="currentSectorInfo"
-    [residuos]="residuos"
-    [userEmail]="userEmail"
-    [userName]="userName"
-    (pickupCreated)="onPickupCreated($event)">
-  </app-pickup-form>
+    <!-- 3. HISTORIAL DE RETIROS VECINALES -->
+    <app-pickup-history
+      [pickups]="pickups"
+      [isStaff]="isStaff"
+      [userEmail]="userEmail"
+      [selectedPickupId]="selectedTrackingPickup?.id ?? null"
+      (actionRequested)="openActionModal($event)"
+      (pickupSelected)="onPickupSelectedForTracking($event)">
+    </app-pickup-history>
+
+    <div class="mt-4 text-center sm:text-left">
+      <a (click)="showRutaModal = true" class="text-sm text-[#123F5B] hover:underline cursor-pointer">
+        <i class="fa-solid fa-map-location-dot mr-1"></i>Ver mapa de recorrido comunal
+      </a>
+    </div>
   </ng-container>
 
   <!-- ==================== MODAL: RECORRIDO COMUNAL Y CUADRANTES (MODULARIZADO) ==================== -->

@@ -14,7 +14,7 @@ import { Pickup } from '../data/sectors.data';
       <div (click)="$event.stopPropagation()"
            class="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto">
         
-        <div class="h-1.5 w-full bg-gradient-to-r from-[#123F5B] via-[#38BDF8] to-[#4F8A3D]"></div>
+        <div class="h-1.5 w-full bg-[#123F5B]"></div>
 
         <div class="px-6 sm:px-8 pt-6 pb-4 border-b border-[#E2E9E4] flex items-center justify-between bg-[#F8FAF7]">
           <div class="flex items-center gap-3.5">
@@ -22,9 +22,6 @@ import { Pickup } from '../data/sectors.data';
               <i class="fa-solid fa-clipboard-list"></i>
             </div>
             <div>
-              <span class="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-slate-400 block">
-                DIMAO • Registro Oficial
-              </span>
               <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy leading-tight">
                 Auditoría Histórica Comunal
               </h3>

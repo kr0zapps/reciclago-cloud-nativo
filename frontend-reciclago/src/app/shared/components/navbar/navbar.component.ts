@@ -35,17 +35,17 @@ import { RouterModule, Router } from '@angular/router';
 
         <!-- NAVEGACIÓN DESKTOP ESENCIAL (3 LINKS CLAVE) CON INDICADORES SUAVES -->
         <nav class="hidden lg:flex items-center gap-7 xl:gap-9 text-[14.5px] font-semibold transition-colors" [ngClass]="navTextClass">
-          <button (click)="scrollToSection('como-funciona')" type="button" class="relative group hover:text-[#4ade80] transition-colors py-2 font-semibold cursor-pointer">
+          <button (click)="scrollToSection('como-funciona')" type="button" class="relative group hover:text-[#22a652] transition-colors py-2 font-semibold cursor-pointer">
             <span>¿Cómo funciona?</span>
-            <span class="absolute bottom-0.5 left-0 w-0 h-0.5 bg-[#4ade80] rounded-full group-hover:w-full transition-all duration-300 ease-out"></span>
+            <span class="absolute bottom-0.5 left-0 w-0 h-0.5 bg-[#22a652] rounded-full group-hover:w-full transition-all duration-300 ease-out"></span>
           </button>
-          <button (click)="scrollToSection('cuadrantes')" type="button" class="relative group hover:text-[#4ade80] transition-colors py-2 font-semibold cursor-pointer">
+          <button (click)="scrollToSection('cuadrantes')" type="button" class="relative group hover:text-[#22a652] transition-colors py-2 font-semibold cursor-pointer">
             <span>Cuadrantes</span>
-            <span class="absolute bottom-0.5 left-0 w-0 h-0.5 bg-[#4ade80] rounded-full group-hover:w-full transition-all duration-300 ease-out"></span>
+            <span class="absolute bottom-0.5 left-0 w-0 h-0.5 bg-[#22a652] rounded-full group-hover:w-full transition-all duration-300 ease-out"></span>
           </button>
-          <button (click)="openMaterials.emit()" type="button" class="relative group hover:text-[#4ade80] transition-colors py-2 font-semibold cursor-pointer">
+          <button (click)="openMaterials.emit()" type="button" class="relative group hover:text-[#22a652] transition-colors py-2 font-semibold cursor-pointer">
             <span>Materiales</span>
-            <span class="absolute bottom-0.5 left-0 w-0 h-0.5 bg-[#4ade80] rounded-full group-hover:w-full transition-all duration-300 ease-out"></span>
+            <span class="absolute bottom-0.5 left-0 w-0 h-0.5 bg-[#22a652] rounded-full group-hover:w-full transition-all duration-300 ease-out"></span>
           </button>
         </nav>
 
@@ -109,30 +109,30 @@ import { RouterModule, Router } from '@angular/router';
            class="lg:hidden border-t border-[#E2E9E4] bg-white px-4 pt-3 pb-5 space-y-3.5 shadow-xl border-b border-[#E2E9E4] relative z-50 animate-drawer-slide">
         <div class="flex items-center gap-3 p-2.5 rounded-xl bg-[#F8FAF7] border border-[#E2E9E4]">
           <img src="assets/escudo-puerto-varas.svg" alt="Escudo Puerto Varas" class="h-8 w-auto object-contain flex-shrink-0">
-          <div class="text-xs text-[#546571] leading-tight">
+          <div class="text-xs text-gray-500 leading-tight">
             Ilustre Municipalidad de <strong class="text-[#123F5B] block font-bold">Puerto Varas</strong>
           </div>
-          <span class="ml-auto px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#E8F3E6] text-[#3D742F] border border-[#CCE4C8]">Portal 2026</span>
+          <span class="ml-auto px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#E8F3E6] text-[#22a652] border border-[#CCE4C8]">Portal 2026</span>
         </div>
 
-        <nav class="flex flex-col space-y-1 text-[15px] font-semibold text-[#183247]">
+        <nav class="flex flex-col space-y-1 text-[15px] font-semibold text-[#123F5B]">
           <button type="button" (click)="scrollToSection('como-funciona')"
-                  class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all font-semibold text-[15px] text-[#183247] cursor-pointer">
+                  class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all font-semibold text-[15px] text-[#123F5B] cursor-pointer">
             <i class="fa-solid fa-circle-question w-5 text-center text-sm text-[#0ea5e9]"></i>
             <span>¿Cómo funciona?</span>
           </button>
           <button type="button" (click)="scrollToSection('cuadrantes')"
-                  class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all font-semibold text-[15px] text-[#183247] cursor-pointer">
+                  class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all font-semibold text-[15px] text-[#123F5B] cursor-pointer">
             <i class="fa-solid fa-map-location-dot w-5 text-center text-sm text-[#4F8A3D]"></i>
             <span>Cuadrantes comunales</span>
           </button>
           <button type="button" (click)="openMaterials.emit(); mobileMenuOpen = false"
-                  class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all font-semibold text-[15px] text-[#183247] cursor-pointer">
+                  class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all font-semibold text-[15px] text-[#123F5B] cursor-pointer">
             <i class="fa-solid fa-recycle w-5 text-center text-sm text-[#4F8A3D]"></i>
             <span>Materiales de reciclaje</span>
           </button>
           <button type="button" (click)="openContact.emit(); mobileMenuOpen = false"
-                  class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all font-semibold text-[15px] text-[#183247] cursor-pointer">
+                  class="flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-[#F8FAF7] transition-all font-semibold text-[15px] text-[#123F5B] cursor-pointer">
             <i class="fa-solid fa-envelope w-5 text-center text-sm text-emerald-600"></i>
             <span>Contacto DIMAO</span>
           </button>
@@ -155,7 +155,7 @@ import { RouterModule, Router } from '@angular/router';
               <div class="min-w-0 flex-1">
                 <div class="text-[13.5px] font-bold text-[#123F5B] truncate leading-tight">{{ currentUser }}</div>
                 <div class="text-[11.5px] text-[#61717A] flex items-center gap-1.5 mt-0.5">
-                  <span class="font-semibold text-[#3D742F]">Mi Panel</span>
+                  <span class="font-semibold text-[#22a652]">Mi Panel</span>
                   <span class="text-slate-300">•</span>
                   <span class="text-slate-500">Puerto Varas</span>
                 </div>
@@ -205,15 +205,15 @@ export class NavbarComponent {
 
   get headerClass(): string {
     if (this.mobileMenuOpen) {
-      return 'sticky top-0 z-50 transition-all duration-300 bg-white border-b border-[#E2E9E4] shadow-md text-[#183247]';
+      return 'sticky top-0 z-50 transition-all duration-300 bg-white border-b border-gray-200 shadow-md text-[#123F5B]';
     }
     if (this.isHomePage) {
       if (this.isScrolled) {
-        return 'sticky top-0 z-50 transition-all duration-300 -mb-[96px] bg-[#041624]/95 backdrop-blur-md border-b border-white/10 shadow-md text-white';
+        return 'sticky top-0 z-50 transition-all duration-300 -mb-[96px] bg-[#123F5B]/95 backdrop-blur-md border-b border-white/10 shadow-md text-white';
       }
       return 'sticky top-0 z-50 transition-all duration-300 -mb-[96px] bg-transparent border-b-0 border-transparent shadow-none text-white';
     }
-    return 'sticky top-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-md border-b border-[#E2E9E4] shadow-sm text-[#183247]';
+    return 'sticky top-0 z-50 transition-all duration-300 bg-white border-b border-gray-200 shadow-sm text-[#123F5B]';
   }
 
   get logoTextClass(): string {
@@ -225,21 +225,21 @@ export class NavbarComponent {
 
   get logoAccentClass(): string {
     if (this.mobileMenuOpen || (!this.isHomePage || this.isScrolled)) {
-      return 'text-[#3D742F]';
+      return 'text-[#22a652]';
     }
-    return 'text-[#4ade80]';
+    return 'text-[#22a652]';
   }
 
   get logoSloganClass(): string {
     if (this.mobileMenuOpen) {
-      return 'text-[#546571]';
+      return 'text-gray-500';
     }
-    return (this.isHomePage && !this.isScrolled) ? 'text-slate-300' : 'text-[#546571]';
+    return (this.isHomePage && !this.isScrolled) ? 'text-slate-300' : 'text-gray-500';
   }
 
-  get navTextClass(): string { return this.isHomePage ? 'text-white' : 'text-[#183247]'; }
+  get navTextClass(): string { return this.isHomePage ? 'text-white' : 'text-[#123F5B]'; }
   get sealBorderClass(): string { return this.isHomePage ? 'border-white/20' : 'border-[#E2E9E4]'; }
-  get sealSubtextClass(): string { return (this.isHomePage && !this.isScrolled) ? 'text-slate-300' : 'text-[#546571]'; }
+  get sealSubtextClass(): string { return (this.isHomePage && !this.isScrolled) ? 'text-slate-300' : 'text-gray-500'; }
   get sealTitleClass(): string { return (this.isHomePage && !this.isScrolled) ? 'text-white' : 'text-[#123F5B]'; }
   get accountBtnClass(): string {
     if (this.isHomePage && !this.isScrolled) {

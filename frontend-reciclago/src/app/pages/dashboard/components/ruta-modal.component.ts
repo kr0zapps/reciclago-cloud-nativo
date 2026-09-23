@@ -14,7 +14,7 @@ import { Sector } from '../data/sectors.data';
       <div (click)="$event.stopPropagation()"
            class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto">
         
-        <div class="h-1.5 w-full bg-gradient-to-r from-[#4F8A3D] via-[#38BDF8] to-[#123F5B]"></div>
+        <div class="h-1.5 w-full bg-[#123F5B]"></div>
 
         <div class="px-6 sm:px-8 pt-6 pb-4 border-b border-[#E2E9E4] flex items-center justify-between bg-[#F8FAF7]">
           <div class="flex items-center gap-3.5">
@@ -22,9 +22,6 @@ import { Sector } from '../data/sectors.data';
               <i class="fa-solid fa-map-location-dot"></i>
             </div>
             <div>
-              <span class="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-[#4F8A3D] block">
-                Plan Comunal DIMAO • Puerto Varas
-              </span>
               <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#123F5B] leading-tight">
                 Recorrido y Cuadrantes
               </h3>

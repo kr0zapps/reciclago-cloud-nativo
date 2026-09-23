@@ -53,14 +53,14 @@ import { RouterModule } from '@angular/router';
                 <span class="text-white">Recic</span>
                 <span class="text-[#22a652]">LaGo</span>
               </div>
-              <span class="text-xs font-bold uppercase tracking-wider text-slate-200">
+              <span class="text-xs font-bold uppercase tracking-wider text-gray-300">
                 Puerto Varas · Cuenca Lago Llanquihue
               </span>
             </div>
           </a>
 
           <!-- Enlaces de Navegación del Footer -->
-          <nav aria-label="Navegación del pie de página" class="flex flex-wrap justify-center items-center gap-x-3 sm:gap-x-4 gap-y-2 text-xs sm:text-sm text-slate-200 font-medium">
+          <nav aria-label="Navegación del pie de página" class="flex flex-wrap justify-center items-center gap-x-3 sm:gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-300 font-medium">
             <a class="hover:text-[#22a652] focus-visible:outline-none focus-visible:text-[#22a652] focus-visible:underline transition-colors py-1 px-1.5" routerLink="/">Inicio</a>
             <span class="text-white/40" aria-hidden="true">|</span>
             <button (click)="openHowItWorks.emit()" type="button" class="hover:text-[#22a652] focus-visible:outline-none focus-visible:text-[#22a652] focus-visible:underline transition-colors cursor-pointer py-1 px-1.5">¿Cómo funciona?</button>
@@ -107,7 +107,7 @@ import { RouterModule } from '@angular/router';
             <div class="flex items-center gap-2.5 border-l border-white/20 pl-3">
               <img src="assets/escudo-puerto-varas.svg" alt="Escudo de la Ilustre Municipalidad de Puerto Varas" class="h-9 w-auto object-contain drop-shadow">
               <div class="text-left leading-tight hidden sm:block">
-                <div class="text-[9.5px] font-medium text-slate-300 uppercase tracking-wider">Ilustre Municipalidad</div>
+                <div class="text-[9.5px] font-medium text-gray-300 uppercase tracking-wider">Ilustre Municipalidad</div>
                 <div class="text-[12.5px] font-bold text-white tracking-tight">Puerto Varas</div>
               </div>
             </div>
@@ -116,7 +116,7 @@ import { RouterModule } from '@angular/router';
 
         <!-- Fila Inferior con Lema Destacado -->
         <div class="pt-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <p class="text-xs text-slate-300">
+          <p class="text-xs text-gray-300">
             © 2026 Municipalidad de Puerto Varas. Todos los derechos reservados.
           </p>
 

@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BffService } from '../../services/bff.service';
 import { MsalService } from '@azure/msal-angular';
+import { Subject, interval } from 'rxjs';
+import { takeUntil, switchMap } from 'rxjs/operators';
 
 import { HeroPickupComponent } from './components/hero-pickup.component';
 import { TruckTrackingComponent } from './components/truck-tracking.component';
@@ -66,6 +68,9 @@ import { DAY_NAME_TO_NUMBER } from './utils/sector.utils';
   templateUrl: './dashboard.component.html'
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+  private readonly POLLING_INTERVAL_MS = 20_000;
+
   userName = '';
   userEmail = '';
   userRoles: string[] = [];
@@ -99,6 +104,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showActionModal = false;
   selectedPickupForAction: Pickup | null = null;
   actionType: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar' = 'programar';
+
+  /** Pickup seleccionado por el vecino desde el historial para ver en el tracker */
+  selectedTrackingPickup: Pickup | null = null;
 
   truckSimulationRunning = true;
   truckSpeed = 1;
@@ -219,6 +227,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.truckWaypoints = this.currentSectorInfo?.waypoints || [];
     this.loadResiduos();
     this.loadPickups();
+    this.startPickupPolling();
     this.loadCuadrantes();
     this.loadCamiones();
     this.loadRotacionSemanal();
@@ -227,6 +236,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     if (this.truckTimer) {
       clearInterval(this.truckTimer);
       this.truckTimer = null;
@@ -352,6 +363,31 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  private startPickupPolling(): void {
+    if (this.isStaff) return;
+    interval(this.POLLING_INTERVAL_MS)
+      .pipe(
+        takeUntil(this.destroy$),
+        switchMap(() => {
+          const emailFilter = this.userEmail || '';
+          return this.bffService.getPickups(emailFilter);
+        })
+      )
+      .subscribe({
+        next: (data: any[]) => {
+          this.pickups = (data || []).map((p: any) => ({
+            ...p,
+            fecha: p.fechaProgramada || p.fecha || '',
+            fechaTexto: p.fechaProgramada
+              ? new Date(p.fechaProgramada).toLocaleDateString('es-CL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+              : (p.fechaTexto || ''),
+            kilosRecolectados: p.pesoRealKg ?? p.pesoEstimadoKg ?? p.kilosRecolectados ?? null,
+          }));
+        },
+        error: () => { /* silent retry on next interval */ }
+      });
+  }
+
   loadCuadrantes(): void {
     this.bffService.getCuadrantes().subscribe({
       next: (data) => {
@@ -431,6 +467,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   onSectoresModificados(sectoresActualizados: Sector[]): void {
     this.sectores = [...sectoresActualizados];
     this.truckWaypoints = this.currentSectorInfo?.waypoints || [];
+  }
+
+  onPickupSelectedForTracking(pickup: Pickup): void {
+    // Toggle: si el vecino clickea el mismo pickup, deselecciona
+    if (this.selectedTrackingPickup?.id === pickup.id) {
+      this.selectedTrackingPickup = null;
+    } else {
+      this.selectedTrackingPickup = pickup;
+    }
   }
 
   onCamionEstadoCambiado(camionActualizado: Camion): void {

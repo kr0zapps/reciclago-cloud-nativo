@@ -25,7 +25,7 @@ import { GlobalModalsComponent } from './shared/components/global-modals/global-
   template: `
     <app-page-loader [isLoading]="isPageLoading"></app-page-loader>
 
-    <div class="min-h-screen max-w-full flex flex-col overflow-x-hidden" [ngClass]="(isHomePage && !isScrolled) ? 'bg-[#041624]' : 'bg-[#F8FAF7]'">
+    <div class="min-h-screen max-w-full flex flex-col overflow-x-hidden" [ngClass]="(isHomePage && !isScrolled) ? 'bg-[#123F5B]' : 'bg-[#F8FAF7]'">
       <app-navbar
         [isHomePage]="isHomePage"
         [isScrolled]="isScrolled"

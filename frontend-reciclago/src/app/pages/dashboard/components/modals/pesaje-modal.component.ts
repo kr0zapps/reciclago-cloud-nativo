@@ -21,7 +21,7 @@ import { Pickup } from '../../data/sectors.data';
            class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel p-6 sm:p-7 text-slate-800 my-auto">
         
         <!-- Franja de acento superior institucional -->
-        <div class="h-1.5 -mx-7 -mt-7 mb-5 bg-gradient-to-r from-[#4F8A3D] via-[#84CC16] to-[#123F5B]"></div>
+        <div class="h-1.5 -mx-7 -mt-7 mb-5 bg-[#22a652]"></div>
 
         <!-- Encabezado del modal -->
         <div class="flex items-center justify-between mb-3">
@@ -30,9 +30,9 @@ import { Pickup } from '../../data/sectors.data';
               <i class="fa-solid fa-scale-balanced"></i>
             </div>
             <div>
-              <span class="text-[10px] font-black uppercase tracking-wider text-[#4F8A3D] block">Báscula Digital de Terreno</span>
+              <span class="text-[10px] font-black uppercase tracking-wider text-[#4F8A3D] block">Registrar peso</span>
               <h3 id="modal-pesaje-title" class="font-heading font-extrabold text-lg sm:text-xl text-[#123F5B]">
-                Pesaje Oficial #{{ pickup?.id }}
+                Peso del retiro #{{ pickup?.id }}
               </h3>
             </div>
           </div>
@@ -78,7 +78,7 @@ import { Pickup } from '../../data/sectors.data';
             </div>
           </div>
           <p class="text-xs text-slate-500 text-center">
-            <i class="fa-solid fa-satellite-dish text-emerald-600 mr-1"></i> Se emitirá evento a Kafka y comando de certificado a RabbitMQ (<code>q.cmd.certificate</code>).
+            <i class="fa-solid fa-satellite-dish text-emerald-600 mr-1"></i> Se generará el certificado de pesaje.
           </p>
         </div>
 

@@ -22,8 +22,7 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
            class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel p-6 sm:p-7 text-slate-800 my-auto">
         
         <!-- Franja de acento superior institucional -->
-        <div class="h-1.5 -mx-7 -mt-7 mb-5"
-             [ngClass]="actionType === 'en-ruta' ? 'bg-gradient-to-r from-[#123F5B] via-[#38BDF8] to-[#4F8A3D]' : 'bg-gradient-to-r from-amber-500 to-emerald-600'"></div>
+        <div class="h-1.5 -mx-7 -mt-7 mb-5 bg-[#123F5B] rounded-t-2xl"></div>
 
         <!-- Encabezado del modal -->
         <div class="flex items-center justify-between mb-3">
@@ -68,9 +67,9 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
               <i class="fa-regular fa-clock"></i>
             </div>
             <div>
-              <p class="text-sm font-bold text-amber-950">Esperando Visto Bueno del Coordinador</p>
+              <p class="text-sm font-bold text-amber-950">Esta solicitud debe ser programada primero.</p>
               <p class="text-xs text-amber-900 leading-relaxed mt-1">
-                Debes esperar el visto bueno de tu Coordinador para seguir esta orden. La solicitud aún está en estado <strong>SOLICITADO</strong> y debe ser programada con fecha y camión asignado antes de salir a ruta.
+                La solicitud aún está en estado <strong>SOLICITADO</strong> y debe ser programada con fecha y camión asignado antes de salir a ruta.
               </p>
             </div>
           </div>
@@ -120,7 +119,7 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
                         (click)="seleccionarFecha(d.value)"
                         type="button"
                         class="p-2 rounded-xl text-left border-2 transition-all cursor-pointer flex flex-col justify-between"
-                        [ngClass]="selectedFecha === d.value ? 'bg-[#123F5B] text-white border-[#123F5B] shadow-2xs font-bold ring-1 ring-sky-300' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'">
+                        [ngClass]="selectedFecha === d.value ? 'bg-[#ecf7e6] border-[#22a652]' : 'bg-white border-gray-200'">
                   <div>
                     <div class="flex items-center justify-between">
                       <span class="text-[9px] font-black uppercase opacity-80">{{ d.diaSemana }}</span>
@@ -148,7 +147,7 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
                         (click)="seleccionarHora(slot.value)"
                         type="button"
                         class="py-1.5 px-1 rounded-lg text-center border transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5"
-                        [ngClass]="selectedHora === slot.value ? 'bg-[#4F8A3D] text-white border-[#4F8A3D] font-bold shadow-2xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'">
+                        [ngClass]="selectedHora === slot.value ? 'bg-[#ecf7e6] border-[#22a652]' : 'bg-white border-gray-200'">
                   <span class="text-xs font-bold">{{ slot.label }}</span>
                   <span class="text-[8.5px] font-medium opacity-80">{{ slot.periodo }}</span>
                 </button>
@@ -176,8 +175,8 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
                         [ngClass]="c.estado === 'MANTENIMIENTO'
                           ? 'bg-slate-50 border-slate-200 opacity-50 cursor-not-allowed text-slate-400'
                           : (actionCamionPatente === c.patente
-                            ? 'bg-[#EEF5EB] border-[#4F8A3D] ring-2 ring-emerald-300 text-emerald-950 shadow-2xs'
-                            : 'bg-white border-[#E2E9E4] hover:border-slate-300 hover:bg-slate-50/80 text-slate-700')">
+                            ? 'bg-[#ecf7e6] border-[#22a652]'
+                            : 'bg-white border-gray-200 hover:border-slate-300 hover:bg-slate-50/80 text-slate-700')">
                   <div class="flex items-center justify-between gap-1">
                     <div class="flex items-center gap-1.5">
                       <i class="fa-solid fa-truck-front text-xs"
@@ -199,7 +198,7 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
           </div>
 
           <p class="text-xs text-slate-600 leading-relaxed px-1">
-            Al confirmar, el estado pasará a <strong>EN_RUTA</strong>, habilitando la telemetría GPS y notificando al vecino.
+            El retiro pasará a estado En Ruta.
           </p>
         </div>
 
