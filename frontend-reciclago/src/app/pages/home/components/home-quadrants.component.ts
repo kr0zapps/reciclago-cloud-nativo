@@ -184,10 +184,6 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
               <!-- Placa Material Asignado -->
               <div class="p-3 rounded-xl border border-slate-200/90 bg-slate-50/70 flex items-center justify-between gap-3 mb-3">
                 <div class="min-w-0">
-                  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-[11px] font-semibold mb-1">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                    {{ activeWeek === 1 ? 'Esta semana' : 'Próxima semana' }}
-                  </span>
                   <h4 class="font-heading font-extrabold text-base text-slate-900 leading-snug truncate">{{ q.materialNombre }}</h4>
                   <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">{{ q.materialDescripcion }}</p>
                 </div>
@@ -297,10 +293,6 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                 <!-- Bloque Héroe del Material -->
                 <div class="p-3 sm:p-3.5 rounded-xl border border-slate-200/90 bg-slate-50/70 flex items-center justify-between gap-3 mb-3">
                   <div class="min-w-0">
-                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-[11px] font-semibold mb-1">
-                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                      {{ activeWeek === 1 ? 'Esta semana' : 'Próxima semana' }}
-                    </span>
                     <h4 class="font-heading font-extrabold text-base sm:text-lg text-slate-900 leading-snug truncate">{{ q.materialNombre }}</h4>
                     <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">{{ q.materialDescripcion }}</p>
                   </div>

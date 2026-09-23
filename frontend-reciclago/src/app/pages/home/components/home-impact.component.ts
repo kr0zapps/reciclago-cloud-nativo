@@ -78,10 +78,6 @@ import { BffService } from '../../../services/bff.service';
                 <i class="fa-solid fa-truck-ramp-box text-sm"></i>
               </div>
               <div>
-                <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400 mb-0.5">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                  Retiros Especiales
-                </span>
                 <h3 class="text-base sm:text-lg font-extrabold text-white tracking-tight mb-0.5 font-heading">
                   ¿Muebles viejos o escombros?
                 </h3>
