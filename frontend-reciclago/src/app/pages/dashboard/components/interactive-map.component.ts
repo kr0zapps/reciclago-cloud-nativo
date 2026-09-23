@@ -24,7 +24,7 @@ import { Sector, Waypoint } from '../data/sectors.data';
           <div class="flex items-center justify-between gap-2 mb-3">
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-compass text-[#123F5B] text-base"></i>
-              <span class="font-bold text-sm text-[#123F5B]">{{ sector?.cuadrante }}</span>
+              <span class="font-bold text-sm text-[#123F5B]">{{ sector.cuadrante }}</span>
             </div>
             <span class="inline-flex items-center gap-1.5 text-xs text-slate-600 font-medium">
               <i class="fa-solid text-[9px]" [ngClass]="truckSimulationRunning ? 'fa-circle text-[#4F8A3D]' : 'fa-circle text-slate-400'"></i>
@@ -85,7 +85,7 @@ import { Sector, Waypoint } from '../data/sectors.data';
                   <i class="fa-solid fa-truck-fast text-[11px] text-white"></i>
                 </div>
                 <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-[#041D2D] text-white text-[8px] font-bold px-1.5 py-0.2 rounded-md shadow whitespace-nowrap border border-slate-700">
-                  {{ activeCamionPatente || sector?.patente || 'PV-RC-2026' }}
+                  {{ activeCamionPatente || sector.patente || 'PV-RC-2026' }}
                 </div>
               </div>
             </div>

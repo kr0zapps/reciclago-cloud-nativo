@@ -9,14 +9,12 @@ import {
   Waypoint,
   EstadoCamion,
   RotacionSemanal,
-  RotacionConfig,
   SEMANAS_ROTACION_DEFAULT,
   loadLocalRotacionConfig,
   saveLocalRotacionConfig,
   loadScheduleOverrides,
   saveScheduleOverrides,
   getScheduleOverrideForSector,
-  SectorScheduleOverride,
   DEFAULT_SECTORES,
   aplicarSectorOverrides,
   loadLocalSectorOverrides,
@@ -914,12 +912,10 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
 
                 <!-- Menú Desplegable Flotante Moderno -->
                 <div *ngIf="isMaterialDropdownOpen"
-                     role="listbox"
                      class="absolute left-0 right-0 top-full mt-1.5 bg-white rounded-2xl shadow-2xl border border-[#E2E8F0] p-2 z-[100] anim-modal-backdrop space-y-1">
                   <button
                     *ngFor="let r of residuos"
                     type="button"
-                    role="option"
                     [attr.aria-selected]="nuevoResiduoId === r.id"
                     (click)="selectResiduo(r.id)"
                     class="w-full text-left p-2 rounded-xl transition-all flex items-center justify-between group cursor-pointer"
@@ -969,7 +965,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
     </div>
   `
 })
-export class AdminDashboardComponent implements OnInit, OnChanges {
+export class AdminDashboardComponent implements OnInit, OnChanges, OnDestroy {
   @Input() sector: Sector | null = null;
   @Input() sectores: Sector[] = [];
   @Input() pickups: Pickup[] = [];
@@ -991,7 +987,7 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
   @Output() rotacionModificada = new EventEmitter<void>();
   @Output() sectoresModificados = new EventEmitter<Sector[]>();
 
-  Math = Math;
+  readonly Math = Math;
   selectedTruckPatente: string = 'PV-RC-2026';
 
   /** Pestaña activa en la consola de administración */
@@ -1047,7 +1043,7 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
 
   get selectedResiduoNombre(): string {
     const found = this.residuos.find(r => r.id === Number(this.nuevoResiduoId));
-    return found ? found.nombre : (this.residuos[0]?.nombre || 'Vidrio');
+    return found ? found.nombre : (this.residuos?.[0]?.nombre ?? 'Vidrio');
   }
 
   getMaterialIcon(name?: string): string {
@@ -1066,7 +1062,7 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
     'PV-RC-2028': { name: 'Camino a Ensenada Km 2', detail: 'Traslado a centro de acopio comunal', eta: '18 min', distancia: '3.1 km', x: 75, y: 60, estado: 'En traslado' }
   };
 
-  constructor(private bffService: BffService) {}
+  constructor(private readonly bffService: BffService) {}
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
@@ -1095,7 +1091,7 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
     if (this.rotacionSemanal?.slotSemana) {
       this.semanaSeleccionada = this.rotacionSemanal.slotSemana;
     }
-    if (this.sectores && this.sectores.length > 0) {
+    if (this.sectores?.length > 0) {
       this.sectorSeleccionadoNombre = this.sectores[0].nombre;
     }
     this.syncSectorSeleccionadoForm();
@@ -1104,10 +1100,10 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['residuos'] && this.residuos && this.residuos.length > 0) {
+    if (changes['residuos'] && this.residuos?.length > 0) {
       this.nuevoResiduoId = this.residuos[0].id;
     }
-    if (changes['sectores'] && this.sectores && this.sectores.length > 0) {
+    if (changes['sectores'] && this.sectores?.length > 0) {
       if (!this.sectorSeleccionadoNombre) {
         this.sectorSeleccionadoNombre = this.sectores[0].nombre;
       }
@@ -1133,7 +1129,7 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
     }
     this.bffService.getRotacionConfig().subscribe({
       next: (cfg) => {
-        if (cfg && cfg.modo) {
+        if (cfg?.modo) {
           this.rotacionModo = cfg.modo;
           if (cfg.overrideCodigoResiduo) {
             this.overrideMaterialCodigo = cfg.overrideCodigoResiduo;
@@ -1339,8 +1335,7 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
 
   getDiaSector(sectorNombre: string, semana: number): string {
     const override = getScheduleOverrideForSector(sectorNombre, semana);
-    if (override) return override.nuevoDia;
-    return this.getDiaHabitual(sectorNombre);
+    return override?.nuevoDia ?? this.getDiaHabitual(sectorNombre);
   }
 
   isSectorModificadoEnSemana(sectorNombre: string, semana: number): boolean {
@@ -1493,7 +1488,7 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
     if (camion.id) {
       this.bffService.actualizarEstadoCamion(camion.id, nuevoEstado).subscribe({
         next: (res) => {
-          if (res && res.estado) {
+          if (res?.estado) {
             camion.estado = res.estado;
             this.camionEstadoCambiado.emit(camion);
           }
@@ -1507,7 +1502,7 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
 
   exportarPlanillaCsv(): void {
     const sanitizeCsvField = (val: any): string => {
-      let s = String(val ?? '').replace(/"/g, '""').replace(/[\r\n]+/g, ' ');
+      let s = String(val ?? '').replaceAll('"', '""').replace(/[\r\n]+/g, ' ');
       if (/^[=+\-@\t]/.test(s)) {
         s = "'" + s;
       }
@@ -1532,7 +1527,7 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
     link.setAttribute('download', `planilla_oficial_dimao_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    link.remove();
     URL.revokeObjectURL(url);
   }
 
@@ -1690,7 +1685,7 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
       direccion: this.nuevaDireccion.trim(),
       comuna: 'Puerto Varas',
       residuoId: Number(this.nuevoResiduoId || 1),
-      residuoNombre: resObj ? resObj.nombre : 'Vidrio',
+      residuoNombre: resObj?.nombre ?? 'Vidrio',
       pesoEstimadoKg: pesoNum,
       comentarios: comentariosCompletos,
       observaciones: comentariosCompletos
