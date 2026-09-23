@@ -23,72 +23,54 @@ import { BffService } from '../../../services/bff.service';
         </div>
 
         <!-- 3 Tarjetas de Métricas Simétricas (Horizontal en Móvil / Grid en Desktop) -->
-        <div class="flex md:grid md:grid-cols-3 gap-3 sm:gap-5 overflow-x-auto md:overflow-visible pb-3 md:pb-0 px-1 snap-x snap-mandatory scroll-smooth no-scrollbar mb-6 md:mb-8">
+        <div class="flex md:grid md:grid-cols-3 gap-2.5 sm:gap-4 overflow-x-auto md:overflow-visible pb-2 md:pb-0 px-1 snap-x snap-mandatory scroll-smooth no-scrollbar mb-4 md:mb-6">
           
           <!-- Métrica 1: Kilos -->
-          <div class="w-[240px] sm:w-[260px] md:w-auto shrink-0 snap-center bg-slate-50/70 rounded-2xl p-5 text-center border border-slate-200/90 shadow-2xs hover:shadow-md hover:-translate-y-1 hover:border-slate-300 transition-all duration-300 flex flex-col justify-between items-center group">
-            <div class="w-11 h-11 mx-auto mb-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-base shadow-2xs group-hover:scale-105 group-hover:border-emerald-300 transition-all duration-300">
-              <i class="fa-solid fa-scale-balanced text-emerald-600"></i>
+          <div class="w-[200px] sm:w-[220px] md:w-auto shrink-0 snap-start bg-slate-50/80 rounded-xl p-3.5 sm:p-4 text-center border border-slate-200/90 shadow-2xs hover:bg-white hover:shadow-md hover:-translate-y-1 hover:border-slate-300 transition-all duration-300 flex flex-col justify-center items-center group">
+            <div class="w-8 h-8 mx-auto mb-1.5 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs shadow-2xs group-hover:scale-105 transition-transform">
+              <i class="fa-solid fa-scale-balanced"></i>
             </div>
-            <div>
-              <p class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-1 font-heading tracking-tight">
-                {{ displayKg }} <span class="text-xl font-bold text-emerald-600">kg</span>
-              </p>
-              <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Kilos Recolectados</h3>
-              <p class="text-xs text-slate-500">Material clasificado y pesado en ruta</p>
-            </div>
-            <div class="mt-3.5 pt-2.5 border-t border-slate-200/70 w-full flex items-center justify-center gap-1.5 text-[11px] font-medium text-slate-500">
-              <i class="fa-solid fa-check text-emerald-600"></i>
-              <span>Certificado en planta de acopio</span>
-            </div>
+            <p class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-0.5 font-heading tracking-tight">
+              {{ displayKg }} <span class="text-sm font-bold text-emerald-600">kg</span>
+            </p>
+            <h3 class="text-xs sm:text-sm font-heading font-bold text-slate-800 leading-snug">Kilos Recolectados</h3>
+            <p class="text-[11px] text-slate-500 mt-0.5 leading-tight">Pesado y retirado en ruta</p>
           </div>
 
-          <!-- Métrica 2: Meta Comunal (Limpia, Sin Donut) -->
-          <div class="w-[240px] sm:w-[260px] md:w-auto shrink-0 snap-center bg-slate-50/70 rounded-2xl p-5 text-center border border-slate-200/90 shadow-2xs hover:shadow-md hover:-translate-y-1 hover:border-slate-300 transition-all duration-300 flex flex-col justify-between items-center group">
-            <div class="w-11 h-11 mx-auto mb-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-base shadow-2xs group-hover:scale-105 group-hover:border-emerald-300 transition-all duration-300">
-              <i class="fa-solid fa-leaf text-emerald-600"></i>
+          <!-- Métrica 2: Meta Comunal (Opción A) -->
+          <div class="w-[200px] sm:w-[220px] md:w-auto shrink-0 snap-start bg-slate-50/80 rounded-xl p-3.5 sm:p-4 text-center border border-slate-200/90 shadow-2xs hover:bg-white hover:shadow-md hover:-translate-y-1 hover:border-slate-300 transition-all duration-300 flex flex-col justify-center items-center group">
+            <div class="w-8 h-8 mx-auto mb-1.5 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs shadow-2xs group-hover:scale-105 transition-transform">
+              <i class="fa-solid fa-leaf"></i>
             </div>
-            <div>
-              <p class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-1 font-heading tracking-tight">
-                {{ currentPercent }}%
-              </p>
-              <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Meta Comunal 2024</h3>
-              <p class="text-xs text-slate-500">Reducción de basura hacia vertedero</p>
-            </div>
-            <div class="mt-3.5 pt-2.5 border-t border-slate-200/70 w-full flex items-center justify-center gap-1.5 text-[11px] font-medium text-slate-500">
-              <i class="fa-solid fa-arrow-trend-up text-emerald-600"></i>
-              <span>Compromiso municipal activo</span>
-            </div>
+            <p class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-0.5 font-heading tracking-tight">
+              {{ currentPercent }}%
+            </p>
+            <h3 class="text-xs sm:text-sm font-heading font-bold text-slate-800 leading-snug">Meta de Reciclaje</h3>
+            <p class="text-[11px] text-slate-500 mt-0.5 leading-tight">Menos residuos al vertedero</p>
           </div>
 
-          <!-- Métrica 3: Cobertura de Cuadrantes -->
-          <div class="w-[240px] sm:w-[260px] md:w-auto shrink-0 snap-center bg-slate-50/70 rounded-2xl p-5 text-center border border-slate-200/90 shadow-2xs hover:shadow-md hover:-translate-y-1 hover:border-slate-300 transition-all duration-300 flex flex-col justify-between items-center group">
-            <div class="w-11 h-11 mx-auto mb-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-base shadow-2xs group-hover:scale-105 group-hover:border-emerald-300 transition-all duration-300">
-              <i class="fa-solid fa-truck-fast text-slate-800"></i>
+          <!-- Métrica 3: Cobertura Comunal (Opción A) -->
+          <div class="w-[200px] sm:w-[220px] md:w-auto shrink-0 snap-start bg-slate-50/80 rounded-xl p-3.5 sm:p-4 text-center border border-slate-200/90 shadow-2xs hover:bg-white hover:shadow-md hover:-translate-y-1 hover:border-slate-300 transition-all duration-300 flex flex-col justify-center items-center group">
+            <div class="w-8 h-8 mx-auto mb-1.5 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs shadow-2xs group-hover:scale-105 transition-transform">
+              <i class="fa-solid fa-truck-fast"></i>
             </div>
-            <div>
-              <p class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-1 font-heading tracking-tight">
-                4 <span class="text-lg font-bold text-emerald-600">cuadrantes</span>
-              </p>
-              <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Cobertura Comunal</h3>
-              <p class="text-xs text-slate-500">Recorridos semanales en Puerto Varas</p>
-            </div>
-            <div class="mt-3.5 pt-2.5 border-t border-slate-200/70 w-full flex items-center justify-center gap-1.5 text-[11px] font-medium text-slate-500">
-              <i class="fa-solid fa-location-dot text-emerald-600"></i>
-              <span>Puerto Chico, Costanera, Ensenada, N. Braunau</span>
-            </div>
+            <p class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-0.5 font-heading tracking-tight">
+              4 <span class="text-sm font-bold text-emerald-600">sectores</span>
+            </p>
+            <h3 class="text-xs sm:text-sm font-heading font-bold text-slate-800 leading-snug">Cobertura Comunal</h3>
+            <p class="text-[11px] text-slate-500 mt-0.5 leading-tight">Rutas semanales activas</p>
           </div>
 
         </div>
 
-        <!-- Indicador visual de deslizamiento en móvil -->
-        <div class="md:hidden flex items-center justify-center gap-1.5 mb-6 text-[11px] text-slate-400 font-medium">
+        <!-- Indicador visual sutil en móvil -->
+        <div class="md:hidden flex items-center justify-center gap-1.5 mb-4 text-[10px] text-slate-400 font-medium">
           <span>Desliza para ver métricas</span>
-          <i class="fa-solid fa-arrow-right-long text-xs animate-pulse text-slate-500"></i>
+          <i class="fa-solid fa-arrow-right-long text-[10px] animate-pulse text-slate-500"></i>
         </div>
 
-        <!-- Banner Retiro Especial (Legibilidad y Lenguaje Claro) -->
-        <div class="relative rounded-2xl overflow-hidden shadow-md border border-slate-800 bg-slate-950 min-h-[150px] flex items-center">
+        <!-- Banner Retiro Especial Compacto -->
+        <div class="relative rounded-xl overflow-hidden shadow-sm border border-slate-800 bg-slate-950 min-h-[120px] sm:min-h-[140px] flex items-center">
           <img
             src="assets/stitch/cta_lake_flowers.png"
             alt="Paisaje Lago Llanquihue y flores Puerto Varas"
@@ -96,31 +78,32 @@ import { BffService } from '../../../services/bff.service';
           />
           <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/95 to-slate-950/20 sm:to-transparent"></div>
           
-          <div class="relative z-10 p-5 sm:p-7 w-full flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-            <div class="flex items-start gap-3.5 max-w-xl">
-              <div class="shrink-0 w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mt-0.5 shadow-2xs">
-                <i class="fa-solid fa-truck-ramp-box text-base"></i>
+          <div class="relative z-10 p-4 sm:p-6 w-full flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-5">
+            <div class="flex items-start gap-3 max-w-xl">
+              <div class="shrink-0 w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mt-0.5 shadow-2xs">
+                <i class="fa-solid fa-truck-ramp-box text-sm"></i>
               </div>
               <div>
-                <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-400 block mb-1">
+                <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-emerald-400 block mb-0.5">
                   Retiros Especiales
                 </span>
-                <h3 class="text-lg sm:text-xl font-extrabold text-white tracking-tight mb-1 font-heading">
-                  ¿Muebles viejos, ramas o escombros?
+                <h3 class="text-base sm:text-lg font-extrabold text-white tracking-tight mb-0.5 font-heading">
+                  ¿Muebles viejos o escombros?
                 </h3>
-                <p class="text-xs sm:text-sm text-slate-300 font-sans leading-relaxed">
-                  Coordina una fecha de recolección especial a domicilio directamente con el servicio municipal.
+                <p class="text-xs text-slate-300 font-sans leading-snug">
+                  Coordina el retiro especial a domicilio directamente con el servicio municipal.
                 </p>
               </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row items-center gap-2.5 shrink-0">
-              <a routerLink="/dashboard" class="w-full sm:w-auto text-center inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs py-2.5 px-4 rounded-xl transition shadow-sm cursor-pointer font-heading">
-                <span>Agendar Retiro Especial</span>
-                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            <!-- Botones Compactos en 1 Fila -->
+            <div class="flex items-center gap-2 shrink-0">
+              <a routerLink="/dashboard" class="flex-1 sm:flex-initial text-center inline-flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs py-2 px-3.5 rounded-lg transition shadow-xs cursor-pointer font-heading">
+                <span>Agendar Retiro</span>
+                <i class="fa-solid fa-arrow-right text-[9px]"></i>
               </a>
-              <button type="button" (click)="openInfoModal.emit()" class="w-full sm:w-auto text-center px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition border border-white/20 shadow-2xs cursor-pointer font-heading">
-                Preguntas Frecuentes
+              <button type="button" (click)="openInfoModal.emit()" class="flex-1 sm:flex-initial text-center px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition border border-white/20 shadow-2xs cursor-pointer font-heading">
+                Preguntas
               </button>
             </div>
           </div>

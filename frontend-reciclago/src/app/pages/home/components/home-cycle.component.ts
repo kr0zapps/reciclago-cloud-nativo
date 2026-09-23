@@ -31,7 +31,7 @@ interface CycleStep {
         <div class="relative">
           
           <!-- Línea de Conexión de Fondo Animada (Desktop) -->
-          <div class="hidden lg:block absolute top-12 left-12 right-12 h-0.5 bg-slate-200 -z-0">
+          <div class="hidden lg:block absolute top-9 left-10 right-10 h-0.5 bg-slate-200 -z-0">
             <div 
               class="h-full bg-slate-900 transition-all duration-500 ease-out"
               [style.width]="((hoveredStep || 1) / 5 * 100) + '%'">
@@ -39,49 +39,40 @@ interface CycleStep {
           </div>
 
           <!-- Horizontal Scroll on Mobile (Lineal a la derecha) / Grid on Desktop -->
-          <div class="flex lg:grid lg:grid-cols-5 gap-3 sm:gap-4 overflow-x-auto lg:overflow-visible pb-3 lg:pb-0 px-1 snap-x snap-mandatory scroll-smooth no-scrollbar text-left relative z-10">
+          <div class="flex lg:grid lg:grid-cols-5 gap-2.5 sm:gap-3.5 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 px-1 snap-x snap-mandatory scroll-smooth no-scrollbar text-left relative z-10">
             <div 
               *ngFor="let step of steps; let isLast = last" 
               (mouseenter)="hoveredStep = step.stepNumber"
               (mouseleave)="hoveredStep = 0"
-              class="w-[235px] sm:w-[260px] lg:w-auto shrink-0 snap-center group bg-slate-50/80 rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:bg-white hover:shadow-md hover:-translate-y-1 hover:border-slate-400 transition-all duration-300 flex flex-col justify-between cursor-pointer">
+              class="w-[200px] sm:w-[220px] lg:w-auto shrink-0 snap-center group bg-slate-50/90 rounded-xl p-3.5 sm:p-4 border border-slate-200/90 shadow-2xs hover:bg-white hover:shadow-md hover:-translate-y-1 hover:border-slate-400 transition-all duration-300 flex flex-col justify-between cursor-pointer">
               
-              <div>
-                <!-- Top Row: Number + Icon Medallion -->
-                <div class="flex items-center justify-between mb-3 sm:mb-4">
-                  <span class="font-heading font-black text-2xl text-slate-400 group-hover:text-slate-900 transition-colors duration-200">
-                    0{{ step.stepNumber }}
-                  </span>
-                  <div class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-xs shadow-2xs group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900 group-hover:scale-105 transition-all duration-300">
-                    <i [class]="step.iconClass"></i>
-                  </div>
+              <!-- Top Row: Number + Icon Medallion -->
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-mono text-xs font-bold text-slate-400 group-hover:text-emerald-700 transition-colors">
+                  0{{ step.stepNumber }}
+                </span>
+                <div class="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-xs shadow-2xs group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900 transition-all duration-200">
+                  <i [class]="step.iconClass"></i>
                 </div>
-
-                <!-- Step Title -->
-                <h3 class="font-heading font-extrabold text-base text-slate-900 mb-1 leading-snug">
-                  {{ step.title }}
-                </h3>
-
-                <!-- Summary -->
-                <p class="text-xs text-slate-500 leading-relaxed font-sans line-clamp-2">
-                  {{ step.summary }}
-                </p>
               </div>
 
-              <!-- Bottom Indicator -->
-              <div class="mt-4 pt-2.5 border-t border-slate-200/70 flex items-center justify-between text-[11px] text-slate-400 font-medium">
-                <span class="group-hover:text-slate-700 transition-colors">Paso {{ step.stepNumber }}/5</span>
-                <i *ngIf="!isLast" class="fa-solid fa-arrow-right text-xs text-slate-300 group-hover:text-slate-900 group-hover:translate-x-1 transition-all duration-200"></i>
-                <i *ngIf="isLast" class="fa-solid fa-circle-check text-emerald-600 text-xs"></i>
+              <!-- Step Title & Summary -->
+              <div>
+                <h3 class="font-heading font-extrabold text-sm sm:text-base text-slate-900 mb-0.5 leading-snug">
+                  {{ step.title }}
+                </h3>
+                <p class="text-xs text-slate-500 leading-snug font-sans">
+                  {{ step.summary }}
+                </p>
               </div>
 
             </div>
           </div>
 
-          <!-- Indicador visual de deslizamiento en móvil -->
-          <div class="lg:hidden flex items-center justify-center gap-1.5 mt-2 text-[11px] text-slate-400 font-medium">
+          <!-- Indicador visual sutil en móvil -->
+          <div class="lg:hidden flex items-center justify-center gap-1.5 mt-1.5 text-[10px] text-slate-400 font-medium">
             <span>Desliza para ver los 5 pasos</span>
-            <i class="fa-solid fa-arrow-right-long text-xs animate-pulse text-slate-500"></i>
+            <i class="fa-solid fa-arrow-right-long text-[10px] animate-pulse text-slate-500"></i>
           </div>
 
         </div>
