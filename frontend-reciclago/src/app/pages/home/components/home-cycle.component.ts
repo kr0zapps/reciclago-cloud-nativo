@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, OnDestroy, inject } from '@angular/core';
+﻿import { Component, ElementRef, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 interface CycleStep {
@@ -19,7 +19,7 @@ interface CycleStep {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <!-- Title & Subtitle con Revelación Suave -->
         <div class="reveal-init" [class.reveal-active]="isVisible">
-          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a233b] tracking-tight mb-2.5 font-heading">
+          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#123F5B] tracking-tight mb-2.5 font-heading">
             El ciclo de vida del retiro
           </h2>
           <p class="text-xs sm:text-sm text-slate-600 max-w-xl mx-auto mb-10 sm:mb-14 leading-relaxed">
@@ -34,16 +34,16 @@ interface CycleStep {
                [class.reveal-active]="isVisible"
                [style.transition-delay]="(i * 90) + 'ms'">
             <!-- Círculo Grande con Ícono -->
-            <div class="absolute -left-[57px] top-0 w-11 h-11 rounded-2xl bg-white border-2 border-emerald-400 shadow-sm flex items-center justify-center text-[#206935] flex-shrink-0 transition-transform duration-300 hover:scale-105">
+            <div class="absolute -left-[57px] top-0 w-11 h-11 rounded-2xl bg-white border-2 border-emerald-400 shadow-sm flex items-center justify-center text-[#22a652] flex-shrink-0 transition-transform duration-300 hover:scale-105">
               <i [class]="step.iconClass + ' text-base'"></i>
-              <span class="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 rounded-full bg-[#206935] text-white text-[10px] font-black flex items-center justify-center border border-white">
+              <span class="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 rounded-full bg-[#22a652] text-white text-[10px] font-black flex items-center justify-center border border-white">
                 {{ step.stepNumber }}
               </span>
             </div>
 
             <!-- Contenido del Paso con Elevación Suave (Sin Spans Redundantes) -->
             <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow duration-300">
-              <h3 class="font-extrabold text-sm text-[#0a233b] font-heading mb-1">{{ step.title }}</h3>
+              <h3 class="font-extrabold text-sm text-[#123F5B] font-heading mb-1">{{ step.title }}</h3>
               <p class="text-xs text-slate-600 leading-relaxed">{{ step.description }}</p>
             </div>
           </div>
@@ -58,16 +58,16 @@ interface CycleStep {
             
             <!-- Contenedor Circular Amplio con Ícono e Interacción de Giro Sutil -->
             <div class="relative mb-4">
-              <div class="w-16 h-16 lg:w-18 lg:h-18 rounded-2xl bg-[#dcf2e3] group-hover:bg-[#22a652] group-hover:text-white flex items-center justify-center text-[#206935] shadow-xs transition-all duration-300 transform group-hover:scale-110 group-hover:rotate-3">
+              <div class="w-16 h-16 lg:w-18 lg:h-18 rounded-2xl bg-[#ecf7e6] group-hover:bg-[#22a652] group-hover:text-white flex items-center justify-center text-[#22a652] shadow-xs transition-all duration-300 transform group-hover:scale-110 group-hover:rotate-3">
                 <i [class]="step.iconClass + ' text-xl lg:text-2xl transition-colors duration-300'"></i>
               </div>
               <!-- Badge de Número -->
-              <span class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-[#206935] group-hover:bg-[#0a233b] text-white text-xs font-bold flex items-center justify-center border-2 border-white shadow-2xs transition-all duration-300">
+              <span class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-[#22a652] group-hover:bg-[#123F5B] text-white text-xs font-bold flex items-center justify-center border-2 border-white shadow-2xs transition-all duration-300">
                 {{ step.stepNumber }}
               </span>
             </div>
 
-            <h3 class="font-extrabold text-[#0a233b] text-sm lg:text-base mb-1.5 font-heading group-hover:text-[#22a652] transition-colors duration-200">
+            <h3 class="font-extrabold text-[#123F5B] text-sm lg:text-base mb-1.5 font-heading group-hover:text-[#22a652] transition-colors duration-200">
               {{ step.title }}
             </h3>
             <p class="text-xs text-slate-600 leading-relaxed max-w-[170px]">
@@ -151,3 +151,4 @@ export class HomeCycleComponent implements OnInit, OnDestroy {
     this.observer?.disconnect();
   }
 }
+

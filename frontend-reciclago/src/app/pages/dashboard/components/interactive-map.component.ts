@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+﻿import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Sector, Waypoint } from '../data/sectors.data';
 
@@ -9,13 +9,13 @@ import { Sector, Waypoint } from '../data/sectors.data';
   template: `
     <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 flex flex-col justify-between shadow-xs card-hover h-full">
       <div class="space-y-4">
-        <div class="w-12 h-12 rounded-xl bg-[#E8F3F7] text-brand-lake flex items-center justify-center text-2xl interactive-icon">
+        <div class="w-12 h-12 rounded-xl bg-gray-50 text-[#123F5B] flex items-center justify-center text-2xl interactive-icon">
           <i class="fa-solid fa-map-location-dot"></i>
         </div>
         <div>
-          <h3 class="font-heading font-extrabold text-2xl text-brand-navy">Mapa de recorrido vecinal</h3>
+          <h3 class="font-heading font-extrabold text-2xl text-[#123F5B]">Mapa de recorrido vecinal</h3>
         </div>
-        <p class="text-sm sm:text-base text-brand-muted leading-relaxed">
+        <p class="text-sm sm:text-base text-gray-500 leading-relaxed">
           Consulta cuándo pasa el camión por tu calle y revisa el cuadrante comunal por días y tipos de materiales en toda la comuna.
         </p>
 
@@ -23,8 +23,8 @@ import { Sector, Waypoint } from '../data/sectors.data';
         <div class="rounded-xl bg-[#F0F6F9] border border-[#D4E6EF] p-4 sm:p-5 relative overflow-hidden shadow-xs">
           <div class="flex items-center justify-between gap-2 mb-3">
             <div class="flex items-center gap-2">
-              <i class="fa-solid fa-compass text-brand-lake text-base"></i>
-              <span class="font-bold text-sm text-brand-navy">{{ sector?.cuadrante }}</span>
+              <i class="fa-solid fa-compass text-[#123F5B] text-base"></i>
+              <span class="font-bold text-sm text-[#123F5B]">{{ sector?.cuadrante }}</span>
             </div>
             <span class="inline-flex items-center gap-1.5 text-xs text-slate-600 font-medium">
               <i class="fa-solid text-[9px]" [ngClass]="truckSimulationRunning ? 'fa-circle text-[#4F8A3D]' : 'fa-circle text-slate-400'"></i>
@@ -35,7 +35,7 @@ import { Sector, Waypoint } from '../data/sectors.data';
           <!-- Mapa Vectorial de Calles -->
           <div class="h-44 sm:h-48 w-full bg-white rounded-xl relative p-2 overflow-hidden border border-[#E1EDF2] select-none">
             <!-- Lago Llanquihue -->
-            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-2xl flex flex-col items-center justify-center text-[10px] font-extrabold text-brand-lake border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
+            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-2xl flex flex-col items-center justify-center text-[10px] font-extrabold text-[#123F5B] border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
               <div class="flex items-center gap-1.5 opacity-90">
                 <i class="fa-solid fa-water text-xs text-sky-500"></i>
                 <span>Lago Llanquihue</span>
@@ -123,7 +123,7 @@ import { Sector, Waypoint } from '../data/sectors.data';
       </div>
 
       <div class="pt-6">
-        <button (click)="openRutaModal.emit()" type="button" class="btn-action inline-flex items-center justify-start gap-2.5 text-brand-lake hover:text-brand-navy font-bold text-base transition-colors py-2 cursor-pointer">
+        <button (click)="openRutaModal.emit()" type="button" class="btn-action inline-flex items-center justify-start gap-2.5 text-[#123F5B] hover:text-[#123F5B] font-bold text-base transition-colors py-2 cursor-pointer">
           <span>Ver mi recorrido comunal completo</span>
           <i class="fa-solid fa-arrow-right text-sm btn-arrow"></i>
         </button>
@@ -143,3 +143,4 @@ export class InteractiveMapComponent {
   @Output() resetSimulation = new EventEmitter<void>();
   @Output() openRutaModal = new EventEmitter<void>();
 }
+

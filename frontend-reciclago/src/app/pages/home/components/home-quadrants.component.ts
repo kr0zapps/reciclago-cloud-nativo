@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter, ChangeDetectorRef, ElementRef, inject } from '@angular/core';
+﻿import { Component, OnInit, OnDestroy, Output, EventEmitter, ChangeDetectorRef, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BffService } from '../../../services/bff.service';
 import { QuadrantCardInfo, INITIAL_QUADRANTS } from '../data/home-sectors.data';
@@ -56,7 +56,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
         <div class="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4 reveal-init"
              [class.reveal-active]="isVisible">
           <div>
-            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a233b] tracking-tight mb-2 font-heading">
+            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#123F5B] tracking-tight mb-2 font-heading">
               Cuadrantes y Residuos Comunales
             </h2>
             <p class="text-xs sm:text-sm text-slate-600 max-w-xl">
@@ -65,12 +65,12 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
           </div>
 
           <!-- Selector / Indicador Reactivo de Rotación Municipal con Feedback Táctil -->
-          <div class="inline-flex items-center gap-1 bg-[#edf5ef] p-1.5 rounded-2xl border border-emerald-200/80 self-start md:self-auto shadow-xs">
+          <div class="inline-flex items-center gap-1 bg-[#ecf7e6] p-1.5 rounded-2xl border border-emerald-200/80 self-start md:self-auto shadow-xs">
             <button
               type="button"
               (click)="selectWeek(1)"
               [class.bg-white]="activeWeek === 1"
-              [class.text-[#1b5e20]]="activeWeek === 1"
+              [class.text-[#22a652]]="activeWeek === 1"
               [class.shadow-sm]="activeWeek === 1"
               [class.font-bold]="activeWeek === 1"
               [class.text-slate-600]="activeWeek !== 1"
@@ -82,7 +82,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
               type="button"
               (click)="selectWeek(2)"
               [class.bg-white]="activeWeek === 2"
-              [class.text-[#1b5e20]]="activeWeek === 2"
+              [class.text-[#22a652]]="activeWeek === 2"
               [class.shadow-sm]="activeWeek === 2"
               [class.font-bold]="activeWeek === 2"
               [class.text-slate-600]="activeWeek !== 2"
@@ -172,7 +172,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
             <!-- Contenido Informativo de la Tarjeta Móvil -->
             <div class="p-4 sm:p-5">
               <div class="flex items-baseline justify-between mb-3">
-                <h3 class="text-lg font-extrabold text-[#0a233b] tracking-tight font-heading">
+                <h3 class="text-lg font-extrabold text-[#123F5B] tracking-tight font-heading">
                   {{ q.name }}
                 </h3>
                 <span class="text-xs text-slate-500 font-medium">{{ q.hours }}</span>
@@ -197,7 +197,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                 </div>
 
                 <div class="flex items-start gap-2">
-                  <div class="w-4 h-4 rounded-full bg-[#206935] flex items-center justify-center text-white shrink-0 mt-0.5 shadow-2xs">
+                  <div class="w-4 h-4 rounded-full bg-[#22a652] flex items-center justify-center text-white shrink-0 mt-0.5 shadow-2xs">
                     <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24">
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
@@ -250,7 +250,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                  [class.grid-rows-[0fr]]="expandedAccordionId !== q.id">
               <div class="overflow-hidden">
                 <div class="p-4 bg-emerald-50/60 border-t border-emerald-100/80 text-xs text-slate-700 leading-relaxed">
-                  <div class="font-bold text-[#206935] mb-1 flex items-center gap-1.5">
+                  <div class="font-bold text-[#22a652] mb-1 flex items-center gap-1.5">
                     <i class="fa-solid fa-list-check"></i>
                     <span>Instrucciones de preparación comunal:</span>
                   </div>
@@ -303,7 +303,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
               <!-- Contenido Informativo de la Tarjeta -->
               <div class="p-5 sm:p-6">
                 <div class="flex items-baseline justify-between mb-4">
-                  <h3 class="text-xl sm:text-2xl font-extrabold text-[#0a233b] tracking-tight font-heading group-hover:text-[#22a652] transition-colors duration-200">
+                  <h3 class="text-xl sm:text-2xl font-extrabold text-[#123F5B] tracking-tight font-heading group-hover:text-[#22a652] transition-colors duration-200">
                     {{ q.name }}
                   </h3>
                   <span class="text-xs text-slate-400 font-medium">{{ q.hours }}</span>
@@ -334,7 +334,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                   </div>
 
                   <div class="flex items-start gap-2.5">
-                    <div class="w-5 h-5 rounded-full bg-[#206935] flex items-center justify-center text-white shrink-0 mt-0.5 shadow-2xs">
+                    <div class="w-5 h-5 rounded-full bg-[#22a652] flex items-center justify-center text-white shrink-0 mt-0.5 shadow-2xs">
                       <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24">
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
@@ -391,7 +391,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                  [class.grid-rows-[0fr]]="expandedAccordionId !== q.id">
               <div class="overflow-hidden">
                 <div class="px-5 sm:px-6 py-4 bg-emerald-50/50 border-t border-emerald-100/80 text-xs text-slate-700 leading-relaxed">
-                  <div class="font-bold text-[#206935] mb-1 flex items-center gap-1.5">
+                  <div class="font-bold text-[#22a652] mb-1 flex items-center gap-1.5">
                     <i class="fa-solid fa-list-check"></i>
                     <span>Instrucciones oficiales de entrega DIMAO:</span>
                   </div>
@@ -571,3 +571,4 @@ export class HomeQuadrantsComponent implements OnInit, OnDestroy {
     this.quadrantSelected.emit(q);
   }
 }
+

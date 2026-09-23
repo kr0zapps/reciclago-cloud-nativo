@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy, HostListener } from '@angular/core';
+﻿import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BffService } from '../../../../services/bff.service';
@@ -95,9 +95,9 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
             </div>
 
             <div class="mt-2 text-[11px] text-slate-700 space-y-0.5">
-              <div>Fecha: <strong class="text-brand-navy">{{ selectedFechaFullText }}</strong></div>
-              <div>Hora: <strong class="text-brand-navy">{{ selectedHora }} hrs</strong> ({{ selectedPeriodo }})</div>
-              <div>Cuadrilla: <strong class="text-brand-navy">{{ actionCamionPatente }}</strong></div>
+              <div>Fecha: <strong class="text-[#123F5B]">{{ selectedFechaFullText }}</strong></div>
+              <div>Hora: <strong class="text-[#123F5B]">{{ selectedHora }} hrs</strong> ({{ selectedPeriodo }})</div>
+              <div>Cuadrilla: <strong class="text-[#123F5B]">{{ actionCamionPatente }}</strong></div>
             </div>
           </div>
 
@@ -563,3 +563,4 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
     });
   }
 }
+

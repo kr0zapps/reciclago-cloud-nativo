@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+﻿import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Pickup } from '../data/sectors.data';
 
@@ -22,7 +22,7 @@ import { Pickup } from '../data/sectors.data';
               <i class="fa-solid fa-clipboard-list"></i>
             </div>
             <div>
-              <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy leading-tight">
+              <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#123F5B] leading-tight">
                 Auditoría Histórica Comunal
               </h3>
             </div>
@@ -105,3 +105,4 @@ export class AuditoriaModalComponent {
   @Output() close = new EventEmitter<void>();
   @Output() changePage = new EventEmitter<number>();
 }
+

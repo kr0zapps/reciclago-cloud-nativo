@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, SimpleChanges, HostListener } from '@angular/core';
+﻿import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, SimpleChanges, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -43,14 +43,14 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
 
           <button (click)="openAuditoriaModal.emit()"
                   type="button"
-                  class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-[#123F5B] hover:bg-[#0D3549] text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer">
+                  class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-[#123F5B] hover:bg-[#123F5B] text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer">
             <i class="fa-solid fa-clock-rotate-left text-xs"></i>
             <span>Auditoría</span>
           </button>
 
           <button (click)="openNuevoRetiroModal()"
                   type="button"
-                  class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer">
+                  class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer">
             <i class="fa-solid fa-plus text-xs"></i>
             <span>Ingresar Solicitud</span>
           </button>
@@ -58,7 +58,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
 
       <!-- ==================== 2. TARJETAS DE KPIS EJECUTIVOS ==================== -->
       <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-        <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <span class="text-xs font-semibold text-slate-500">Por asignar</span>
             <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-xs font-bold border border-amber-200/80">
@@ -66,7 +66,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
             </div>
           </div>
           <div class="mt-3">
-            <div class="text-3xl sm:text-4xl font-black font-heading text-brand-navy">{{ countPendientes }}</div>
+            <div class="text-3xl sm:text-4xl font-black font-heading text-[#123F5B]">{{ countPendientes }}</div>
             <p class="text-xs text-slate-500 mt-1">
               <span [ngClass]="countPendientes > 0 ? 'text-amber-700 font-bold' : 'text-emerald-700 font-bold'">
                 {{ countPendientes > 0 ? 'Requieren programación' : 'Al día' }}
@@ -75,7 +75,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <span class="text-xs font-semibold text-slate-500">En recorrido</span>
             <div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center text-xs font-bold border border-sky-200/80">
@@ -88,7 +88,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <span class="text-xs font-semibold text-slate-500">Kilos certificados</span>
             <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs font-bold border border-emerald-200/80">
@@ -103,7 +103,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <span class="text-xs font-semibold text-slate-500">Cumplimiento comunal</span>
             <div class="w-8 h-8 rounded-xl bg-slate-100 text-[#123F5B] flex items-center justify-center text-xs font-bold border border-slate-200">
@@ -118,14 +118,14 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
       </section>
 
       <!-- ==================== 3. GESTIÓN Y DISPONIBILIDAD DE FLOTA (EXCLUSIVO ADMIN) ==================== -->
-      <section class="bg-white rounded-2xl border border-[#E2E9E4] p-6 sm:p-8 shadow-xs">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-6 border-b border-[#EAEFE8]">
+      <section class="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 shadow-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-6 border-b border-[#F8FAF7]">
           <div>
             <div class="flex items-center gap-2">
               <span class="text-xs font-bold uppercase tracking-wider text-[#123F5B]">Control de Activos y Mantenimiento</span>
               <span class="text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded">Exclusivo Admin</span>
             </div>
-            <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy mt-0.5">
+            <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#123F5B] mt-0.5">
               Disponibilidad Operativa de Camiones Tolva
             </h3>
           </div>
@@ -137,14 +137,14 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
         <div *ngIf="camiones.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           <div *ngFor="let c of camiones"
                class="p-5 rounded-2xl border transition-all flex flex-col justify-between"
-               [ngClass]="c.estado === 'MANTENIMIENTO' ? 'bg-rose-50/40 border-rose-200' : 'bg-[#F8FAF7] border-[#E2E9E4] hover:border-[#CFE2D4]'">
+               [ngClass]="c.estado === 'MANTENIMIENTO' ? 'bg-rose-50/40 border-rose-200' : 'bg-[#F8FAF7] border-[#E2E8F0] hover:border-[#CFE2D4]'">
             <div>
               <div class="flex items-center justify-between mb-3">
-                <span class="font-mono text-sm font-black px-2.5 py-1 rounded-lg bg-white border border-[#DFE8E1] text-[#123F5B] shadow-2xs">
+                <span class="font-mono text-sm font-black px-2.5 py-1 rounded-lg bg-white border border-[#E2E8F0] text-[#123F5B] shadow-2xs">
                   {{ c.patente }}
                 </span>
                 <span class="px-2.5 py-1 rounded-md text-xs font-bold"
-                      [ngClass]="c.estado === 'MANTENIMIENTO' ? 'bg-rose-100 text-rose-800 border border-rose-300' : (c.estado === 'EN_RUTA' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-[#EBF5E7] text-emerald-900 border border-[#CDE8C7]')">
+                      [ngClass]="c.estado === 'MANTENIMIENTO' ? 'bg-rose-100 text-rose-800 border border-rose-300' : (c.estado === 'EN_RUTA' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-[#ecf7e6] text-emerald-900 border border-[#E2E8F0]')">
                   <i class="fa-solid mr-1"
                      [class.fa-triangle-exclamation]="c.estado === 'MANTENIMIENTO'"
                      [class.fa-truck-fast]="c.estado === 'EN_RUTA'"
@@ -152,7 +152,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                   {{ c.estado === 'MANTENIMIENTO' ? 'En taller' : (c.estado === 'EN_RUTA' ? 'En ruta' : 'Disponible') }}
                 </span>
               </div>
-              <h4 class="font-bold text-sm text-brand-navy">Camión Tolva Compactador</h4>
+              <h4 class="font-bold text-sm text-[#123F5B]">Camión Tolva Compactador</h4>
               <p class="text-xs text-slate-500 mt-1">
                 Capacidad nominal: <strong class="text-slate-700">{{ c.capacidadKilos || c.capacidadMaximaKg || 1500 }} kg</strong>
               </p>
@@ -188,16 +188,16 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
       </section>
 
       <!-- ==================== GESTIÓN Y REPROGRAMACIÓN DE RECORRIDOS POR SEMANA Y SECTOR (DIMAO) ==================== -->
-      <section class="bg-white rounded-2xl border border-[#E2E9E4] p-6 sm:p-8 shadow-xs space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#EAEFE8]">
+      <section class="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 shadow-xs space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#F8FAF7]">
           <div>
             <div class="flex items-center gap-2">
               <span class="text-xs font-bold uppercase tracking-wider text-[#123F5B]">Planificación Operativa Comunal</span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-[#EBF5E7] text-emerald-900 border border-[#CDE8C7]">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-[#ecf7e6] text-emerald-900 border border-[#E2E8F0]">
                 Sincronización en Tiempo Real
               </span>
             </div>
-            <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy mt-0.5">
+            <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#123F5B] mt-0.5">
               Calendario y Rotación Semanal de Residuos
             </h3>
             <p class="text-xs text-slate-500 mt-0.5">
@@ -244,8 +244,8 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                  (click)="seleccionarSemana(sem.slot)"
                  class="p-4 rounded-xl border transition-all flex flex-col justify-between cursor-pointer select-none"
                  [ngClass]="semanaSeleccionada === sem.slot
-                   ? 'bg-[#F0F6F9] border-2 border-[#123F5B] ring-2 ring-[#123F5B]/20 shadow-xs'
-                   : 'bg-white border-[#E2E9E4] hover:border-[#123F5B]/50 hover:bg-[#FAFBF9]'">
+                   ? 'bg-[#F8FAF7] border-2 border-[#123F5B] ring-2 ring-[#123F5B]/20 shadow-xs'
+                   : 'bg-white border-[#E2E8F0] hover:border-[#123F5B]/50 hover:bg-[#FAFBF9]'">
               <div>
                 <div class="flex items-center justify-between mb-2">
                   <span class="text-xs font-extrabold text-[#123F5B]">Semana {{ sem.slot }}</span>
@@ -259,10 +259,10 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                   </span>
                 </div>
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm mb-2"
-                     [ngClass]="semanaSeleccionada === sem.slot ? 'bg-[#123F5B] text-white' : 'bg-[#EEF5EB] text-[#4F8A3D]'">
+                     [ngClass]="semanaSeleccionada === sem.slot ? 'bg-[#123F5B] text-white' : 'bg-[#F8FAF7] text-[#22a652]'">
                   <i [class]="getRotacionMaterialIcon(sem.codigo)"></i>
                 </div>
-                <h5 class="text-xs font-extrabold text-brand-navy leading-tight">{{ sem.nombre }}</h5>
+                <h5 class="text-xs font-extrabold text-[#123F5B] leading-tight">{{ sem.nombre }}</h5>
                 <p class="text-[10px] text-slate-500 mt-1 line-clamp-2 leading-snug">{{ sem.descripcion }}</p>
               </div>
               <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px]">
@@ -274,8 +274,8 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
         </div>
 
         <!-- Panel de Control: Reprogramar Día del Sector Seleccionado -->
-        <div class="p-5 rounded-2xl bg-[#F8FAF7] border border-[#E2E9E4] space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#E2E9E4]">
+        <div class="p-5 rounded-2xl bg-[#F8FAF7] border border-[#E2E8F0] space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#E2E8F0]">
             <div class="flex items-center gap-2">
               <div class="w-7 h-7 rounded-lg bg-[#123F5B] text-white flex items-center justify-center text-xs font-bold">
                 <i class="fa-solid fa-sliders"></i>
@@ -306,7 +306,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
               <select id="adminSelectSector"
                       [(ngModel)]="sectorSeleccionadoNombre"
                       (ngModelChange)="onSectorSeleccionadoChange()"
-                      class="select-stitch w-full py-2 px-3 text-xs font-bold text-[#123F5B] bg-white border border-[#D5E2D9]">
+                      class="select-stitch w-full py-2 px-3 text-xs font-bold text-[#123F5B] bg-white border border-[#E2E8F0]">
                 <option *ngFor="let s of sectores" [value]="s.nombre">
                   C{{ s.numero }}: {{ s.nombre }} (Habitual: {{ getDiaHabitual(s.nombre) }})
                 </option>
@@ -320,7 +320,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
               </label>
               <select id="adminSelectNuevoDia"
                       [(ngModel)]="nuevoDiaSeleccionado"
-                      class="select-stitch w-full py-2 px-3 text-xs font-bold text-[#123F5B] bg-white border border-[#D5E2D9]">
+                      class="select-stitch w-full py-2 px-3 text-xs font-bold text-[#123F5B] bg-white border border-[#E2E8F0]">
                 <option value="Lunes">Lunes</option>
                 <option value="Martes">Martes</option>
                 <option value="Miércoles">Miércoles</option>
@@ -339,7 +339,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                      type="text"
                      [(ngModel)]="motivoCambioDia"
                      placeholder="Ej: Feriado irrenunciable o contingencia climática"
-                     class="input-stitch w-full py-2 px-3 text-xs font-medium bg-white border border-[#D5E2D9]">
+                     class="input-stitch w-full py-2 px-3 text-xs font-medium bg-white border border-[#E2E8F0]">
             </div>
           </div>
 
@@ -389,10 +389,10 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                    ? 'border-[#123F5B] bg-[#F4F8FA] ring-2 ring-[#123F5B]/20 shadow-xs'
                    : (isSectorModificadoEnSemana(s.nombre, semanaSeleccionada)
                      ? 'border-amber-300 bg-amber-50/40 hover:border-amber-400'
-                     : 'border-[#E2E9E4] bg-white hover:border-slate-300')">
+                     : 'border-[#E2E8F0] bg-white hover:border-slate-300')">
               <div>
                 <div class="flex items-center justify-between mb-2">
-                  <span class="font-mono text-xs font-black px-2 py-0.5 rounded bg-white border border-[#DFE8E1] text-[#123F5B]">
+                  <span class="font-mono text-xs font-black px-2 py-0.5 rounded bg-white border border-[#E2E8F0] text-[#123F5B]">
                     C{{ s.numero }}
                   </span>
                   <span class="text-[10px] font-bold px-2 py-0.5 rounded"
@@ -403,14 +403,14 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                   </span>
                 </div>
 
-                <h5 class="text-xs font-extrabold text-brand-navy leading-tight">{{ s.nombre }}</h5>
+                <h5 class="text-xs font-extrabold text-[#123F5B] leading-tight">{{ s.nombre }}</h5>
                 <p class="text-[11px] text-slate-500 mt-0.5">{{ s.sector }} • {{ s.patente }}</p>
 
                 <!-- Día asignado destacado -->
                 <div class="mt-3 p-2.5 rounded-lg flex items-center justify-between"
                      [ngClass]="isSectorModificadoEnSemana(s.nombre, semanaSeleccionada)
                        ? 'bg-amber-100/70 border border-amber-300 text-amber-950'
-                       : 'bg-[#F8FAF7] border border-[#E2E9E4] text-slate-800'">
+                       : 'bg-[#F8FAF7] border border-[#E2E8F0] text-slate-800'">
                   <div>
                     <span class="text-[10px] font-bold uppercase tracking-wider block text-slate-500">Día de Retiro</span>
                     <span class="text-sm font-extrabold"
@@ -442,12 +442,12 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
       </section>
 
       <!-- ==================== 4. PLANILLA MAESTRA DE DESPACHO CON PAGINACIÓN ==================== -->
-      <section class="bg-white rounded-2xl border border-[#E2E9E4] shadow-xs overflow-hidden">
-        <div class="p-6 border-b border-[#EAEFE8] space-y-4">
+      <section class="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs overflow-hidden">
+        <div class="p-6 border-b border-[#F8FAF7] space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <span class="text-xs font-bold uppercase tracking-wider text-[#123F5B]">Supervisión y Control Integral</span>
-              <h3 class="font-heading font-extrabold text-2xl text-brand-navy mt-0.5">
+              <h3 class="font-heading font-extrabold text-2xl text-[#123F5B] mt-0.5">
                 Planilla Maestra de Trazabilidad Comunal
               </h3>
             </div>
@@ -536,12 +536,12 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
         </div>
 
         <!-- Filas de la Planilla -->
-        <div class="divide-y divide-[#EEF3EF]">
+        <div class="divide-y divide-[#E2E8F0]">
           <div *ngFor="let p of paginatedPickups"
                class="p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:bg-[#F9FAF8] transition-colors">
             
             <div class="flex items-start sm:items-center gap-4 min-w-0 flex-1">
-              <div class="w-12 h-12 rounded-2xl bg-[#EEF5EB] text-[#4F8A3D] flex items-center justify-center text-xl flex-shrink-0 border border-[#CCE4C8] shadow-2xs">
+              <div class="w-12 h-12 rounded-2xl bg-[#F8FAF7] text-[#22a652] flex items-center justify-center text-xl flex-shrink-0 border border-[#E2E8F0] shadow-2xs">
                 <i class="fa-solid fa-recycle"></i>
               </div>
 
@@ -550,10 +550,10 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                   <span class="text-xs font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
                     #{{ p.id }}
                   </span>
-                  <h4 class="font-heading font-bold text-base sm:text-lg text-brand-navy">
+                  <h4 class="font-heading font-bold text-base sm:text-lg text-[#123F5B]">
                     {{ p.direccion }}
                   </h4>
-                  <span class="text-xs font-bold text-[#4F8A3D] px-2.5 py-0.5 rounded-lg bg-[#EBF5E7] border border-[#CDE8C7]">
+                  <span class="text-xs font-bold text-[#22a652] px-2.5 py-0.5 rounded-lg bg-[#ecf7e6] border border-[#E2E8F0]">
                     {{ p.residuoNombre || 'Reciclaje Domiciliario' }}
                   </span>
                 </div>
@@ -590,7 +590,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                 <button *ngIf="p.estado === 'SOLICITADO'"
                         (click)="requestAction(p, 'programar')"
                         type="button"
-                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#123F5B] hover:bg-[#0D3549] text-white transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#123F5B] hover:bg-[#123F5B] text-white transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
                   <i class="fa-regular fa-calendar-check text-xs"></i>
                   <span>Programar Camión</span>
                 </button>
@@ -614,7 +614,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                 <button *ngIf="p.estado === 'RETIRADO'"
                         (click)="requestAction(p, 'pesado')"
                         type="button"
-                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#22a652] hover:bg-[#1b8e45] text-white transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
                   <i class="fa-solid fa-scale-balanced text-xs"></i>
                   <span>Pesar en Báscula</span>
                 </button>
@@ -642,13 +642,13 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
             <div class="w-12 h-12 mx-auto rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center text-lg mb-2">
               <i class="fa-solid fa-inbox"></i>
             </div>
-            <p class="font-bold text-brand-navy text-sm">No hay retiros en este filtro</p>
+            <p class="font-bold text-[#123F5B] text-sm">No hay retiros en este filtro</p>
             <p class="text-xs text-slate-500 mt-0.5">Selecciona otra pestaña o cambia el sector.</p>
           </div>
         </div>
 
         <!-- Paginación -->
-        <div *ngIf="filteredPickups.length > 0" class="p-4 bg-[#F8FAF7] border-t border-[#EAEFE8] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <div *ngIf="filteredPickups.length > 0" class="p-4 bg-[#F8FAF7] border-t border-[#F8FAF7] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
           <span class="text-slate-500 font-medium">
             Mostrando <strong class="text-slate-800">{{ (currentPage - 1) * pageSize + 1 }}</strong> a
             <strong class="text-slate-800">{{ Math.min(currentPage * pageSize, filteredPickups.length) }}</strong> de
@@ -684,11 +684,11 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
       </section>
 
       <!-- ==================== 5. SUPERVISIÓN SATELITAL GPS DE TODA LA FLOTA ==================== -->
-      <section class="bg-white rounded-2xl border border-[#E2E9E4] p-6 sm:p-8 shadow-xs">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-[#EAEFE8]">
+      <section class="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 shadow-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-[#F8FAF7]">
           <div>
             <span class="text-xs font-bold uppercase tracking-wider text-[#123F5B]">Telemetría Satelital de Flota</span>
-            <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy mt-0.5">
+            <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#123F5B] mt-0.5">
               Supervisión de Camiones en Puerto Varas
             </h3>
           </div>
@@ -707,11 +707,11 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           </div>
         </div>
 
-        <div class="rounded-2xl bg-[#F0F6F9] border-2 border-[#D4E6EF] p-4 sm:p-5 relative overflow-hidden">
+        <div class="rounded-2xl bg-[#F8FAF7] border-2 border-[#E2E8F0] p-4 sm:p-5 relative overflow-hidden">
           <div class="flex items-center justify-between gap-2 mb-3">
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-satellite-dish text-[#123F5B] text-lg"></i>
-              <span class="font-bold text-sm text-brand-navy">
+              <span class="font-bold text-sm text-[#123F5B]">
                 Unidad {{ selectedCamion.patente }} — {{ currentWaypoint.name }}
               </span>
             </div>
@@ -721,7 +721,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           </div>
 
           <div class="h-48 sm:h-56 w-full bg-white rounded-xl relative p-2 overflow-hidden border border-[#E1EDF2] select-none">
-            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-2xl flex flex-col items-center justify-center text-[10px] font-extrabold text-[#1F6685] border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
+            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-2xl flex flex-col items-center justify-center text-[10px] font-extrabold text-[#123F5B] border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
               <div class="flex items-center gap-1.5 opacity-90">
                 <i class="fa-solid fa-water text-xs text-sky-500"></i>
                 <span>Lago Llanquihue</span>
@@ -742,7 +742,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
 
             <svg class="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 100 100">
               <path d="M 8 72 L 28 72 L 28 28 L 52 28 L 52 72 L 82 72" fill="none" stroke="#CBD5E1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 3"></path>
-              <path d="M 8 72 L 28 72 L 28 28 L 52 28 L 52 72 L 82 72" fill="none" stroke="#4F8A3D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"></path>
+              <path d="M 8 72 L 28 72 L 28 28 L 52 28 L 52 72 L 82 72" fill="none" stroke="#22a652" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"></path>
             </svg>
 
             <div class="absolute z-30 pointer-events-none -translate-x-1/2 -translate-y-1/2"
@@ -772,14 +772,14 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
               <p class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-2 flex-wrap">
                 <span>{{ currentWaypoint.detail }}</span>
                 <span class="text-slate-300">•</span>
-                <span class="font-bold text-[#4F8A3D]">ETA: {{ currentWaypoint.eta }}</span>
+                <span class="font-bold text-[#22a652]">ETA: {{ currentWaypoint.eta }}</span>
                 <span class="text-slate-300">•</span>
                 <span class="font-semibold text-slate-600">{{ currentWaypoint.distancia }}</span>
               </p>
             </div>
 
             <div class="flex items-center gap-1.5 flex-shrink-0 self-end sm:self-center">
-              <button (click)="toggleTruckSimulation.emit()" type="button" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#EEF5EB] hover:bg-[#E0EDE0] text-[#3D742F] border border-[#C8DFCA] transition-colors flex items-center gap-1.5 cursor-pointer">
+              <button (click)="toggleTruckSimulation.emit()" type="button" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#F8FAF7] hover:bg-[#E0EDE0] text-[#1b8e45] border border-[#C8DFCA] transition-colors flex items-center gap-1.5 cursor-pointer">
                 <i class="fa-solid" [class.fa-pause]="truckSimulationRunning" [class.fa-play]="!truckSimulationRunning"></i>
                 <span>{{ truckSimulationRunning ? 'Pausar' : 'Reanudar' }}</span>
               </button>
@@ -802,13 +802,13 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
            aria-labelledby="admin-mesa-title"
            class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
         <div (click)="$event.stopPropagation()"
-             class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto p-6 sm:p-8">
+             class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-[#E2E8F0] overflow-hidden anim-modal-panel text-slate-800 my-auto p-6 sm:p-8">
           
-          <div class="h-1.5 -mx-8 -mt-8 mb-6 bg-gradient-to-r from-[#123F5B] via-[#38BDF8] to-[#4F8A3D]"></div>
+          <div class="h-1.5 -mx-8 -mt-8 mb-6 bg-gradient-to-r from-[#123F5B] via-[#38BDF8] to-[#22a652]"></div>
 
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-2.5">
-              <div class="w-9 h-9 rounded-xl bg-[#EEF5EB] text-[#4F8A3D] flex items-center justify-center text-sm font-bold border border-[#CCE4C8]">
+              <div class="w-9 h-9 rounded-xl bg-[#F8FAF7] text-[#22a652] flex items-center justify-center text-sm font-bold border border-[#E2E8F0]">
                 <i class="fa-solid fa-file-circle-plus"></i>
               </div>
               <div>
@@ -861,9 +861,9 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                   aria-labelledby="adminResiduoLabel"
                   aria-haspopup="listbox"
                   [attr.aria-expanded]="isMaterialDropdownOpen"
-                  class="w-full flex items-center justify-between py-2 px-3 rounded-xl border border-[#D5E2D9] bg-white hover:border-[#4F8A3D] text-left shadow-2xs transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#4F8A3D]/30 min-h-[42px]">
+                  class="w-full flex items-center justify-between py-2 px-3 rounded-xl border border-[#E2E8F0] bg-white hover:border-[#22a652] text-left shadow-2xs transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#22a652]/30 min-h-[42px]">
                   <div class="flex items-center gap-2.5 min-w-0">
-                    <div class="w-7 h-7 rounded-lg bg-[#EEF5EB] text-[#4F8A3D] flex items-center justify-center text-xs flex-shrink-0">
+                    <div class="w-7 h-7 rounded-lg bg-[#F8FAF7] text-[#22a652] flex items-center justify-center text-xs flex-shrink-0">
                       <i [class]="getMaterialIcon(selectedResiduoNombre)"></i>
                     </div>
                     <span class="text-xs font-bold text-[#123F5B] truncate">{{ selectedResiduoNombre }}</span>
@@ -875,7 +875,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                 <!-- Menú Desplegable Flotante Moderno -->
                 <div *ngIf="isMaterialDropdownOpen"
                      role="listbox"
-                     class="absolute left-0 right-0 top-full mt-1.5 bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] p-2 z-[100] anim-modal-backdrop space-y-1">
+                     class="absolute left-0 right-0 top-full mt-1.5 bg-white rounded-2xl shadow-2xl border border-[#E2E8F0] p-2 z-[100] anim-modal-backdrop space-y-1">
                   <button
                     *ngFor="let r of residuos"
                     type="button"
@@ -883,10 +883,10 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                     [attr.aria-selected]="nuevoResiduoId === r.id"
                     (click)="selectResiduo(r.id)"
                     class="w-full text-left p-2 rounded-xl transition-all flex items-center justify-between group cursor-pointer"
-                    [ngClass]="nuevoResiduoId === r.id ? 'bg-[#EEF5EB] border border-[#CCE4C8]' : 'hover:bg-slate-50 border border-transparent'">
+                    [ngClass]="nuevoResiduoId === r.id ? 'bg-[#F8FAF7] border border-[#E2E8F0]' : 'hover:bg-slate-50 border border-transparent'">
                     <div class="flex items-center gap-2.5 min-w-0">
                       <div class="w-7 h-7 rounded-lg flex items-center justify-center text-xs flex-shrink-0 transition-colors"
-                           [ngClass]="nuevoResiduoId === r.id ? 'bg-[#4F8A3D] text-white' : 'bg-slate-100 text-slate-600 group-hover:bg-[#EEF5EB] group-hover:text-[#4F8A3D]'">
+                           [ngClass]="nuevoResiduoId === r.id ? 'bg-[#22a652] text-white' : 'bg-slate-100 text-slate-600 group-hover:bg-[#F8FAF7] group-hover:text-[#22a652]'">
                         <i [class]="getMaterialIcon(r.nombre)"></i>
                       </div>
                       <div class="min-w-0">
@@ -894,7 +894,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                         <span class="text-[10px] text-slate-400 block truncate">{{ r.descripcion || 'Reciclaje clasificado' }}</span>
                       </div>
                     </div>
-                    <i *ngIf="nuevoResiduoId === r.id" class="fa-solid fa-circle-check text-[#4F8A3D] text-sm flex-shrink-0 ml-2"></i>
+                    <i *ngIf="nuevoResiduoId === r.id" class="fa-solid fa-circle-check text-[#22a652] text-sm flex-shrink-0 ml-2"></i>
                   </button>
                 </div>
               </div>
@@ -1676,7 +1676,7 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
       case 'RETIRADO':
         return 'bg-emerald-50 text-emerald-900 border-emerald-200/80';
       case 'PESADO':
-        return 'bg-[#EBF5E7] text-emerald-900 border-[#CDE8C7]';
+        return 'bg-[#ecf7e6] text-emerald-900 border-[#E2E8F0]';
       default:
         return 'bg-slate-100 text-slate-700 border-slate-200';
     }
@@ -1699,3 +1699,4 @@ export class AdminDashboardComponent implements OnInit, OnChanges {
     }
   }
 }
+

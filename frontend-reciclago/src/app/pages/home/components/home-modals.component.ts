@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
+﻿import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { QuadrantCardInfo } from '../data/home-sectors.data';
 
@@ -13,16 +13,16 @@ import { QuadrantCardInfo } from '../data/home-sectors.data';
          class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
       
       <div (click)="$event.stopPropagation()"
-           class="relative w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto">
-        <div class="h-2 w-full bg-gradient-to-r from-[#206935] via-[#38BDF8] to-[#093554]"></div>
+           class="relative w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-[#E2E8F0] overflow-hidden anim-modal-panel text-slate-800 my-auto">
+        <div class="h-2 w-full bg-gradient-to-r from-[#22a652] via-[#38BDF8] to-[#093554]"></div>
 
         <div class="px-6 sm:px-8 pt-6 pb-4 border-b border-slate-100 flex items-center justify-between bg-[#F8FAF7]">
           <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl bg-[#EEF5EB] border border-[#D5E6D2] flex items-center justify-center text-[#206935] text-xl flex-shrink-0 shadow-xs">
+            <div class="w-12 h-12 rounded-xl bg-[#F8FAF7] border border-[#E2E8F0] flex items-center justify-center text-[#22a652] text-xl flex-shrink-0 shadow-xs">
               <i [class]="selectedQuadrant.iconClass"></i>
             </div>
             <div>
-              <span class="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-[#206935] block">
+              <span class="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-[#22a652] block">
                 Cuadrante {{ selectedQuadrant.cuadranteNumber }} · {{ selectedQuadrant.name }}
               </span>
               <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#093554] leading-tight">
@@ -45,7 +45,7 @@ import { QuadrantCardInfo } from '../data/home-sectors.data';
               <i class="fa-solid fa-calendar-day"></i> Día: {{ selectedQuadrant.day }}
             </span>
             <span class="font-medium text-slate-600">
-              <i class="fa-regular fa-clock text-[#206935]"></i> {{ selectedQuadrant.hours }}
+              <i class="fa-regular fa-clock text-[#22a652]"></i> {{ selectedQuadrant.hours }}
             </span>
           </div>
 
@@ -81,7 +81,7 @@ import { QuadrantCardInfo } from '../data/home-sectors.data';
           <span class="text-xs text-slate-500 font-medium">DIMAO · Municipalidad de Puerto Varas</span>
           <button (click)="closeQuadrantModal()"
                   type="button"
-                  class="bg-[#206935] hover:bg-[#1a552b] text-white font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-xl transition-all shadow-xs cursor-pointer">
+                  class="bg-[#22a652] hover:bg-[#1a552b] text-white font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-xl transition-all shadow-xs cursor-pointer">
             Entendido
           </button>
         </div>
@@ -94,12 +94,12 @@ import { QuadrantCardInfo } from '../data/home-sectors.data';
          class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
       
       <div (click)="$event.stopPropagation()"
-           class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto">
+           class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-[#E2E8F0] overflow-hidden anim-modal-panel text-slate-800 my-auto">
         <div class="h-1.5 w-full bg-gradient-to-r from-[#437d32] via-[#38BDF8] to-[#093554]"></div>
 
-        <div class="px-6 sm:px-8 pt-6 pb-4 border-b border-[#E2E9E4] flex items-center justify-between bg-[#F8FAF7]">
+        <div class="px-6 sm:px-8 pt-6 pb-4 border-b border-[#E2E8F0] flex items-center justify-between bg-[#F8FAF7]">
           <div class="flex items-center gap-3.5">
-            <div class="w-11 h-11 rounded-xl bg-[#EEF5EB] border border-[#D5E6D2] flex items-center justify-center text-[#437d32] text-lg flex-shrink-0 shadow-xs">
+            <div class="w-11 h-11 rounded-xl bg-[#F8FAF7] border border-[#E2E8F0] flex items-center justify-center text-[#437d32] text-lg flex-shrink-0 shadow-xs">
               <i class="fa-solid fa-leaf"></i>
             </div>
             <div>
@@ -113,7 +113,7 @@ import { QuadrantCardInfo } from '../data/home-sectors.data';
           </div>
           <button (click)="closeMaterialsModal()"
                   type="button"
-                  class="w-9 h-9 rounded-lg bg-white border border-[#DFE8E1] hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-sm transition-colors shadow-xs cursor-pointer"
+                  class="w-9 h-9 rounded-lg bg-white border border-[#E2E8F0] hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-sm transition-colors shadow-xs cursor-pointer"
                   aria-label="Cerrar">
             <i class="fa-solid fa-xmark"></i>
           </button>
@@ -144,7 +144,7 @@ import { QuadrantCardInfo } from '../data/home-sectors.data';
           </div>
         </div>
 
-        <div class="px-6 sm:px-8 py-4 bg-[#F8FAF7] border-t border-[#E2E9E4] flex items-center justify-between">
+        <div class="px-6 sm:px-8 py-4 bg-[#F8FAF7] border-t border-[#E2E8F0] flex items-center justify-between">
           <span class="text-xs text-slate-500 font-medium">DIMAO · Puerto Varas</span>
           <button (click)="closeMaterialsModal()"
                   type="button"
@@ -160,12 +160,12 @@ import { QuadrantCardInfo } from '../data/home-sectors.data';
          (click)="closeFaqModal()"
          class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
       <div (click)="$event.stopPropagation()"
-           class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto">
+           class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-[#E2E8F0] overflow-hidden anim-modal-panel text-slate-800 my-auto">
         <div class="h-1.5 w-full bg-gradient-to-r from-[#437d32] via-[#38BDF8] to-[#093554]"></div>
 
-        <div class="px-6 sm:px-8 pt-6 pb-4 border-b border-[#E2E9E4] flex items-center justify-between bg-[#F8FAF7]">
+        <div class="px-6 sm:px-8 pt-6 pb-4 border-b border-[#E2E8F0] flex items-center justify-between bg-[#F8FAF7]">
           <div class="flex items-center gap-3.5">
-            <div class="w-11 h-11 rounded-xl bg-[#EEF5EB] border border-[#D5E6D2] flex items-center justify-center text-[#093554] text-lg flex-shrink-0 shadow-xs">
+            <div class="w-11 h-11 rounded-xl bg-[#F8FAF7] border border-[#E2E8F0] flex items-center justify-center text-[#093554] text-lg flex-shrink-0 shadow-xs">
               <i class="fa-solid fa-circle-question"></i>
             </div>
             <div>
@@ -179,14 +179,14 @@ import { QuadrantCardInfo } from '../data/home-sectors.data';
           </div>
           <button (click)="closeFaqModal()"
                   type="button"
-                  class="w-9 h-9 rounded-lg bg-white border border-[#DFE8E1] hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-sm transition-colors shadow-xs cursor-pointer"
+                  class="w-9 h-9 rounded-lg bg-white border border-[#E2E8F0] hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-sm transition-colors shadow-xs cursor-pointer"
                   aria-label="Cerrar">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
 
         <div class="px-6 sm:px-8 py-6 max-h-[calc(85vh-140px)] overflow-y-auto space-y-3.5 text-sm text-slate-600 leading-relaxed">
-          <div class="p-4 rounded-2xl bg-[#F8FAF7] border border-[#E2E9E4]">
+          <div class="p-4 rounded-2xl bg-[#F8FAF7] border border-[#E2E8F0]">
             <h4 class="font-bold text-sm text-[#093554] flex items-center gap-2 mb-1">
               <i class="fa-solid fa-circle-check text-xs text-[#437d32]"></i>
               ¿Tiene algún costo el retiro municipal?
@@ -194,7 +194,7 @@ import { QuadrantCardInfo } from '../data/home-sectors.data';
             <p class="text-xs text-slate-600 pl-4">No. El retiro regular puerta a puerta es un servicio comunal 100% gratuito financiado por la Municipalidad de Puerto Varas para proteger el entorno natural.</p>
           </div>
 
-          <div class="p-4 rounded-2xl bg-[#F8FAF7] border border-[#E2E9E4]">
+          <div class="p-4 rounded-2xl bg-[#F8FAF7] border border-[#E2E8F0]">
             <h4 class="font-bold text-sm text-[#093554] flex items-center gap-2 mb-1">
               <i class="fa-solid fa-circle-check text-xs text-[#437d32]"></i>
               ¿Cómo funciona el pesaje in situ?
@@ -202,7 +202,7 @@ import { QuadrantCardInfo } from '../data/home-sectors.data';
             <p class="text-xs text-slate-600 pl-4">Cada camión cuenta con una báscula digital homologada. Al momento del retiro en tu puerta, el chofer pesa la carga y queda registrada de inmediato en la plataforma para emitir tu certificado ambiental.</p>
           </div>
 
-          <div class="p-4 rounded-2xl bg-[#F8FAF7] border border-[#E2E9E4]">
+          <div class="p-4 rounded-2xl bg-[#F8FAF7] border border-[#E2E8F0]">
             <h4 class="font-bold text-sm text-[#093554] flex items-center gap-2 mb-1">
               <i class="fa-solid fa-circle-check text-xs text-[#437d32]"></i>
               ¿Cómo solicito retiro de colchones, podas o electrodomésticos?
@@ -211,7 +211,7 @@ import { QuadrantCardInfo } from '../data/home-sectors.data';
           </div>
         </div>
 
-        <div class="px-6 sm:px-8 py-4 bg-[#F8FAF7] border-t border-[#E2E9E4] flex items-center justify-between">
+        <div class="px-6 sm:px-8 py-4 bg-[#F8FAF7] border-t border-[#E2E8F0] flex items-center justify-between">
           <span class="text-xs text-slate-500 font-medium">DIMAO · Puerto Varas</span>
           <button (click)="closeFaqModal()"
                   type="button"
@@ -259,4 +259,5 @@ export class HomeModalsComponent implements OnChanges, OnDestroy {
     this.closeFaq.emit();
   }
 }
+
 

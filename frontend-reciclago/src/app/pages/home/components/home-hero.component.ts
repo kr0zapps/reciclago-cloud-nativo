@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+﻿import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -58,7 +58,7 @@ import { RouterModule } from '@angular/router';
               <!-- CTA Primario: Botón verde sólido dominante con ícono -->
               <a
                 routerLink="/dashboard"
-                class="group btn-interactive w-full sm:w-auto inline-flex items-center justify-center gap-2.5 min-h-[48px] h-12 sm:h-[50px] px-7 rounded-xl bg-[#2E9E4F] hover:bg-[#258241] active:bg-[#1e6c36] text-white font-bold text-sm uppercase tracking-wider cursor-pointer text-center shadow-lg shadow-emerald-950/30 transition-all font-heading">
+                class="group btn-interactive w-full sm:w-auto inline-flex items-center justify-center gap-2.5 min-h-[48px] h-12 sm:h-[50px] px-7 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] active:bg-[#1e6c36] text-white font-bold text-sm uppercase tracking-wider cursor-pointer text-center shadow-lg shadow-emerald-950/30 transition-all font-heading">
                 <i class="fa-solid fa-arrow-right-to-bracket text-sm group-hover:translate-x-0.5 transition-transform duration-200"></i>
                 Ingresar al Portal Vecinal
               </a>
@@ -144,3 +144,4 @@ export class HomeHeroComponent {
     }
   }
 }
+

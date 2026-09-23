@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+﻿import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data';
@@ -14,7 +14,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
         <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
           <span>Conductor: <strong class="text-[#123F5B] font-bold">{{ userName || 'Chofer' }}</strong></span>
           <span class="text-slate-300">•</span>
-          <span>Unidad: <strong class="text-[#4F8A3D] font-mono font-bold">{{ selectedCamion.patente }}</strong></span>
+          <span>Unidad: <strong class="text-[#22a652] font-mono font-bold">{{ selectedCamion.patente }}</strong></span>
         </div>
 
         <!-- Selector de Camión Asignado -->
@@ -25,7 +25,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
                     (click)="selectTruck(c.patente)"
                     type="button"
                     class="px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all cursor-pointer"
-                    [ngClass]="selectedTruckPatente === c.patente ? 'bg-[#4F8A3D] text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'">
+                    [ngClass]="selectedTruckPatente === c.patente ? 'bg-[#22a652] text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'">
               <i class="fa-solid fa-truck text-[10px] mr-1"></i>
               {{ c.patente }}
             </button>
@@ -36,10 +36,10 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
       <!-- ==================== 2. KPIS Y MEDIDOR DE CAPACIDAD DE TOLVA ==================== -->
       <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         <!-- KPI 1: Unidad y Estado -->
-        <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <span class="text-xs font-semibold text-slate-500">Unidad operativa</span>
-            <div class="w-8 h-8 rounded-xl bg-[#EEF5EB] text-[#4F8A3D] flex items-center justify-center text-xs font-bold border border-[#CCE4C8]">
+            <div class="w-8 h-8 rounded-xl bg-[#F8FAF7] text-[#22a652] flex items-center justify-center text-xs font-bold border border-[#E2E8F0]">
               <i class="fa-solid fa-id-card"></i>
             </div>
           </div>
@@ -52,7 +52,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
         </div>
 
         <!-- KPI 2: Paradas Pendientes del Turno -->
-        <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <span class="text-xs font-semibold text-slate-500">Paradas pendientes</span>
             <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-xs font-bold border border-amber-200">
@@ -60,13 +60,13 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
             </div>
           </div>
           <div class="mt-3">
-            <div class="text-3xl sm:text-4xl font-black font-heading text-brand-navy">{{ countChoferPendientes }}</div>
+            <div class="text-3xl sm:text-4xl font-black font-heading text-[#123F5B]">{{ countChoferPendientes }}</div>
             <p class="text-xs text-slate-500 mt-1">Direcciones por retirar hoy</p>
           </div>
         </div>
 
         <!-- KPI 3: Kilos en Tolva -->
-        <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <span class="text-xs font-semibold text-slate-500">Kilos en tolva</span>
             <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs font-bold border border-emerald-200">
@@ -82,7 +82,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
         </div>
 
         <!-- KPI 4: Capacidad y Barra de Llenado -->
-        <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <span class="text-xs font-semibold text-slate-500">Capacidad de tolva</span>
             <div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center text-xs font-bold border border-sky-200">
@@ -95,28 +95,28 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
               <span class="text-xs font-semibold text-slate-500">de {{ selectedCamion.capacidadKilos || 1500 }} kg</span>
             </div>
             <div class="w-full bg-slate-100 rounded-full h-2.5 mt-2 overflow-hidden border border-slate-200">
-              <div class="h-2.5 rounded-full bg-[#4F8A3D] transition-all duration-500" [style.width.%]="choferPorcentajeCarga"></div>
+              <div class="h-2.5 rounded-full bg-[#22a652] transition-all duration-500" [style.width.%]="choferPorcentajeCarga"></div>
             </div>
           </div>
         </div>
       </section>
 
       <!-- ==================== 3. PRÓXIMA PARADA DESTACADA (EN CABINA) ==================== -->
-      <section class="p-6 rounded-2xl bg-[#F0F6F9] border-2 border-[#D4E6EF] shadow-xs">
+      <section class="p-6 rounded-2xl bg-[#F8FAF7] border-2 border-[#E2E8F0] shadow-xs">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-5">
           <div class="flex items-start gap-4">
             <div class="w-14 h-14 rounded-2xl bg-[#123F5B] text-white flex items-center justify-center text-2xl flex-shrink-0 shadow-xs">
               <i class="fa-solid fa-map-pin"></i>
             </div>
             <div>
-              <span class="text-[11px] font-black uppercase tracking-wider text-[#1F6685] block">
+              <span class="text-[11px] font-black uppercase tracking-wider text-[#123F5B] block">
                 {{ activeDriverStop?.estado === 'RETIRADO' ? '⚠️ Retiro Realizado — Pendiente Registrar Báscula' : (activeDriverStop?.estado === 'SOLICITADO' ? '⏳ Esperando Visto Bueno del Coordinador' : 'Próxima Parada Inmediata en Hoja de Ruta') }}
               </span>
-              <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy mt-0.5">
+              <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#123F5B] mt-0.5">
                 {{ activeDriverStop?.direccion || '¡Ruta completada! Todas las direcciones atendidas' }}
               </h3>
               <p class="text-xs text-slate-600 mt-1 flex items-center gap-2 flex-wrap" *ngIf="activeDriverStop">
-                <span class="font-bold text-[#4F8A3D] px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200">
+                <span class="font-bold text-[#22a652] px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200">
                   Material: {{ activeDriverStop.residuoNombre || 'Reciclaje' }}
                 </span>
                 <span class="text-slate-300" *ngIf="activeDriverStop.pesoEstimadoKg">•</span>
@@ -147,7 +147,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
             <button *ngIf="activeDriverStop.estado === 'PROGRAMADO'"
                     (click)="requestAction(activeDriverStop, 'en-ruta')"
                     type="button"
-                    class="w-full sm:w-auto px-6 py-4 rounded-2xl bg-[#123F5B] hover:bg-[#0D3549] text-white text-sm sm:text-base font-extrabold shadow-sm transition-all cursor-pointer flex items-center justify-center gap-3">
+                    class="w-full sm:w-auto px-6 py-4 rounded-2xl bg-[#123F5B] hover:bg-[#123F5B] text-white text-sm sm:text-base font-extrabold shadow-sm transition-all cursor-pointer flex items-center justify-center gap-3">
               <i class="fa-solid fa-truck-fast text-lg"></i>
               <span>Iniciar Ruta a esta Dirección</span>
             </button>
@@ -161,7 +161,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
               </button>
               <button (click)="requestAction(activeDriverStop, 'pesado')"
                       type="button"
-                      class="w-full sm:w-auto px-5 py-4 rounded-2xl bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white text-sm sm:text-base font-extrabold shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2">
+                      class="w-full sm:w-auto px-5 py-4 rounded-2xl bg-[#22a652] hover:bg-[#1b8e45] text-white text-sm sm:text-base font-extrabold shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2">
                 <i class="fa-solid fa-scale-balanced text-lg"></i>
                 <span>Pesar en Báscula</span>
               </button>
@@ -170,7 +170,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
             <button *ngIf="activeDriverStop.estado === 'RETIRADO'"
                     (click)="requestAction(activeDriverStop, 'pesado')"
                     type="button"
-                    class="w-full sm:w-auto px-6 py-4 rounded-2xl bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white text-sm sm:text-base font-extrabold shadow-md transition-all cursor-pointer flex items-center justify-center gap-3 ring-2 ring-emerald-400">
+                    class="w-full sm:w-auto px-6 py-4 rounded-2xl bg-[#22a652] hover:bg-[#1b8e45] text-white text-sm sm:text-base font-extrabold shadow-md transition-all cursor-pointer flex items-center justify-center gap-3 ring-2 ring-emerald-400">
               <i class="fa-solid fa-scale-balanced text-xl"></i>
               <span>Registrar Pesaje en Báscula (kg)</span>
             </button>
@@ -179,24 +179,24 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
       </section>
 
       <!-- ==================== 4. HOJA DE RECORRIDO TÁCTIL PARA EL CHOFER ==================== -->
-      <section class="bg-white rounded-2xl border border-[#E2E9E4] shadow-xs overflow-hidden">
-        <div class="p-6 border-b border-[#EAEFE8] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <section class="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs overflow-hidden">
+        <div class="p-6 border-b border-[#F8FAF7] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-[#4F8A3D]">Hoja de Trabajo en Terreno</span>
-            <h3 class="font-heading font-extrabold text-xl text-brand-navy mt-0.5">
+            <span class="text-xs font-bold uppercase tracking-wider text-[#22a652]">Hoja de Trabajo en Terreno</span>
+            <h3 class="font-heading font-extrabold text-xl text-[#123F5B] mt-0.5">
               Paradas de la Cuadrilla ({{ choferPickups.length }})
             </h3>
           </div>
           <span class="text-xs text-slate-500 font-semibold">Toca el botón correspondiente para registrar el avance</span>
         </div>
 
-        <div class="divide-y divide-[#EEF3EF]">
+        <div class="divide-y divide-[#E2E8F0]">
           <div *ngFor="let p of choferPickups"
                class="p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-[#F9FAF8] transition-colors">
             
             <div class="flex items-start sm:items-center gap-4 min-w-0 flex-1">
               <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 border shadow-2xs"
-                   [ngClass]="p.estado === 'PESADO' ? 'bg-[#EEF5EB] text-[#4F8A3D] border-[#CCE4C8]' : (p.estado === 'EN_RUTA' ? 'bg-sky-50 text-sky-700 border-sky-200' : 'bg-slate-100 text-slate-600 border-slate-200')">
+                   [ngClass]="p.estado === 'PESADO' ? 'bg-[#F8FAF7] text-[#22a652] border-[#E2E8F0]' : (p.estado === 'EN_RUTA' ? 'bg-sky-50 text-sky-700 border-sky-200' : 'bg-slate-100 text-slate-600 border-slate-200')">
                 <i [ngClass]="p.estado === 'PESADO' ? 'fa-solid fa-check' : (p.estado === 'EN_RUTA' ? 'fa-solid fa-truck-fast' : 'fa-solid fa-location-dot')"></i>
               </div>
 
@@ -205,10 +205,10 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
                   <span class="text-xs font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
                     #{{ p.id }}
                   </span>
-                  <h4 class="font-heading font-bold text-base sm:text-lg text-brand-navy">
+                  <h4 class="font-heading font-bold text-base sm:text-lg text-[#123F5B]">
                     {{ p.direccion }}
                   </h4>
-                  <span class="text-xs font-bold text-[#4F8A3D] px-2.5 py-0.5 rounded-lg bg-[#EBF5E7] border border-[#CDE8C7]">
+                  <span class="text-xs font-bold text-[#22a652] px-2.5 py-0.5 rounded-lg bg-[#ecf7e6] border border-[#E2E8F0]">
                     {{ p.residuoNombre || 'Reciclaje' }}
                   </span>
                 </div>
@@ -247,7 +247,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
               <button *ngIf="p.estado === 'PROGRAMADO'"
                       (click)="requestAction(p, 'en-ruta')"
                       type="button"
-                      class="px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-[#123F5B] hover:bg-[#0D3549] text-white transition-all cursor-pointer shadow-xs flex items-center gap-2">
+                      class="px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-[#123F5B] hover:bg-[#123F5B] text-white transition-all cursor-pointer shadow-xs flex items-center gap-2">
                 <i class="fa-solid fa-truck-fast"></i>
                 <span>Iniciar Ruta</span>
               </button>
@@ -262,7 +262,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
                 </button>
                 <button (click)="requestAction(p, 'pesado')"
                         type="button"
-                        class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white transition-all cursor-pointer shadow-xs flex items-center gap-1.5">
+                        class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#22a652] hover:bg-[#1b8e45] text-white transition-all cursor-pointer shadow-xs flex items-center gap-1.5">
                   <i class="fa-solid fa-scale-balanced"></i>
                   <span>Pesar</span>
                 </button>
@@ -272,15 +272,15 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
               <button *ngIf="p.estado === 'RETIRADO'"
                       (click)="requestAction(p, 'pesado')"
                       type="button"
-                      class="px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white transition-all cursor-pointer shadow-md flex items-center gap-2 ring-2 ring-emerald-300">
+                      class="px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-[#22a652] hover:bg-[#1b8e45] text-white transition-all cursor-pointer shadow-md flex items-center gap-2 ring-2 ring-emerald-300">
                 <i class="fa-solid fa-scale-balanced text-sm"></i>
                 <span>Registrar Báscula</span>
               </button>
 
               <!-- 4. PESADO -> Certificado -->
               <div *ngIf="p.estado === 'PESADO'"
-                   class="px-4 py-2.5 rounded-xl text-xs font-bold bg-[#EBF5E7] text-emerald-900 border border-[#CDE8C7] flex items-center gap-2 shadow-2xs">
-                <i class="fa-solid fa-circle-check text-[#4F8A3D]"></i>
+                   class="px-4 py-2.5 rounded-xl text-xs font-bold bg-[#ecf7e6] text-emerald-900 border border-[#E2E8F0] flex items-center gap-2 shadow-2xs">
+                <i class="fa-solid fa-circle-check text-[#22a652]"></i>
                 <span>Pesaje Oficial Listo</span>
               </div>
             </div>
@@ -290,29 +290,29 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
             <div class="w-12 h-12 mx-auto rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center text-lg mb-2">
               <i class="fa-solid fa-clipboard-check"></i>
             </div>
-            <p class="font-bold text-brand-navy text-sm">No hay paradas asignadas para el camión {{ selectedTruckPatente }}</p>
+            <p class="font-bold text-[#123F5B] text-sm">No hay paradas asignadas para el camión {{ selectedTruckPatente }}</p>
             <p class="text-xs text-slate-500 mt-0.5">Comunícate con el Coordinador de Despacho si necesitas asignar paradas a esta cuadrilla.</p>
           </div>
         </div>
       </section>
 
       <!-- ==================== 5. NAVEGADOR GPS DE CABINA ==================== -->
-      <section class="bg-white rounded-2xl border border-[#E2E9E4] p-6 sm:p-8 shadow-xs">
-        <div class="flex items-center justify-between pb-4 mb-4 border-b border-[#EAEFE8]">
+      <section class="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 shadow-xs">
+        <div class="flex items-center justify-between pb-4 mb-4 border-b border-[#F8FAF7]">
           <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-[#4F8A3D]">Navegación GPS de Cabina</span>
-            <h3 class="font-heading font-extrabold text-xl text-brand-navy mt-0.5">
+            <span class="text-xs font-bold uppercase tracking-wider text-[#22a652]">Navegación GPS de Cabina</span>
+            <h3 class="font-heading font-extrabold text-xl text-[#123F5B] mt-0.5">
               Posición Satelital del Camión {{ selectedCamion.patente }}
             </h3>
           </div>
-          <span class="text-xs font-bold text-emerald-800 bg-[#EBF5E7] border border-[#CDE8C7] px-3 py-1 rounded-xl">
+          <span class="text-xs font-bold text-emerald-800 bg-[#ecf7e6] border border-[#E2E8F0] px-3 py-1 rounded-xl">
             <i class="fa-solid fa-satellite mr-1"></i> Transmitiendo GPS
           </span>
         </div>
 
-        <div class="rounded-2xl bg-[#F0F6F9] border-2 border-[#D4E6EF] p-4 sm:p-5 relative overflow-hidden">
+        <div class="rounded-2xl bg-[#F8FAF7] border-2 border-[#E2E8F0] p-4 sm:p-5 relative overflow-hidden">
           <div class="h-44 sm:h-52 w-full bg-white rounded-xl relative p-2 overflow-hidden border border-[#E1EDF2] select-none">
-            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-2xl flex flex-col items-center justify-center text-[10px] font-extrabold text-[#1F6685] border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
+            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-2xl flex flex-col items-center justify-center text-[10px] font-extrabold text-[#123F5B] border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
               <div class="flex items-center gap-1.5 opacity-90">
                 <i class="fa-solid fa-water text-xs text-sky-500"></i>
                 <span>Lago Llanquihue</span>
@@ -333,7 +333,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
 
             <svg class="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 100 100">
               <path d="M 8 72 L 28 72 L 28 28 L 52 28 L 52 72 L 82 72" fill="none" stroke="#CBD5E1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 3"></path>
-              <path d="M 8 72 L 28 72 L 28 28 L 52 28 L 52 72 L 82 72" fill="none" stroke="#4F8A3D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"></path>
+              <path d="M 8 72 L 28 72 L 28 28 L 52 28 L 52 72 L 82 72" fill="none" stroke="#22a652" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"></path>
             </svg>
 
             <div class="absolute z-30 pointer-events-none -translate-x-1/2 -translate-y-1/2"
@@ -341,7 +341,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
                  [style.top.%]="currentWaypoint.y"
                  style="transition: left 1.2s cubic-bezier(0.4, 0, 0.2, 1), top 1.2s cubic-bezier(0.4, 0, 0.2, 1);">
               <div class="relative flex items-center justify-center">
-                <div class="relative w-10 h-10 rounded-full bg-gradient-to-tr from-[#4F8A3D] to-[#123F5B] text-white flex items-center justify-center text-sm shadow-lg ring-2 ring-white">
+                <div class="relative w-10 h-10 rounded-full bg-gradient-to-tr from-[#22a652] to-[#123F5B] text-white flex items-center justify-center text-sm shadow-lg ring-2 ring-white">
                   <i class="fa-solid fa-truck text-xs text-white"></i>
                 </div>
                 <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-[#041D2D] text-white text-[9px] font-mono font-bold px-1.5 py-0.5 rounded shadow whitespace-nowrap border border-slate-700">
@@ -355,7 +355,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
             <div>
               <span class="text-xs font-bold text-[#123F5B]">Posición GPS: {{ currentWaypoint.name }}</span>
               <p class="text-[11px] text-slate-500 mt-0.5">
-                {{ currentWaypoint.detail }} • <strong class="text-[#4F8A3D]">ETA: {{ currentWaypoint.eta }}</strong> ({{ currentWaypoint.distancia }})
+                {{ currentWaypoint.detail }} • <strong class="text-[#22a652]">ETA: {{ currentWaypoint.eta }}</strong> ({{ currentWaypoint.distancia }})
               </p>
             </div>
           </div>
@@ -433,3 +433,4 @@ export class ChoferDashboardComponent implements OnInit, OnChanges {
     this.actionRequested.emit({ pickup, action });
   }
 }
+

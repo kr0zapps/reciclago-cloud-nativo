@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, SimpleChanges, HostListener } from '@angular/core';
+﻿import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, SimpleChanges, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Sector, Camion, Residuo, Pickup, Waypoint, RotacionSemanal } from '../data/sectors.data';
@@ -47,7 +47,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                 <strong>{{ s.nombre }}:</strong>
                 <span class="line-through text-slate-400">{{ s.diaOriginal }}</span>
                 <i class="fa-solid fa-arrow-right text-[10px] text-amber-600"></i>
-                <span class="text-[#4F8A3D] font-extrabold">{{ s.dia }}</span>
+                <span class="text-[#22a652] font-extrabold">{{ s.dia }}</span>
                 <span *ngIf="s.motivoModificacion" class="text-slate-500 font-normal">({{ s.motivoModificacion }})</span>
               </span>
             </div>
@@ -64,7 +64,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
       <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         <!-- Tarjeta 1: Solicitudes Entrantes (Por Asignar) -->
         <div class="bg-white rounded-2xl p-4 sm:p-5 border shadow-xs flex flex-col justify-between"
-             [ngClass]="countPendientes > 0 ? 'border-amber-200 bg-amber-50/20' : 'border-[#E2E9E4]'">
+             [ngClass]="countPendientes > 0 ? 'border-amber-200 bg-amber-50/20' : 'border-[#E2E8F0]'">
           <div class="flex items-center justify-between">
             <span class="text-xs font-semibold text-slate-600">Por programar</span>
             <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-800 flex items-center justify-center text-xs font-bold border border-amber-200">
@@ -80,7 +80,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
         </div>
 
         <!-- Tarjeta 2: Listos para Despacho (Programados) -->
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <span class="text-xs font-semibold text-slate-600">Programados</span>
             <div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center text-xs font-bold border border-sky-200">
@@ -94,7 +94,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
         </div>
 
         <!-- Tarjeta 3: Cuadrillas en Ruta -->
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <span class="text-xs font-semibold text-slate-600">En ruta</span>
             <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center text-xs font-bold border border-indigo-200">
@@ -108,7 +108,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
         </div>
 
         <!-- Tarjeta 4: Camiones Operables -->
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <span class="text-xs font-semibold text-slate-600">Flota activa</span>
             <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs font-bold border border-emerald-200">
@@ -127,11 +127,11 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
       </section>
 
       <!-- ==================== 3. PLANILLA DE DESPACHO Y ASIGNACIÓN DE RUTAS ==================== -->
-      <section class="bg-white rounded-2xl border border-[#E2E9E4] shadow-xs overflow-hidden">
-        <div class="p-4 sm:p-6 border-b border-[#EAEFE8] space-y-4">
+      <section class="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs overflow-hidden">
+        <div class="p-4 sm:p-6 border-b border-[#F8FAF7] space-y-4">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
             <div>
-              <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy">
+              <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#123F5B]">
                 Planilla de Despacho y Gestión de Rutas
               </h3>
               <p class="text-xs text-slate-500 mt-0.5">Control de solicitudes domiciliarias, cuadrillas y báscula municipal.</p>
@@ -143,7 +143,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                 <span class="text-xs font-semibold text-slate-500">Sector:</span>
                 <select [(ngModel)]="filterSector"
                         (ngModelChange)="onFilterSectorChange()"
-                        class="select-stitch py-1.5 px-3 text-xs font-bold text-[#1F6685] bg-[#F8FAF7] border border-slate-200 rounded-xl">
+                        class="select-stitch py-1.5 px-3 text-xs font-bold text-[#123F5B] bg-[#F8FAF7] border border-slate-200 rounded-xl">
                   <option value="ALL">Todos los Sectores</option>
                   <option *ngFor="let s of sectores" [value]="s.nombre">{{ s.nombre }}</option>
                 </select>
@@ -153,7 +153,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                 <span class="text-xs font-semibold text-slate-500">Filas:</span>
                 <select [(ngModel)]="pageSize"
                         (ngModelChange)="onPageSizeChange()"
-                        class="select-stitch py-1.5 px-2 text-xs font-bold text-[#1F6685] bg-[#F8FAF7] border border-slate-200 rounded-xl">
+                        class="select-stitch py-1.5 px-2 text-xs font-bold text-[#123F5B] bg-[#F8FAF7] border border-slate-200 rounded-xl">
                   <option [value]="5">5</option>
                   <option [value]="10">10</option>
                   <option [value]="20">20</option>
@@ -212,12 +212,12 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
         </div>
 
         <!-- Lista de Despacho -->
-        <div class="divide-y divide-[#EEF3EF]">
+        <div class="divide-y divide-[#E2E8F0]">
           <div *ngFor="let p of paginatedPickups"
                class="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-[#F9FAF8] transition-colors">
             
             <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0 flex-1">
-              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-sky-50 text-[#1F6685] flex items-center justify-center text-lg sm:text-xl flex-shrink-0 border border-sky-100">
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-sky-50 text-[#123F5B] flex items-center justify-center text-lg sm:text-xl flex-shrink-0 border border-sky-100">
                 <i class="fa-solid fa-route"></i>
               </div>
 
@@ -226,10 +226,10 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                   <span class="text-xs font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
                     #{{ p.id }}
                   </span>
-                  <h4 class="font-heading font-bold text-base sm:text-lg text-brand-navy truncate">
+                  <h4 class="font-heading font-bold text-base sm:text-lg text-[#123F5B] truncate">
                     {{ p.direccion }}
                   </h4>
-                  <span class="text-xs font-medium text-[#1F6685] px-2.5 py-0.5 rounded-lg bg-sky-50 border border-sky-200/70">
+                  <span class="text-xs font-medium text-[#123F5B] px-2.5 py-0.5 rounded-lg bg-sky-50 border border-sky-200/70">
                     {{ p.residuoNombre || 'Reciclaje Domiciliario' }}
                   </span>
                 </div>
@@ -272,7 +272,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                 <button *ngIf="p.estado === 'SOLICITADO'"
                         (click)="requestAction(p, 'programar')"
                         type="button"
-                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#1F6685] hover:bg-[#164E66] text-white transition-all cursor-pointer shadow-xs flex items-center gap-1.5">
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#123F5B] hover:bg-[#164E66] text-white transition-all cursor-pointer shadow-xs flex items-center gap-1.5">
                   <i class="fa-regular fa-calendar-check text-xs"></i>
                   <span>Programar</span>
                 </button>
@@ -308,7 +308,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                 <button *ngIf="p.estado === 'RETIRADO'"
                         (click)="requestAction(p, 'pesado')"
                         type="button"
-                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#22a652] hover:bg-[#1b8e45] text-white transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
                   <i class="fa-solid fa-scale-balanced text-xs"></i>
                   <span>Registrar Báscula</span>
                 </button>
@@ -320,13 +320,13 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
             <div class="w-12 h-12 mx-auto rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center text-lg mb-2">
               <i class="fa-solid fa-inbox"></i>
             </div>
-            <p class="font-bold text-brand-navy text-sm">No hay retiros en este filtro</p>
+            <p class="font-bold text-[#123F5B] text-sm">No hay retiros en este filtro</p>
             <p class="text-xs text-slate-500 mt-0.5">Selecciona otra pestaña o cambia de sector.</p>
           </div>
         </div>
 
         <!-- Paginación -->
-        <div *ngIf="filteredPickups.length > 0" class="p-4 bg-[#F8FAF7] border-t border-[#EAEFE8] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <div *ngIf="filteredPickups.length > 0" class="p-4 bg-[#F8FAF7] border-t border-[#F8FAF7] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
           <span class="text-slate-500 font-medium">
             Mostrando <strong class="text-slate-800">{{ (currentPage - 1) * pageSize + 1 }}</strong> a
             <strong class="text-slate-800">{{ Math.min(currentPage * pageSize, filteredPickups.length) }}</strong> de
@@ -346,7 +346,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                     (click)="setPage(page)"
                     type="button"
                     class="w-8 h-8 rounded-lg font-bold transition-all text-xs flex items-center justify-center cursor-pointer"
-                    [ngClass]="currentPage === page ? 'bg-[#1F6685] text-white shadow-xs' : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'">
+                    [ngClass]="currentPage === page ? 'bg-[#123F5B] text-white shadow-xs' : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'">
               {{ page }}
             </button>
 
@@ -362,10 +362,10 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
       </section>
 
       <!-- ==================== 4. TELEMETRÍA MULTICAMIÓN PARA DESPACHO ==================== -->
-      <section class="bg-white rounded-2xl border border-[#E2E9E4] p-5 sm:p-8 shadow-xs">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-[#EAEFE8]">
+      <section class="bg-white rounded-2xl border border-[#E2E8F0] p-5 sm:p-8 shadow-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-[#F8FAF7]">
           <div>
-            <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy">
+            <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#123F5B]">
               Monitoreo de Cuadrillas en Terreno
             </h3>
             <p class="text-xs text-slate-500 mt-0.5">Seguimiento satelital y tiempos estimados de llegada (ETA) por cuadrante.</p>
@@ -378,18 +378,18 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                       (click)="selectTruck(c.patente)"
                       type="button"
                       class="px-3 py-1 rounded-lg text-xs font-bold font-mono transition-all cursor-pointer"
-                      [ngClass]="selectedTruckPatente === c.patente ? 'bg-[#1F6685] text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'">
+                      [ngClass]="selectedTruckPatente === c.patente ? 'bg-[#123F5B] text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'">
                 {{ c.patente }}
               </button>
             </div>
           </div>
         </div>
 
-        <div class="rounded-2xl bg-[#F0F6F9] border-2 border-[#D4E6EF] p-4 sm:p-5 relative overflow-hidden">
+        <div class="rounded-2xl bg-[#F8FAF7] border-2 border-[#E2E8F0] p-4 sm:p-5 relative overflow-hidden">
           <div class="flex items-center justify-between gap-2 mb-3">
             <div class="flex items-center gap-2">
-              <i class="fa-solid fa-compass text-[#1F6685] text-lg"></i>
-              <span class="font-bold text-sm text-brand-navy">
+              <i class="fa-solid fa-compass text-[#123F5B] text-lg"></i>
+              <span class="font-bold text-sm text-[#123F5B]">
                 Camión {{ selectedCamion.patente }} — {{ currentWaypoint.name }}
               </span>
             </div>
@@ -399,7 +399,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           </div>
 
           <div class="h-48 sm:h-56 w-full bg-white rounded-xl relative p-2 overflow-hidden border border-[#E1EDF2] select-none">
-            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-2xl flex flex-col items-center justify-center text-[10px] font-extrabold text-[#1F6685] border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
+            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-2xl flex flex-col items-center justify-center text-[10px] font-extrabold text-[#123F5B] border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
               <div class="flex items-center gap-1.5 opacity-90">
                 <i class="fa-solid fa-water text-xs text-sky-500"></i>
                 <span>Lago Llanquihue</span>
@@ -420,7 +420,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
 
             <svg class="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 100 100">
               <path d="M 8 72 L 28 72 L 28 28 L 52 28 L 52 72 L 82 72" fill="none" stroke="#CBD5E1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 3"></path>
-              <path d="M 8 72 L 28 72 L 28 28 L 52 28 L 52 72 L 82 72" fill="none" stroke="#4F8A3D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"></path>
+              <path d="M 8 72 L 28 72 L 28 28 L 52 28 L 52 72 L 82 72" fill="none" stroke="#22a652" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"></path>
             </svg>
 
             <div class="absolute z-30 pointer-events-none -translate-x-1/2 -translate-y-1/2"
@@ -428,7 +428,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                  [style.top.%]="currentWaypoint.y"
                  style="transition: left 1.2s cubic-bezier(0.4, 0, 0.2, 1), top 1.2s cubic-bezier(0.4, 0, 0.2, 1);">
               <div class="relative flex items-center justify-center">
-                <div class="relative w-9 h-9 rounded-full bg-gradient-to-tr from-[#1F6685] to-[#38BDF8] text-white flex items-center justify-center text-xs shadow-lg ring-2 ring-white">
+                <div class="relative w-9 h-9 rounded-full bg-gradient-to-tr from-[#123F5B] to-[#38BDF8] text-white flex items-center justify-center text-xs shadow-lg ring-2 ring-white">
                   <i class="fa-solid fa-truck-moving text-xs text-white"></i>
                 </div>
                 <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-[#041D2D] text-white text-[9px] font-mono font-bold px-1.5 py-0.5 rounded shadow whitespace-nowrap border border-slate-700">
@@ -445,14 +445,14 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                 <span class="text-xs text-slate-400 font-medium">({{ currentWaypoint.detail }})</span>
               </div>
               <p class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-2 flex-wrap">
-                <span class="font-bold text-[#4F8A3D]"><i class="fa-regular fa-clock mr-1"></i>ETA: {{ currentWaypoint.eta }}</span>
+                <span class="font-bold text-[#22a652]"><i class="fa-regular fa-clock mr-1"></i>ETA: {{ currentWaypoint.eta }}</span>
                 <span class="text-slate-300">•</span>
                 <span class="font-semibold text-slate-600"><i class="fa-solid fa-route mr-1 text-slate-400"></i>{{ currentWaypoint.distancia }}</span>
               </p>
             </div>
 
             <div class="flex items-center gap-1.5 flex-shrink-0 self-end sm:self-center">
-              <button (click)="toggleTruckSimulation.emit()" type="button" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#EEF5EB] hover:bg-[#E0EDE0] text-[#3D742F] border border-[#C8DFCA] transition-colors flex items-center gap-1.5 cursor-pointer">
+              <button (click)="toggleTruckSimulation.emit()" type="button" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#F8FAF7] hover:bg-[#E0EDE0] text-[#1b8e45] border border-[#C8DFCA] transition-colors flex items-center gap-1.5 cursor-pointer">
                 <i class="fa-solid" [class.fa-pause]="truckSimulationRunning" [class.fa-play]="!truckSimulationRunning"></i>
                 <span>{{ truckSimulationRunning ? 'Pausar' : 'Reanudar' }}</span>
               </button>
@@ -475,17 +475,17 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
            aria-labelledby="coord-mesa-title"
            class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
         <div (click)="$event.stopPropagation()"
-             class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto p-6 sm:p-8">
+             class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-[#E2E8F0] overflow-hidden anim-modal-panel text-slate-800 my-auto p-6 sm:p-8">
           
-          <div class="h-1.5 -mx-8 -mt-8 mb-6 bg-gradient-to-r from-[#1F6685] via-[#38BDF8] to-[#4F8A3D]"></div>
+          <div class="h-1.5 -mx-8 -mt-8 mb-6 bg-gradient-to-r from-[#123F5B] via-[#38BDF8] to-[#22a652]"></div>
 
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-2.5">
-              <div class="w-9 h-9 rounded-xl bg-sky-50 text-[#1F6685] flex items-center justify-center text-sm font-bold border border-sky-200">
+              <div class="w-9 h-9 rounded-xl bg-sky-50 text-[#123F5B] flex items-center justify-center text-sm font-bold border border-sky-200">
                 <i class="fa-solid fa-file-circle-plus"></i>
               </div>
               <div>
-                <h3 id="coord-mesa-title" class="font-heading font-extrabold text-lg text-brand-navy">Ingresar Solicitud de Retiro</h3>
+                <h3 id="coord-mesa-title" class="font-heading font-extrabold text-lg text-[#123F5B]">Ingresar Solicitud de Retiro</h3>
                 <p class="text-xs text-slate-400">Registro de solicitud vecinal para recolección</p>
               </div>
             </div>
@@ -501,25 +501,25 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
 
           <form (ngSubmit)="submitRetiroVecinal()" class="space-y-3.5 text-left">
             <div>
-              <label for="coordVecinoNombre" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Nombre Completo del Vecino</label>
+              <label for="coordVecinoNombre" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Nombre Completo del Vecino</label>
               <input id="coordVecinoNombre" type="text" [(ngModel)]="nuevoVecinoNombre" name="nuevoVecinoNombre" required class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: Juan Pérez González">
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label for="coordVecinoRut" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">RUT Vecino (Opcional)</label>
+                <label for="coordVecinoRut" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">RUT Vecino (Opcional)</label>
                 <input id="coordVecinoRut" type="text" [value]="nuevoVecinoRut" (input)="onMesaRutInput($event)" name="nuevoVecinoRut" class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: 12.345.678-K">
                 <span *ngIf="mesaRutError" class="text-[10px] text-rose-600 font-bold mt-0.5 block">{{ mesaRutError }}</span>
               </div>
               <div>
-                <label for="coordVecinoTelefono" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Teléfono Móvil (Opcional)</label>
+                <label for="coordVecinoTelefono" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Teléfono Móvil (Opcional)</label>
                 <input id="coordVecinoTelefono" type="text" [value]="nuevoVecinoTelefono" (input)="onMesaPhoneInput($event)" name="nuevoVecinoTelefono" class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: +56 9 8765 4321">
                 <span *ngIf="mesaPhoneError" class="text-[10px] text-rose-600 font-bold mt-0.5 block">{{ mesaPhoneError }}</span>
               </div>
             </div>
 
             <div>
-              <label for="coordNuevaDireccion" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Dirección Exacta</label>
+              <label for="coordNuevaDireccion" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Dirección Exacta</label>
               <input id="coordNuevaDireccion" type="text" [(ngModel)]="nuevaDireccion" name="nuevaDireccion" required class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: San Francisco 320, Puerto Varas">
             </div>
 
@@ -527,16 +527,16 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <!-- Selector de Material Personalizado -->
               <div class="relative material-dropdown-container">
-                <label id="coordResiduoLabel" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Tipo de Residuo / Material</label>
+                <label id="coordResiduoLabel" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Tipo de Residuo / Material</label>
                 <button
                   type="button"
                   (click)="toggleMaterialDropdown($event)"
                   aria-labelledby="coordResiduoLabel"
                   aria-haspopup="listbox"
                   [attr.aria-expanded]="isMaterialDropdownOpen"
-                  class="w-full flex items-center justify-between py-2 px-3 rounded-xl border border-[#D5E2D9] bg-white hover:border-[#4F8A3D] text-left shadow-2xs transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#4F8A3D]/30 min-h-[42px]">
+                  class="w-full flex items-center justify-between py-2 px-3 rounded-xl border border-[#E2E8F0] bg-white hover:border-[#22a652] text-left shadow-2xs transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#22a652]/30 min-h-[42px]">
                   <div class="flex items-center gap-2.5 min-w-0">
-                    <div class="w-7 h-7 rounded-lg bg-[#EEF5EB] text-[#4F8A3D] flex items-center justify-center text-xs flex-shrink-0">
+                    <div class="w-7 h-7 rounded-lg bg-[#F8FAF7] text-[#22a652] flex items-center justify-center text-xs flex-shrink-0">
                       <i [class]="getMaterialIcon(selectedResiduoNombre)"></i>
                     </div>
                     <span class="text-xs font-bold text-[#123F5B] truncate">{{ selectedResiduoNombre }}</span>
@@ -548,7 +548,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                 <!-- Menú Desplegable Flotante Moderno -->
                 <div *ngIf="isMaterialDropdownOpen"
                      role="listbox"
-                     class="absolute left-0 right-0 top-full mt-1.5 bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] p-2 z-[100] anim-modal-backdrop space-y-1">
+                     class="absolute left-0 right-0 top-full mt-1.5 bg-white rounded-2xl shadow-2xl border border-[#E2E8F0] p-2 z-[100] anim-modal-backdrop space-y-1">
                   <button
                     *ngFor="let r of residuos"
                     type="button"
@@ -556,10 +556,10 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                     [attr.aria-selected]="nuevoResiduoId === r.id"
                     (click)="selectResiduo(r.id)"
                     class="w-full text-left p-2 rounded-xl transition-all flex items-center justify-between group cursor-pointer"
-                    [ngClass]="nuevoResiduoId === r.id ? 'bg-[#EEF5EB] border border-[#CCE4C8]' : 'hover:bg-slate-50 border border-transparent'">
+                    [ngClass]="nuevoResiduoId === r.id ? 'bg-[#F8FAF7] border border-[#E2E8F0]' : 'hover:bg-slate-50 border border-transparent'">
                     <div class="flex items-center gap-2.5 min-w-0">
                       <div class="w-7 h-7 rounded-lg flex items-center justify-center text-xs flex-shrink-0 transition-colors"
-                           [ngClass]="nuevoResiduoId === r.id ? 'bg-[#4F8A3D] text-white' : 'bg-slate-100 text-slate-600 group-hover:bg-[#EEF5EB] group-hover:text-[#4F8A3D]'">
+                           [ngClass]="nuevoResiduoId === r.id ? 'bg-[#22a652] text-white' : 'bg-slate-100 text-slate-600 group-hover:bg-[#F8FAF7] group-hover:text-[#22a652]'">
                         <i [class]="getMaterialIcon(r.nombre)"></i>
                       </div>
                       <div class="min-w-0">
@@ -567,14 +567,14 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
                         <span class="text-[10px] text-slate-400 block truncate">{{ r.descripcion || 'Reciclaje clasificado' }}</span>
                       </div>
                     </div>
-                    <i *ngIf="nuevoResiduoId === r.id" class="fa-solid fa-circle-check text-[#4F8A3D] text-sm flex-shrink-0 ml-2"></i>
+                    <i *ngIf="nuevoResiduoId === r.id" class="fa-solid fa-circle-check text-[#22a652] text-sm flex-shrink-0 ml-2"></i>
                   </button>
                 </div>
               </div>
 
               <!-- Peso Estimado -->
               <div>
-                <label for="coordNuevoPeso" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Peso Estimado (kg)</label>
+                <label for="coordNuevoPeso" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Peso Estimado (kg)</label>
                 <div class="relative">
                   <input id="coordNuevoPeso" type="number" step="0.5" min="0.5" max="500" [(ngModel)]="nuevoPesoEstimadoKg" name="nuevoPesoEstimadoKg" class="input-stitch w-full py-2 px-3 text-sm font-medium text-center min-h-[42px]" placeholder="5.0">
                   <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">kg</span>
@@ -583,7 +583,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
             </div>
 
             <div>
-              <label for="coordNuevosComentarios" class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Observaciones para el Chofer</label>
+              <label for="coordNuevosComentarios" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Observaciones para el Chofer</label>
               <textarea id="coordNuevosComentarios" [(ngModel)]="nuevosComentarios" name="nuevosComentarios" rows="2" class="input-stitch w-full py-2 px-3 text-sm" placeholder="Ej: Dejar cajas amarradas en el portón"></textarea>
             </div>
 
@@ -591,7 +591,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
               <button (click)="closeNuevoRetiroModal()" type="button" class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer">
                 Cancelar
               </button>
-              <button type="submit" [disabled]="isSubmittingRetiro" class="px-5 py-2.5 rounded-xl bg-[#1F6685] hover:bg-[#164E66] text-white text-xs font-bold cursor-pointer">
+              <button type="submit" [disabled]="isSubmittingRetiro" class="px-5 py-2.5 rounded-xl bg-[#123F5B] hover:bg-[#164E66] text-white text-xs font-bold cursor-pointer">
                 <span *ngIf="!isSubmittingRetiro">Guardar Solicitud</span>
                 <span *ngIf="isSubmittingRetiro"><i class="fa-solid fa-spinner fa-spin"></i> Guardando...</span>
               </button>
@@ -891,7 +891,7 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges, OnDestr
       case 'RETIRADO':
         return 'bg-emerald-50 text-emerald-900 border-emerald-200/80';
       case 'PESADO':
-        return 'bg-[#EBF5E7] text-emerald-900 border-[#CDE8C7]';
+        return 'bg-[#ecf7e6] text-emerald-900 border-[#E2E8F0]';
       default:
         return 'bg-slate-100 text-slate-700 border-slate-200';
     }
@@ -914,3 +914,4 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges, OnDestr
     }
   }
 }
+

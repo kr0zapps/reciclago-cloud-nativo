@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, OnInit, AfterViewInit, OnDestroy, ElementRef, ChangeDetectorRef, NgZone, Inject, PLATFORM_ID } from '@angular/core';
+﻿import { Component, Output, EventEmitter, OnInit, AfterViewInit, OnDestroy, ElementRef, ChangeDetectorRef, NgZone, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { BffService } from '../../../services/bff.service';
@@ -12,7 +12,7 @@ import { BffService } from '../../../services/bff.service';
     <section class="relative py-16 sm:py-20 bg-gradient-to-b from-sky-50/60 via-emerald-50/25 to-[#F8FAF7] overflow-hidden border-t border-slate-200/60" id="impacto">
       <!-- Watermarked volcano silhouette background -->
       <div class="absolute inset-0 opacity-10 pointer-events-none flex items-end justify-center" aria-hidden="true">
-        <svg class="w-full h-auto text-[#0a233b] max-h-96" fill="currentColor" viewBox="0 0 1200 350">
+        <svg class="w-full h-auto text-[#123F5B] max-h-96" fill="currentColor" viewBox="0 0 1200 350">
           <path d="M0,350 L350,140 L450,220 L650,40 L850,230 L1000,160 L1200,350 Z"></path>
         </svg>
       </div>
@@ -289,3 +289,4 @@ export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 }
+
