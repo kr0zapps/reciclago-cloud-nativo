@@ -6,22 +6,51 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        brand: {
-          primary: '#22a652',
-          'primary-dark': '#1b8e45',
-          'primary-light': '#ecf7e6',
-          navy: '#123F5B',
-          'navy-dark': '#0D3549',
-          muted: '#61717A',
-          canvas: '#F9F8F5',
+        bosque: {
+          950: '#0E1A14',
+          900: '#14261C',
+          800: '#1A3324',
+          700: '#1F3D2C',
         },
-        bg: '#F8FAF7',
-        surface: '#ffffff',
-        border: '#e2e8f0',
+        pizarra: {
+          700: '#334149',
+          600: '#4A5A63',
+          400: '#748791',
+          200: '#C8D1D5',
+        },
+        niebla: {
+          50: '#F5F6F3',
+          100: '#EDEFEA',
+          200: '#DFE2DA',
+        },
+        madera: {
+          600: '#744F35',
+          500: '#8B6142',
+          400: '#A67855',
+          100: '#F5EBE1',
+        },
+        lago: {
+          600: '#4F737C',
+          400: '#7FA5AE',
+          200: '#BED1D6',
+        },
+        brand: {
+          primary: '#1F3D2C',
+          'primary-dark': '#14261C',
+          'primary-light': '#EDEFEA',
+          navy: '#0E1A14',
+          'navy-dark': '#09120D',
+          muted: '#4A5A63',
+          canvas: '#EDEFEA',
+        },
+        bg: '#EDEFEA',
+        surface: '#F5F6F3',
+        border: '#DFE2DA',
       },
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'sans-serif'],
         heading: ['"Outfit"', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
         script: ['"Kalam"', '"Caveat"', 'cursive'],
         handwriting: ['"Caveat"', '"Kalam"', 'cursive'],
       },

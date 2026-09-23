@@ -3,137 +3,150 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { BffService } from '../../../services/bff.service';
 
+export interface MetricaImpacto {
+  kilosCertificados: number;
+  porcentajeDesvio: number;
+  camionesActivos: number;
+}
+
 @Component({
   selector: 'app-home-impact',
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <!-- BEGIN: ImpactSection -->
-    <section class="relative py-16 sm:py-20 bg-white overflow-hidden border-b border-slate-200" id="impacto">
-      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- SECCIÓN: Impacto Comunal y Trazabilidad (Panel Institucional DIMAO Unificado) -->
+    <section class="py-20 sm:py-24 bg-niebla-100 relative border-b border-niebla-200" id="impacto">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <!-- Encabezado de Sección Modern Clean -->
-        <div class="mb-10 text-center sm:text-left">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200/70 mb-3 shadow-2xs">
-            <i class="fa-solid fa-chart-simple text-[11px]"></i> Trazabilidad y Metas Ambientales
-          </span>
-          <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-heading mb-2">
-            Impacto en la Comuna
+        <!-- Encabezado Sobrio Sin Badges Cliché -->
+        <div class="max-w-2xl mb-12">
+          <p class="font-mono text-xs text-pizarra-600 tracking-wider mb-2">
+            AUDITORÍA AMBIENTAL COMUNAL · DIMAO
+          </p>
+          <h2 class="text-3xl sm:text-5xl font-extrabold text-bosque-950 tracking-tight font-heading leading-tight mb-2">
+            Impacto y trazabilidad de pesaje
           </h2>
-          <p class="text-xs sm:text-sm text-slate-500 max-w-xl font-sans">
-            Cada kilogramo recolectado se pesa in situ y se certifica para valorización, evitando su disposición en vertederos provinciales.
+          <p class="text-sm sm:text-base text-pizarra-600 font-sans leading-relaxed">
+            Datos reales registrados en báscula electrónica para valorización en plantas regionales y mitigación de vertedero.
           </p>
         </div>
 
-        <!-- 3 Tarjetas de Métricas Modernas -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
+        <!-- PANEL INSTITUCIONAL UNIFICADO (bg-bosque-950) -->
+        <div class="bg-bosque-950 text-niebla-100 rounded-3xl p-8 sm:p-12 border border-bosque-800 shadow-2xl overflow-hidden relative">
           
-          <!-- Métrica 1: Kilos -->
-          <div class="bg-slate-50/70 rounded-2xl p-7 text-center border border-slate-200 shadow-2xs hover:shadow-md hover:-translate-y-1.5 hover:border-slate-300 transition-all duration-300 flex flex-col justify-between items-center group">
-            <div class="w-12 h-12 mx-auto mb-3.5 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-lg shadow-2xs group-hover:scale-110 group-hover:border-emerald-300 transition-all duration-300">
-              <i class="fa-solid fa-scale-balanced text-emerald-600"></i>
+          <!-- Metadatos de Cabecera del Panel -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-8 border-b border-bosque-800 gap-4 text-xs font-mono">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-lago-400"></span>
+              <span class="text-lago-400 uppercase tracking-wider font-semibold">
+                SISTEMA REGIONAL DE VALORIZACIÓN
+              </span>
             </div>
-            <div>
-              <p class="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-1 font-heading tracking-tight">
-                {{ displayKg }} <span class="text-2xl font-bold text-emerald-600">kg</span>
-              </p>
-              <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Kilos Certificados en Báscula</h3>
-              <p class="text-xs text-slate-500">Pesaje digital verificado en ruta</p>
-            </div>
-            <div class="mt-4 pt-3 border-t border-slate-200/70 w-full flex items-center justify-center gap-1.5 text-[11px] font-semibold text-emerald-700">
-              <i class="fa-solid fa-arrow-trend-up text-xs"></i>
-              <span>Trazabilidad 100% Digital</span>
+            <div class="text-pizarra-400">
+              DATOS EN TIEMPO REAL · CUENCA LAGO LLANQUIHUE
             </div>
           </div>
 
-          <!-- Métrica 2: Vertederos con Anillo Circular SVG Animado -->
-          <div class="bg-slate-50/70 rounded-2xl p-7 text-center border border-slate-200 shadow-2xs hover:shadow-md hover:-translate-y-1.5 hover:border-slate-300 transition-all duration-300 flex flex-col justify-between items-center group">
-            <!-- Anillo SVG Circular en Vivo -->
-            <div class="relative w-24 h-24 mx-auto mb-2 flex items-center justify-center">
-              <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="38" stroke="#E2E8F0" stroke-width="7" fill="none" />
-                <circle cx="50" cy="50" r="38" stroke="#16A34A" stroke-width="7" fill="none" stroke-linecap="round"
-                        stroke-dasharray="238.76"
-                        [style.stroke-dashoffset]="238.76 - (238.76 * currentPercent / 100)"
-                        class="transition-all duration-700 ease-out" />
-              </svg>
-              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span class="text-2xl font-extrabold text-slate-900 font-heading leading-none">{{ currentPercent }}%</span>
-                <span class="text-[9px] font-bold text-emerald-700 uppercase tracking-wider mt-0.5">Meta</span>
+          <!-- COMPOSICIÓN EDITORIAL ASIMÉTRICA: Cifra Hero + Instrumental Técnico -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center mb-10">
+            
+            <!-- Columna Hero (7 cols): Cifra Monumental -->
+            <div class="lg:col-span-7">
+              <span class="font-mono text-xs uppercase tracking-wider text-pizarra-400 block mb-2">
+                Total Certificado en Báscula
+              </span>
+              <div class="flex items-baseline gap-3 mb-3">
+                <span class="font-mono font-black text-6xl sm:text-7xl lg:text-8xl text-white tracking-tight tabular-nums">
+                  {{ displayKg }}
+                </span>
+                <span class="font-heading font-extrabold text-3xl sm:text-4xl text-lago-400">kg</span>
               </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Desviación de Vertederos</h3>
-              <p class="text-xs text-slate-500">Recuperación y valorización REP</p>
-            </div>
-            <div class="mt-4 pt-3 border-t border-slate-200/70 w-full flex items-center justify-center gap-1.5 text-[11px] font-semibold text-slate-500">
-              <span>Evitando saturación comunal</span>
-            </div>
-          </div>
-
-          <!-- Métrica 3: Flota -->
-          <div class="bg-slate-50/70 rounded-2xl p-7 text-center border border-slate-200 shadow-2xs hover:shadow-md hover:-translate-y-1.5 hover:border-slate-300 transition-all duration-300 flex flex-col justify-between items-center group">
-            <div class="w-12 h-12 mx-auto mb-3.5 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-lg shadow-2xs group-hover:scale-110 group-hover:border-emerald-300 transition-all duration-300">
-              <i class="fa-solid fa-truck-fast text-slate-800"></i>
-            </div>
-            <div>
-              <p class="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-1 font-heading tracking-tight">
-                {{ currentTrucks }} <span class="text-xl font-bold text-emerald-600">camiones</span>
+              <p class="text-sm text-pizarra-400 max-w-lg leading-relaxed font-sans">
+                Materiales segregados limpios pesados electrónicamente antes de su despacho a plantas de reciclaje en la Región de Los Lagos.
               </p>
-              <h3 class="text-sm font-heading font-bold text-slate-800 mb-0.5">Flota Activa con GPS</h3>
-              <p class="text-xs text-slate-500">Cobertura en los 4 cuadrantes</p>
             </div>
-            <div class="mt-4 pt-3 border-t border-slate-200/70 w-full flex items-center justify-center gap-1.5 text-[11px] font-semibold text-emerald-700">
-              <i class="fa-solid fa-satellite-dish text-xs"></i>
-              <span>Monitoreo Satelital</span>
-            </div>
-          </div>
 
-        </div>
-
-        <!-- Banner Retiro Especial de Alto Contraste (Legibilidad 100% Garantizada) -->
-        <div class="relative rounded-3xl overflow-hidden shadow-lg border border-slate-800 bg-slate-950 min-h-[200px] flex items-center">
-          <img
-            src="assets/stitch/cta_lake_flowers.png"
-            alt="Paisaje Lago Llanquihue y flores Puerto Varas"
-            class="absolute right-0 inset-y-0 w-full md:w-3/5 h-full object-cover object-center opacity-65"
-          />
-          <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/95 to-slate-950/20 sm:to-transparent"></div>
-          
-          <div class="relative z-10 p-6 sm:p-10 w-full flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div class="flex items-start gap-4 max-w-xl">
-              <div class="shrink-0 w-11 h-11 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mt-1 shadow-2xs">
-                <i class="fa-solid fa-leaf text-lg"></i>
-              </div>
+            <!-- Columna Soporte Técnico (5 cols): Barra Instrumental & Flota -->
+            <div class="lg:col-span-5 space-y-8 bg-bosque-900/60 p-6 sm:p-8 rounded-2xl border border-bosque-800">
+              
+              <!-- Métrica 1: Desvío de Vertedero con Barra de Progreso Técnica -->
               <div>
-                <div class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-400 mb-1">
-                  <i class="fa-solid fa-truck-ramp-box"></i>
-                  <span>Servicio Municipal DIMAO</span>
+                <div class="flex justify-between items-baseline mb-2">
+                  <span class="font-mono text-xs text-pizarra-400 uppercase tracking-wider">
+                    Desviación de Vertedero
+                  </span>
+                  <span class="font-mono text-xl font-bold text-white tabular-nums">
+                    {{ currentPercent }}%
+                  </span>
                 </div>
-                <h3 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight mb-1 font-heading">
-                  ¿Necesitas retirar voluminosos o podas?
-                </h3>
-                <p class="text-xs sm:text-sm text-slate-300 font-sans leading-relaxed">
-                  Agenda una fecha de recolección especial para muebles en desuso, escombros limpios o ramas directamente desde el portal.
-                </p>
+
+                <!-- Barra Instrumental Continua -->
+                <div class="relative w-full h-3 bg-bosque-950 rounded-full overflow-hidden border border-bosque-800">
+                  <div
+                    class="h-full bg-lago-400 rounded-full transition-all duration-1000 ease-out"
+                    [style.width.%]="currentPercent">
+                  </div>
+                </div>
+
+                <!-- Coordenadas sobre la barra -->
+                <div class="flex justify-between items-center text-[10px] font-mono text-pizarra-400 mt-2">
+                  <span>0% BASE</span>
+                  <span class="text-madera-400">ACTUAL: {{ currentPercent }}%</span>
+                  <span>META COMUNAL: 70%</span>
+                </div>
               </div>
+
+              <!-- Métrica 2: Flota Satelital en Operación -->
+              <div class="pt-6 border-t border-bosque-800">
+                <div class="flex justify-between items-baseline mb-2">
+                  <span class="font-mono text-xs text-pizarra-400 uppercase tracking-wider">
+                    Flota de Camiones Activa
+                  </span>
+                  <span class="font-mono text-xl font-bold text-white tabular-nums">
+                    {{ currentTrucks }} vehículos
+                  </span>
+                </div>
+                <p class="text-xs text-pizarra-400 font-sans leading-relaxed">
+                  Monitoreo satelital continuo cubriendo los 4 cuadrantes con tolva para residuos limpios.
+                </p>
+                <div class="mt-3 flex items-center gap-2 text-[11px] font-mono text-lago-400">
+                  <i class="fa-solid fa-satellite-dish text-xs"></i>
+                  <span>COBERTURA TOTAL COMUNAL</span>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- SUB-SECCIÓN INTEGRADA: Retiro de Voluminosos (Continuación Natural del Panel) -->
+          <div class="pt-8 border-t border-bosque-800 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="max-w-xl">
+              <span class="font-mono text-[11px] text-madera-400 uppercase tracking-wider block mb-1">
+                Servicio Especial Municipal DIMAO
+              </span>
+              <h4 class="font-heading font-extrabold text-xl text-white tracking-tight mb-1">
+                ¿Necesitas retirar voluminosos o podas?
+              </h4>
+              <p class="text-xs text-pizarra-400 font-sans leading-relaxed">
+                Agenda retiro puerta a puerta para ramas de jardín, escombros limpios o muebles en desuso sin contaminar espacios públicos.
+              </p>
             </div>
 
             <div class="flex flex-col sm:flex-row items-center gap-3 shrink-0">
-              <a routerLink="/dashboard" class="w-full sm:w-auto text-center inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs py-3 px-5 rounded-xl transition shadow-sm cursor-pointer font-heading">
-                <span>Agendar Retiro Especial</span>
-                <i class="fa-solid fa-arrow-right text-[11px]"></i>
+              <a routerLink="/dashboard" class="w-full sm:w-auto text-center px-6 py-3 rounded-xl bg-madera-500 hover:bg-madera-600 text-white font-heading font-semibold text-xs transition shadow-sm cursor-pointer">
+                Agendar Retiro Especial
               </a>
-              <button type="button" (click)="openInfoModal.emit()" class="w-full sm:w-auto text-center px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition border border-white/20 shadow-2xs cursor-pointer font-heading">
+              <button type="button" (click)="openInfoModal.emit()" class="w-full sm:w-auto text-center px-5 py-3 rounded-xl bg-bosque-900 hover:bg-bosque-800 text-niebla-200 font-heading font-semibold text-xs transition border border-bosque-800 cursor-pointer">
                 Preguntas Frecuentes
               </button>
             </div>
           </div>
+
         </div>
 
       </div>
     </section>
-    <!-- END: ImpactSection -->
   `
 })
 export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -194,7 +207,6 @@ export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       },
       error: () => {
-        // Fallback: intentar al menos obtener el conteo de camiones reales desde ms-reciclago-catalog
         this.bffService.getCamiones().subscribe({
           next: (camiones) => {
             if (camiones && camiones.length > 0) {
@@ -237,8 +249,6 @@ export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
       const step = (currentTime: number) => {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
-        // Easing: easeOutCubic
         const ease = 1 - Math.pow(1 - progress, 3);
 
         const valKg = Math.floor(ease * this.targetKg);
@@ -279,4 +289,3 @@ export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 }
-

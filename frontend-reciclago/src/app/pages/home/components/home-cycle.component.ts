@@ -1,12 +1,14 @@
 import { Component, ElementRef, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-interface CycleStep {
-  stepNumber: number;
-  title: string;
-  subtitle: string;
-  description: string;
-  iconClass: string;
+export interface EstadoRetiro {
+  id: string;
+  paso: number;
+  nombre: string;
+  rol: string;
+  estado: 'completado' | 'en_curso' | 'pendiente';
+  timestamp?: string;
+  detalleTecnico?: string;
 }
 
 @Component({
@@ -14,109 +16,209 @@ interface CycleStep {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <!-- BEGIN: HowItWorks -->
-    <section class="py-16 sm:py-20 bg-white border-b border-slate-200" id="como-funciona">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <!-- SECCIÓN: Ciclo de Vida del Retiro (Timeline Continuo y Asimétrico) -->
+    <section class="py-20 sm:py-24 bg-niebla-100 border-b border-niebla-200" id="como-funciona">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <!-- Section Tag Modern -->
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200/70 mb-3 shadow-2xs">
-          <i class="fa-solid fa-arrows-spin text-[10px]"></i> Trazabilidad Paso a Paso
-        </span>
+        <!-- Encabezado Editorial Sin Badges Cliché -->
+        <div class="max-w-2xl mb-14">
+          <p class="font-mono text-xs text-pizarra-600 tracking-wider mb-2">
+            PROTOCOLO DIMAO · LEY 20.920
+          </p>
+          <h2 class="text-3xl sm:text-5xl font-extrabold text-bosque-950 tracking-tight font-heading leading-tight mb-3">
+            El ciclo de vida del retiro
+          </h2>
+          <p class="text-sm sm:text-base text-pizarra-600 font-sans leading-relaxed">
+            Cadena de custodia continua desde la solicitud vecinal hasta la báscula y emisión del certificado oficial de valorización.
+          </p>
+        </div>
 
-        <!-- Title & Subtitle -->
-        <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-heading mb-2">
-          El Ciclo de Vida del Retiro
-        </h2>
-        <p class="text-xs sm:text-sm text-slate-500 max-w-xl mx-auto mb-10 sm:mb-12 font-sans">
-          Un proceso simple, ordenado y transparente regulado bajo la Ley REP, desde tu puerta hasta la báscula y certificación digital.
-        </p>
+        <!-- TIMELINE CONTINUO DESKTOP (lg:block) -->
+        <div class="hidden lg:block relative mb-8">
+          
+          <!-- Línea conectora base -->
+          <div class="absolute top-7 left-8 right-8 h-0.5 bg-niebla-200 -z-0">
+            <div class="h-full bg-bosque-700 w-3/5 transition-all duration-1000"></div>
+          </div>
 
-        <!-- 5-Step Process Modern Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5 text-left">
-          <div *ngFor="let step of steps; let isLast = last" 
-               class="group bg-slate-50/70 rounded-2xl p-6 border border-slate-200 shadow-2xs hover:bg-white hover:shadow-md hover:-translate-y-1.5 hover:border-emerald-300/80 transition-all duration-300 flex flex-col justify-between cursor-default">
+          <!-- Grilla Asimétrica: 2 pasos compactos + 1 Activo Dominante + 1 Pendiente + 1 Ticket de Báscula -->
+          <div class="grid grid-cols-12 gap-5 items-start relative z-10">
             
-            <div>
-              <!-- Top Row: Number + Icon Medallion -->
-              <div class="flex items-center justify-between mb-4">
-                <span class="font-heading font-black text-2xl sm:text-3xl text-slate-900 group-hover:text-emerald-700 transition-colors">
-                  0{{ step.stepNumber }}
+            <!-- Paso 1: Solicitado (Completado) -->
+            <div class="col-span-2 pt-2">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-10 h-10 rounded-full bg-bosque-700 text-niebla-50 font-mono text-xs font-bold flex items-center justify-center shadow-xs">
+                  <i class="fa-solid fa-check text-[11px]"></i>
                 </span>
-                <div class="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 text-sm shadow-2xs group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-600 group-hover:scale-110 transition-all duration-300">
-                  <i [class]="step.iconClass"></i>
+                <span class="font-mono text-[11px] text-pizarra-600 tabular-nums">08:12 hrs</span>
+              </div>
+              <h3 class="font-heading font-bold text-sm text-bosque-950 mb-0.5">1. Solicitud Vecinal</h3>
+              <p class="text-xs text-pizarra-600 leading-snug">
+                Georreferenciada en plataforma municipal.
+              </p>
+              <div class="mt-2 text-[10px] font-mono text-pizarra-400">ID: REQ-8821</div>
+            </div>
+
+            <!-- Paso 2: Programado (Completado) -->
+            <div class="col-span-2 pt-2">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-10 h-10 rounded-full bg-bosque-700 text-niebla-50 font-mono text-xs font-bold flex items-center justify-center shadow-xs">
+                  <i class="fa-solid fa-check text-[11px]"></i>
+                </span>
+                <span class="font-mono text-[11px] text-pizarra-600 tabular-nums">08:35 hrs</span>
+              </div>
+              <h3 class="font-heading font-bold text-sm text-bosque-950 mb-0.5">2. Asignación Cuadrante</h3>
+              <p class="text-xs text-pizarra-600 leading-snug">
+                Cuadrante 1 · Puerto Chico.
+              </p>
+              <div class="mt-2 text-[10px] font-mono text-pizarra-400">Ruta VRP DIMAO</div>
+            </div>
+
+            <!-- Paso 3: EN RUTA (ACTIVO DOMINANTE - PROTAGONISMO ESPACIAL) -->
+            <div class="col-span-4 bg-bosque-950 text-niebla-100 rounded-2xl p-6 shadow-xl border border-bosque-800 relative -top-3">
+              <!-- Indicador vivo sin parpadeos banales -->
+              <div class="flex items-center justify-between pb-3 mb-3 border-b border-bosque-800">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-lago-400"></span>
+                  <span class="font-mono text-[11px] text-lago-400 font-semibold tracking-wider uppercase">
+                    3. En Ruta · Telemetría en Vivo
+                  </span>
                 </div>
+                <span class="font-mono text-xs text-niebla-200 tabular-nums">GPS Activo</span>
               </div>
 
-              <!-- Step Title & Actor -->
-              <h3 class="font-heading font-bold text-base text-slate-900 mb-0.5 leading-snug">
-                {{ step.title }}
-              </h3>
-              <span class="text-xs font-semibold text-emerald-600 mb-2 block">
-                {{ step.subtitle }}
-              </span>
+              <div class="space-y-2 mb-4">
+                <div class="flex justify-between items-baseline">
+                  <span class="font-heading text-lg font-bold text-white">Camión Municipal DIMAO-02</span>
+                  <span class="font-mono text-xs text-madera-400">ETA: ~14 min</span>
+                </div>
+                <p class="text-xs text-pizarra-400 leading-relaxed font-sans">
+                  Cuadrilla en tránsito hacia Calle Vicente Pérez Rosales. Tolva compartimentada para Vidrio.
+                </p>
+              </div>
 
-              <!-- Description -->
-              <p class="text-xs text-slate-500 leading-relaxed font-sans">
-                {{ step.description }}
+              <!-- Telemetría técnica -->
+              <div class="grid grid-cols-2 gap-2 pt-3 border-t border-bosque-900 font-mono text-[11px]">
+                <div>
+                  <span class="text-pizarra-400 block text-[9px] uppercase">Coordenadas</span>
+                  <span class="text-white tabular-nums">-41.3195, -72.9854</span>
+                </div>
+                <div>
+                  <span class="text-pizarra-400 block text-[9px] uppercase">Capacidad Tolva</span>
+                  <span class="text-lago-400 tabular-nums">48% ocupada</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Paso 4: Retirado (Pendiente inmediato) -->
+            <div class="col-span-2 pt-2 opacity-85">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-10 h-10 rounded-full bg-niebla-200 border border-niebla-300 text-pizarra-600 font-mono text-xs font-bold flex items-center justify-center">
+                  04
+                </span>
+                <span class="font-mono text-[11px] text-pizarra-400">Próximo</span>
+              </div>
+              <h3 class="font-heading font-bold text-sm text-bosque-950 mb-0.5">4. Retiro Frontis</h3>
+              <p class="text-xs text-pizarra-600 leading-snug">
+                Inspección de pureza y carga selectiva en domicilio.
               </p>
             </div>
 
-            <!-- Bottom Progress Line Indicating Sequence -->
-            <div class="mt-4 pt-3 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-slate-400 font-medium">
-              <span>Etapa {{ step.stepNumber }}/5</span>
-              <i *ngIf="!isLast" class="fa-solid fa-arrow-right text-slate-400 text-xs group-hover:text-emerald-600 group-hover:translate-x-1 transition-all"></i>
-              <i *ngIf="isLast" class="fa-solid fa-check-circle text-emerald-600 text-xs"></i>
+            <!-- Paso 5: PESADO Y CERTIFICADO (TICKET DE BÁSCULA CON FOLIO) -->
+            <div class="col-span-2 bg-niebla-50 border border-dashed border-pizarra-400 rounded-xl p-4 relative shadow-2xs">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-niebla-200 font-mono text-[10px] text-pizarra-600">
+                <span>CERTIFICADO REP</span>
+                <span class="text-madera-500 font-bold">#PV-9042</span>
+              </div>
+              <div class="mb-2">
+                <span class="font-mono text-[9px] text-pizarra-400 block uppercase">5. Pesaje Báscula</span>
+                <span class="font-heading font-black text-xl text-bosque-950 tabular-nums">14.8 kg</span>
+              </div>
+              <p class="text-[11px] text-pizarra-600 leading-tight">
+                Emisión digital con trazabilidad a planta de reciclaje regional.
+              </p>
+              <div class="mt-2.5 pt-2 border-t border-niebla-200 flex items-center justify-between text-[9px] font-mono text-madera-600">
+                <span>BÁSCULA INN</span>
+                <span class="font-bold">VERIFICADO</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TIMELINE VERTICAL MOBILE (lg:hidden) -->
+        <div class="lg:hidden space-y-6 relative border-l-2 border-bosque-700/30 ml-4 pl-6">
+          
+          <!-- Paso 1 -->
+          <div class="relative">
+            <span class="absolute -left-[31px] top-0 w-6 h-6 rounded-full bg-bosque-700 text-white flex items-center justify-center text-[10px]">
+              <i class="fa-solid fa-check"></i>
+            </span>
+            <div class="flex items-baseline gap-2 mb-1">
+              <h3 class="font-heading font-bold text-sm text-bosque-950">1. Solicitud Vecinal</h3>
+              <span class="font-mono text-[10px] text-pizarra-600">08:12 hrs</span>
+            </div>
+            <p class="text-xs text-pizarra-600">Ingresada y validada en plataforma municipal.</p>
+          </div>
+
+          <!-- Paso 2 -->
+          <div class="relative">
+            <span class="absolute -left-[31px] top-0 w-6 h-6 rounded-full bg-bosque-700 text-white flex items-center justify-center text-[10px]">
+              <i class="fa-solid fa-check"></i>
+            </span>
+            <div class="flex items-baseline gap-2 mb-1">
+              <h3 class="font-heading font-bold text-sm text-bosque-950">2. Asignación Cuadrante</h3>
+              <span class="font-mono text-[10px] text-pizarra-600">08:35 hrs</span>
+            </div>
+            <p class="text-xs text-pizarra-600">Cuadrante 1 · Puerto Chico.</p>
+          </div>
+
+          <!-- Paso 3: Activo Móvil -->
+          <div class="relative bg-bosque-950 text-white p-5 rounded-xl border border-bosque-800 shadow-md -ml-2">
+            <span class="absolute -left-[27px] top-4 w-6 h-6 rounded-full bg-lago-400 text-bosque-950 font-bold flex items-center justify-center text-[10px]">
+              3
+            </span>
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-mono text-[10px] text-lago-400 uppercase tracking-wider font-semibold">En Ruta Activa</span>
+              <span class="font-mono text-xs text-madera-400">ETA ~14 min</span>
+            </div>
+            <h3 class="font-heading font-bold text-base mb-1">Camión Municipal DIMAO-02</h3>
+            <p class="text-xs text-pizarra-400 mb-3">En trayecto por Costanera. Material: Vidrio.</p>
+            <div class="text-[10px] font-mono text-pizarra-400 pt-2 border-t border-bosque-900 flex justify-between">
+              <span>GPS: -41.3195, -72.9854</span>
+              <span>Tolva: 48%</span>
             </div>
           </div>
+
+          <!-- Paso 4 -->
+          <div class="relative opacity-80">
+            <span class="absolute -left-[31px] top-0 w-6 h-6 rounded-full bg-niebla-200 border border-niebla-300 text-pizarra-600 flex items-center justify-center text-[10px]">
+              4
+            </span>
+            <h3 class="font-heading font-bold text-sm text-bosque-950">4. Retiro Frontis</h3>
+            <p class="text-xs text-pizarra-600">Inspección de pureza y carga selectiva en domicilio.</p>
+          </div>
+
+          <!-- Paso 5: Ticket Móvil -->
+          <div class="relative bg-niebla-50 border border-dashed border-pizarra-400 p-4 rounded-xl -ml-2">
+            <div class="flex justify-between items-center text-[10px] font-mono text-pizarra-600 mb-1">
+              <span>CERTIFICADO DIGITAL BÁSCULA</span>
+              <span class="text-madera-500 font-bold">#PV-9042</span>
+            </div>
+            <span class="font-heading font-black text-xl text-bosque-950">14.8 kg Certificados</span>
+            <p class="text-xs text-pizarra-600 mt-1">Pesaje electrónico calibrado INN.</p>
+          </div>
+
         </div>
 
       </div>
     </section>
-    <!-- END: HowItWorks -->
   `
 })
 export class HomeCycleComponent implements OnInit, OnDestroy {
   private elementRef = inject(ElementRef);
   private observer: IntersectionObserver | null = null;
   isVisible = false;
-
-  steps: CycleStep[] = [
-    {
-      stepNumber: 1,
-      title: 'Solicitado',
-      subtitle: 'Vecino',
-      description: 'El vecino agenda su retiro desde la web o teléfono municipal.',
-      iconClass: 'fa-solid fa-user-check'
-    },
-    {
-      stepNumber: 2,
-      title: 'Programado',
-      subtitle: 'Coordinador DIMAO',
-      description: 'Se organiza la ruta y el cuadrante según el calendario comunal.',
-      iconClass: 'fa-solid fa-calendar-check'
-    },
-    {
-      stepNumber: 3,
-      title: 'En Ruta',
-      subtitle: 'Seguimiento GPS',
-      description: 'Puedes ver el recorrido del camión en tiempo real desde tu celular.',
-      iconClass: 'fa-solid fa-truck-fast'
-    },
-    {
-      stepNumber: 4,
-      title: 'Retirado',
-      subtitle: 'Puerta a puerta',
-      description: 'La cuadrilla municipal retira tus residuos en el frontis de tu hogar.',
-      iconClass: 'fa-solid fa-house'
-    },
-    {
-      stepNumber: 5,
-      title: 'Pesado y Certificado',
-      subtitle: 'Báscula y Ley REP',
-      description: 'Se registra el peso exacto y se genera tu comprobante oficial de CO₂.',
-      iconClass: 'fa-solid fa-scale-balanced'
-    }
-  ];
 
   ngOnInit(): void {
     if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
@@ -139,4 +241,3 @@ export class HomeCycleComponent implements OnInit, OnDestroy {
     this.observer?.disconnect();
   }
 }
-
