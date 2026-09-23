@@ -21,8 +21,8 @@ module.exports = {
       },
       fontFamily: {
         sans: ['"Manrope"', '"Figtree"', '"Inter"', 'system-ui', 'sans-serif'],
-        heading: ['"Space Grotesk"', '"Outfit"', '"Manrope"', 'sans-serif'],
-        display: ['"Space Grotesk"', '"Outfit"', '"Geist"', 'sans-serif'],
+        heading: ['"Clash Display"', '"Outfit"', '"Manrope"', 'sans-serif'],
+        display: ['"Clash Display"', '"Outfit"', '"Geist"', 'sans-serif'],
         mono: ['"Manrope"', 'system-ui', 'sans-serif'],
         script: ['"Kalam"', '"Caveat"', 'cursive'],
         handwriting: ['"Caveat"', '"Kalam"', 'cursive'],

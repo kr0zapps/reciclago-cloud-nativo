@@ -31,27 +31,27 @@ import { RouterModule } from '@angular/router';
       </div>
 
       <!-- 2. Espaciador Superior para Compensar el Header Sticky -->
-      <div class="h-20 sm:h-24 flex-shrink-0 pointer-events-none"></div>
+      <div class="h-16 sm:h-20 lg:h-24 flex-shrink-0 pointer-events-none"></div>
 
       <!-- 3. Contenido Editorial Principal: Monumental, Centrado e Imponente (Cero Slop, Cero Cuadritos) -->
-      <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-14 w-full my-auto text-center flex flex-col items-center justify-center">
+      <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 lg:py-12 w-full my-auto text-center flex flex-col items-center justify-center">
         
-        <!-- Titular Monumental, Prominente y de Alto Impacto con Syne -->
-        <h1 class="hero-title text-5xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[106px] tracking-tight leading-[0.92] text-white drop-shadow-sm">
-          Reciclaje Comunal<br />
-          Puerto Varas
+        <!-- Titular Monumental, Prominente y de Alto Impacto con Clash Display -->
+        <h1 class="hero-title text-white drop-shadow-sm">
+          <span class="block">Reciclaje Comunal</span>
+          <span class="block text-[#22a652]">Puerto Varas</span>
         </h1>
 
         <!-- Subtítulo Corto, Directo y Conciso -->
-        <p class="text-base sm:text-xl md:text-2xl text-slate-200 font-medium max-w-2xl mx-auto mt-4 sm:mt-5 mb-7 sm:mb-9 drop-shadow-sm leading-snug">
+        <p class="text-sm sm:text-lg md:text-xl text-slate-200 font-medium max-w-xl mx-auto mt-3 sm:mt-5 mb-5 sm:mb-8 drop-shadow-sm leading-snug">
           Retiro domiciliario y pesaje digital para proteger nuestro lago.
         </p>
 
         <!-- Botones de Acción Centrados, Ergonómicos y con Colores Sólidos -->
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 w-full sm:w-auto">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 w-full sm:w-auto">
           <a
             routerLink="/dashboard"
-            class="inline-flex items-center justify-center gap-2.5 min-h-[52px] sm:min-h-[56px] px-8 sm:px-10 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white font-extrabold text-sm sm:text-base tracking-wide shadow-xl shadow-emerald-950/50 border-none transition-all active:scale-[0.98] cursor-pointer">
+            class="inline-flex items-center justify-center gap-2.5 min-h-[48px] sm:min-h-[54px] px-7 sm:px-9 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white font-extrabold text-sm sm:text-base tracking-wide shadow-xl shadow-emerald-950/50 border-none transition-all active:scale-[0.98] cursor-pointer">
             <span>Ingresar al Portal Vecinal</span>
             <i class="fa-solid fa-arrow-right text-xs"></i>
           </a>
@@ -59,15 +59,15 @@ import { RouterModule } from '@angular/router';
           <a
             href="#cuadrantes"
             (click)="scrollToSection($event, 'cuadrantes')"
-            class="inline-flex items-center justify-center gap-2.5 min-h-[52px] sm:min-h-[56px] px-7 sm:px-9 rounded-xl bg-[#092232]/85 hover:bg-[#123F5B] text-white font-bold text-sm sm:text-base border border-white/20 backdrop-blur-md shadow-lg transition-all active:scale-[0.98] cursor-pointer">
+            class="inline-flex items-center justify-center gap-2.5 min-h-[48px] sm:min-h-[54px] px-6 sm:px-8 rounded-xl bg-[#092232]/85 hover:bg-[#123F5B] text-white font-bold text-sm sm:text-base border border-white/20 backdrop-blur-md shadow-lg transition-all active:scale-[0.98] cursor-pointer">
             <i class="fa-solid fa-calendar-days text-[#22a652]"></i>
             <span>Ver Cuadrantes y Días</span>
           </a>
         </div>
 
         <!-- Lema Cálido / Humano con Amplio Espaciado y Cero Emojis -->
-        <div class="mt-14 sm:mt-18 text-center">
-          <p class="font-script text-lg sm:text-2xl text-slate-300/80 tracking-wide select-none m-0">
+        <div class="mt-8 sm:mt-14 text-center">
+          <p class="font-script text-base sm:text-xl md:text-2xl text-slate-300/80 tracking-wide select-none m-0">
             Reciclar también es cuidar nuestro lago
           </p>
         </div>
