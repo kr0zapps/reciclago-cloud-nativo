@@ -14,7 +14,7 @@ import { RouterModule } from '@angular/router';
       <div class="absolute inset-0 -bottom-2 z-0 pointer-events-none overflow-hidden">
         <img
           alt="Lago Llanquihue y Volcán Osorno al atardecer - Puerto Varas"
-          class="w-full h-full object-cover object-[62%_34%] sm:object-[66%_35%] lg:object-[center_38%] scale-105 select-none pointer-events-none transition-transform duration-100 ease-out will-change-transform"
+          class="w-full h-full object-cover object-[60%_28%] sm:object-[64%_32%] lg:object-[center_38%] scale-105 select-none pointer-events-none transition-transform duration-100 ease-out will-change-transform"
           [ngStyle]="{ transform: 'translate3d(0, ' + parallaxOffset + 'px, 0)' }"
           src="assets/ultrawide.jpg"
         />
@@ -40,36 +40,54 @@ import { RouterModule } from '@angular/router';
       <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 w-full my-auto">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          <!-- Columna Izquierda: Titular Limpio, Subtítulo y Botones Directos -->
-          <div class="lg:col-span-7 xl:col-span-8 max-w-2xl xl:max-w-3xl">
+          <!-- Columna Izquierda: Titular Imponente, Subtítulo y Botones Directos -->
+          <div class="lg:col-span-7 xl:col-span-8 max-w-2xl xl:max-w-3xl relative">
+            <!-- Aura luminosa ambiental en verde esmeralda (profundidad de alta gama) -->
+            <div class="absolute -top-12 -left-8 w-64 h-64 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
 
-            <!-- Titular Principal -->
-            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.1] mb-5 font-heading">
+            <!-- Titular Principal con Gradiente y Tipografía Imponente -->
+            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.08] mb-4 sm:mb-5 font-heading drop-shadow-md">
               Reciclaje Comunal<br />
-              <span class="text-[#22a652]">Puerto Varas</span>
+              <span class="bg-gradient-to-r from-emerald-400 via-emerald-300 to-teal-200 bg-clip-text text-transparent">Puerto Varas</span>
             </h1>
 
             <!-- Subtítulo -->
-            <p class="text-base sm:text-lg text-slate-200 font-medium leading-relaxed max-w-xl mb-8">
+            <p class="text-sm sm:text-lg text-slate-200/90 font-medium leading-relaxed max-w-xl mb-6 sm:mb-8 drop-shadow-sm">
               Sistema de trazabilidad, retiro domiciliario y pesaje digital para proteger la cuenca del Lago Llanquihue bajo la Ley REP.
             </p>
 
-            <!-- CTAs Modernos y Equilibrados -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 w-full sm:w-auto">
+            <!-- CTAs Modernos, Imponentes y de Alta Gama -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
               <a
                 routerLink="/dashboard"
-                class="inline-flex items-center justify-center gap-2.5 min-h-[48px] px-6 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white font-semibold text-sm cursor-pointer shadow-lg shadow-emerald-950/40 hover:-translate-y-0.5 active:translate-y-0 transition-all">
-                <span>Ingresar al Portal Vecinal</span>
-                <i class="fa-solid fa-arrow-right text-xs"></i>
+                class="relative group overflow-hidden inline-flex items-center justify-center gap-2.5 min-h-[50px] px-6 rounded-2xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 hover:from-emerald-400 hover:to-emerald-600 text-white font-bold text-sm tracking-wide shadow-xl shadow-emerald-950/60 ring-1 ring-white/20 active:scale-[0.98] transition-all cursor-pointer">
+                <span class="relative z-10">Ingresar al Portal Vecinal</span>
+                <i class="fa-solid fa-arrow-right text-xs relative z-10 group-hover:translate-x-1 transition-transform"></i>
               </a>
 
               <a
                 href="#cuadrantes"
                 (click)="scrollToSection($event, 'cuadrantes')"
-                class="inline-flex items-center justify-center gap-2.5 min-h-[48px] px-6 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm border border-white/25 cursor-pointer backdrop-blur-sm shadow-sm hover:-translate-y-0.5 active:translate-y-0 transition-all">
-                <i class="fa-solid fa-calendar-days text-[#22a652]"></i>
+                class="inline-flex items-center justify-center gap-2.5 min-h-[50px] px-6 rounded-2xl bg-slate-900/60 hover:bg-slate-900/80 text-white font-semibold text-sm border border-white/20 cursor-pointer backdrop-blur-md shadow-lg active:scale-[0.98] transition-all">
+                <i class="fa-solid fa-calendar-days text-emerald-400"></i>
                 <span>Ver Cuadrantes y Días</span>
               </a>
+            </div>
+
+            <!-- Micro-Widgets Flotantes de Métricas Rápidas (Exclusivo móvil: da densidad, prestigio e impacto visual) -->
+            <div class="mt-6 pt-5 border-t border-white/15 grid grid-cols-3 gap-2 text-center lg:hidden">
+              <div class="py-2.5 px-1.5 rounded-xl bg-slate-950/50 backdrop-blur-md border border-white/10 shadow-xs">
+                <span class="block text-emerald-400 font-extrabold text-xs">4 Sectores</span>
+                <span class="block text-[10px] text-slate-300 font-medium mt-0.5">Cuadrantes</span>
+              </div>
+              <div class="py-2.5 px-1.5 rounded-xl bg-slate-950/50 backdrop-blur-md border border-white/10 shadow-xs">
+                <span class="block text-emerald-400 font-extrabold text-xs">100% Gratis</span>
+                <span class="block text-[10px] text-slate-300 font-medium mt-0.5">En tu puerta</span>
+              </div>
+              <div class="py-2.5 px-1.5 rounded-xl bg-slate-950/50 backdrop-blur-md border border-white/10 shadow-xs">
+                <span class="block text-emerald-400 font-extrabold text-xs">Digital</span>
+                <span class="block text-[10px] text-slate-300 font-medium mt-0.5">Balanza INN</span>
+              </div>
             </div>
           </div>
 
