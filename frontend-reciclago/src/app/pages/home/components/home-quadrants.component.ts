@@ -16,29 +16,29 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
   {
     categoryKey: 'VIDRIO',
     materialNombre: 'Vidrio',
-    materialDescripcion: 'Botellas, frascos conserveros y envases de vidrio transparente o color',
-    materialInstrucciones: 'Enjuagar botellas y frascos, retirar tapas y corchos. No incluir cerámica, ampolletas ni espejos.',
+    materialDescripcion: 'Botellas y frascos de vidrio',
+    materialInstrucciones: 'Enjuagar botellas y frascos, retirar tapas y corchos. Sin cerámica ni espejos.',
     binImage: 'assets/bin_vidrio_clean.png'
   },
   {
     categoryKey: 'CARTON',
     materialNombre: 'Cartón',
-    materialDescripcion: 'Cajas de cartón corrugado, papel kraft, diarios y revistas limpias',
-    materialInstrucciones: 'Aplanar cajas para reducir volumen. Mantener seco y libre de restos de grasa, comida o cintas adhesivas excesivas.',
+    materialDescripcion: 'Cajas dobladas, diarios y papel',
+    materialInstrucciones: 'Aplanar cajas para reducir volumen. Mantener seco y libre de restos de comida.',
     binImage: 'assets/bin_carton_clean.png'
   },
   {
     categoryKey: 'PLASTICO',
     materialNombre: 'Plásticos PET/PEAD',
-    materialDescripcion: 'Botellas plásticas de bebidas (PET 1) y envases de detergente/lácteos (PEAD 2)',
-    materialInstrucciones: 'Lavar, escurrir, aplastar para reducir volumen y volver a colocar la tapa plástica.',
+    materialDescripcion: 'Botellas plásticas y envases limpios',
+    materialInstrucciones: 'Lavar, escurrir, aplastar y volver a colocar la tapa plástica.',
     binImage: 'assets/bin_plasticos_clean.png'
   },
   {
     categoryKey: 'LATAS',
     materialNombre: 'Latas',
-    materialDescripcion: 'Latas de bebidas de aluminio y tarros de conserva de hojalata',
-    materialInstrucciones: 'Enjuagar para evitar olores y vectores sanitarios. Aplastar si es posible.',
+    materialDescripcion: 'Latas de bebidas y conservas',
+    materialInstrucciones: 'Enjuagar para evitar olores. Aplastar si es posible.',
     binImage: 'assets/bin_latas_clean.png'
   }
 ];
@@ -170,93 +170,65 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
             </div>
 
             <!-- Contenido Informativo de la Tarjeta Móvil -->
-            <div class="p-5">
-              <div class="flex items-baseline justify-between mb-1.5">
-                <h3 class="text-xl font-black text-[#123F5B] tracking-tight font-heading">
+            <div class="p-4 sm:p-5">
+              <div class="flex items-baseline justify-between mb-2">
+                <h3 class="text-lg font-black text-[#123F5B] font-heading">
                   {{ q.name }}
                 </h3>
-                <span class="text-xs text-gray-500 font-medium">{{ q.hours }}</span>
+                <span class="text-xs font-bold text-gray-500">{{ q.day }} · {{ q.hours }}</span>
               </div>
 
-              <!-- Horario y Día en Línea Tipográfica Limpia -->
-              <div class="flex items-center gap-2 text-xs font-bold text-gray-600 mb-4">
-                <i class="fa-regular fa-calendar-check text-[#22a652] text-sm"></i>
-                <span>Pasa los días <strong class="text-[#123F5B]">{{ q.day }}</strong></span>
-                <span *ngIf="q.diaModificado" class="text-[10px] font-extrabold text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-300">
-                  Reprogramado
-                </span>
-              </div>
-
-              <div *ngIf="q.diaModificado && q.motivoModificacion" class="mb-3 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-relaxed">
+              <div *ngIf="q.diaModificado && q.motivoModificacion" class="mb-2 p-2 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-relaxed">
                 <i class="fa-solid fa-triangle-exclamation text-amber-600 mr-1"></i>
                 <strong>Aviso:</strong> {{ q.motivoModificacion }}
               </div>
 
-              <!-- Material Asignado Editorial -->
-              <div class="pt-3 border-t border-gray-100 flex items-center justify-between gap-4">
+              <!-- Material Asignado -->
+              <div class="pt-2.5 border-t border-gray-100 flex items-center justify-between gap-3">
                 <div class="min-w-0 flex-1">
-                  <span class="text-[11px] font-black uppercase tracking-wider text-[#22a652] block">
-                    {{ activeWeek === 1 ? 'Material esta semana' : 'Material próxima semana' }}
+                  <span class="text-[10px] font-black uppercase tracking-wider text-[#22a652] block">
+                    {{ activeWeek === 1 ? 'Esta semana' : 'Próxima semana' }}
                   </span>
-                  <h4 class="text-lg font-black text-[#123F5B] mt-0.5">
+                  <h4 class="text-base font-black text-[#123F5B] mt-0.5">
                     {{ q.materialNombre }}
                   </h4>
-                  <p *ngIf="q.materialDescripcion" class="text-xs text-gray-500 mt-0.5 line-clamp-2 leading-relaxed">
+                  <p class="text-xs text-gray-500 mt-0.5">
                     {{ q.materialDescripcion }}
                   </p>
-                  <div class="mt-2 flex items-center gap-1.5 text-xs font-bold text-gray-700">
-                    <i class="fa-solid fa-circle-check text-[#22a652] text-xs"></i>
-                    <span>{{ q.requisitos }}</span>
-                  </div>
+                  <span class="inline-flex items-center gap-1 mt-1.5 text-xs font-bold text-[#22a652]">
+                    <i class="fa-solid fa-check text-[10px]"></i> {{ q.requisitos }}
+                  </span>
                 </div>
 
-                <div class="flex-shrink-0 flex items-center justify-center p-1">
-                  <img
-                    [src]="q.binImage"
-                    [alt]="q.materialNombre"
-                    class="h-16 w-auto object-contain drop-shadow-sm"
-                  />
-                </div>
+                <img
+                  [src]="q.binImage"
+                  [alt]="q.materialNombre"
+                  class="h-14 w-auto object-contain flex-shrink-0 drop-shadow-sm"
+                />
+              </div>
+
+              <!-- Acordeón preparación -->
+              <button
+                type="button"
+                (click)="toggleAccordion(q.id)"
+                class="w-full mt-2.5 pt-2 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-gray-500 hover:text-[#123F5B] transition-colors cursor-pointer"
+                [attr.aria-expanded]="expandedAccordionId === q.id">
+                <span class="inline-flex items-center gap-1.5">
+                  <i class="fa-regular fa-lightbulb text-amber-500 text-[11px]"></i>
+                  <span>{{ expandedAccordionId === q.id ? 'Cerrar' : '¿Cómo preparar?' }}</span>
+                </span>
+                <i class="fa-solid fa-chevron-down text-[9px] transition-transform duration-200" [class.rotate-180]="expandedAccordionId === q.id"></i>
+              </button>
+
+              <div *ngIf="expandedAccordionId === q.id"
+                   class="mt-2 p-2.5 rounded-lg bg-[#F8FAF7] border border-[#E2E8F0] text-xs text-gray-600 leading-relaxed">
+                {{ q.materialInstrucciones || 'Enjuagar y secar botellas y envases antes de depositar.' }}
               </div>
             </div>
-
-            <!-- Acordeón interactivo inline: Ver preparación para la entrega -->
-            <button
-              type="button"
-              (click)="toggleAccordion(q.id)"
-              class="w-full px-4 py-3 flex items-center justify-between text-xs text-emerald-700 font-bold border-t border-slate-100 hover:bg-emerald-50/50 transition-colors cursor-pointer"
-              [attr.aria-expanded]="expandedAccordionId === q.id">
-              <span class="inline-flex items-center gap-1.5">
-                <i class="fa-solid fa-circle-info text-emerald-600"></i>
-                <span>{{ expandedAccordionId === q.id ? 'Ocultar preparación' : 'Ver preparación para la entrega' }}</span>
-              </span>
-              <i class="fa-solid fa-chevron-down text-xs transition-transform duration-300 ease-out" [class.rotate-180]="expandedAccordionId === q.id"></i>
-            </button>
-
-            <!-- Panel Expandido del Acordeón Móvil con Grid Animado -->
-            <div class="grid transition-all duration-300 ease-out"
-                 [class.grid-rows-[1fr]]="expandedAccordionId === q.id"
-                 [class.grid-rows-[0fr]]="expandedAccordionId !== q.id">
-              <div class="overflow-hidden">
-                <div class="p-4 bg-emerald-50/60 border-t border-emerald-100/80 text-xs text-slate-700 leading-relaxed">
-                  <div class="font-bold text-[#22a652] mb-1 flex items-center gap-1.5">
-                    <i class="fa-solid fa-list-check"></i>
-                    <span>Instrucciones de preparación comunal:</span>
-                  </div>
-                  <p class="mb-2">{{ q.materialInstrucciones || 'Enjuagar y secar botellas y envases antes de depositar. Aplanar cajas de cartón.' }}</p>
-                  <div class="text-[11px] font-semibold text-slate-600 flex items-center gap-1">
-                    <i class="fa-solid fa-circle-check text-emerald-600"></i>
-                    <span>Entrega: {{ q.requisitos }} · Frente a frontis domiciliario</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
           </article>
         </div>
 
-        <!-- Desktop View: 4 Quadrants Grid Moderno y Elegante -->
-        <!-- Vista Desktop: 2 Columnas Limpias y Espaciosas -->
+        <!-- Desktop View: 2 Columnas Limpias y Espaciosas -->
         <div class="hidden md:grid md:grid-cols-2 gap-6 lg:gap-8">
           <article
             *ngFor="let q of quadrants; let i = index"
@@ -285,75 +257,62 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                 
                 <!-- Badge Aviso Reprogramación DIMAO -->
                 <span *ngIf="q.diaModificado" class="absolute top-3 left-3 bg-amber-500 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-md shadow-sm flex items-center gap-1.5">
-                  <i class="fa-solid fa-bullhorn text-[9px]"></i> Aviso de cambio de fecha
+                  <i class="fa-solid fa-bullhorn text-[9px]"></i> Cambio de fecha
                 </span>
 
                 <!-- Badge Catálogo Live -->
                 <span *ngIf="catalogLoaded" class="absolute top-3 right-3 bg-white/95 backdrop-blur-sm text-[10px] font-bold text-emerald-800 px-2.5 py-1 rounded-md shadow-2xs border border-emerald-200">
-                  <i class="fa-solid fa-circle-check text-[#22a652] mr-1"></i>Catálogo Oficial DIMAO
+                  <i class="fa-solid fa-circle-check text-[#22a652] mr-1"></i>Oficial DIMAO
                 </span>
               </div>
 
-              <!-- Contenido Informativo de la Tarjeta: Tipografía y Contenido sin Cajas Anidadas -->
-              <div class="p-6">
+              <!-- Contenido Informativo de la Tarjeta -->
+              <div class="p-5 sm:p-6">
                 <!-- Cabecera del Sector -->
-                <div class="flex items-baseline justify-between mb-1.5">
+                <div class="flex items-baseline justify-between mb-2">
                   <h3 class="text-xl sm:text-2xl font-black text-[#123F5B] tracking-tight font-heading group-hover:text-[#22a652] transition-colors duration-200">
                     {{ q.name }}
                   </h3>
-                  <span class="text-xs text-gray-500 font-medium">{{ q.hours }}</span>
+                  <span class="text-xs font-bold text-gray-500">{{ q.day }} · {{ q.hours }}</span>
                 </div>
 
-                <!-- Horario y Día en Línea Tipográfica Limpia -->
-                <div class="flex items-center gap-2 text-xs font-bold text-gray-600 mb-5">
-                  <i class="fa-regular fa-calendar-check text-[#22a652] text-sm"></i>
-                  <span>Pasa los días <strong class="text-[#123F5B]">{{ q.day }}</strong></span>
-                  <span *ngIf="q.diaModificado" class="text-[10px] font-extrabold text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-300">
-                    Reprogramado
-                  </span>
-                </div>
-
-                <div *ngIf="q.diaModificado && q.motivoModificacion" class="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-relaxed">
+                <div *ngIf="q.diaModificado && q.motivoModificacion" class="mb-3 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-relaxed">
                   <i class="fa-solid fa-triangle-exclamation text-amber-600 mr-1"></i>
-                  <strong>Nota municipal:</strong> {{ q.motivoModificacion }}
+                  <strong>Nota:</strong> {{ q.motivoModificacion }}
                 </div>
 
-                <!-- Material Asignado con Presentación Editorial Espaciosa -->
-                <div class="pt-4 border-t border-gray-100 flex items-center justify-between gap-5">
+                <!-- Material Asignado -->
+                <div class="pt-3.5 border-t border-gray-100 flex items-center justify-between gap-4">
                   <div class="min-w-0 flex-1">
-                    <span class="text-[11px] font-black uppercase tracking-wider text-[#22a652] block">
-                      {{ activeWeek === 1 ? 'Material esta semana' : 'Material próxima semana' }}
+                    <span class="text-[10px] font-black uppercase tracking-wider text-[#22a652] block">
+                      {{ activeWeek === 1 ? 'Esta semana' : 'Próxima semana' }}
                     </span>
-                    <h4 class="text-xl sm:text-2xl font-black text-[#123F5B] mt-0.5 leading-snug">
+                    <h4 class="text-xl font-black text-[#123F5B] mt-0.5 leading-snug">
                       {{ q.materialNombre }}
                     </h4>
-                    <p *ngIf="q.materialDescripcion" class="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">
+                    <p class="text-xs text-gray-500 mt-0.5">
                       {{ q.materialDescripcion }}
                     </p>
-                    <div class="mt-3 flex items-center gap-1.5 text-xs font-bold text-gray-700">
-                      <i class="fa-solid fa-circle-check text-[#22a652] text-xs"></i>
-                      <span>{{ q.requisitos }}</span>
-                    </div>
+                    <span class="inline-flex items-center gap-1.5 mt-2.5 text-xs font-bold text-[#22a652]">
+                      <i class="fa-solid fa-check text-[10px]"></i> {{ q.requisitos }}
+                    </span>
                   </div>
 
-                  <!-- Imagen Ilustrativa del Contenedor (Sin caja blanca enclaustrada) -->
-                  <div class="flex-shrink-0 flex items-center justify-center p-2">
-                    <img
-                      [src]="q.binImage"
-                      [alt]="q.materialNombre"
-                      class="h-20 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
-                    />
-                  </div>
+                  <img
+                    [src]="q.binImage"
+                    [alt]="q.materialNombre"
+                    class="h-16 w-auto object-contain flex-shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform"
+                  />
                 </div>
 
                 <!-- Acordeón Desplegable para Instrucciones -->
                 <button
                   type="button"
                   (click)="toggleAccordion(q.id)"
-                  class="w-full mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-[#123F5B] hover:text-[#22a652] transition-colors cursor-pointer"
+                  class="w-full mt-3.5 pt-2.5 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-gray-500 hover:text-[#123F5B] transition-colors cursor-pointer"
                   [attr.aria-expanded]="expandedAccordionId === q.id">
-                  <span class="inline-flex items-center gap-2">
-                    <i class="fa-regular fa-lightbulb text-amber-500"></i>
+                  <span class="inline-flex items-center gap-1.5">
+                    <i class="fa-regular fa-lightbulb text-amber-500 text-[11px]"></i>
                     <span>{{ expandedAccordionId === q.id ? 'Ocultar recomendaciones' : '¿Cómo preparar tus residuos?' }}</span>
                   </span>
                   <i class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200" [class.rotate-180]="expandedAccordionId === q.id"></i>
@@ -361,12 +320,8 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
 
                 <!-- Panel Expandido del Acordeón -->
                 <div *ngIf="expandedAccordionId === q.id"
-                     class="mt-3 p-3.5 rounded-xl bg-[#F8FAF7] border border-[#E2E8F0] text-xs text-gray-700 leading-relaxed space-y-1">
-                  <div class="font-bold text-[#123F5B] flex items-center gap-1.5">
-                    <i class="fa-solid fa-clipboard-check text-[#22a652]"></i>
-                    <span>Recomendación DIMAO:</span>
-                  </div>
-                  <p class="text-xs text-gray-600">{{ q.materialInstrucciones || 'Enjuagar y secar botellas y envases antes de depositar. Aplanar cajas de cartón.' }}</p>
+                     class="mt-2.5 p-3 rounded-xl bg-[#F8FAF7] border border-[#E2E8F0] text-xs text-gray-600 leading-relaxed">
+                  <strong class="text-[#123F5B]">Recomendación DIMAO:</strong> {{ q.materialInstrucciones || 'Enjuagar y secar botellas y envases antes de depositar.' }}
                 </div>
               </div>
             </div>
