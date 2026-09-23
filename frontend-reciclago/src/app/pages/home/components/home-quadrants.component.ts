@@ -54,48 +54,48 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
   imports: [CommonModule],
   template: `
     <!-- BEGIN: QuadrantsSection -->
-    <section class="py-14 sm:py-20 bg-white relative overflow-hidden" id="cuadrantes">
+    <section class="py-16 sm:py-24 bg-[#F9F8F5] relative overflow-hidden border-b border-[#E7E4DC]" id="cuadrantes">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <!-- Section Tag & Heading con Scroll Reveal -->
-        <div class="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4 reveal-init"
+        <!-- Section Header Editorial Gazette -->
+        <div class="mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-6 reveal-init"
              [class.reveal-active]="isVisible">
           <div>
-            <span class="inline-block px-3.5 py-1 rounded-full bg-emerald-100 text-[#206935] font-bold text-xs mb-3 shadow-2xs">
-              Tu comuna, cuatro cuadrantes
+            <span class="font-mono text-[11px] font-bold uppercase tracking-widest text-[#8C5D19] bg-[#FAF0DC] px-3 py-1 rounded border border-[#EADBCA] inline-flex items-center gap-1.5 mb-3 shadow-2xs">
+              <i class="fa-solid fa-scale-balanced text-[10px]"></i> Ordenanza Comunal N° 1.402 · Cuenca Lago Llanquihue
             </span>
-            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a233b] tracking-tight mb-2 font-heading">
-              Cuadrantes y Residuos Comunales
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#163828] tracking-tight mb-3 font-serif">
+              Cuadrantes y Residuos Semanales
             </h2>
-            <p class="text-xs sm:text-sm text-slate-600 max-w-xl">
-              Revisa tu cuadrante, el día de retiro y qué material corresponde esta semana según el catálogo oficial DIMAO.
+            <p class="text-sm sm:text-base text-[#6B726D] max-w-2xl font-sans">
+              Calendario oficial del servicio municipal de recolección diferenciada puerta a puerta para la comuna de Puerto Varas.
             </p>
           </div>
 
-          <!-- Selector de Semana Ejecutivo -->
-          <div class="inline-flex rounded-xl p-1 bg-gray-100 border border-[#E2E8F0] shadow-2xs self-start md:self-auto">
+          <!-- Selector de Semana Ejecutivo Gazette -->
+          <div class="inline-flex rounded-xl p-1 bg-[#EAE8E1] border border-[#DDD9CE] shadow-xs self-start md:self-auto">
             <button
               type="button"
               (click)="selectWeek(1)"
-              [class.bg-white]="activeWeek === 1"
-              [class.text-[#123F5B]]="activeWeek === 1"
-              [class.shadow-2xs]="activeWeek === 1"
-              [class.font-bold]="activeWeek === 1"
-              [class.text-gray-600]="activeWeek !== 1"
-              class="px-4 py-2 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-2">
-              <i class="fa-solid fa-calendar-check" [class.text-[#22a652]]="activeWeek === 1"></i>
+              [class.bg-[#163828]]="activeWeek === 1"
+              [class.text-white]="activeWeek === 1"
+              [class.shadow-xs]="activeWeek === 1"
+              [class.text-[#6B726D]]="activeWeek !== 1"
+              [class.hover:text-[#163828]]="activeWeek !== 1"
+              class="px-4 py-2 rounded-lg text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2">
+              <i class="fa-solid fa-calendar-check" [class.text-[#C98A2C]]="activeWeek === 1"></i>
               <span>Semana Actual</span>
             </button>
             <button
               type="button"
               (click)="selectWeek(2)"
-              [class.bg-white]="activeWeek === 2"
-              [class.text-[#123F5B]]="activeWeek === 2"
-              [class.shadow-2xs]="activeWeek === 2"
-              [class.font-bold]="activeWeek === 2"
-              [class.text-gray-600]="activeWeek !== 2"
-              class="px-4 py-2 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-2">
-              <i class="fa-solid fa-calendar-plus" [class.text-[#22a652]]="activeWeek === 2"></i>
+              [class.bg-[#163828]]="activeWeek === 2"
+              [class.text-white]="activeWeek === 2"
+              [class.shadow-xs]="activeWeek === 2"
+              [class.text-[#6B726D]]="activeWeek !== 2"
+              [class.hover:text-[#163828]]="activeWeek !== 2"
+              class="px-4 py-2 rounded-lg text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2">
+              <i class="fa-solid fa-calendar-plus" [class.text-[#C98A2C]]="activeWeek === 2"></i>
               <span>Próxima Semana</span>
             </button>
           </div>
@@ -103,62 +103,58 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
 
         <!-- Mobile View: Selector con Scroll Horizontal + Tarjeta Interactiva (md:hidden) -->
         <div class="md:hidden">
-          <!-- Contenedor con Scroll Horizontal -->
+          <!-- Pills cuadrantes móvil -->
           <div class="relative mb-4">
             <div class="flex items-center gap-2 overflow-x-auto pb-1 px-0.5 no-scrollbar scroll-smooth">
               <button
                 *ngFor="let q of quadrants; let i = index"
                 type="button"
                 (click)="setMobileQuadrant(i)"
-                [class.bg-[#123F5B]]="selectedMobileIndex === i"
+                [class.bg-[#163828]]="selectedMobileIndex === i"
                 [class.text-white]="selectedMobileIndex === i"
-                [class.border-[#123F5B]]="selectedMobileIndex === i"
+                [class.border-[#163828]]="selectedMobileIndex === i"
                 [class.shadow-xs]="selectedMobileIndex === i"
                 [class.bg-white]="selectedMobileIndex !== i"
-                [class.text-slate-600]="selectedMobileIndex !== i"
-                [class.border-slate-200]="selectedMobileIndex !== i"
-                class="shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer">
-                Cuadrante {{ q.cuadranteNumber }} · {{ q.shortName }}
+                [class.text-[#6B726D]]="selectedMobileIndex !== i"
+                [class.border-[#E7E4DC]]="selectedMobileIndex !== i"
+                class="shrink-0 px-3.5 py-1.5 rounded-lg text-xs font-mono font-bold uppercase tracking-wider border transition-all cursor-pointer">
+                C{{ q.cuadranteNumber }} · {{ q.shortName }}
               </button>
             </div>
           </div>
 
-          <!-- Single Interactive Card con Transición Suave de Semana -->
+          <!-- Single Interactive Card Móvil -->
           <article
             *ngIf="quadrants[selectedMobileIndex] as q"
-            class="bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-xs flex flex-col"
+            class="bg-white rounded-2xl overflow-hidden border border-[#E7E4DC] shadow-[0_2px_8px_rgba(22,56,40,0.04)] flex flex-col"
             [ngClass]="{ 'opacity-0 translate-y-3 scale-[0.98] pointer-events-none': isFadingOut, 'anim-week-switch': !isFadingOut }">
             
-            <!-- Imagen Paisajística del Sector con Controles Flechas y Chips -->
-            <div class="relative h-48 w-full overflow-hidden bg-slate-100">
+            <!-- Imagen Paisajística del Sector -->
+            <div class="relative h-48 w-full overflow-hidden bg-[#EAE8E1]">
               <img
                 [src]="q.image"
                 [alt]="'Sector ' + q.name + ' - Puerto Varas'"
                 class="w-full h-full object-cover"
                 loading="lazy"
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-900/20 to-transparent pointer-events-none"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-[#163828]/95 via-[#163828]/35 to-transparent pointer-events-none"></div>
 
-              <!-- Badges de cabecera en foto -->
+              <!-- Badges de cabecera -->
               <div class="absolute top-3 left-3 flex items-center gap-2">
-                <span *ngIf="q.diaModificado" class="bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-xs flex items-center gap-1">
-                  <i class="fa-solid fa-circle-exclamation text-[9px]"></i> Cambio fecha
-                </span>
-              </div>
-
-              <span *ngIf="catalogLoaded" class="absolute top-3 right-3 bg-white/95 backdrop-blur-md text-[10px] font-semibold text-slate-700 px-2 py-0.5 rounded-full shadow-2xs border border-white/40 flex items-center gap-1">
-                <i class="fa-solid fa-circle-check text-[#22a652]"></i> DIMAO
-              </span>
-
-              <!-- Chip Cuadrante -->
-              <div class="absolute bottom-3 left-3 flex items-center gap-2">
-                <span class="bg-[#206935] text-white text-xs font-bold px-3 py-1 rounded shadow-md">
+                <span class="font-mono text-[10px] font-bold uppercase tracking-widest text-white bg-[#163828]/95 px-2.5 py-1 rounded border border-white/20 backdrop-blur-xs">
                   Cuadrante {{ q.cuadranteNumber }}
                 </span>
+                <span *ngIf="q.diaModificado" class="font-mono text-[10px] font-bold text-amber-900 bg-amber-100/95 px-2 py-1 rounded border border-amber-300 flex items-center gap-1">
+                  <i class="fa-solid fa-triangle-exclamation"></i> Reprogramado
+                </span>
               </div>
 
+              <span *ngIf="catalogLoaded" class="absolute top-3 right-3 font-mono text-[10px] font-bold text-[#163828] bg-[#FFFDF9]/95 px-2.5 py-1 rounded border border-[#E7E4DC] flex items-center gap-1.5 shadow-2xs">
+                <i class="fa-solid fa-stamp text-[#C98A2C]"></i> DIMAO
+              </span>
+
               <!-- Controles Flechas ← 1 / 4 → flotantes -->
-              <div class="absolute bottom-3 right-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full text-white text-xs font-semibold">
+              <div class="absolute top-12 right-3 flex items-center gap-1.5 bg-[#163828]/80 backdrop-blur-sm px-2 py-1 rounded-full text-white text-xs font-mono font-bold border border-white/20">
                 <button
                   type="button"
                   (click)="prevMobileQuadrant()"
@@ -166,7 +162,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                   aria-label="Cuadrante anterior">
                   ‹
                 </button>
-                <span class="text-[11px] font-medium px-1">{{ selectedMobileIndex + 1 }} / {{ quadrants.length }}</span>
+                <span class="text-[10px] px-1">{{ selectedMobileIndex + 1 }} / {{ quadrants.length }}</span>
                 <button
                   type="button"
                   (click)="nextMobileQuadrant()"
@@ -175,215 +171,212 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                   ›
                 </button>
               </div>
+
+              <!-- Título en Overlay -->
+              <div class="absolute bottom-3 left-4 right-4">
+                <span class="font-mono text-[10px] font-bold tracking-wider text-emerald-200 block uppercase">Sector Residencial</span>
+                <h3 class="font-serif text-2xl font-bold text-white tracking-tight drop-shadow-sm">
+                  {{ q.name }}
+                </h3>
+              </div>
             </div>
 
-            <!-- Contenido Informativo Móvil (2-Column Info Grid) -->
+            <!-- Contenido Informativo Móvil -->
             <div class="p-5">
-              <h3 class="text-xl font-extrabold text-[#0a233b] mb-3 font-heading">
-                {{ q.name }}
-              </h3>
-
-              <div *ngIf="q.diaModificado && q.motivoModificacion" class="mb-3 p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-relaxed flex items-start gap-2">
+              <div *ngIf="q.diaModificado && q.motivoModificacion" class="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-relaxed flex items-start gap-2">
                 <i class="fa-solid fa-circle-exclamation text-amber-600 mt-0.5 shrink-0"></i>
                 <div>
                   <span class="font-bold">Aviso DIMAO:</span> {{ q.motivoModificacion }}
                 </div>
               </div>
 
-              <!-- 2-column info grid Stitch -->
-              <div class="grid grid-cols-2 gap-3 pb-3 border-b border-slate-100">
-                <div class="flex items-start gap-2">
-                  <svg class="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <rect height="18" rx="2" ry="2" stroke-width="2" width="18" x="3" y="4"></rect>
-                    <line stroke-width="2" x1="16" x2="16" y1="2" y2="6"></line>
-                    <line stroke-width="2" x1="8" x2="8" y1="2" y2="6"></line>
-                    <line stroke-width="2" x1="3" x2="21" y1="10" y2="10"></line>
-                  </svg>
-                  <div>
-                    <span class="block text-[10px] text-slate-500 font-medium">Día de retiro</span>
-                    <span class="block text-xs font-extrabold text-slate-800">{{ q.day }}</span>
-                    <span class="block text-[10px] text-slate-400 font-medium">{{ q.hours }}</span>
+              <!-- 2-column info grid Gazette -->
+              <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="p-3 rounded-xl bg-[#FAF9F6] border border-[#E7E4DC] flex flex-col justify-between">
+                  <div class="flex items-center gap-1.5 text-[#8C5D19] font-mono text-[10px] uppercase font-bold tracking-wider mb-1">
+                    <i class="fa-solid fa-calendar-day"></i> Día de Retiro
                   </div>
+                  <span class="font-serif text-base font-bold text-[#163828]">{{ q.day }}</span>
+                  <span class="font-mono text-[10px] text-[#6B726D] mt-0.5"><i class="fa-regular fa-clock mr-1"></i>{{ q.hours }}</span>
                 </div>
-                <div class="flex items-start gap-2">
-                  <div class="w-4 h-4 rounded-full bg-[#206935] flex items-center justify-center text-white shrink-0 mt-0.5">
-                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
+                <div class="p-3 rounded-xl bg-[#FAF9F6] border border-[#E7E4DC] flex flex-col justify-between">
+                  <div class="flex items-center gap-1.5 text-[#163828] font-mono text-[10px] uppercase font-bold tracking-wider mb-1">
+                    <i class="fa-solid fa-circle-check text-[#22a652]"></i> Condición
                   </div>
-                  <div>
-                    <span class="block text-[10px] text-slate-500 font-medium">Requisitos</span>
-                    <span class="block text-xs font-bold text-slate-800">{{ q.requisitos }}</span>
-                  </div>
+                  <span class="font-sans text-xs font-semibold text-[#232826] leading-snug">{{ q.requisitos }}</span>
+                  <span class="font-mono text-[10px] text-[#6B726D] mt-0.5">Frontis del hogar</span>
                 </div>
               </div>
 
-              <!-- Material Asignado -->
-              <div class="pt-3 flex items-center justify-between">
+              <!-- Placa Material Asignado -->
+              <div class="p-4 rounded-xl border border-[#E7E4DC] bg-white flex items-center justify-between shadow-2xs mb-4">
                 <div>
-                  <span class="block text-[10px] text-[#22a652] font-bold uppercase tracking-wider">
-                    {{ activeWeek === 1 ? 'Esta semana' : 'Próxima semana' }}
-                  </span>
-                  <span class="block text-base font-extrabold text-[#11324d] mt-0.5">
-                    {{ q.materialNombre }}
-                  </span>
-                  <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">
-                    {{ q.materialDescripcion }}
-                  </p>
+                  <div class="flex items-center gap-2 mb-0.5">
+                    <span class="w-2 h-2 rounded-full" [class.bg-[#C98A2C]]="activeWeek === 1" [class.bg-[#163828]]="activeWeek === 2"></span>
+                    <span class="font-mono text-[10px] font-bold uppercase tracking-widest" [class.text-[#8C5D19]]="activeWeek === 1" [class.text-[#163828]]="activeWeek === 2">
+                      {{ activeWeek === 1 ? 'Material Esta Semana' : 'Material Próxima Semana' }}
+                    </span>
+                  </div>
+                  <h4 class="font-serif text-lg font-bold text-[#163828]">{{ q.materialNombre }}</h4>
+                  <p class="font-sans text-xs text-[#6B726D] mt-0.5 line-clamp-1">{{ q.materialDescripcion }}</p>
                 </div>
 
-                <div class="w-10 h-10 rounded-full bg-[#dcf2e3] flex items-center justify-center text-[#206935] shrink-0">
-                  <svg *ngIf="q.categoryKey === 'VIDRIO'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 2h8v4l-2 3v13H10V9L8 6V2z"></path><line stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="10" x2="14" y1="2" y2="2"></line></svg>
-                  <svg *ngIf="q.categoryKey === 'CARTON'" class="w-5 h-5 text-amber-700" fill="currentColor" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                  <svg *ngIf="q.categoryKey === 'PLASTICO'" class="w-5 h-5 text-sky-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 2h8v2H8V2zm1 3h6v2.5l2 3.5v11H7V11l2-3.5V5z"></path></svg>
-                  <svg *ngIf="q.categoryKey === 'LATAS'" class="w-5 h-5 text-slate-600" fill="currentColor" viewBox="0 0 24 24"><rect height="16" rx="2" width="10" x="7" y="4"></rect><path d="M9 2h6v2H9z"></path></svg>
+                <div class="w-12 h-12 rounded-xl bg-[#FAF9F6] border border-[#E7E4DC] flex items-center justify-center text-xl shrink-0 shadow-2xs">
+                  <svg *ngIf="q.categoryKey === 'VIDRIO'" class="w-6 h-6 text-[#163828]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 2h8v4l-2 3v13H10V9L8 6V2z"></path><line stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="10" x2="14" y1="2" y2="2"></line></svg>
+                  <svg *ngIf="q.categoryKey === 'CARTON'" class="w-6 h-6 text-[#C98A2C]" fill="currentColor" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                  <svg *ngIf="q.categoryKey === 'PLASTICO'" class="w-6 h-6 text-sky-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 2h8v2H8V2zm1 3h6v2.5l2 3.5v11H7V11l2-3.5V5z"></path></svg>
+                  <svg *ngIf="q.categoryKey === 'LATAS'" class="w-6 h-6 text-slate-600" fill="currentColor" viewBox="0 0 24 24"><rect height="16" rx="2" width="10" x="7" y="4"></rect><path d="M9 2h6v2H9z"></path></svg>
                 </div>
               </div>
 
-              <!-- Acordeón preparación -->
-              <div class="mt-3 pt-2.5 border-t border-slate-100">
+              <!-- Acordeón protocolo -->
+              <div class="border-t border-[#E7E4DC] pt-3">
                 <button
                   type="button"
                   (click)="toggleAccordion(q.id)"
-                  class="w-full flex items-center justify-between text-xs font-semibold text-slate-500 hover:text-[#0a233b] transition-colors cursor-pointer"
+                  class="w-full flex items-center justify-between text-xs font-mono font-bold text-[#163828] hover:text-[#C98A2C] transition-colors cursor-pointer py-1"
                   [attr.aria-expanded]="expandedAccordionId === q.id">
-                  <span class="inline-flex items-center gap-1.5">
-                    <i class="fa-regular fa-circle-question text-slate-400 text-xs"></i>
-                    <span>{{ expandedAccordionId === q.id ? 'Ocultar recomendaciones' : '¿Cómo preparar tus residuos?' }}</span>
+                  <span class="inline-flex items-center gap-2">
+                    <i class="fa-solid fa-book-open-reader text-[#C98A2C]"></i>
+                    <span>{{ expandedAccordionId === q.id ? 'Ocultar protocolo de entrega' : 'Protocolo de entrega DIMAO' }}</span>
                   </span>
-                  <i class="fa-solid fa-chevron-down text-[9px] transition-transform duration-200 text-slate-400" [class.rotate-180]="expandedAccordionId === q.id"></i>
+                  <i class="fa-solid fa-chevron-down text-[10px] text-[#6B726D] transition-transform duration-200" [class.rotate-180]="expandedAccordionId === q.id"></i>
                 </button>
 
                 <div *ngIf="expandedAccordionId === q.id"
-                     class="mt-2 p-2.5 rounded-lg bg-[#F8FAF7] border border-[#E2E8F0] text-xs text-slate-600 leading-relaxed">
-                  <strong class="text-[#0a233b]">Instrucción DIMAO:</strong> {{ q.materialInstrucciones || 'Enjuagar y secar botellas y envases antes de depositar.' }}
+                     class="mt-2.5 p-3.5 rounded-xl bg-[#FAF9F6] border border-[#E7E4DC] text-xs font-sans text-[#232826] leading-relaxed">
+                  <div class="flex items-start gap-2.5 mb-1.5">
+                    <i class="fa-solid fa-circle-info text-[#163828] mt-0.5 shrink-0"></i>
+                    <div>
+                      <strong class="text-[#163828] font-bold">Instrucción Oficial:</strong> {{ q.materialInstrucciones || 'Enjuagar y secar botellas y envases antes de depositar.' }}
+                    </div>
+                  </div>
+                  <div class="text-[10px] font-mono text-[#8C5D19] border-t border-[#E7E4DC] pt-2 mt-2 flex items-center gap-1.5">
+                    <i class="fa-solid fa-stamp"></i> Certificación DIMAO Puerto Varas · Res. Exenta 1.402
+                  </div>
                 </div>
               </div>
             </div>
           </article>
         </div>
 
-        <!-- Desktop View: 2 Columnas Elegantes Stitch -->
-        <div class="hidden md:grid md:grid-cols-2 gap-6 lg:gap-8">
+        <!-- Desktop View: 2 Columnas Elegantes Gazette -->
+        <div class="hidden md:grid md:grid-cols-2 gap-8">
           <article
             *ngFor="let q of quadrants; let i = index"
-            class="group bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between reveal-init"
+            class="group bg-white rounded-2xl overflow-hidden border border-[#E7E4DC] shadow-[0_2px_8px_rgba(22,56,40,0.04)] hover:shadow-[0_12px_32px_rgba(22,56,40,0.1)] hover:border-[#C98A2C] transition-all duration-300 flex flex-col justify-between reveal-init"
             [class.reveal-active]="isVisible"
             [style.transition-delay]="(i * 100) + 'ms'"
             [ngClass]="{ 'opacity-0 translate-y-3 scale-[0.98] pointer-events-none': isFadingOut, 'anim-week-switch': !isFadingOut && isVisible }">
             
             <div>
               <!-- Imagen Paisajística del Sector con Encuadre Editorial -->
-              <div class="relative h-48 sm:h-52 w-full overflow-hidden bg-slate-100">
+              <div class="relative h-56 w-full overflow-hidden bg-[#EAE8E1]">
                 <img
                   [src]="q.image"
                   [alt]="'Sector ' + q.name + ' - Puerto Varas'"
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   loading="lazy"
                 />
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-900/20 to-transparent pointer-events-none"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-[#163828]/95 via-[#163828]/35 to-transparent pointer-events-none"></div>
 
                 <!-- Badges de cabecera -->
-                <div class="absolute top-3 left-3 flex items-center gap-2">
-                  <span *ngIf="q.diaModificado" class="bg-amber-500 text-white text-[10px] font-bold px-2.5 py-1 rounded shadow-xs flex items-center gap-1.5">
-                    <i class="fa-solid fa-circle-exclamation text-[9px]"></i> Cambio de fecha
+                <div class="absolute top-3.5 left-4 flex items-center gap-2">
+                  <span class="font-mono text-[10px] font-bold uppercase tracking-widest text-white bg-[#163828]/95 px-2.5 py-1 rounded border border-white/20 backdrop-blur-xs shadow-xs">
+                    Cuadrante {{ q.cuadranteNumber }}
+                  </span>
+                  <span *ngIf="q.diaModificado" class="font-mono text-[10px] font-bold text-amber-900 bg-amber-100/95 px-2.5 py-1 rounded border border-amber-300 flex items-center gap-1.5 shadow-xs">
+                    <i class="fa-solid fa-triangle-exclamation text-[9px]"></i> Reprogramado
                   </span>
                 </div>
 
-                <span *ngIf="catalogLoaded" class="absolute top-3 right-3 bg-white/95 backdrop-blur-md text-[10px] font-semibold text-slate-700 px-2.5 py-1 rounded-full shadow-2xs border border-white/40 flex items-center gap-1">
-                  <i class="fa-solid fa-circle-check text-[#22a652]"></i> DIMAO
+                <span *ngIf="catalogLoaded" class="absolute top-3.5 right-4 font-mono text-[10px] font-bold text-[#163828] bg-[#FFFDF9]/95 px-2.5 py-1 rounded border border-[#E7E4DC] flex items-center gap-1.5 shadow-xs backdrop-blur-xs">
+                  <i class="fa-solid fa-stamp text-[#C98A2C]"></i> DIMAO OFICIAL
                 </span>
 
-                <!-- Chip de Sector en overlay -->
-                <div class="absolute bottom-3 left-4 flex items-center gap-2">
-                  <span class="bg-[#206935] text-white text-xs font-bold px-3 py-1 rounded shadow-md tracking-wide">
-                    Cuadrante {{ q.cuadranteNumber }}
-                  </span>
+                <!-- Titular del Sector en Overlay -->
+                <div class="absolute bottom-3.5 left-5 right-5">
+                  <span class="font-mono text-[11px] font-bold tracking-wider text-emerald-200 block uppercase">Sector Residencial</span>
+                  <h3 class="font-serif text-2xl sm:text-3xl font-bold text-white tracking-tight drop-shadow-sm">
+                    {{ q.name }}
+                  </h3>
                 </div>
               </div>
 
-              <!-- Contenido Informativo de la Tarjeta Stitch (2-Column Info Grid) -->
-              <div class="p-6">
-                <!-- Cabecera del Sector -->
-                <h3 class="text-xl sm:text-2xl font-extrabold text-[#0a233b] mb-4 font-heading group-hover:text-[#22a652] transition-colors duration-200">
-                  {{ q.name }}
-                </h3>
-
-                <div *ngIf="q.diaModificado && q.motivoModificacion" class="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-relaxed flex items-start gap-2">
-                  <i class="fa-solid fa-circle-exclamation text-amber-600 mt-0.5 shrink-0"></i>
+              <!-- Contenido Informativo de la Tarjeta Gazette -->
+              <div class="p-6 sm:p-7">
+                <div *ngIf="q.diaModificado && q.motivoModificacion" class="mb-5 p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-relaxed flex items-start gap-2.5">
+                  <i class="fa-solid fa-triangle-exclamation text-amber-600 mt-0.5 shrink-0"></i>
                   <div>
-                    <span class="font-bold">Aviso DIMAO:</span> {{ q.motivoModificacion }}
+                    <span class="font-bold">Aviso Oficial DIMAO:</span> {{ q.motivoModificacion }}
                   </div>
                 </div>
 
-                <!-- 2-column metadata grid from Stitch -->
-                <div class="grid grid-cols-2 gap-4 pb-4 border-b border-slate-100">
-                  <div class="flex items-start gap-2.5">
-                    <svg class="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <rect height="18" rx="2" ry="2" stroke-width="2" width="18" x="3" y="4"></rect>
-                      <line stroke-width="2" x1="16" x2="16" y1="2" y2="6"></line>
-                      <line stroke-width="2" x1="8" x2="8" y1="2" y2="6"></line>
-                      <line stroke-width="2" x1="3" x2="21" y1="10" y2="10"></line>
-                    </svg>
-                    <div>
-                      <span class="block text-[11px] text-slate-500 font-medium">Día de retiro</span>
-                      <span class="block text-sm font-extrabold text-slate-800">{{ q.day }}</span>
-                      <span class="block text-[11px] text-slate-400 font-medium">{{ q.hours }}</span>
+                <!-- 2-column metadata grid Gazette -->
+                <div class="grid grid-cols-2 gap-4 mb-5">
+                  <div class="p-3.5 rounded-xl bg-[#FAF9F6] border border-[#E7E4DC] flex flex-col justify-between">
+                    <div class="flex items-center gap-1.5 text-[#8C5D19] font-mono text-[10px] uppercase font-bold tracking-wider mb-1">
+                      <i class="fa-solid fa-calendar-day"></i> Día de Retiro
                     </div>
+                    <span class="font-serif text-base sm:text-lg font-bold text-[#163828]">{{ q.day }}</span>
+                    <span class="font-mono text-[11px] text-[#6B726D] mt-0.5"><i class="fa-regular fa-clock text-[10px] mr-1"></i>{{ q.hours }}</span>
                   </div>
-                  <div class="flex items-start gap-2.5">
-                    <div class="w-5 h-5 rounded-full bg-[#206935] flex items-center justify-center text-white shrink-0 mt-0.5">
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
+                  <div class="p-3.5 rounded-xl bg-[#FAF9F6] border border-[#E7E4DC] flex flex-col justify-between">
+                    <div class="flex items-center gap-1.5 text-[#163828] font-mono text-[10px] uppercase font-bold tracking-wider mb-1">
+                      <i class="fa-solid fa-circle-check text-[#22a652]"></i> Condición
                     </div>
-                    <div>
-                      <span class="block text-[11px] text-slate-500 font-medium">Requisitos de entrega</span>
-                      <span class="block text-xs font-bold text-slate-800">{{ q.requisitos }}</span>
-                    </div>
+                    <span class="font-sans text-xs font-semibold text-[#232826] leading-snug">{{ q.requisitos }}</span>
+                    <span class="font-mono text-[10px] text-[#6B726D] mt-0.5">En frontis de hogar</span>
                   </div>
                 </div>
 
-                <!-- Material Row with pure vector SVG icon -->
-                <div class="pt-4 flex items-center justify-between">
+                <!-- Material Row con pure vector SVG icon -->
+                <div class="p-4 rounded-xl border border-[#E7E4DC] bg-white flex items-center justify-between shadow-2xs mb-5">
                   <div>
-                    <span class="block text-[11px] text-[#22a652] font-bold uppercase tracking-wider">
-                      {{ activeWeek === 1 ? 'Esta semana' : 'Próxima semana' }}
-                    </span>
-                    <span class="block text-base sm:text-lg font-extrabold text-[#11324d] mt-0.5">
-                      {{ q.materialNombre }}
-                    </span>
-                    <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">
-                      {{ q.materialDescripcion }}
-                    </p>
+                    <div class="flex items-center gap-2 mb-0.5">
+                      <span class="w-2.5 h-2.5 rounded-full" [class.bg-[#C98A2C]]="activeWeek === 1" [class.bg-[#163828]]="activeWeek === 2"></span>
+                      <span class="font-mono text-[10px] font-bold uppercase tracking-widest" [class.text-[#8C5D19]]="activeWeek === 1" [class.text-[#163828]]="activeWeek === 2">
+                        {{ activeWeek === 1 ? 'Material Esta Semana' : 'Material Próxima Semana' }}
+                      </span>
+                    </div>
+                    <h4 class="font-serif text-lg sm:text-xl font-bold text-[#163828]">{{ q.materialNombre }}</h4>
+                    <p class="font-sans text-xs text-[#6B726D] mt-0.5 line-clamp-1">{{ q.materialDescripcion }}</p>
                   </div>
 
-                  <div class="w-11 h-11 rounded-full bg-[#dcf2e3] flex items-center justify-center text-[#206935] shrink-0">
-                    <svg *ngIf="q.categoryKey === 'VIDRIO'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 2h8v4l-2 3v13H10V9L8 6V2z"></path><line stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="10" x2="14" y1="2" y2="2"></line></svg>
-                    <svg *ngIf="q.categoryKey === 'CARTON'" class="w-5 h-5 text-amber-700" fill="currentColor" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                    <svg *ngIf="q.categoryKey === 'PLASTICO'" class="w-5 h-5 text-sky-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 2h8v2H8V2zm1 3h6v2.5l2 3.5v11H7V11l2-3.5V5z"></path></svg>
-                    <svg *ngIf="q.categoryKey === 'LATAS'" class="w-5 h-5 text-slate-600" fill="currentColor" viewBox="0 0 24 24"><rect height="16" rx="2" width="10" x="7" y="4"></rect><path d="M9 2h6v2H9z"></path></svg>
+                  <div class="w-13 h-13 rounded-xl bg-[#FAF9F6] border border-[#E7E4DC] flex items-center justify-center text-xl shrink-0 shadow-2xs">
+                    <svg *ngIf="q.categoryKey === 'VIDRIO'" class="w-7 h-7 text-[#163828]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 2h8v4l-2 3v13H10V9L8 6V2z"></path><line stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="10" x2="14" y1="2" y2="2"></line></svg>
+                    <svg *ngIf="q.categoryKey === 'CARTON'" class="w-7 h-7 text-[#C98A2C]" fill="currentColor" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                    <svg *ngIf="q.categoryKey === 'PLASTICO'" class="w-7 h-7 text-sky-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 2h8v2H8V2zm1 3h6v2.5l2 3.5v11H7V11l2-3.5V5z"></path></svg>
+                    <svg *ngIf="q.categoryKey === 'LATAS'" class="w-7 h-7 text-slate-600" fill="currentColor" viewBox="0 0 24 24"><rect height="16" rx="2" width="10" x="7" y="4"></rect><path d="M9 2h6v2H9z"></path></svg>
                   </div>
                 </div>
 
                 <!-- Acordeón Desplegable para Instrucciones -->
-                <div class="mt-4 pt-3 border-t border-slate-100">
+                <div class="border-t border-[#E7E4DC] pt-3.5">
                   <button
                     type="button"
                     (click)="toggleAccordion(q.id)"
-                    class="w-full flex items-center justify-between text-xs font-semibold text-slate-500 hover:text-[#0a233b] transition-colors cursor-pointer"
+                    class="w-full flex items-center justify-between text-xs font-mono font-bold text-[#163828] hover:text-[#C98A2C] transition-colors cursor-pointer py-1"
                     [attr.aria-expanded]="expandedAccordionId === q.id">
                     <span class="inline-flex items-center gap-2">
-                      <i class="fa-regular fa-circle-question text-slate-400 text-xs"></i>
-                      <span>{{ expandedAccordionId === q.id ? 'Ocultar recomendaciones' : '¿Cómo preparar tus residuos?' }}</span>
+                      <i class="fa-solid fa-book-open-reader text-[#C98A2C]"></i>
+                      <span>{{ expandedAccordionId === q.id ? 'Ocultar protocolo de entrega' : 'Protocolo de entrega DIMAO' }}</span>
                     </span>
-                    <i class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200 text-slate-400" [class.rotate-180]="expandedAccordionId === q.id"></i>
+                    <i class="fa-solid fa-chevron-down text-[10px] text-[#6B726D] transition-transform duration-200" [class.rotate-180]="expandedAccordionId === q.id"></i>
                   </button>
 
                   <!-- Panel Expandido del Acordeón -->
                   <div *ngIf="expandedAccordionId === q.id"
-                       class="mt-2.5 p-3 rounded-lg bg-[#F8FAF7] border border-[#E2E8F0] text-xs text-slate-600 leading-relaxed">
-                    <strong class="text-[#0a233b]">Instrucción DIMAO:</strong> {{ q.materialInstrucciones || 'Enjuagar y secar botellas y envases antes de depositar.' }}
+                       class="mt-3 p-4 rounded-xl bg-[#FAF9F6] border border-[#E7E4DC] text-xs font-sans text-[#232826] leading-relaxed">
+                    <div class="flex items-start gap-2.5 mb-2">
+                      <i class="fa-solid fa-circle-info text-[#163828] mt-0.5 shrink-0"></i>
+                      <div>
+                        <strong class="text-[#163828] font-bold">Instrucción Oficial:</strong> {{ q.materialInstrucciones || 'Enjuagar y secar botellas y envases antes de depositar.' }}
+                      </div>
+                    </div>
+                    <div class="text-[11px] font-mono text-[#8C5D19] border-t border-[#E7E4DC] pt-2 mt-2 flex items-center gap-1.5">
+                      <i class="fa-solid fa-stamp"></i> Certificación DIMAO Puerto Varas · Res. Exenta 1.402
+                    </div>
                   </div>
                 </div>
               </div>

@@ -9,105 +9,105 @@ import { BffService } from '../../../services/bff.service';
   imports: [CommonModule, RouterModule],
   template: `
     <!-- BEGIN: ImpactSection -->
-    <section class="relative py-16 sm:py-20 bg-gradient-to-b from-sky-50/70 via-emerald-50/30 to-white overflow-hidden border-t border-slate-100" id="impacto">
+    <section class="relative py-16 sm:py-24 bg-[#F9F8F5] overflow-hidden border-b border-[#E7E4DC]" id="impacto">
       
-      <!-- Watermarked volcano silhouette background Stitch -->
-      <div class="absolute inset-0 opacity-15 pointer-events-none flex items-end justify-center">
-        <svg class="w-full h-auto text-sky-700 max-h-96" fill="currentColor" viewBox="0 0 1200 350">
+      <!-- Watermarked volcano silhouette background -->
+      <div class="absolute inset-0 opacity-10 pointer-events-none flex items-end justify-center">
+        <svg class="w-full h-auto text-[#163828] max-h-96" fill="currentColor" viewBox="0 0 1200 350">
           <path d="M0,350 L350,140 L450,220 L650,40 L850,230 L1000,160 L1200,350 Z"></path>
         </svg>
       </div>
 
       <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <!-- Encabezado de Sección Stitch -->
-        <div class="mb-10 text-center sm:text-left">
-          <span class="inline-block px-3.5 py-1 rounded-full bg-cyan-100 text-cyan-900 font-bold text-xs mb-3 shadow-2xs">
-            Nuestra huella
+        <!-- Encabezado de Sección Gazette -->
+        <div class="mb-12 text-center sm:text-left">
+          <span class="font-mono text-[11px] font-bold uppercase tracking-widest text-[#8C5D19] bg-[#FAF0DC] px-3 py-1 rounded border border-[#EADBCA] inline-flex items-center gap-1.5 mb-3 shadow-2xs">
+            <i class="fa-solid fa-chart-pie text-[10px]"></i> Indicadores Oficiales DIMAO
           </span>
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0a233b] tracking-tight font-heading">
-            Impacto en la comuna
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#163828] tracking-tight font-serif">
+            Impacto Comunal y Trazabilidad
           </h2>
-          <p class="text-xs sm:text-sm text-slate-600 mt-1 max-w-xl">
-            Cada kilo reciclado cuenta. Así avanzamos juntos hacia una Puerto Varas más limpia y sustentable en la cuenca del Lago Llanquihue.
+          <p class="text-sm sm:text-base text-[#6B726D] mt-2 max-w-2xl font-sans">
+            Cada kilogramo reciclado es certificado digitalmente bajo la Ley REP, desviando toneladas de residuos de los vertederos de la Provincia de Llanquihue.
           </p>
         </div>
 
-        <!-- 3 Tarjetas de Métricas Verticales Centradas Stitch -->
+        <!-- 3 Tarjetas de Métricas Verticales Gazette -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           
           <!-- Métrica 1: Kilos -->
-          <div class="bg-white rounded-2xl p-7 text-center shadow-xs hover:shadow-md border border-slate-100 transition-all">
-            <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-emerald-50 flex items-center justify-center text-[#206935]">
-              <i class="fa-solid fa-scale-balanced text-xl"></i>
+          <div class="bg-white rounded-2xl p-7 text-center border border-[#E7E4DC] shadow-[0_2px_8px_rgba(22,56,40,0.03)] hover:border-[#C98A2C] hover:shadow-[0_8px_24px_rgba(22,56,40,0.08)] transition-all">
+            <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-[#FAF9F6] border border-[#E7E4DC] flex items-center justify-center text-[#163828]">
+              <i class="fa-solid fa-scale-balanced text-xl text-[#C98A2C]"></i>
             </div>
-            <p class="text-3xl sm:text-4xl font-black text-[#0a233b] mb-1 font-heading">
-              {{ displayKg }} <span class="text-2xl font-bold text-[#206935]">kg</span>
+            <p class="text-4xl sm:text-5xl font-bold text-[#163828] mb-1 font-serif">
+              {{ displayKg }} <span class="text-2xl font-bold text-[#C98A2C]">kg</span>
             </p>
-            <h3 class="text-xs sm:text-sm font-bold text-slate-700 mb-1">Kilos de reciclaje certificados</h3>
-            <p class="text-[11px] text-slate-400 font-medium">Pesaje digital en ruta vecinal</p>
+            <h3 class="text-sm font-serif font-bold text-[#163828] mb-1">Kilos Certificados en Báscula</h3>
+            <p class="text-[11px] font-mono text-[#6B726D]">Pesaje digital verificado en ruta</p>
           </div>
 
           <!-- Métrica 2: Vertederos -->
-          <div class="bg-white rounded-2xl p-7 text-center shadow-xs hover:shadow-md border border-slate-100 transition-all">
-            <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-emerald-50 flex items-center justify-center text-[#206935]">
-              <i class="fa-solid fa-arrow-trend-down text-xl"></i>
+          <div class="bg-white rounded-2xl p-7 text-center border border-[#E7E4DC] shadow-[0_2px_8px_rgba(22,56,40,0.03)] hover:border-[#C98A2C] hover:shadow-[0_8px_24px_rgba(22,56,40,0.08)] transition-all">
+            <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-[#FAF9F6] border border-[#E7E4DC] flex items-center justify-center text-[#163828]">
+              <i class="fa-solid fa-arrow-trend-down text-xl text-[#22a652]"></i>
             </div>
-            <p class="text-3xl sm:text-4xl font-black text-[#0a233b] mb-1 font-heading">
-              {{ currentPercent }}<span class="text-2xl font-bold text-[#206935]">%</span>
+            <p class="text-4xl sm:text-5xl font-bold text-[#163828] mb-1 font-serif">
+              {{ currentPercent }}<span class="text-2xl font-bold text-[#C98A2C]">%</span>
             </p>
-            <h3 class="text-xs sm:text-sm font-bold text-slate-700 mb-1">Menos en vertederos provinciales</h3>
-            <p class="text-[11px] text-slate-400 font-medium">Desviación hacia valorización REP</p>
+            <h3 class="text-sm font-serif font-bold text-[#163828] mb-1">Desviación de Vertederos</h3>
+            <p class="text-[11px] font-mono text-[#6B726D]">Recuperación y valorización REP</p>
           </div>
 
           <!-- Métrica 3: Flota -->
-          <div class="bg-white rounded-2xl p-7 text-center shadow-xs hover:shadow-md border border-slate-100 transition-all">
-            <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-emerald-50 flex items-center justify-center text-[#206935]">
-              <i class="fa-solid fa-truck-fast text-xl"></i>
+          <div class="bg-white rounded-2xl p-7 text-center border border-[#E7E4DC] shadow-[0_2px_8px_rgba(22,56,40,0.03)] hover:border-[#C98A2C] hover:shadow-[0_8px_24px_rgba(22,56,40,0.08)] transition-all">
+            <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-[#FAF9F6] border border-[#E7E4DC] flex items-center justify-center text-[#163828]">
+              <i class="fa-solid fa-truck-fast text-xl text-[#163828]"></i>
             </div>
-            <p class="text-3xl sm:text-4xl font-black text-[#0a233b] mb-1 font-heading">
-              {{ currentTrucks }} <span class="text-xl font-bold text-[#206935]">camiones</span>
+            <p class="text-4xl sm:text-5xl font-bold text-[#163828] mb-1 font-serif">
+              {{ currentTrucks }} <span class="text-xl font-bold text-[#C98A2C]">camiones</span>
             </p>
-            <h3 class="text-xs sm:text-sm font-bold text-slate-700 mb-1">Capacidad activa de flota</h3>
-            <p class="text-[11px] text-slate-400 font-medium">Cobertura en 4 cuadrantes comunales</p>
+            <h3 class="text-sm font-serif font-bold text-[#163828] mb-1">Flota Activa con GPS</h3>
+            <p class="text-[11px] font-mono text-[#6B726D]">Cobertura en los 4 cuadrantes</p>
           </div>
 
         </div>
 
-        <!-- Banner Retiro Especial Panorámico Stitch con cta_lake_flowers.png -->
-        <div class="relative rounded-3xl overflow-hidden shadow-md border border-slate-100 min-h-[200px] flex items-center">
+        <!-- Banner Retiro Especial Panorámico Gazette con cta_lake_flowers.png -->
+        <div class="relative rounded-2xl overflow-hidden shadow-md border border-[#E7E4DC] min-h-[220px] flex items-center">
           <img
             src="assets/stitch/cta_lake_flowers.png"
             alt="Paisaje Lago Llanquihue y flores Puerto Varas"
             class="absolute inset-0 w-full h-full object-cover object-center"
           />
-          <div class="absolute inset-0 bg-gradient-to-r from-white/95 via-white/85 to-white/20 sm:to-transparent"></div>
+          <div class="absolute inset-0 bg-gradient-to-r from-[#F9F8F5]/98 via-[#F9F8F5]/92 to-[#F9F8F5]/30 sm:to-transparent"></div>
           
           <div class="relative z-10 p-6 sm:p-10 w-full flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div class="flex items-start gap-4 max-w-xl">
-              <div class="shrink-0 w-12 h-12 rounded-full bg-[#dcf2e3] flex items-center justify-center text-[#206935] mt-1 shadow-2xs">
-                <i class="fa-solid fa-leaf text-xl"></i>
+              <div class="shrink-0 w-12 h-12 rounded-xl bg-white border border-[#E7E4DC] flex items-center justify-center text-[#163828] mt-1 shadow-2xs">
+                <i class="fa-solid fa-leaf text-xl text-[#22a652]"></i>
               </div>
               <div>
-                <div class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#206935] mb-1">
+                <div class="inline-flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-[#8C5D19] mb-1">
                   <i class="fa-solid fa-truck-ramp-box"></i>
                   <span>Servicio Municipal DIMAO</span>
                 </div>
-                <h3 class="text-xl sm:text-2xl font-black text-[#0a233b] tracking-tight mb-1 font-heading">
-                  Tu compromiso hace la diferencia
+                <h3 class="text-2xl sm:text-3xl font-bold text-[#163828] tracking-tight mb-1.5 font-serif">
+                  Tu compromiso cuida nuestro lago
                 </h3>
-                <p class="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
-                  ¿Necesitas recolección para podas, escombros limpios o enseres mayores? Agenda tu visita domiciliaria.
+                <p class="text-xs sm:text-sm text-[#6B726D] font-sans leading-relaxed">
+                  ¿Necesitas recolección especial para podas, escombros limpios o enseres mayores? Agenda tu visita domiciliaria en la plataforma.
                 </p>
               </div>
             </div>
 
             <div class="flex flex-col sm:flex-row items-center gap-3 shrink-0">
-              <a routerLink="/dashboard" class="w-full sm:w-auto text-center inline-flex items-center justify-center gap-2 bg-[#286f34] hover:bg-[#205b2a] text-white text-xs sm:text-sm font-bold py-3.5 px-6 rounded-xl transition shadow-md group cursor-pointer">
+              <a routerLink="/dashboard" class="w-full sm:w-auto text-center inline-flex items-center justify-center gap-2.5 bg-[#163828] hover:bg-[#1b5e37] text-white font-mono text-xs font-bold uppercase tracking-wider py-3.5 px-6 rounded-xl transition shadow-sm cursor-pointer">
                 <span>Agendar Retiro Especial</span>
-                <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
               </a>
-              <button type="button" (click)="openInfoModal.emit()" class="w-full sm:w-auto text-center px-4 py-3.5 rounded-xl bg-white/90 hover:bg-white text-slate-700 text-xs sm:text-sm font-bold transition border border-slate-200 shadow-2xs cursor-pointer">
+              <button type="button" (click)="openInfoModal.emit()" class="w-full sm:w-auto text-center px-5 py-3.5 rounded-xl bg-white hover:bg-[#FAF9F6] text-[#163828] font-mono text-xs font-bold uppercase tracking-wider transition border border-[#E7E4DC] shadow-2xs cursor-pointer">
                 Preguntas Frecuentes
               </button>
             </div>

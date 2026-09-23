@@ -15,50 +15,57 @@ interface CycleStep {
   imports: [CommonModule],
   template: `
     <!-- BEGIN: HowItWorks -->
-    <section class="py-14 sm:py-20 bg-[#f7faf7] border-b border-emerald-50/80" id="como-funciona">
+    <section class="py-16 sm:py-24 bg-[#FAF9F6] border-b border-[#E7E4DC]" id="como-funciona">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         
-        <!-- Section Tag -->
-        <span class="inline-block px-3.5 py-1 rounded-full bg-emerald-100 text-[#206935] font-bold text-xs mb-3 shadow-2xs">
-          ¿Cómo funciona?
+        <!-- Section Tag Gazette -->
+        <span class="font-mono text-[11px] font-bold uppercase tracking-widest text-[#8C5D19] bg-[#FAF0DC] px-3 py-1 rounded border border-[#EADBCA] inline-flex items-center gap-1.5 mb-3 shadow-2xs">
+          <i class="fa-solid fa-arrows-spin text-[10px]"></i> Trazabilidad Paso a Paso
         </span>
 
         <!-- Title & Subtitle -->
-        <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0a233b] tracking-tight mb-2 font-heading">
-          El ciclo de vida del retiro
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#163828] tracking-tight mb-3 font-serif">
+          El Ciclo de Vida del Retiro
         </h2>
-        <p class="text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto mb-12 sm:mb-14">
-          Un proceso simple, ordenado y transparente, desde tu solicitud hasta la certificación oficial del pesaje.
+        <p class="text-sm sm:text-base text-[#6B726D] max-w-2xl mx-auto mb-12 sm:mb-16 font-sans">
+          Un proceso transparente y regulado bajo la Ley REP, desde tu hogar hasta la báscula y certificación digital.
         </p>
 
-        <!-- 5-Step Process Timeline connected with arrows -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 sm:gap-6 relative">
-          <div *ngFor="let step of steps; let isLast = last" class="flex flex-col items-center text-center relative group">
+        <!-- 5-Step Process Editorial Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 sm:gap-6 relative text-left">
+          <div *ngFor="let step of steps; let isLast = last" 
+               class="group bg-white rounded-2xl p-6 border border-[#E7E4DC] shadow-[0_2px_8px_rgba(22,56,40,0.03)] hover:border-[#C98A2C] hover:shadow-[0_8px_24px_rgba(22,56,40,0.08)] transition-all duration-300 flex flex-col justify-between">
             
-            <!-- Circular Medallion with step badge -->
-            <div class="relative mb-4">
-              <div class="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-[#dcf2e3] flex items-center justify-center text-[#206935] text-2xl shadow-xs transition-transform transform group-hover:scale-105">
-                <i [class]="step.iconClass"></i>
+            <div>
+              <!-- Top Row: Number + Icon Medallion -->
+              <div class="flex items-center justify-between mb-4">
+                <span class="font-serif text-2xl sm:text-3xl font-bold text-[#C98A2C]">
+                  0{{ step.stepNumber }}
+                </span>
+                <div class="w-11 h-11 rounded-xl bg-[#FAF9F6] border border-[#E7E4DC] flex items-center justify-center text-[#163828] text-base shadow-2xs group-hover:bg-[#163828] group-hover:text-white transition-colors duration-200">
+                  <i [class]="step.iconClass"></i>
+                </div>
               </div>
-              <span class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-[#206935] text-white text-xs font-bold flex items-center justify-center border-2 border-white shadow-xs">
-                {{ step.stepNumber }}
+
+              <!-- Step Title & Actor -->
+              <h3 class="font-serif text-lg font-bold text-[#163828] mb-0.5 leading-snug">
+                {{ step.title }}
+              </h3>
+              <span class="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5D19] mb-2.5 block">
+                {{ step.subtitle }}
               </span>
+
+              <!-- Description -->
+              <p class="font-sans text-xs text-[#6B726D] leading-relaxed">
+                {{ step.description }}
+              </p>
             </div>
 
-            <!-- Content -->
-            <h3 class="font-bold text-[#0a233b] text-base mb-0.5 font-heading">
-              {{ step.title }}
-            </h3>
-            <span class="text-xs font-semibold text-slate-500 mb-1.5">
-              {{ step.subtitle }}
-            </span>
-            <p class="text-[11px] text-slate-600 leading-relaxed max-w-[170px]">
-              {{ step.description }}
-            </p>
-
-            <!-- Arrow to next step (hidden on mobile, shown on desktop) -->
-            <div *ngIf="!isLast" class="hidden lg:block absolute top-9 -right-3.5 transform -translate-y-1/2 text-slate-300 font-bold text-xl select-none pointer-events-none">
-              →
+            <!-- Bottom Progress Line Indicating Sequence -->
+            <div class="mt-4 pt-3 border-t border-[#E7E4DC] flex items-center justify-between text-[10px] font-mono text-[#6B726D]">
+              <span>Etapa {{ step.stepNumber }}/5</span>
+              <i *ngIf="!isLast" class="fa-solid fa-arrow-right text-[#C98A2C] text-xs"></i>
+              <i *ngIf="isLast" class="fa-solid fa-certificate text-[#22a652] text-xs"></i>
             </div>
           </div>
         </div>
