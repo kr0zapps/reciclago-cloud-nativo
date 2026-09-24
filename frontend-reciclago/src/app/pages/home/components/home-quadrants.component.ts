@@ -113,7 +113,6 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
               [class.text-slate-600]="selectedMobileIndex !== i"
               [class.hover:text-slate-900]="selectedMobileIndex !== i"
               class="py-2 px-1 rounded-lg text-center transition-all cursor-pointer">
-              <span class="block text-xs font-bold leading-none">C{{ q.cuadranteNumber }}</span>
               <span class="block text-[10px] leading-tight truncate mt-1 text-slate-500" [class.text-emerald-700]="selectedMobileIndex === i" [class.font-semibold]="selectedMobileIndex === i">{{ q.shortName }}</span>
             </button>
           </div>
