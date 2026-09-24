@@ -272,7 +272,6 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                   <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-white tracking-tight drop-shadow-sm">
                     {{ q.name }}
                   </h3>
-                  <span class="text-[10px] font-medium text-emerald-300">Residencial</span>
                 </div>
               </div>
 
