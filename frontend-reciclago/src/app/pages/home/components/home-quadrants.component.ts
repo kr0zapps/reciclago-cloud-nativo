@@ -168,7 +168,6 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                 <h3 class="font-heading font-extrabold text-xl text-white tracking-tight drop-shadow-sm">
                   {{ q.name }}
                 </h3>
-                <span class="text-[10px] font-medium text-emerald-300">Residencial</span>
               </div>
             </div>
 
@@ -260,9 +259,6 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
 
                 <!-- Badges de cabecera -->
                 <div class="absolute top-2.5 left-4 flex items-center gap-2">
-                  <span class="text-white text-[11px] font-semibold bg-slate-900/80 backdrop-blur-sm px-2.5 py-0.5 rounded-md border border-white/15 shadow-2xs">
-                    Cuadrante {{ q.cuadranteNumber }}
-                  </span>
                   <span *ngIf="q.diaModificado" class="text-[11px] font-semibold text-amber-900 bg-amber-100/95 px-2 py-0.5 rounded-md border border-amber-300 flex items-center gap-1 shadow-2xs">
                     <i class="fa-solid fa-triangle-exclamation text-[9px]"></i> Reprogramado
                   </span>
