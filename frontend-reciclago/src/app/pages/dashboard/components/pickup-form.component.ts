@@ -22,7 +22,7 @@ import { Sector, Residuo, Pickup } from '../data/sectors.data';
       <form (ngSubmit)="onSubmit()" class="space-y-5 text-slate-700">
         <!-- Banners de notificación -->
         <div *ngIf="submitStatus === 'success'" role="alert" class="bg-emerald-50 border border-emerald-200 text-emerald-900 px-4 py-3 rounded-xl text-xs sm:text-sm">
-          <strong>¡Solicitud recibida!</strong> Tu retiro quedó registrado. El coordinador asignará el camión recolector para tu día operativo.
+          <strong>¡Solicitud recibida!</strong> Tu retiro quedó registrado. El coordinador asignará un camión recolector para tu domicilio.
         </div>
 
         <div *ngIf="submitStatus === 'error'" role="alert" class="bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3 rounded-xl text-xs sm:text-sm">
@@ -228,7 +228,7 @@ export class PickupFormComponent implements OnChanges {
       next: (res) => {
         this.isDetectingCuadrante = false;
         if (res?.cuadranteId) {
-          this.detectedCuadrante = `Cuadrante detectado: ${res.nombre} (Día habitual: ${res.diaSemana})`;
+          this.detectedCuadrante = `Cuadrante detectado: ${res.nombre}`;
           if (res.sector) {
             this.newPickup.sector = res.sector;
           }
