@@ -76,7 +76,13 @@ import { Sector, Residuo, Pickup } from '../data/sectors.data';
               <div class="flex items-center gap-2.5 min-w-0">
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0"
                      [ngClass]="newPickup.residuoNombre === res.nombre ? 'bg-white text-[#22a652]' : 'bg-slate-100 text-slate-500'">
-                  <i [class]="getResiduoIcon(res.nombre)"></i>
+                  <i *ngIf="!isLata(res.nombre)" [class]="getResiduoIcon(res.nombre)"></i>
+                  <svg *ngIf="isLata(res.nombre)" class="w-4 h-4 text-inherit" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                    <ellipse cx="12" cy="5" rx="5.5" ry="2"/>
+                    <path d="M6.5 5v14c0 1.1 2.46 2 5.5 2s5.5-.9 5.5-2V5"/>
+                    <path d="M6.5 13c0 1.1 2.46 2 5.5 2s5.5-.9 5.5-2"/>
+                    <ellipse cx="12" cy="5" rx="1.8" ry="0.7"/>
+                  </svg>
                 </div>
                 <span class="text-xs font-semibold truncate leading-tight">{{ res.nombre }}</span>
               </div>
@@ -194,9 +200,15 @@ export class PickupFormComponent implements OnChanges {
     if (n.includes('VIDRIO')) return 'fa-solid fa-wine-bottle';
     if (n.includes('CART')) return 'fa-solid fa-box-open';
     if (n.includes('PLAST')) return 'fa-solid fa-bottle-water';
-    if (n.includes('LATA') || n.includes('METAL')) return 'fa-solid fa-can-food';
+    if (n.includes('LATA') || n.includes('METAL')) return 'fa-solid fa-boxes-stacked';
     if (n.includes('RAEE') || n.includes('ELECTR')) return 'fa-solid fa-plug';
     return 'fa-solid fa-recycle';
+  }
+
+  isLata(name?: string): boolean {
+    if (!name) return false;
+    const n = name.toUpperCase();
+    return n.includes('LATA') || n.includes('METAL');
   }
 
   selectResiduo(nombre: string): void {

@@ -50,7 +50,7 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
     materialNombre: 'Latas',
     materialDescripcion: 'Latas de bebidas y conservas',
     materialInstrucciones: 'Enjuagar para evitar olores. Aplastar si es posible.',
-    iconClass: 'fa-solid fa-can-food',
+    iconClass: 'fa-solid fa-boxes-stacked',
     binImage: 'assets/bin_latas_clean.png'
   }
 ];

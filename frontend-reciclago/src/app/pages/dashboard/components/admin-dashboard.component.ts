@@ -1052,7 +1052,7 @@ export class AdminDashboardComponent implements OnInit, OnChanges, OnDestroy {
     if (n.includes('vidrio')) return 'fa-solid fa-wine-bottle';
     if (n.includes('cartón') || n.includes('carton') || n.includes('papel')) return 'fa-solid fa-box-archive';
     if (n.includes('plástico') || n.includes('plastico') || n.includes('pet')) return 'fa-solid fa-bottle-water';
-    if (n.includes('lata') || n.includes('metal')) return 'fa-solid fa-can-food';
+    if (n.includes('lata') || n.includes('metal')) return 'fa-solid fa-boxes-stacked';
     return 'fa-solid fa-recycle';
   }
 
@@ -1171,7 +1171,7 @@ export class AdminDashboardComponent implements OnInit, OnChanges, OnDestroy {
       case 'VIDRIO': return 'fa-solid fa-wine-bottle';
       case 'CARTON_PAPEL': return 'fa-solid fa-box-archive';
       case 'PLASTICO_PET': return 'fa-solid fa-bottle-water';
-      case 'LATAS_METALES': return 'fa-solid fa-can-food';
+      case 'LATAS_METALES': return 'fa-solid fa-boxes-stacked';
       default: return 'fa-solid fa-recycle';
     }
   }

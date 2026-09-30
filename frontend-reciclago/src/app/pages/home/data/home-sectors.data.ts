@@ -86,7 +86,7 @@ export const INITIAL_QUADRANTS: QuadrantCardInfo[] = [
     image: 'assets/stitch/quadrant_braunau.png',
     binImage: 'assets/bin_latas_clean.png',
     badgeColor: '#c25e1a',
-    iconClass: 'fa-solid fa-can-food'
+    iconClass: 'fa-solid fa-boxes-stacked'
   }
 ];
 

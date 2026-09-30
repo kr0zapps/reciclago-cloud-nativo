@@ -693,7 +693,7 @@ export class CoordinadorDashboardComponent implements OnChanges, OnDestroy {
     if (n.includes('vidrio')) return 'fa-solid fa-wine-bottle';
     if (n.includes('cartón') || n.includes('carton') || n.includes('papel')) return 'fa-solid fa-box-archive';
     if (n.includes('plástico') || n.includes('plastico') || n.includes('pet')) return 'fa-solid fa-bottle-water';
-    if (n.includes('lata') || n.includes('metal')) return 'fa-solid fa-can-food';
+    if (n.includes('lata') || n.includes('metal')) return 'fa-solid fa-boxes-stacked';
     return 'fa-solid fa-recycle';
   }
 
