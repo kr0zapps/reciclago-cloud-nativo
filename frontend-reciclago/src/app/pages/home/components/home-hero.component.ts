@@ -52,7 +52,7 @@ import { RouterModule } from '@angular/router';
           <a
             routerLink="/dashboard"
             class="inline-flex items-center justify-center gap-2.5 min-h-[44px] sm:min-h-[50px] px-6 sm:px-8 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white font-extrabold text-sm tracking-wide shadow-xl shadow-emerald-950/50 border-none transition-all active:scale-[0.98] cursor-pointer">
-            <span>Ingresar al Portal Vecinal</span>
+            <span>Pedir Retiro (Portal Vecinal)</span>
             <i class="fa-solid fa-arrow-right text-[10px]"></i>
           </a>
 
@@ -63,6 +63,29 @@ import { RouterModule } from '@angular/router';
             <i class="fa-solid fa-map-location-dot text-[#22a652]"></i>
             <span>Ver Estado de Sectores</span>
           </a>
+        </div>
+
+        <!-- Fila de materiales aceptados (Muy visible para adultos mayores) -->
+        <div class="mt-12 sm:mt-16 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-4 sm:p-5 w-full max-w-2xl mx-auto">
+          <p class="text-white font-bold text-sm sm:text-base mb-3 drop-shadow-sm">¿Qué puedes reciclar con nosotros?</p>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div class="flex flex-col items-center gap-1.5 p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors">
+              <i class="fa-solid fa-wine-bottle text-[#22a652] text-xl sm:text-2xl drop-shadow-md"></i>
+              <span class="text-white text-xs font-semibold">Vidrio</span>
+            </div>
+            <div class="flex flex-col items-center gap-1.5 p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors">
+              <i class="fa-solid fa-box-open text-[#22a652] text-xl sm:text-2xl drop-shadow-md"></i>
+              <span class="text-white text-xs font-semibold">Cartón / Papel</span>
+            </div>
+            <div class="flex flex-col items-center gap-1.5 p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors">
+              <i class="fa-solid fa-bottle-water text-[#22a652] text-xl sm:text-2xl drop-shadow-md"></i>
+              <span class="text-white text-xs font-semibold">Plástico (PET)</span>
+            </div>
+            <div class="flex flex-col items-center gap-1.5 p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors">
+              <i class="fa-solid fa-boxes-stacked text-[#22a652] text-xl sm:text-2xl drop-shadow-md"></i>
+              <span class="text-white text-xs font-semibold">Latas</span>
+            </div>
+          </div>
         </div>
 
       </div>
