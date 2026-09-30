@@ -69,39 +69,11 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
              [class.reveal-active]="isVisible">
           <div>
             <h2 class="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-heading mb-1">
-              Cuadrantes y Residuos Semanales
+              Cuadrantes de Retiro
             </h2>
             <p class="text-xs sm:text-sm text-slate-500 max-w-xl font-sans">
-              Revisa tu sector comunal, el día de retiro programado y qué residuo corresponde separar esta semana.
+              Revisa tu sector comunal, el día de retiro programado y el estado del camión recolector.
             </p>
-          </div>
-
-          <!-- Selector de Semana Ejecutivo Moderno -->
-          <div class="inline-flex rounded-xl p-1 bg-white border border-slate-200 shadow-2xs self-start md:self-auto">
-            <button
-              type="button"
-              (click)="selectWeek(1)"
-              [class.bg-slate-900]="activeWeek === 1"
-              [class.text-white]="activeWeek === 1"
-              [class.shadow-xs]="activeWeek === 1"
-              [class.text-slate-600]="activeWeek !== 1"
-              [class.hover:text-slate-900]="activeWeek !== 1"
-              class="px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all cursor-pointer flex items-center gap-2">
-              <i class="fa-solid fa-calendar-check" [class.text-emerald-400]="activeWeek === 1" [class.text-emerald-600]="activeWeek !== 1"></i>
-              <span>Semana Actual</span>
-            </button>
-            <button
-              type="button"
-              (click)="selectWeek(2)"
-              [class.bg-slate-900]="activeWeek === 2"
-              [class.text-white]="activeWeek === 2"
-              [class.shadow-xs]="activeWeek === 2"
-              [class.text-slate-600]="activeWeek !== 2"
-              [class.hover:text-slate-900]="activeWeek !== 2"
-              class="px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all cursor-pointer flex items-center gap-2">
-              <i class="fa-solid fa-calendar-plus" [class.text-emerald-400]="activeWeek === 2" [class.text-emerald-600]="activeWeek !== 2"></i>
-              <span>Próxima Semana</span>
-            </button>
           </div>
         </div>
 
@@ -479,7 +451,7 @@ export class HomeQuadrantsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.updateQuadrantsForWeek(this.activeWeek);
+    this.updateQuadrants();
     this.loadCatalogResiduos();
     this.loadTrackingAll();
 
@@ -508,7 +480,7 @@ export class HomeQuadrantsComponent implements OnInit, OnDestroy {
       next: (rot) => {
         if (rot && rot.slotSemana) {
           this.currentCycleWeek = rot.slotSemana;
-          this.updateQuadrantsForWeek(this.activeWeek);
+          this.updateQuadrants();
           this.cdr.markForCheck();
         }
       },
@@ -526,7 +498,7 @@ export class HomeQuadrantsComponent implements OnInit, OnDestroy {
             else if (cat.includes('PLASTICO')) this.liveResiduosMap.set('PLASTICO', r);
             else if (cat.includes('LATA') || cat.includes('METAL')) this.liveResiduosMap.set('LATAS', r);
           });
-          this.updateQuadrantsForWeek(this.activeWeek);
+          this.updateQuadrants();
           this.cdr.markForCheck();
         }
       },
@@ -536,24 +508,10 @@ export class HomeQuadrantsComponent implements OnInit, OnDestroy {
     });
   }
 
-  getEffectiveWeek(weekNumber: number): number {
-    if (weekNumber === 2) {
-      return (this.currentCycleWeek % 4) + 1;
-    }
-    return this.currentCycleWeek;
-  }
-
-  updateQuadrantsForWeek(weekNumber: number): void {
-    const offset = weekNumber === 2 ? 1 : 0;
-    const effectiveWeek = this.getEffectiveWeek(weekNumber);
-
-    this.quadrants = INITIAL_QUADRANTS.map((q, idx) => {
-      const matIndex = (idx + offset) % DEFAULT_MATERIALS_CYCLE.length;
-      const baseMat = DEFAULT_MATERIALS_CYCLE[matIndex];
-      const liveMat = this.liveResiduosMap.get(baseMat.categoryKey);
-
+  updateQuadrants(): void {
+    this.quadrants = INITIAL_QUADRANTS.map((q) => {
       // Sincronización con reprogramación de día del admin DIMAO
-      const override = getScheduleOverrideForSector(q.name, effectiveWeek);
+      const override = getScheduleOverrideForSector(q.name, this.currentCycleWeek);
 
       return {
         ...q,
@@ -563,35 +521,17 @@ export class HomeQuadrantsComponent implements OnInit, OnDestroy {
         day: override?.nuevoDia ?? q.day,
         hours: q.hours,
         image: q.image,
-        categoryKey: baseMat.categoryKey,
-        materialNombre: liveMat?.nombre || baseMat.materialNombre,
-        materialDescripcion: liveMat?.descripcion || baseMat.materialDescripcion,
-        materialInstrucciones: liveMat?.instrucciones || baseMat.materialInstrucciones,
-        binImage: baseMat.binImage,
-        iconClass: baseMat.iconClass || q.iconClass,
+        categoryKey: 'ALL',
+        materialNombre: '4 Fracciones',
+        materialDescripcion: 'Vidrio, Cartón, Plástico PET/PEAD y Latas.',
+        materialInstrucciones: 'Asegúrate de enjuagar, secar y aplastar los materiales.',
+        binImage: '',
+        iconClass: 'fa-solid fa-recycle',
         diaModificado: !!override,
         diaOriginal: override?.diaOriginal ?? q.day,
         motivoModificacion: override?.motivo || ''
       };
     });
-  }
-
-  selectWeek(weekNumber: number): void {
-    if (this.activeWeek === weekNumber && !this.isFadingOut) return;
-
-    this.isFadingOut = true;
-    this.expandedAccordionId = null;
-    this.cdr.markForCheck();
-
-    setTimeout(() => {
-      this.activeWeek = weekNumber;
-      this.updateQuadrantsForWeek(weekNumber);
-
-      setTimeout(() => {
-        this.isFadingOut = false;
-        this.cdr.markForCheck();
-      }, 50);
-    }, 140);
   }
 
   onSelectQuadrant(q: QuadrantCardInfo): void {

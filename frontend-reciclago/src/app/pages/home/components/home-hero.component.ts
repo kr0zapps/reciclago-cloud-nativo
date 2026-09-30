@@ -33,43 +33,51 @@ import { RouterModule } from '@angular/router';
       <!-- 2. Espaciador Superior para Compensar el Header Sticky -->
       <div class="h-16 sm:h-20 lg:h-24 flex-shrink-0 pointer-events-none"></div>
 
-      <!-- 3. Contenido Editorial Principal: Monumental, Centrado e Imponente (Cero Slop, Cero Cuadritos) -->
-      <div class="relative z-10 max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 lg:py-12 w-full my-auto text-center flex flex-col items-center justify-center">
+      <!-- 3. Contenido Editorial Principal: Monumental, Centrado e Imponente -->
+      <div class="relative z-10 max-w-5xl mx-auto px-4 py-8 sm:py-12 w-full my-auto text-center flex flex-col items-center justify-center">
         
-        <!-- Titular Monumental, Prominente y de Alto Impacto con Cabinet Grotesk (Blanco Puro Sólido) -->
-        <h1 class="hero-title text-white">
+        <!-- Civic Badge: Municipalidad de Puerto Varas -->
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-6 sm:mb-8 shadow-sm">
+          <i class="fa-solid fa-building-columns text-[#22a652] text-xs"></i>
+          <span class="text-[10px] sm:text-xs font-bold tracking-widest text-white uppercase">Municipalidad de Puerto Varas · DIMAO</span>
+        </div>
+
+        <!-- Titular Monumental -->
+        <h1 class="hero-title text-white leading-tight">
           <span class="block">Reciclaje Comunal</span>
           <span class="block">Puerto Varas</span>
         </h1>
 
-        <!-- Subtítulo Corto, Directo y Conciso -->
-        <p class="text-sm sm:text-lg md:text-xl text-white/90 font-medium max-w-xl mx-auto mt-3 sm:mt-5 mb-5 sm:mb-8 drop-shadow-sm leading-snug">
+        <!-- Subtítulo Corto -->
+        <p class="text-sm sm:text-lg md:text-xl text-white/90 font-medium max-w-xl mx-auto mt-4 sm:mt-5 mb-6 sm:mb-8 drop-shadow-sm leading-relaxed">
           Retiro domiciliario y pesaje digital para proteger nuestro lago.
         </p>
 
-        <!-- Botones de Acción Centrados, Ergonómicos y con Colores Sólidos -->
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-sm sm:max-w-none mx-auto">
+        <!-- Botones de Acción Agrupados Elegantes (Sin full-width pills en mobile) -->
+        <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 w-full px-2">
           <a
             routerLink="/dashboard"
-            class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 min-h-[48px] sm:min-h-[54px] px-7 sm:px-9 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white font-extrabold text-sm sm:text-base tracking-wide shadow-xl shadow-emerald-950/50 border-none transition-all active:scale-[0.98] cursor-pointer">
+            class="inline-flex items-center justify-center gap-2.5 min-h-[44px] sm:min-h-[50px] px-6 sm:px-8 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white font-extrabold text-sm tracking-wide shadow-xl shadow-emerald-950/50 border-none transition-all active:scale-[0.98] cursor-pointer">
             <span>Ingresar al Portal Vecinal</span>
-            <i class="fa-solid fa-arrow-right text-xs"></i>
+            <i class="fa-solid fa-arrow-right text-[10px]"></i>
           </a>
 
           <a
             href="#cuadrantes"
             (click)="scrollToSection($event, 'cuadrantes')"
-            class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 min-h-[48px] sm:min-h-[54px] px-6 sm:px-8 rounded-xl bg-[#092232]/85 hover:bg-[#123F5B] text-white font-bold text-sm sm:text-base border border-white/20 backdrop-blur-md shadow-lg transition-all active:scale-[0.98] cursor-pointer">
+            class="inline-flex items-center justify-center gap-2.5 min-h-[44px] sm:min-h-[50px] px-5 sm:px-7 rounded-xl bg-[#092232]/80 hover:bg-[#123F5B] text-white font-semibold text-sm border border-white/20 backdrop-blur-md shadow-lg transition-all active:scale-[0.98] cursor-pointer">
             <i class="fa-solid fa-calendar-days text-[#22a652]"></i>
-            <span>Ver Cuadrantes y Días</span>
+            <span>Ver Cuadrantes</span>
           </a>
         </div>
 
-        <!-- Lema Cálido / Humano con Amplio Espaciado y Cero Emojis -->
-        <div class="mt-8 sm:mt-14 text-center">
-          <p class="font-script text-base sm:text-xl md:text-2xl text-emerald-100/90 font-bold tracking-wide select-none m-0 drop-shadow-sm">
-            Reciclar también es cuidar nuestro lago
-          </p>
+        <!-- Tracking Telemetry Pill -->
+        <div class="mt-8 sm:mt-12 inline-flex items-center gap-2.5 px-4 py-2 bg-[#041624]/60 border border-white/10 rounded-full backdrop-blur-sm shadow-inner">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22a652] opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-[#22a652]"></span>
+          </span>
+          <span class="text-xs sm:text-sm font-medium text-white/90 tracking-wide">Servicio activo en la comuna</span>
         </div>
 
       </div>
