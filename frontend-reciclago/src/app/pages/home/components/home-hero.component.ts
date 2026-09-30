@@ -35,25 +35,19 @@ import { RouterModule } from '@angular/router';
 
       <!-- 3. Contenido Editorial Principal: Monumental, Centrado e Imponente -->
       <div class="relative z-10 max-w-5xl mx-auto px-4 py-8 sm:py-12 w-full my-auto text-center flex flex-col items-center justify-center">
-        
-        <!-- Civic Badge: Municipalidad de Puerto Varas -->
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-6 sm:mb-8 shadow-sm">
-          <i class="fa-solid fa-building-columns text-[#22a652] text-xs"></i>
-          <span class="text-[10px] sm:text-xs font-bold tracking-widest text-white uppercase">Municipalidad de Puerto Varas · DIMAO</span>
-        </div>
 
         <!-- Titular Monumental -->
-        <h1 class="hero-title text-white leading-tight">
+        <h1 class="hero-title text-white leading-tight mt-6 sm:mt-10">
           <span class="block">Reciclaje Comunal</span>
           <span class="block">Puerto Varas</span>
         </h1>
 
         <!-- Subtítulo Corto -->
-        <p class="text-sm sm:text-lg md:text-xl text-white/90 font-medium max-w-xl mx-auto mt-4 sm:mt-5 mb-6 sm:mb-8 drop-shadow-sm leading-relaxed">
-          Retiro domiciliario y pesaje digital para proteger nuestro lago.
+        <p class="text-sm sm:text-lg md:text-xl text-white/90 font-medium max-w-xl mx-auto mt-4 sm:mt-5 mb-8 sm:mb-10 drop-shadow-sm leading-relaxed">
+          Retiro domiciliario a pedido y pesaje digital para proteger nuestro lago.
         </p>
 
-        <!-- Botones de Acción Agrupados Elegantes (Sin full-width pills en mobile) -->
+        <!-- Botones de Acción Agrupados Elegantes -->
         <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 w-full px-2">
           <a
             routerLink="/dashboard"
@@ -66,18 +60,9 @@ import { RouterModule } from '@angular/router';
             href="#cuadrantes"
             (click)="scrollToSection($event, 'cuadrantes')"
             class="inline-flex items-center justify-center gap-2.5 min-h-[44px] sm:min-h-[50px] px-5 sm:px-7 rounded-xl bg-[#092232]/80 hover:bg-[#123F5B] text-white font-semibold text-sm border border-white/20 backdrop-blur-md shadow-lg transition-all active:scale-[0.98] cursor-pointer">
-            <i class="fa-solid fa-calendar-days text-[#22a652]"></i>
-            <span>Ver Cuadrantes</span>
+            <i class="fa-solid fa-map-location-dot text-[#22a652]"></i>
+            <span>Ver Estado de Sectores</span>
           </a>
-        </div>
-
-        <!-- Tracking Telemetry Pill -->
-        <div class="mt-8 sm:mt-12 inline-flex items-center gap-2.5 px-4 py-2 bg-[#041624]/60 border border-white/10 rounded-full backdrop-blur-sm shadow-inner">
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22a652] opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-[#22a652]"></span>
-          </span>
-          <span class="text-xs sm:text-sm font-medium text-white/90 tracking-wide">Servicio activo en la comuna</span>
         </div>
 
       </div>

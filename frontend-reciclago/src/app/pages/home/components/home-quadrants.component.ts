@@ -151,31 +151,8 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
 
             <!-- Contenido Informativo Móvil Compacto -->
             <div class="p-4">
-              <div *ngIf="q.diaModificado && q.motivoModificacion" class="mb-3 p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-snug flex items-start gap-2">
-                <i class="fa-solid fa-circle-exclamation text-amber-600 mt-0.5 shrink-0 text-xs"></i>
-                <div>
-                  <span class="font-bold">Aviso DIMAO:</span> {{ q.motivoModificacion }}
-                </div>
-              </div>
-
-              <!-- Placa Material Asignado -->
-              <div class="p-3 rounded-xl border border-slate-200/90 bg-slate-50/70 flex items-center justify-between gap-3 mb-3">
-                <div class="min-w-0">
-                  <h4 class="font-heading font-extrabold text-base text-slate-900 leading-snug truncate">{{ q.materialNombre }}</h4>
-                  <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">{{ q.materialDescripcion }}</p>
-                </div>
-
-                <div class="w-11 h-11 rounded-xl bg-white border border-slate-200/90 flex items-center justify-center text-slate-700 shrink-0 shadow-2xs">
-                  <svg *ngIf="q.categoryKey === 'VIDRIO'" class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 2h6v3l1.5 2.5a2 2 0 0 1 .5 1.3V20a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V8.8a2 2 0 0 1 .5-1.3L9 5V2z"/><line x1="8" y1="2" x2="16" y2="2"/><line x1="10" y1="13" x2="14" y2="13"/></svg>
-                  <svg *ngIf="q.categoryKey === 'CARTON'" class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 12v10"/></svg>
-                  <svg *ngIf="q.categoryKey === 'PLASTICO'" class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="10" y="2" width="4" height="2" rx="0.5"/><path d="M10 4h4v2a2 2 0 0 0 .5 1.3l1.2 1.4A2 2 0 0 1 16 10v9a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-9a2 2 0 0 1 .3-1.3l1.2-1.4A2 2 0 0 0 10 6V4z"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="16" x2="15" y2="16"/></svg>
-                  <svg *ngIf="q.categoryKey === 'LATAS'" class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="5.5" ry="2"/><path d="M6.5 5v14c0 1.1 2.46 2 5.5 2s5.5-.9 5.5-2V5"/><path d="M6.5 13c0 1.1 2.46 2 5.5 2s5.5-.9 5.5-2"/><ellipse cx="12" cy="5" rx="1.8" ry="0.7"/></svg>
-                  <svg *ngIf="q.categoryKey !== 'VIDRIO' && q.categoryKey !== 'CARTON' && q.categoryKey !== 'PLASTICO' && q.categoryKey !== 'LATAS'" class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8m-4-4h8"/></svg>
-                </div>
-              </div>
-
               <!-- Estado del Camión en el Cuadrante (Información en Vivo) -->
-              <div *ngIf="getTracking(q.cuadranteNumber) as t" class="p-3 rounded-xl border border-slate-200 bg-slate-50 mb-3 text-xs text-slate-700">
+              <div *ngIf="getTracking(q.cuadranteNumber) as t" class="p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-700">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
                     <i class="fa-solid fa-truck text-slate-500"></i>
@@ -189,44 +166,6 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                 </div>
                 <div *ngIf="t.calleActual" class="text-[11px] text-slate-500 mt-1 truncate">
                   Pasa por: {{ t.calleActual }}
-                </div>
-              </div>
-
-              <!-- Fila Día y Condición Compacta -->
-              <div class="grid grid-cols-2 gap-2 text-xs mb-3">
-                <div class="px-3 py-2 rounded-lg bg-slate-50/70 border border-slate-200/80 flex items-center gap-2">
-                  <i class="fa-regular fa-calendar text-slate-400 text-xs"></i>
-                  <div class="min-w-0">
-                    <span class="font-bold text-slate-900 block leading-tight truncate">{{ q.day }}</span>
-                    <span class="text-[10px] text-slate-500 block truncate">{{ q.hours }}</span>
-                  </div>
-                </div>
-                <div class="px-3 py-2 rounded-lg bg-slate-50/70 border border-slate-200/80 flex items-center gap-2">
-                  <i class="fa-solid fa-circle-check text-emerald-600 text-xs"></i>
-                  <div class="min-w-0">
-                    <span class="font-semibold text-slate-800 block leading-tight truncate">{{ q.requisitos }}</span>
-                    <span class="text-[10px] text-slate-500 block truncate">En frontis</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Acordeón protocolo -->
-              <div class="border-t border-slate-100 pt-2.5">
-                <button
-                  type="button"
-                  (click)="toggleAccordion(q.id)"
-                  class="w-full flex items-center justify-between text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors cursor-pointer py-0.5"
-                  [attr.aria-expanded]="expandedAccordionId === q.id">
-                  <span class="inline-flex items-center gap-1.5 text-[11px] text-slate-500">
-                    <i class="fa-regular fa-circle-question text-slate-400"></i>
-                    <span>{{ expandedAccordionId === q.id ? 'Ocultar instrucciones' : '¿Cómo preparar tus residuos?' }}</span>
-                  </span>
-                  <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform duration-200" [class.rotate-180]="expandedAccordionId === q.id"></i>
-                </button>
-
-                <div *ngIf="expandedAccordionId === q.id"
-                     class="mt-2 p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600 leading-relaxed">
-                  <strong class="text-slate-900 font-semibold">Norma DIMAO:</strong> {{ q.materialInstrucciones || 'Enjuagar y secar botellas y envases antes de depositar.' }}
                 </div>
               </div>
             </div>
@@ -269,31 +208,8 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
 
               <!-- Contenido Informativo Compacto -->
               <div class="p-4 sm:p-5 flex flex-col justify-between">
-                <div *ngIf="q.diaModificado && q.motivoModificacion" class="mb-3 p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-snug flex items-start gap-2">
-                  <i class="fa-solid fa-triangle-exclamation text-amber-600 mt-0.5 shrink-0 text-xs"></i>
-                  <div>
-                    <span class="font-bold">Aviso Oficial DIMAO:</span> {{ q.motivoModificacion }}
-                  </div>
-                </div>
-
-                <!-- Bloque Héroe del Material -->
-                <div class="p-3 sm:p-3.5 rounded-xl border border-slate-200/90 bg-slate-50/70 flex items-center justify-between gap-3 mb-3">
-                  <div class="min-w-0">
-                    <h4 class="font-heading font-extrabold text-base sm:text-lg text-slate-900 leading-snug truncate">{{ q.materialNombre }}</h4>
-                    <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">{{ q.materialDescripcion }}</p>
-                  </div>
-
-                  <div class="w-11 h-11 rounded-xl bg-white border border-slate-200/90 flex items-center justify-center text-slate-700 shrink-0 shadow-2xs">
-                    <svg *ngIf="q.categoryKey === 'VIDRIO'" class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 2h6v3l1.5 2.5a2 2 0 0 1 .5 1.3V20a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V8.8a2 2 0 0 1 .5-1.3L9 5V2z"/><line x1="8" y1="2" x2="16" y2="2"/><line x1="10" y1="13" x2="14" y2="13"/></svg>
-                    <svg *ngIf="q.categoryKey === 'CARTON'" class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 12v10"/></svg>
-                    <svg *ngIf="q.categoryKey === 'PLASTICO'" class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="10" y="2" width="4" height="2" rx="0.5"/><path d="M10 4h4v2a2 2 0 0 0 .5 1.3l1.2 1.4A2 2 0 0 1 16 10v9a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-9a2 2 0 0 1 .3-1.3l1.2-1.4A2 2 0 0 0 10 6V4z"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="16" x2="15" y2="16"/></svg>
-                    <svg *ngIf="q.categoryKey === 'LATAS'" class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="5.5" ry="2"/><path d="M6.5 5v14c0 1.1 2.46 2 5.5 2s5.5-.9 5.5-2V5"/><path d="M6.5 13c0 1.1 2.46 2 5.5 2s5.5-.9 5.5-2"/><ellipse cx="12" cy="5" rx="1.8" ry="0.7"/></svg>
-                    <svg *ngIf="q.categoryKey !== 'VIDRIO' && q.categoryKey !== 'CARTON' && q.categoryKey !== 'PLASTICO' && q.categoryKey !== 'LATAS'" class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8m-4-4h8"/></svg>
-                  </div>
-                </div>
-
                 <!-- Estado del Camión en el Cuadrante (Información en Vivo) -->
-                <div *ngIf="getTracking(q.cuadranteNumber) as t" class="p-3 rounded-xl border border-slate-200 bg-slate-50 mb-3 text-xs text-slate-700">
+                <div *ngIf="getTracking(q.cuadranteNumber) as t" class="p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-700">
                   <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
                       <i class="fa-solid fa-truck text-slate-500"></i>
@@ -307,45 +223,6 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                   </div>
                   <div *ngIf="t.calleActual" class="text-[11px] text-slate-500 mt-1 truncate">
                     Pasa por: {{ t.calleActual }}
-                  </div>
-                </div>
-
-                <!-- Fila Compacta Día y Condición -->
-                <div class="grid grid-cols-2 gap-2 text-xs mb-3">
-                  <div class="px-3 py-2 rounded-lg bg-slate-50/70 border border-slate-200/80 flex items-center gap-2">
-                    <i class="fa-regular fa-calendar text-slate-400 text-xs"></i>
-                    <div class="min-w-0">
-                      <span class="font-bold text-slate-900 block leading-tight truncate">{{ q.day }}</span>
-                      <span class="text-[10px] text-slate-500 block truncate">{{ q.hours }}</span>
-                    </div>
-                  </div>
-                  <div class="px-3 py-2 rounded-lg bg-slate-50/70 border border-slate-200/80 flex items-center gap-2">
-                    <i class="fa-solid fa-circle-check text-emerald-600 text-xs"></i>
-                    <div class="min-w-0">
-                      <span class="font-semibold text-slate-800 block leading-tight truncate">{{ q.requisitos }}</span>
-                      <span class="text-[10px] text-slate-500 block truncate">En frontis</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Acordeón Desplegable para Instrucciones -->
-                <div class="border-t border-slate-100 pt-2.5">
-                  <button
-                    type="button"
-                    (click)="toggleAccordion(q.id)"
-                    class="w-full flex items-center justify-between text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors cursor-pointer py-0.5"
-                    [attr.aria-expanded]="expandedAccordionId === q.id">
-                    <span class="inline-flex items-center gap-1.5 text-[11px] text-slate-500">
-                      <i class="fa-regular fa-circle-question text-slate-400"></i>
-                      <span>{{ expandedAccordionId === q.id ? 'Ocultar instrucciones' : '¿Cómo preparar tus residuos?' }}</span>
-                    </span>
-                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform duration-200" [class.rotate-180]="expandedAccordionId === q.id"></i>
-                  </button>
-
-                  <!-- Panel Expandido del Acordeón -->
-                  <div *ngIf="expandedAccordionId === q.id"
-                       class="mt-2 p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600 leading-relaxed">
-                    <strong class="text-slate-900 font-semibold">Norma DIMAO:</strong> {{ q.materialInstrucciones || 'Enjuagar y secar botellas y envases antes de depositar.' }}
                   </div>
                 </div>
               </div>
@@ -510,26 +387,12 @@ export class HomeQuadrantsComponent implements OnInit, OnDestroy {
 
   updateQuadrants(): void {
     this.quadrants = INITIAL_QUADRANTS.map((q) => {
-      // Sincronización con reprogramación de día del admin DIMAO
-      const override = getScheduleOverrideForSector(q.name, this.currentCycleWeek);
-
       return {
         ...q,
         cuadranteNumber: q.cuadranteNumber,
         name: q.name,
         shortName: q.shortName,
-        day: override?.nuevoDia ?? q.day,
-        hours: q.hours,
-        image: q.image,
-        categoryKey: 'ALL',
-        materialNombre: '4 Fracciones',
-        materialDescripcion: 'Vidrio, Cartón, Plástico PET/PEAD y Latas.',
-        materialInstrucciones: 'Asegúrate de enjuagar, secar y aplastar los materiales.',
-        binImage: '',
-        iconClass: 'fa-solid fa-recycle',
-        diaModificado: !!override,
-        diaOriginal: override?.diaOriginal ?? q.day,
-        motivoModificacion: override?.motivo || ''
+        image: q.image
       };
     });
   }
