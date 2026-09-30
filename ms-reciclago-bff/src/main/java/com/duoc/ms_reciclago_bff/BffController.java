@@ -408,6 +408,23 @@ public class BffController {
         }
     }
 
+    @PutMapping("/api/pickups/{id}/status")
+    public ResponseEntity<?> updatePickupStatus(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        try {
+            Object response = restClient.put()
+                    .uri(pickupsUrl + PATH_API_PICKUPS_SLASH + id + "/status")
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                    .body(body)
+                    .retrieve()
+                    .body(Object.class);
+            return ResponseEntity.ok(response);
+        } catch (org.springframework.web.client.HttpStatusCodeException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(ERROR_KEY, e.getMessage()));
+        }
+    }
+
     @PatchMapping("/api/pickups/{id}/en-ruta")
     public ResponseEntity<?> enRutaPickup(@PathVariable Long id) {
         try {

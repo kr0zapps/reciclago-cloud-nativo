@@ -141,6 +141,31 @@ public class PickupController {
         return ResponseEntity.ok(actualizado);
     }
 
+    /**
+     * Endpoint unificado de actualización de estado compatible con la especificación PUT /api/pickups/{id}/status.
+     * Enruta dinámicamente al flujo de negocio correspondiente según el estado solicitado.
+     */
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> actualizarEstadoUnificado(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        String nuevoEstado = resolverString(null, body, "nuevoEstado");
+        if (nuevoEstado == null || nuevoEstado.isBlank()) {
+            nuevoEstado = resolverString(null, body, "estado");
+        }
+        if (nuevoEstado == null || nuevoEstado.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "El campo nuevoEstado (o estado) es obligatorio"));
+        }
+
+        return switch (nuevoEstado.toUpperCase().trim()) {
+            case "PROGRAMADO" -> programarRetiro(id, null, null, null, body);
+            case "EN_RUTA" -> cambiarEstadoEnRuta(id);
+            case "RETIRADO" -> marcarRetirado(id);
+            case "PESADO" -> registrarPesaje(id, null, body);
+            case "CANCELADO" -> cancelarRetiro(id, null, body);
+            default -> ResponseEntity.badRequest().body(Map.of("error", "Estado no reconocido: " + nuevoEstado
+                    + ". Estados válidos: PROGRAMADO, EN_RUTA, RETIRADO, PESADO, CANCELADO"));
+        };
+    }
+
     // ── Utilidades internas ───────────────────────────────────────────
 
     private Long resolverLong(Long valor, Map<String, Object> body, String clave) {

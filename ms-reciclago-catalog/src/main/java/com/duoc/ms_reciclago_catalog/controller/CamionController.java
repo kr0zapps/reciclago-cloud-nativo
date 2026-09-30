@@ -68,6 +68,36 @@ public class CamionController {
         }
     }
 
+    @PatchMapping("/patente/{patente}/reducir-capacidad")
+    public ResponseEntity<Camion> reducirCapacidadPorPatente(@PathVariable String patente, @RequestParam Double pesoKg) {
+        try {
+            Camion actualizado = camionService.reducirCapacidadPorPatente(patente, pesoKg);
+            return ResponseEntity.ok(actualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/{id}/restituir-capacidad")
+    public ResponseEntity<Camion> restituirCapacidad(@PathVariable Long id, @RequestParam Double pesoKg) {
+        try {
+            Camion actualizado = camionService.restituirCapacidad(id, pesoKg);
+            return ResponseEntity.ok(actualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/patente/{patente}/restituir-capacidad")
+    public ResponseEntity<Camion> restituirCapacidadPorPatente(@PathVariable String patente, @RequestParam Double pesoKg) {
+        try {
+            Camion actualizado = camionService.restituirCapacidadPorPatente(patente, pesoKg);
+            return ResponseEntity.ok(actualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PatchMapping("/{id}/estado")
     public ResponseEntity<Camion> actualizarEstado(@PathVariable Long id, @RequestParam String estado) {
         try {

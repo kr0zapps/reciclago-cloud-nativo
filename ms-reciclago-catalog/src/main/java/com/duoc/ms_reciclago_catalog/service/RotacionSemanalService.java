@@ -13,18 +13,42 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Servicio de Rotación Semanal de Residuos Domiciliarios.
+ * Servicio de Rotacion Semanal de Residuos Domiciliarios — Herramienta de Planificacion DIMAO.
  *
- * Implementa el calendario municipal de Puerto Varas / DIMAO:
- *   Semana del mes 1 → Vidrio            (código: VIDRIO)
- *   Semana del mes 2 → Cartón y Papel    (código: CARTON_PAPEL)
- *   Semana del mes 3 → Plásticos PET/PEAD(código: PLASTICO_PET)
- *   Semana del mes 4 → Latas y Metales   (código: LATAS_METALES)
+ * <p><strong>PROPOSITO CORRECTO DE ESTE SERVICIO:</strong>
+ * Este servicio calcula el material que el municipio (Coordinador de Rutas) deberia
+ * PRIORIZAR en la agrupacion de rutas cada semana, para maximizar la eficiencia de la flota.
  *
- * Soporta:
- *   - Modo AUTOMATICO (por defecto según semana ISO del año)
- *   - Modo MANUAL (override administrativo de la semana en curso)
- *   - Overrides de día y material por sector/cuadrante
+ * <p><strong>LO QUE NO ES:</strong>
+ * Este servicio NO es un calendario restrictivo para el vecino.
+ * El modelo de negocio de RecicLaGo es 100% bajo demanda (on-demand):
+ * el vecino puede solicitar el retiro de CUALQUIER material en CUALQUIER momento,
+ * independientemente de que semana corresponda en el calendario.
+ *
+ * <p><strong>FLUJO CORRECTO:</strong>
+ * <ol>
+ *   <li>El vecino solicita retiro de cualquier material via POST /api/pickups (on-demand).</li>
+ *   <li>El Coordinador recibe las solicitudes SOLICITADAS en su bandeja.</li>
+ *   <li>Para planificar rutas eficientes, el Coordinador consulta este servicio y ve
+ *       que material es predominante esta semana, para agrupar solicitudes por tipo.</li>
+ *   <li>El frontend muestra este dato al vecino SOLO como badge informativo
+ *       ("Esta semana el camion prioriza: Vidrio"), nunca como restriccion.</li>
+ * </ol>
+ *
+ * <p>Calendario municipal Puerto Varas / DIMAO (orientativo):
+ * <ul>
+ *   <li>Semana del mes 1 &rarr; Vidrio            (codigo: VIDRIO)</li>
+ *   <li>Semana del mes 2 &rarr; Carton y Papel    (codigo: CARTON_PAPEL)</li>
+ *   <li>Semana del mes 3 &rarr; Plasticos PET/PEAD(codigo: PLASTICO_PET)</li>
+ *   <li>Semana del mes 4 &rarr; Latas y Metales   (codigo: LATAS_METALES)</li>
+ * </ul>
+ *
+ * <p>Soporta:
+ * <ul>
+ *   <li>Modo AUTOMATICO (por defecto segun semana ISO del anio)</li>
+ *   <li>Modo MANUAL (override administrativo de la semana en curso)</li>
+ *   <li>Overrides de dia y material por sector/cuadrante</li>
+ * </ul>
  */
 @Service
 @Transactional(readOnly = true)

@@ -192,6 +192,9 @@ public class PickupService {
 
         Pickup actualizado = pickupRepository.save(pickup);
 
+        // Descontar capacidad física del camión en el catálogo (ms-reciclago-catalog)
+        descontarCapacidadCamionEnCatalogo(actualizado.getCamionId(), actualizado.getCamionPatente(), actualizado.getPesoEstimadoKg());
+
         // Publicar eventos (Kafka + RabbitMQ)
         notificarCambioEstadoKafka(actualizado, estadoAnterior, ESTADO_PROGRAMADO);
 
@@ -309,6 +312,11 @@ public class PickupService {
 
         Pickup actualizado = pickupRepository.save(pickup);
 
+        // Si estaba programado o en ruta, restituir los kilos comprometidos al camión
+        if (ESTADO_PROGRAMADO.equalsIgnoreCase(estadoAnterior) || ESTADO_EN_RUTA.equalsIgnoreCase(estadoAnterior)) {
+            restituirCapacidadCamionEnCatalogo(actualizado.getCamionId(), actualizado.getCamionPatente(), actualizado.getPesoEstimadoKg());
+        }
+
         notificarCambioEstadoKafka(actualizado, estadoAnterior, "CANCELADO");
         notificarEmailRabbitMQ(actualizado, "Solicitud Cancelada #" + actualizado.getCodigoRetiro(),
                 "Tu solicitud de retiro ha sido cancelada. Motivo: " + (motivo != null ? motivo : "Sin especificar"));
@@ -344,6 +352,64 @@ public class PickupService {
         } catch (Exception e) {
             log.warn("No se pudo sincronizar estado del camión {} con el catálogo (best-effort): {}",
                     camionPatente, e.getMessage());
+        }
+    }
+
+    /**
+     * Descuenta la capacidad disponible del camión en ms-reciclago-catalog
+     * al momento de programar la recolección.
+     * Operación best-effort: si el catálogo no está disponible, se loguea el
+     * error pero el flujo del pickup continúa sin interrupción.
+     */
+    private void descontarCapacidadCamionEnCatalogo(Long camionId, String camionPatente, Double pesoKg) {
+        if (pesoKg == null || pesoKg <= 0) {
+            return;
+        }
+        try {
+            String uri;
+            if (camionId != null && camionId > 0) {
+                uri = catalogUrl + "/api/catalog/camiones/" + camionId + "/reducir-capacidad?pesoKg=" + pesoKg;
+            } else if (camionPatente != null && !camionPatente.isBlank()) {
+                uri = catalogUrl + "/api/catalog/camiones/patente/" + camionPatente + "/reducir-capacidad?pesoKg=" + pesoKg;
+            } else {
+                return;
+            }
+            restClient.patch()
+                    .uri(uri)
+                    .retrieve()
+                    .toBodilessEntity();
+            log.info("Capacidad del camión (id: {}, patente: {}) reducida en {} kg en ms-reciclago-catalog",
+                    camionId, camionPatente, pesoKg);
+        } catch (Exception e) {
+            log.warn("No se pudo descontar capacidad del camión en el catálogo (best-effort): {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Restituye la capacidad disponible del camión en ms-reciclago-catalog
+     * si se cancela un retiro previamente programado.
+     */
+    private void restituirCapacidadCamionEnCatalogo(Long camionId, String camionPatente, Double pesoKg) {
+        if (pesoKg == null || pesoKg <= 0) {
+            return;
+        }
+        try {
+            String uri;
+            if (camionId != null && camionId > 0) {
+                uri = catalogUrl + "/api/catalog/camiones/" + camionId + "/restituir-capacidad?pesoKg=" + pesoKg;
+            } else if (camionPatente != null && !camionPatente.isBlank()) {
+                uri = catalogUrl + "/api/catalog/camiones/patente/" + camionPatente + "/restituir-capacidad?pesoKg=" + pesoKg;
+            } else {
+                return;
+            }
+            restClient.patch()
+                    .uri(uri)
+                    .retrieve()
+                    .toBodilessEntity();
+            log.info("Capacidad del camión (id: {}, patente: {}) restituida en {} kg en ms-reciclago-catalog",
+                    camionId, camionPatente, pesoKg);
+        } catch (Exception e) {
+            log.warn("No se pudo restituir capacidad del camión en el catálogo (best-effort): {}", e.getMessage());
         }
     }
 

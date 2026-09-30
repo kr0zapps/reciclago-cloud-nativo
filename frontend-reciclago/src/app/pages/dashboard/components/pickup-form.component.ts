@@ -14,16 +14,19 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
     <section id="solicitud-retiro" class="bg-white border border-[#E2E8F0] rounded-xl p-6 sm:p-8 mt-8">
       <div class="pb-6 mb-6 border-b border-[#E2E8F0]">
         <h3 class="font-heading font-extrabold text-2xl sm:text-3xl text-[#123F5B]">
-          {{ isRetiroEspecial ? 'Retiro especial' : 'Solicitar retiro' }}
+          Solicitar retiro
         </h3>
+        <p class="text-sm text-gray-500 mt-1">
+          Indica que material tenes acumulado. El municipio coordinara el retiro segun disponibilidad de flota.
+        </p>
       </div>
 
       <form (ngSubmit)="onSubmit()" class="space-y-6 text-gray-700">
-        <!-- Banners -->
+        <!-- Banners de estado -->
         <div *ngIf="submitStatus === 'success'" class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6 text-sm">
-          <strong>¡Éxito!</strong> Solicitud recibida.
+          <strong>Exito!</strong> Solicitud recibida. El coordinador asignara fecha y camion pronto.
         </div>
-        
+
         <div *ngIf="submitStatus === 'error'" class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 text-sm">
           <strong>Error:</strong> {{ errorMessage || 'Hubo un problema.' }}
         </div>
@@ -32,6 +35,7 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           <strong>Aviso:</strong> {{ generalError }}
         </div>
 
+        <!-- Datos de contacto opcionales -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="space-y-1 text-left">
             <label for="vecinoRutInput" class="block text-sm font-semibold text-[#123F5B]">RUT (Opcional)</label>
@@ -40,13 +44,14 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           </div>
 
           <div class="space-y-1 text-left">
-            <label for="vecinoTelefonoInput" class="block text-sm font-semibold text-[#123F5B]">Teléfono (Opcional)</label>
+            <label for="vecinoTelefonoInput" class="block text-sm font-semibold text-[#123F5B]">Telefono (Opcional)</label>
             <input id="vecinoTelefonoInput" type="text" [value]="vecinoTelefono" (input)="onPhoneInput($event)" placeholder="Ej: +56 9 8765 4321" maxlength="16" class="input-stitch w-full text-sm p-2 border border-[#E2E8F0] rounded-lg">
             <p *ngIf="phoneError" class="text-sm text-red-600 mt-1">{{ phoneError }}</p>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <!-- Sector y direccion -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div class="space-y-1">
             <label class="block text-sm font-semibold text-[#123F5B]">Sector</label>
             <div class="p-2 border border-[#E2E8F0] rounded-lg bg-gray-50 min-h-[42px] flex items-center">
@@ -56,32 +61,49 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
 
           <div class="space-y-1">
             <div class="flex items-center justify-between">
-              <label class="block text-sm font-semibold text-[#123F5B]" for="direccion">Dirección</label>
+              <label class="block text-sm font-semibold text-[#123F5B]" for="direccion">Direccion</label>
               <button (click)="detectarCuadrante()" type="button" class="text-xs text-[#22a652] hover:underline cursor-pointer">
-                {{ isDetectingCuadrante ? 'Detectando...' : 'Detectar' }}
+                {{ isDetectingCuadrante ? 'Detectando...' : 'Detectar cuadrante' }}
               </button>
             </div>
-            <input [(ngModel)]="newPickup.direccion" (blur)="detectarCuadrante()" class="input-stitch w-full text-sm p-2 border border-[#E2E8F0] rounded-lg" id="direccion" name="direccion" placeholder="Calle y número" required type="text" />
+            <input [(ngModel)]="newPickup.direccion" (blur)="detectarCuadrante()" class="input-stitch w-full text-sm p-2 border border-[#E2E8F0] rounded-lg" id="direccion" name="direccion" placeholder="Calle y numero" required type="text" />
             <p *ngIf="detectedCuadrante" class="text-xs text-green-800 mt-1">{{ detectedCuadrante }}</p>
-          </div>
-
-          <div class="space-y-1">
-            <div class="flex items-center justify-between">
-              <label class="block text-sm font-semibold text-[#123F5B]">Material</label>
-              <button type="button" (click)="toggleRetiroEspecial()" class="text-xs text-[#22a652] hover:underline cursor-pointer">
-                {{ isRetiroEspecial ? 'Volver' : 'Especial' }}
-              </button>
-            </div>
-            <div *ngIf="!isRetiroEspecial" class="p-2 border border-[#E2E8F0] rounded-lg bg-gray-50 min-h-[42px] flex items-center">
-              <span class="text-sm text-gray-700">{{ newPickup.residuoNombre || sector?.materialPrincipal || 'Vidrio' }}</span>
-            </div>
-            <select *ngIf="isRetiroEspecial" [(ngModel)]="newPickup.residuoNombre" class="select-stitch w-full text-sm p-2 border border-[#E2E8F0] rounded-lg" id="residuoNombre" name="residuoNombre" required>
-              <option value="">Selecciona material</option>
-              <option *ngFor="let res of residuos" [value]="res.nombre">{{ res.nombre }}</option>
-            </select>
           </div>
         </div>
 
+        <!--
+          MATERIAL: SIEMPRE libre — modelo on-demand puro.
+          El calendario semanal NO preselecciona ni bloquea este campo.
+          Solo se muestra como badge informativo para orientar al vecino.
+        -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <label class="block text-sm font-semibold text-[#123F5B]" for="residuoNombre">Material a retirar</label>
+            <!--
+              Badge informativo: muestra el material que el camion prioriza esta semana,
+              pero NO restringe la eleccion del vecino. El vecino puede elegir CUALQUIER material.
+            -->
+            <span *ngIf="materialSemana"
+                  class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-medium">
+              <svg class="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+              </svg>
+              Esta semana el camion prioriza: <strong class="ml-1">{{ materialSemana }}</strong>
+            </span>
+          </div>
+          <select [(ngModel)]="newPickup.residuoNombre"
+                  (ngModelChange)="onResiduoChange($event)"
+                  class="select-stitch w-full text-sm p-2 border border-[#E2E8F0] rounded-lg"
+                  id="residuoNombre" name="residuoNombre" required>
+            <option value="">Selecciona el material</option>
+            <option *ngFor="let res of residuos" [value]="res.nombre">{{ res.nombre }}</option>
+          </select>
+          <p class="text-xs text-gray-400">
+            Podes solicitar cualquier material en cualquier momento, independiente del calendario semanal.
+          </p>
+        </div>
+
+        <!-- Peso estimado -->
         <div class="space-y-1">
           <label class="block text-sm font-semibold text-[#123F5B]" for="pesoEstimado">Peso Estimado (kg)</label>
           <div class="flex items-center gap-3">
@@ -96,9 +118,10 @@ import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/
           </div>
         </div>
 
+        <!-- Comentarios -->
         <div class="space-y-1">
           <label class="block text-sm font-semibold text-[#123F5B]" for="comentarios">Comentarios</label>
-          <textarea [(ngModel)]="newPickup.comentarios" class="input-stitch w-full text-sm p-2 border border-[#E2E8F0] rounded-lg" id="comentarios" name="comentarios" placeholder="Opcional"></textarea>
+          <textarea [(ngModel)]="newPickup.comentarios" class="input-stitch w-full text-sm p-2 border border-[#E2E8F0] rounded-lg" id="comentarios" name="comentarios" placeholder="Opcional: acceso al domicilio, instrucciones especiales, etc."></textarea>
         </div>
 
         <div class="pt-4 flex justify-end">
@@ -116,17 +139,25 @@ export class PickupFormComponent implements OnChanges {
   @Input() userEmail: string = '';
   @Input() userName: string = '';
 
+  /**
+   * Nombre del material prioritario de la semana segun el calendario DIMAO.
+   * Solo se usa para el badge informativo — NO preselecciona ni bloquea el dropdown.
+   * El vecino siempre elige libremente (modelo on-demand).
+   * Viene del endpoint GET /api/catalog/rotacion/semanal via el componente padre.
+   */
+  @Input() materialSemana: string = '';
+
   @Output() pickupCreated = new EventEmitter<Pickup>();
 
   newPickup = {
     sector: '',
     direccion: '',
     residuoNombre: '',
+    residuoId: 0,
     pesoEstimadoKg: 5.0,
     comentarios: ''
   };
 
-  isRetiroEspecial = false;
   isDetectingCuadrante = false;
   detectedCuadrante = '';
 
@@ -146,7 +177,7 @@ export class PickupFormComponent implements OnChanges {
     const input = event.target as HTMLInputElement;
     this.vecinoRut = formatRut(input.value);
     if (this.vecinoRut.length > 3) {
-      this.rutError = validateRut(this.vecinoRut) ? '' : 'RUT inválido (ej: 12.345.678-K)';
+      this.rutError = validateRut(this.vecinoRut) ? '' : 'RUT invalido (ej: 12.345.678-K)';
     } else {
       this.rutError = '';
     }
@@ -156,7 +187,7 @@ export class PickupFormComponent implements OnChanges {
     const input = event.target as HTMLInputElement;
     this.vecinoTelefono = formatChileanPhone(input.value);
     if (this.vecinoTelefono.length > 6) {
-      this.phoneError = validateChileanPhone(this.vecinoTelefono) ? '' : 'Formato inválido (ej: +56 9 8765 4321)';
+      this.phoneError = validateChileanPhone(this.vecinoTelefono) ? '' : 'Formato invalido (ej: +56 9 8765 4321)';
     } else {
       this.phoneError = '';
     }
@@ -165,25 +196,15 @@ export class PickupFormComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['sector'] && this.sector) {
       this.newPickup.sector = this.sector.nombre || '';
-      this.syncOfficialMaterialForSector();
     }
+    // IMPORTANTE: No se preselecciona el residuo desde el sector ni desde materialSemana.
+    // El vecino siempre elige libremente (modelo on-demand puro).
   }
 
-  syncOfficialMaterialForSector(): void {
-    if (!this.isRetiroEspecial && this.sector?.materialPrincipal) {
-      const mat = this.sector.materialPrincipal.toLowerCase();
-      const matchingRes = this.residuos.find(r => 
-        r.nombre?.toLowerCase().includes(mat) || mat.includes(r.nombre?.toLowerCase())
-      );
-      this.newPickup.residuoNombre = matchingRes ? matchingRes.nombre : this.sector.materialPrincipal;
-    }
-  }
-
-  toggleRetiroEspecial(): void {
-    this.isRetiroEspecial = !this.isRetiroEspecial;
-    if (!this.isRetiroEspecial) {
-      this.syncOfficialMaterialForSector();
-    }
+  /** Sincroniza residuoId cuando el usuario cambia la seleccion de material */
+  onResiduoChange(nombreSeleccionado: string): void {
+    const match = this.residuos.find(r => r.nombre === nombreSeleccionado);
+    this.newPickup.residuoId = match?.id ?? 0;
   }
 
   detectarCuadrante(): void {
@@ -193,7 +214,7 @@ export class PickupFormComponent implements OnChanges {
       next: (res) => {
         this.isDetectingCuadrante = false;
         if (res?.cuadranteId) {
-          this.detectedCuadrante = `Detectado: ${res.nombre} (${res.diaSemana}) • Horario: ${res.horario}`;
+          this.detectedCuadrante = `Detectado: ${res.nombre} (${res.diaSemana}) Horario: ${res.horario}`;
           if (res.sector) {
             this.newPickup.sector = res.sector;
           }
@@ -211,31 +232,33 @@ export class PickupFormComponent implements OnChanges {
 
   onSubmit(): void {
     this.generalError = '';
+
     if (!this.newPickup.direccion || !this.newPickup.direccion.trim()) {
-      this.generalError = 'Por favor ingresa la calle y número de tu domicilio.';
+      this.generalError = 'Por favor ingresa la calle y numero de tu domicilio.';
+      return;
+    }
+
+    if (!this.newPickup.residuoNombre) {
+      this.generalError = 'Por favor selecciona el tipo de material que deseas retirar.';
       return;
     }
 
     if (this.vecinoRut && !validateRut(this.vecinoRut)) {
-      this.rutError = 'El RUT ingresado no es válido (ej: 12.345.678-K).';
+      this.rutError = 'El RUT ingresado no es valido (ej: 12.345.678-K).';
       this.generalError = 'Corrige el RUT ingresado antes de enviar.';
       return;
     }
 
     if (this.vecinoTelefono && !validateChileanPhone(this.vecinoTelefono)) {
-      this.phoneError = 'El teléfono celular debe tener formato +56 9 XXXX XXXX.';
-      this.generalError = 'Corrige el teléfono de contacto antes de enviar.';
+      this.phoneError = 'El telefono celular debe tener formato +56 9 XXXX XXXX.';
+      this.generalError = 'Corrige el telefono de contacto antes de enviar.';
       return;
     }
 
     const pesoNum = Number(this.newPickup.pesoEstimadoKg);
     if (Number.isNaN(pesoNum) || pesoNum <= 0) {
-      this.generalError = 'Por favor ingresa un peso estimado válido mayor a 0 kg.';
+      this.generalError = 'Por favor ingresa un peso estimado valido mayor a 0 kg.';
       return;
-    }
-
-    if (!this.newPickup.residuoNombre) {
-      this.syncOfficialMaterialForSector();
     }
 
     this.isSubmitting = true;
@@ -248,20 +271,18 @@ export class PickupFormComponent implements OnChanges {
       : `${this.newPickup.direccion.trim()}, ${currentSectorName}`;
 
     const matchingRes = this.residuos.find(r => r.nombre === this.newPickup.residuoNombre);
-    const residuoId = matchingRes?.id ?? 1;
-    const residuoNombre = matchingRes?.nombre ?? (this.newPickup.residuoNombre || 'Vidrio');
+    const residuoId = matchingRes?.id ?? this.newPickup.residuoId ?? 1;
+    const residuoNombre = matchingRes?.nombre ?? this.newPickup.residuoNombre;
 
-    const tipoPrefijo = this.isRetiroEspecial ? '[RETIRO ESPECIAL DIMAO]' : '[AVISO RECORRIDO REGULAR]';
     const contactoInfo = [
       this.vecinoRut ? `RUT: ${this.vecinoRut}` : '',
       this.vecinoTelefono ? `Tel: ${this.vecinoTelefono}` : ''
-    ].filter(Boolean).join(' • ');
+    ].filter(Boolean).join(' - ');
 
     const comentarioCompleto = [
-      tipoPrefijo,
       contactoInfo ? `[${contactoInfo}]` : '',
-      this.newPickup.comentarios?.trim() || 'Notificación vecinal para el cuadrante'
-    ].filter(Boolean).join(' ');
+      this.newPickup.comentarios?.trim() || ''
+    ].filter(Boolean).join(' ') || 'Retiro domiciliario on-demand';
 
     const payload = {
       vecinoEmail: this.userEmail || 'vecino@puertovaras.cl',
@@ -282,12 +303,12 @@ export class PickupFormComponent implements OnChanges {
         this.newPickup.direccion = '';
         this.newPickup.comentarios = '';
         this.newPickup.pesoEstimadoKg = 5.0;
+        this.newPickup.residuoNombre = '';
+        this.newPickup.residuoId = 0;
         this.vecinoRut = '';
         this.vecinoTelefono = '';
         this.rutError = '';
         this.phoneError = '';
-        this.isRetiroEspecial = false;
-        this.syncOfficialMaterialForSector();
         this.pickupCreated.emit(res || payload);
         setTimeout(() => this.submitStatus = 'idle', 5000);
       },
@@ -296,9 +317,9 @@ export class PickupFormComponent implements OnChanges {
         this.submitStatus = 'error';
         const rawDetail = err?.error?.error || err?.error?.message || (typeof err?.error === 'string' ? err.error : null);
         if (err.status === 0) {
-          this.errorMessage = 'No fue posible contactar al microservicio de retiros (BFF fuera de línea o sin conexión).';
+          this.errorMessage = 'No fue posible contactar al microservicio de retiros (BFF fuera de linea o sin conexion).';
         } else {
-          this.errorMessage = rawDetail || 'Ocurrió un error al registrar la solicitud. Por favor intenta más tarde.';
+          this.errorMessage = rawDetail || 'Ocurrio un error al registrar la solicitud. Por favor intenta mas tarde.';
         }
         setTimeout(() => {
           if (this.submitStatus === 'error') this.submitStatus = 'idle';

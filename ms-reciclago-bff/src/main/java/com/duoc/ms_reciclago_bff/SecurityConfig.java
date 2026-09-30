@@ -78,6 +78,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/en-ruta").hasAnyRole(ROLE_ADMIN, ROLE_COORDINADOR, ROLE_CHOFER)
                 .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/retirado").hasAnyRole(ROLE_ADMIN, ROLE_COORDINADOR, ROLE_CHOFER)
                 .requestMatchers(HttpMethod.PATCH, "/api/pickups/*/pesado").hasAnyRole(ROLE_ADMIN, ROLE_COORDINADOR, ROLE_CHOFER)
+                .requestMatchers(HttpMethod.PUT, "/api/pickups/*/status").hasAnyRole(ROLE_ADMIN, ROLE_COORDINADOR, ROLE_CHOFER)
                 .requestMatchers(HttpMethod.PATCH, "/api/catalog/camiones/*/estado").hasAnyRole(ROLE_ADMIN, ROLE_COORDINADOR)
                 .requestMatchers("/api/pickups/**").authenticated()
                 .requestMatchers("/api/catalog/**").authenticated()

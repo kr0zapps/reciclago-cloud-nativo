@@ -108,6 +108,35 @@ public class CamionService {
         }).orElseThrow(() -> new RuntimeException(CAMION_NO_ENCONTRADO_CON_ID + id));
     }
 
+    public Camion reducirCapacidadPorPatente(String patente, Double pesoKg) {
+        return camionRepository.findByPatente(patente).map(c -> {
+            double actual = c.getCapacidadDisponibleKg() != null ? c.getCapacidadDisponibleKg() : c.getCapacidadTotalKg();
+            double restar = pesoKg != null ? pesoKg : 0.0;
+            c.setCapacidadDisponibleKg(Math.max(0.0, actual - restar));
+            return camionRepository.save(c);
+        }).orElseThrow(() -> new RuntimeException("Camión no encontrado con patente: " + patente));
+    }
+
+    public Camion restituirCapacidad(Long id, Double pesoKg) {
+        return camionRepository.findById(id).map(c -> {
+            double actual = c.getCapacidadDisponibleKg() != null ? c.getCapacidadDisponibleKg() : 0.0;
+            double sumar = pesoKg != null ? pesoKg : 0.0;
+            double total = c.getCapacidadTotalKg() != null ? c.getCapacidadTotalKg() : 1500.0;
+            c.setCapacidadDisponibleKg(Math.min(total, actual + sumar));
+            return camionRepository.save(c);
+        }).orElseThrow(() -> new RuntimeException(CAMION_NO_ENCONTRADO_CON_ID + id));
+    }
+
+    public Camion restituirCapacidadPorPatente(String patente, Double pesoKg) {
+        return camionRepository.findByPatente(patente).map(c -> {
+            double actual = c.getCapacidadDisponibleKg() != null ? c.getCapacidadDisponibleKg() : 0.0;
+            double sumar = pesoKg != null ? pesoKg : 0.0;
+            double total = c.getCapacidadTotalKg() != null ? c.getCapacidadTotalKg() : 1500.0;
+            c.setCapacidadDisponibleKg(Math.min(total, actual + sumar));
+            return camionRepository.save(c);
+        }).orElseThrow(() -> new RuntimeException("Camión no encontrado con patente: " + patente));
+    }
+
     public void eliminar(Long id) {
         camionRepository.deleteById(id);
     }
