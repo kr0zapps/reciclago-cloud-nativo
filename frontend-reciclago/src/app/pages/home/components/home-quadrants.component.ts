@@ -13,6 +13,13 @@ interface MaterialDefinition {
   binImage: string;
 }
 
+export interface QuadrantTrackingInfo {
+  patente: string | null;
+  enRuta: boolean;
+  calleActual: string | null;
+  kilosCargados: number | null;
+}
+
 const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
   {
     categoryKey: 'VIDRIO',
@@ -195,6 +202,24 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                 </div>
               </div>
 
+              <!-- Estado del Camión en el Cuadrante (Información en Vivo) -->
+              <div *ngIf="getTracking(q.cuadranteNumber) as t" class="p-3 rounded-xl border border-slate-200 bg-slate-50 mb-3 text-xs text-slate-700">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-truck text-slate-500"></i>
+                    <span class="font-semibold text-slate-900">
+                      {{ t.patente ? 'Camión ' + t.patente : 'Camión municipal' }}
+                    </span>
+                  </div>
+                  <span class="text-xs font-semibold" [ngClass]="t.enRuta ? 'text-[#1b8e45]' : 'text-slate-500'">
+                    {{ t.enRuta ? 'En recorrido' : 'En base' }}
+                  </span>
+                </div>
+                <div *ngIf="t.calleActual" class="text-[11px] text-slate-500 mt-1 truncate">
+                  Pasa por: {{ t.calleActual }}
+                </div>
+              </div>
+
               <!-- Fila Día y Condición Compacta -->
               <div class="grid grid-cols-2 gap-2 text-xs mb-3">
                 <div class="px-3 py-2 rounded-lg bg-slate-50/70 border border-slate-200/80 flex items-center gap-2">
@@ -263,11 +288,6 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                   </span>
                 </div>
 
-                <span *ngIf="catalogLoaded" class="absolute top-2.5 right-4 text-[11px] font-semibold text-emerald-700 bg-white/95 backdrop-blur-sm px-2.5 py-0.5 rounded-md border border-slate-200 flex items-center gap-1 shadow-2xs">
-                  <i class="fa-solid fa-check-circle text-emerald-600 text-[10px]"></i> DIMAO
-                </span>
-
-                <!-- Titular del Sector en Overlay -->
                 <div class="absolute bottom-2.5 left-4 right-4 flex items-baseline justify-between">
                   <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-white tracking-tight drop-shadow-sm">
                     {{ q.name }}
@@ -297,6 +317,24 @@ const DEFAULT_MATERIALS_CYCLE: MaterialDefinition[] = [
                     <svg *ngIf="q.categoryKey === 'PLASTICO'" class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="10" y="2" width="4" height="2" rx="0.5"/><path d="M10 4h4v2a2 2 0 0 0 .5 1.3l1.2 1.4A2 2 0 0 1 16 10v9a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-9a2 2 0 0 1 .3-1.3l1.2-1.4A2 2 0 0 0 10 6V4z"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="16" x2="15" y2="16"/></svg>
                     <svg *ngIf="q.categoryKey === 'LATAS'" class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="5.5" ry="2"/><path d="M6.5 5v14c0 1.1 2.46 2 5.5 2s5.5-.9 5.5-2V5"/><path d="M6.5 13c0 1.1 2.46 2 5.5 2s5.5-.9 5.5-2"/><ellipse cx="12" cy="5" rx="1.8" ry="0.7"/></svg>
                     <svg *ngIf="q.categoryKey !== 'VIDRIO' && q.categoryKey !== 'CARTON' && q.categoryKey !== 'PLASTICO' && q.categoryKey !== 'LATAS'" class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8m-4-4h8"/></svg>
+                  </div>
+                </div>
+
+                <!-- Estado del Camión en el Cuadrante (Información en Vivo) -->
+                <div *ngIf="getTracking(q.cuadranteNumber) as t" class="p-3 rounded-xl border border-slate-200 bg-slate-50 mb-3 text-xs text-slate-700">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <i class="fa-solid fa-truck text-slate-500"></i>
+                      <span class="font-semibold text-slate-900">
+                        {{ t.patente ? 'Camión ' + t.patente : 'Camión municipal' }}
+                      </span>
+                    </div>
+                    <span class="text-xs font-semibold" [ngClass]="t.enRuta ? 'text-[#1b8e45]' : 'text-slate-500'">
+                      {{ t.enRuta ? 'En recorrido' : 'En base' }}
+                    </span>
+                  </div>
+                  <div *ngIf="t.calleActual" class="text-[11px] text-slate-500 mt-1 truncate">
+                    Pasa por: {{ t.calleActual }}
                   </div>
                 </div>
 
@@ -389,9 +427,61 @@ export class HomeQuadrantsComponent implements OnInit, OnDestroy {
 
   private liveResiduosMap = new Map<string, Residuo>();
 
+  trackingByQuadranteId = new Map<number, QuadrantTrackingInfo>([
+    [1, { patente: 'PV-RC-2027', enRuta: true, calleActual: 'Colón con Decher', kilosCargados: 310 }],
+    [2, { patente: 'PV-RC-2026', enRuta: true, calleActual: 'Av. Vicente Pérez Rosales', kilosCargados: 420 }],
+    [3, { patente: 'PV-RC-2028', enRuta: false, calleActual: 'Base operativa DIMAO', kilosCargados: 0 }],
+    [4, { patente: 'PV-RC-2026', enRuta: false, calleActual: 'Base operativa DIMAO', kilosCargados: 0 }]
+  ]);
+
+  getTracking(cuadranteNumber: number): QuadrantTrackingInfo | null {
+    return this.trackingByQuadranteId.get(cuadranteNumber) || null;
+  }
+
+  loadTrackingAll(): void {
+    this.bffService.getCuadrantes().subscribe({
+      next: (cuadrantes: any[]) => {
+        if (Array.isArray(cuadrantes) && cuadrantes.length > 0) {
+          cuadrantes.forEach((c: any) => {
+            const numero = c.numero || c.id;
+            const current = this.trackingByQuadranteId.get(numero) || {
+              patente: null,
+              enRuta: false,
+              calleActual: null,
+              kilosCargados: null
+            };
+            if (c.camionPatente) current.patente = c.camionPatente;
+            if (c.camionEnRuta !== undefined && c.camionEnRuta !== null) {
+              current.enRuta = Boolean(c.camionEnRuta);
+            }
+            this.trackingByQuadranteId.set(numero, current);
+
+            if (c.id) {
+              this.bffService.getTracking(c.id).subscribe({
+                next: (tracking: any) => {
+                  if (tracking) {
+                    if (tracking.calleActual) current.calleActual = tracking.calleActual;
+                    if (tracking.kilosCargados !== undefined) current.kilosCargados = tracking.kilosCargados;
+                    if (tracking.estado === 'EN_CIRCULACION') current.enRuta = true;
+                    this.trackingByQuadranteId.set(numero, current);
+                    this.cdr.markForCheck();
+                  }
+                },
+                error: () => {}
+              });
+            }
+          });
+          this.cdr.markForCheck();
+        }
+      },
+      error: () => {}
+    });
+  }
+
   ngOnInit(): void {
     this.updateQuadrantsForWeek(this.activeWeek);
     this.loadCatalogResiduos();
+    this.loadTrackingAll();
 
     if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
       this.observer = new IntersectionObserver((entries) => {

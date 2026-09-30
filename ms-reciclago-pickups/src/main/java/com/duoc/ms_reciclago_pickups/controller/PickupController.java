@@ -83,7 +83,8 @@ public class PickupController {
 
     /**
      * Transición SOLICITADO/PROGRAMADO → PROGRAMADO.
-     * Requiere camionId, camionPatente y fechaProgramada del coordinador (vía params o body JSON).
+     * Requiere camionId y camionPatente del coordinador. fechaProgramada es opcional;
+     * si se omite, el servicio asigna automáticamente el día siguiente.
      */
     @RequestMapping(value = "/{id}/programar", method = {RequestMethod.PATCH, RequestMethod.POST})
     public ResponseEntity<?> programarRetiro(@PathVariable Long id,
@@ -95,11 +96,11 @@ public class PickupController {
         String effPatente = resolverString(camionPatente, body, "camionPatente");
         String effFecha = resolverString(fechaProgramada, body, "fechaProgramada");
 
-        if (effCamionId == null || effPatente == null || effPatente.isBlank() || effFecha == null || effFecha.isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Los campos camionId, camionPatente y fechaProgramada son obligatorios para programar un retiro"));
+        if (effCamionId == null || effPatente == null || effPatente.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Los campos camionId y camionPatente son obligatorios para programar un retiro"));
         }
 
-        LocalDateTime fecha = parseFechaProgramada(effFecha);
+        LocalDateTime fecha = (effFecha != null && !effFecha.isBlank()) ? parseFechaProgramada(effFecha) : null;
         Pickup actualizado = pickupService.programarRetiro(id, effCamionId, effPatente, fecha);
         return ResponseEntity.ok(actualizado);
     }

@@ -379,25 +379,38 @@ public class BffController {
             String effectivePatente = resolveStringParam(camionPatente, body, FIELD_CAMION_PATENTE);
             String rawFecha = resolveStringParam(fechaProgramada, body, FIELD_FECHA_PROGRAMADA);
 
-            if (effectiveCamionId == null || effectivePatente == null || effectivePatente.isBlank() || rawFecha == null || rawFecha.isBlank()) {
-                return ResponseEntity.badRequest().body(Map.of(ERROR_KEY, "Los campos camionId, camionPatente y fechaProgramada son obligatorios para programar un retiro"));
+            if (effectiveCamionId == null || effectivePatente == null || effectivePatente.isBlank()) {
+                return ResponseEntity.badRequest().body(Map.of(ERROR_KEY, "Los campos camionId y camionPatente son obligatorios para programar un retiro"));
             }
 
-            String effectiveFecha = formatFechaProgramada(rawFecha);
+            String effectiveFecha = (rawFecha != null && !rawFecha.isBlank()) ? formatFechaProgramada(rawFecha) : null;
 
-            Map<String, Object> forwardBody = Map.of(
-                    FIELD_CAMION_ID, effectiveCamionId,
-                    FIELD_CAMION_PATENTE, effectivePatente,
-                    FIELD_FECHA_PROGRAMADA, effectiveFecha
-            );
+            Map<String, Object> forwardBody = new java.util.HashMap<>();
+            forwardBody.put(FIELD_CAMION_ID, effectiveCamionId);
+            forwardBody.put(FIELD_CAMION_PATENTE, effectivePatente);
+            if (effectiveFecha != null) {
+                forwardBody.put(FIELD_FECHA_PROGRAMADA, effectiveFecha);
+            }
 
-            Object response = restClient.patch()
-                    .uri(pickupsUrl + "/api/pickups/{id}/programar?camionId={camionId}&camionPatente={camionPatente}&fechaProgramada={fechaProgramada}",
-                            id, effectiveCamionId, effectivePatente, effectiveFecha)
-                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-                    .body(forwardBody)
-                    .retrieve()
-                    .body(Object.class);
+            String targetUri = pickupsUrl + "/api/pickups/{id}/programar?camionId={camionId}&camionPatente={camionPatente}"
+                    + (effectiveFecha != null ? "&fechaProgramada={fechaProgramada}" : "");
+
+            Object response;
+            if (effectiveFecha != null) {
+                response = restClient.patch()
+                        .uri(targetUri, id, effectiveCamionId, effectivePatente, effectiveFecha)
+                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                        .body(forwardBody)
+                        .retrieve()
+                        .body(Object.class);
+            } else {
+                response = restClient.patch()
+                        .uri(targetUri, id, effectiveCamionId, effectivePatente)
+                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                        .body(forwardBody)
+                        .retrieve()
+                        .body(Object.class);
+            }
             return ResponseEntity.ok(response);
         } catch (org.springframework.web.client.HttpStatusCodeException e) {
             log.error("Error HTTP al programar retiro {}: {} - {}", id, e.getStatusCode(), e.getResponseBodyAsString());
@@ -872,7 +885,13 @@ public class BffController {
     }
 
     private String formatFechaProgramada(String rawFecha) {
+        if (rawFecha == null || rawFecha.isBlank()) {
+            return null;
+        }
         String trimmed = rawFecha.trim();
+        if (trimmed.length() == 10) {
+            return trimmed + "T08:00:00";
+        }
         return (trimmed.length() == 16) ? (trimmed + ":00") : trimmed;
     }
 

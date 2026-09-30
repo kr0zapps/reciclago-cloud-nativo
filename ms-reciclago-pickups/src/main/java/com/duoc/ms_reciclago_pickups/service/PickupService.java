@@ -185,9 +185,10 @@ public class PickupService {
         }
 
         String estadoAnterior = pickup.getEstado();
+        LocalDateTime fechaEfectiva = fechaProgramada != null ? fechaProgramada : LocalDateTime.now().plusDays(1);
         pickup.setCamionId(camionId);
         pickup.setCamionPatente(camionPatente);
-        pickup.setFechaProgramada(fechaProgramada);
+        pickup.setFechaProgramada(fechaEfectiva);
         pickup.setEstado(ESTADO_PROGRAMADO);
 
         Pickup actualizado = pickupRepository.save(pickup);
@@ -200,7 +201,7 @@ public class PickupService {
 
         // Integración RabbitMQ (q.cmd.email y q.cmd.route)
         notificarEmailRabbitMQ(actualizado, "Retiro Programado #" + actualizado.getCodigoRetiro(),
-                "Tu retiro ha sido programado para la fecha: " + fechaProgramada);
+                "Tu retiro ha sido programado para la fecha: " + fechaEfectiva);
         notificarRutaRabbitMQ(actualizado);
 
         return actualizado;
