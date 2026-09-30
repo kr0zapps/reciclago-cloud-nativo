@@ -8,7 +8,7 @@ import { RouterModule } from '@angular/router';
   imports: [CommonModule, RouterModule],
   template: `
     <!-- BEGIN: HeroSection Puerto Varas Recicla -->
-    <section class="relative h-[100dvh] lg:h-screen min-h-[650px] flex flex-col justify-between bg-[#041624] text-white overflow-hidden" id="inicio">
+    <section class="relative min-h-[100dvh] lg:min-h-screen flex flex-col justify-between bg-[#041624] text-white overflow-hidden" id="inicio">
       
       <!-- 1. Escenario Fotográfico: Volcán Osorno y Lago Llanquihue al atardecer -->
       <div class="absolute inset-0 -bottom-2 z-0 pointer-events-none overflow-hidden">
@@ -34,7 +34,7 @@ import { RouterModule } from '@angular/router';
       <div class="h-16 sm:h-20 lg:h-24 flex-shrink-0 pointer-events-none"></div>
 
       <!-- 3. Contenido Editorial Principal: Monumental, Centrado e Imponente -->
-      <div class="relative z-10 max-w-5xl mx-auto px-4 py-8 sm:py-12 w-full my-auto text-center flex flex-col items-center justify-center">
+      <div class="relative z-10 max-w-5xl mx-auto px-4 py-6 sm:py-10 w-full my-auto text-center flex flex-col items-center justify-center">
 
         <!-- Titular Monumental en Cursiva -->
         <h1 class="font-script font-bold text-6xl sm:text-7xl md:text-8xl text-white leading-none mt-6 sm:mt-10 drop-shadow-xl">
@@ -66,7 +66,7 @@ import { RouterModule } from '@angular/router';
         </div>
 
         <!-- Fila de materiales aceptados (Limpia y sin tarjeta de fondo) -->
-        <div class="mt-12 sm:mt-16 w-full max-w-2xl mx-auto">
+        <div class="mt-8 sm:mt-12 w-full max-w-2xl mx-auto">
           <p class="text-white font-bold text-sm sm:text-base mb-4 drop-shadow-md uppercase tracking-wider">¿Qué puedes reciclar con nosotros?</p>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
             <div class="flex flex-col items-center gap-2 transition-transform hover:scale-110">
