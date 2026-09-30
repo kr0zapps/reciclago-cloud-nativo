@@ -36,14 +36,14 @@ import { RouterModule } from '@angular/router';
       <!-- 3. Contenido Editorial Principal: Monumental, Centrado e Imponente -->
       <div class="relative z-10 max-w-5xl mx-auto px-4 py-8 sm:py-12 w-full my-auto text-center flex flex-col items-center justify-center">
 
-        <!-- Titular Monumental -->
-        <h1 class="hero-title text-white leading-tight mt-6 sm:mt-10">
+        <!-- Titular Monumental en Cursiva -->
+        <h1 class="font-script text-6xl sm:text-7xl md:text-8xl text-white leading-none mt-6 sm:mt-10 drop-shadow-xl">
           <span class="block">Reciclaje Comunal</span>
           <span class="block">Puerto Varas</span>
         </h1>
 
         <!-- Subtítulo Corto -->
-        <p class="text-sm sm:text-lg md:text-xl text-white/90 font-medium max-w-xl mx-auto mt-4 sm:mt-5 mb-8 sm:mb-10 drop-shadow-sm leading-relaxed">
+        <p class="text-sm sm:text-lg md:text-xl text-white/90 font-medium max-w-xl mx-auto mt-4 sm:mt-5 mb-8 sm:mb-10 drop-shadow-md leading-relaxed">
           Retiro domiciliario a pedido y pesaje digital para proteger nuestro lago.
         </p>
 
@@ -65,25 +65,25 @@ import { RouterModule } from '@angular/router';
           </a>
         </div>
 
-        <!-- Fila de materiales aceptados (Muy visible para adultos mayores) -->
-        <div class="mt-12 sm:mt-16 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-4 sm:p-5 w-full max-w-2xl mx-auto">
-          <p class="text-white font-bold text-sm sm:text-base mb-3 drop-shadow-sm">¿Qué puedes reciclar con nosotros?</p>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <div class="flex flex-col items-center gap-1.5 p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors">
-              <i class="fa-solid fa-wine-bottle text-[#22a652] text-xl sm:text-2xl drop-shadow-md"></i>
-              <span class="text-white text-xs font-semibold">Vidrio</span>
+        <!-- Fila de materiales aceptados (Limpia y sin tarjeta de fondo) -->
+        <div class="mt-12 sm:mt-16 w-full max-w-2xl mx-auto">
+          <p class="text-white font-bold text-sm sm:text-base mb-4 drop-shadow-md uppercase tracking-wider">¿Qué puedes reciclar con nosotros?</p>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+            <div class="flex flex-col items-center gap-2 transition-transform hover:scale-110">
+              <i class="fa-solid fa-wine-bottle text-[#22a652] text-3xl sm:text-4xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"></i>
+              <span class="text-white text-sm font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">Vidrio</span>
             </div>
-            <div class="flex flex-col items-center gap-1.5 p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors">
-              <i class="fa-solid fa-box-open text-[#22a652] text-xl sm:text-2xl drop-shadow-md"></i>
-              <span class="text-white text-xs font-semibold">Cartón / Papel</span>
+            <div class="flex flex-col items-center gap-2 transition-transform hover:scale-110">
+              <i class="fa-solid fa-box-open text-[#22a652] text-3xl sm:text-4xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"></i>
+              <span class="text-white text-sm font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">Cartón / Papel</span>
             </div>
-            <div class="flex flex-col items-center gap-1.5 p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors">
-              <i class="fa-solid fa-bottle-water text-[#22a652] text-xl sm:text-2xl drop-shadow-md"></i>
-              <span class="text-white text-xs font-semibold">Plástico (PET)</span>
+            <div class="flex flex-col items-center gap-2 transition-transform hover:scale-110">
+              <i class="fa-solid fa-bottle-water text-[#22a652] text-3xl sm:text-4xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"></i>
+              <span class="text-white text-sm font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">Plástico (PET)</span>
             </div>
-            <div class="flex flex-col items-center gap-1.5 p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors">
-              <i class="fa-solid fa-boxes-stacked text-[#22a652] text-xl sm:text-2xl drop-shadow-md"></i>
-              <span class="text-white text-xs font-semibold">Latas</span>
+            <div class="flex flex-col items-center gap-2 transition-transform hover:scale-110">
+              <i class="fa-solid fa-boxes-stacked text-[#22a652] text-3xl sm:text-4xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"></i>
+              <span class="text-white text-sm font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">Latas</span>
             </div>
           </div>
         </div>
