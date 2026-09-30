@@ -180,17 +180,14 @@
     <!-- 1. VISTA: ESTADO Y RASTREO (COMPACTA, EN PANTALLA INMEDIATA) -->
     <div *ngIf="activeVecinoTab === 'seguimiento'" class="space-y-3 anim-tab-enter">
       
-      <!-- Mini barra informativa del sector (reemplaza al hero gigante para que el rastreo sea visible de inmediato) -->
-      <div class="px-3.5 py-2 rounded-xl bg-white border border-[#E2E8F0] shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs">
-        <div class="flex items-center gap-2 text-gray-700">
+      <!-- Mini barra informativa del sector -->
+      <div class="px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs">
+        <div class="flex items-center gap-2 text-slate-700">
           <i class="fa-regular fa-calendar-check text-[#22a652] text-sm"></i>
-          <span>Próximo retiro en tu sector: <strong class="text-[#123F5B]">{{ currentSectorInfo?.dia }} {{ currentSectorInfo?.fechaTexto }}</strong></span>
+          <span>Próximo retiro en tu sector: <strong class="text-[#123F5B]">{{ currentSectorInfo?.fechaTexto || currentSectorInfo?.dia }}</strong></span>
         </div>
-        <div class="flex items-center gap-1.5 font-bold text-gray-600">
-          <span>Material de la semana:</span>
-          <span class="px-2 py-0.5 rounded bg-[#ecf7e6] text-[#22a652] font-black border border-emerald-200">
-            {{ currentSectorInfo?.materialPrincipal || 'Vidrio' }}
-          </span>
+        <div class="text-slate-500 font-medium">
+          Todo tipo de residuo reciclable
         </div>
       </div>
 
@@ -213,7 +210,6 @@
         [residuos]="residuos"
         [userEmail]="userEmail"
         [userName]="userName"
-        [materialSemana]="rotacionSemanal?.residuoNombre || ''"
         (pickupCreated)="onPickupCreated($event)">
       </app-pickup-form>
     </div>

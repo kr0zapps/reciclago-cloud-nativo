@@ -145,7 +145,6 @@ export class PickupFormComponent implements OnChanges {
   @Input() residuos: Residuo[] = [];
   @Input() userEmail: string = '';
   @Input() userName: string = '';
-  @Input() materialSemana: string = '';
 
   @Output() pickupCreated = new EventEmitter<Pickup>();
 
