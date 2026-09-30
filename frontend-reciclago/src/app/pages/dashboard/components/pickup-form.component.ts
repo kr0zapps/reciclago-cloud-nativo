@@ -33,8 +33,28 @@ import { Sector, Residuo, Pickup } from '../data/sectors.data';
           {{ generalError }}
         </div>
 
-        <!-- 1. Dirección domiciliaria -->
+        <!-- 1. Sector y Dirección domiciliaria -->
         <div>
+          <!-- Selector de Sector -->
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-slate-700 mb-1.5" for="formSectorSelect">
+              Sector de residencia
+            </label>
+            <div class="relative">
+              <select
+                id="formSectorSelect"
+                [(ngModel)]="newPickup.sector"
+                name="sector"
+                class="w-full appearance-none bg-white border border-slate-300 text-slate-800 text-sm rounded-lg pl-3 pr-8 py-2.5 focus:outline-none focus:border-[#22a652] focus:ring-1 focus:ring-[#22a652] cursor-pointer transition-colors">
+                <option value="" disabled selected>Selecciona tu cuadrante...</option>
+                <option *ngFor="let s of sectores" [value]="s.nombre">{{ s.nombre }}</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+                <i class="fa-solid fa-chevron-down text-xs"></i>
+              </div>
+            </div>
+          </div>
+
           <div class="flex items-center justify-between mb-1.5">
             <label class="block text-xs font-semibold text-slate-700" for="direccion">
               Dirección en Puerto Varas
@@ -53,9 +73,6 @@ import { Sector, Residuo, Pickup } from '../data/sectors.data';
                  type="text" />
           <p *ngIf="detectedCuadrante" class="text-xs text-[#1b8e45] mt-1.5 font-medium">
             {{ detectedCuadrante }}
-          </p>
-          <p *ngIf="!detectedCuadrante && sector?.nombre" class="text-[11px] text-slate-500 mt-1">
-            Sector activo: <strong class="text-slate-700">{{ sector?.nombre }}</strong>
           </p>
         </div>
 
@@ -151,6 +168,7 @@ import { Sector, Residuo, Pickup } from '../data/sectors.data';
 })
 export class PickupFormComponent implements OnChanges {
   @Input() sector!: Sector | null;
+  @Input() sectores: Sector[] = [];
   @Input() residuos: Residuo[] = [];
   @Input() userEmail: string = '';
   @Input() userName: string = '';

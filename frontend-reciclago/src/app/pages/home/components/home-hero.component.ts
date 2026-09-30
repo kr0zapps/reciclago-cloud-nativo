@@ -8,7 +8,7 @@ import { RouterModule } from '@angular/router';
   imports: [CommonModule, RouterModule],
   template: `
     <!-- BEGIN: HeroSection Puerto Varas Recicla -->
-    <section class="relative min-h-[100svh] lg:min-h-screen flex flex-col justify-between bg-[#041624] text-white overflow-hidden" id="inicio">
+    <section class="relative h-[100dvh] lg:h-screen min-h-[650px] flex flex-col justify-between bg-[#041624] text-white overflow-hidden" id="inicio">
       
       <!-- 1. Escenario Fotográfico: Volcán Osorno y Lago Llanquihue al atardecer -->
       <div class="absolute inset-0 -bottom-2 z-0 pointer-events-none overflow-hidden">
@@ -37,7 +37,7 @@ import { RouterModule } from '@angular/router';
       <div class="relative z-10 max-w-5xl mx-auto px-4 py-8 sm:py-12 w-full my-auto text-center flex flex-col items-center justify-center">
 
         <!-- Titular Monumental en Cursiva -->
-        <h1 class="font-script text-6xl sm:text-7xl md:text-8xl text-white leading-none mt-6 sm:mt-10 drop-shadow-xl">
+        <h1 class="font-script font-bold text-6xl sm:text-7xl md:text-8xl text-white leading-none mt-6 sm:mt-10 drop-shadow-xl">
           <span class="block">Reciclaje Comunal</span>
           <span class="block">Puerto Varas</span>
         </h1>
