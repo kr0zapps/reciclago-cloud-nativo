@@ -87,46 +87,61 @@ export interface TimeSlot {
           </div>
         </div>
 
-        <!-- Selector Intuitivo 1: Día de Retiro -->
+        <!-- Selector Intuitivo 1: Día de Retiro (Táctil) -->
         <div class="mb-4">
-          <label for="fechaSelect" class="block text-xs font-semibold text-slate-700 mb-1.5">
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">
             Día de retiro programado
           </label>
-          <div class="relative">
-            <select id="fechaSelect"
-                    [(ngModel)]="selectedFecha"
-                    class="w-full h-11 px-3 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-[#22a652] focus:ring-1 focus:ring-[#22a652] transition-colors appearance-none cursor-pointer pr-10">
-              <option *ngFor="let d of nextDateOptions" [value]="d.value">
-                {{ d.diaSemana }} {{ d.label }} — {{ d.sublabel }}
-              </option>
-            </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 text-xs">
-              <i class="fa-solid fa-chevron-down"></i>
-            </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button *ngFor="let d of nextDateOptions"
+                    (click)="selectedFecha = d.value"
+                    type="button"
+                    class="p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between"
+                    [ngClass]="selectedFecha === d.value
+                      ? 'bg-[#ecf7e6] border-[#22a652] text-slate-900 shadow-2xs ring-1 ring-[#22a652]'
+                      : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold">{{ d.diaSemana }} {{ d.label }}</span>
+                <i *ngIf="selectedFecha === d.value" class="fa-solid fa-circle-check text-[#22a652] text-xs"></i>
+              </div>
+              <span class="text-[10px] text-slate-500 mt-1">{{ d.sublabel }}</span>
+            </button>
           </div>
           <p class="text-[11px] text-slate-500 mt-1">
             Días oficiales para {{ sectorName }}: {{ allowedDayNames.join(', ') }} ({{ officialHoursRange }}).
           </p>
         </div>
 
-        <!-- Selector Intuitivo 2: Camión Asignado -->
+        <!-- Selector Intuitivo 2: Camión Asignado (Táctil) -->
         <div class="mb-4">
-          <label for="camionSelect" class="block text-xs font-semibold text-slate-700 mb-1.5">
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">
             Camión recolector asignado
           </label>
-          <div class="relative">
-            <select id="camionSelect"
-                    [(ngModel)]="actionCamionPatente"
-                    class="w-full h-11 px-3 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-[#22a652] focus:ring-1 focus:ring-[#22a652] transition-colors appearance-none cursor-pointer pr-10">
-              <option *ngFor="let c of camionesDisponibles"
-                      [value]="c.patente"
-                      [disabled]="c.estado === 'MANTENIMIENTO'">
-                {{ c.patente }} — Capacidad: {{ c.capacidadKilos || c.capacidadMaximaKg || 1500 }} kg ({{ c.estado === 'MANTENIMIENTO' ? 'En taller' : (c.estado === 'EN_RUTA' ? 'En ruta' : 'Disponible') }})
-              </option>
-            </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 text-xs">
-              <i class="fa-solid fa-chevron-down"></i>
-            </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <button *ngFor="let c of camionesDisponibles"
+                    (click)="seleccionarCamion(c)"
+                    [disabled]="c.estado === 'MANTENIMIENTO'"
+                    type="button"
+                    class="p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between"
+                    [ngClass]="c.estado === 'MANTENIMIENTO'
+                      ? 'opacity-40 cursor-not-allowed bg-slate-50 border-slate-200'
+                      : (actionCamionPatente === c.patente
+                        ? 'bg-[#ecf7e6] border-[#22a652] text-slate-900 shadow-2xs ring-1 ring-[#22a652]'
+                        : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300')">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-truck text-xs" [ngClass]="actionCamionPatente === c.patente ? 'text-[#22a652]' : 'text-slate-400'"></i>
+                <div>
+                  <span class="text-xs font-mono font-bold block">{{ c.patente }}</span>
+                  <span class="text-[10px] text-slate-500">{{ c.capacidadKilos || c.capacidadMaximaKg || 1500 }} kg</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="text-[10px] font-medium" [ngClass]="c.estado === 'EN_RUTA' ? 'text-amber-700' : 'text-slate-500'">
+                  {{ c.estado === 'MANTENIMIENTO' ? 'En taller' : (c.estado === 'EN_RUTA' ? 'En ruta' : 'Disponible') }}
+                </span>
+                <i *ngIf="actionCamionPatente === c.patente" class="fa-solid fa-circle-check text-[#22a652] text-xs"></i>
+              </div>
+            </button>
           </div>
         </div>
 
@@ -264,6 +279,11 @@ export class ProgramarModalComponent implements OnChanges, OnDestroy {
     if (changes['pickup'] && this.pickup) {
       this.handlePickupChange();
     }
+  }
+
+  seleccionarCamion(c: Camion): void {
+    if (c.estado === 'MANTENIMIENTO') return;
+    this.actionCamionPatente = c.patente;
   }
 
   @HostListener('document:keydown.escape')

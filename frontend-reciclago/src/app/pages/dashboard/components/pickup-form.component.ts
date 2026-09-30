@@ -59,28 +59,31 @@ import { Sector, Residuo, Pickup } from '../data/sectors.data';
           </p>
         </div>
 
-        <!-- 2. Tipo de residuo a reciclar -->
+        <!-- 2. Tipo de residuo a reciclar (Selector Táctil Intuitivo) -->
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1.5" for="residuoNombre">
+          <label class="block text-xs font-semibold text-slate-700 mb-2">
             Tipo de residuo reciclable
           </label>
-          <div class="relative">
-            <select [(ngModel)]="newPickup.residuoNombre"
-                    (ngModelChange)="onResiduoChange($event)"
-                    class="w-full h-11 px-3 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#22a652] focus:ring-1 focus:ring-[#22a652] transition-colors appearance-none cursor-pointer pr-10"
-                    id="residuoNombre"
-                    name="residuoNombre"
-                    required>
-              <option value="">Selecciona el tipo de residuo</option>
-              <option *ngFor="let res of residuos" [value]="res.nombre">
-                {{ res.nombre }}
-              </option>
-            </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 text-xs">
-              <i class="fa-solid fa-chevron-down"></i>
-            </div>
+          <div class="grid grid-cols-2 gap-2 sm:gap-2.5">
+            <button
+              *ngFor="let res of effectiveResiduos"
+              type="button"
+              (click)="selectResiduo(res.nombre)"
+              class="p-2.5 sm:p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-2"
+              [ngClass]="newPickup.residuoNombre === res.nombre
+                ? 'bg-[#ecf7e6] border-[#22a652] text-slate-900 shadow-2xs ring-1 ring-[#22a652]'
+                : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0"
+                     [ngClass]="newPickup.residuoNombre === res.nombre ? 'bg-white text-[#22a652]' : 'bg-slate-100 text-slate-500'">
+                  <i [class]="getResiduoIcon(res.nombre)"></i>
+                </div>
+                <span class="text-xs font-semibold truncate leading-tight">{{ res.nombre }}</span>
+              </div>
+              <i *ngIf="newPickup.residuoNombre === res.nombre" class="fa-solid fa-circle-check text-[#22a652] text-xs flex-shrink-0"></i>
+            </button>
           </div>
-          <p class="text-[11px] text-slate-500 mt-1">
+          <p class="text-[11px] text-slate-500 mt-1.5">
             Puedes solicitar el retiro de cualquier material reciclable en cualquier momento.
           </p>
         </div>
@@ -173,8 +176,36 @@ export class PickupFormComponent implements OnChanges {
     }
   }
 
+  get effectiveResiduos(): Residuo[] {
+    if (this.residuos && this.residuos.length > 0) {
+      return this.residuos;
+    }
+    return [
+      { id: 1, nombre: 'Vidrio', categoria: 'VIDRIO', tipo: 'VIDRIO', descripcion: 'Botellas y frascos', instrucciones: '' },
+      { id: 2, nombre: 'Cartón y Papel', categoria: 'CARTON', tipo: 'CARTON', descripcion: 'Cajas y papel seco', instrucciones: '' },
+      { id: 3, nombre: 'Plásticos (PET 1 / PEAD 2)', categoria: 'PLASTICO', tipo: 'PLASTICO', descripcion: 'Envases y botellas', instrucciones: '' },
+      { id: 4, nombre: 'Latas y Metales', categoria: 'LATAS', tipo: 'LATAS', descripcion: 'Latas de bebidas y conservas', instrucciones: '' }
+    ];
+  }
+
+  getResiduoIcon(name?: string): string {
+    if (!name) return 'fa-solid fa-recycle';
+    const n = name.toUpperCase();
+    if (n.includes('VIDRIO')) return 'fa-solid fa-wine-bottle';
+    if (n.includes('CART')) return 'fa-solid fa-box-open';
+    if (n.includes('PLAST')) return 'fa-solid fa-bottle-water';
+    if (n.includes('LATA') || n.includes('METAL')) return 'fa-solid fa-can-food';
+    if (n.includes('RAEE') || n.includes('ELECTR')) return 'fa-solid fa-plug';
+    return 'fa-solid fa-recycle';
+  }
+
+  selectResiduo(nombre: string): void {
+    this.newPickup.residuoNombre = nombre;
+    this.onResiduoChange(nombre);
+  }
+
   onResiduoChange(nombreSeleccionado: string): void {
-    const match = this.residuos.find(r => r.nombre === nombreSeleccionado);
+    const match = this.effectiveResiduos.find(r => r.nombre === nombreSeleccionado);
     this.newPickup.residuoId = match?.id ?? 0;
   }
 
