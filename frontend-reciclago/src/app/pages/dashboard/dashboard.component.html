@@ -19,7 +19,7 @@
           Hola, {{ userName || 'Vecino/a' }}
         </h1>
         <div class="flex items-center gap-2 text-xs text-gray-500 mt-0.5 flex-wrap">
-          <span>{{ currentSectorInfo?.nombre }} &middot; {{ currentSectorInfo?.dia }}</span>
+          <span>{{ currentSectorInfo?.nombre }}</span>
           <span>&middot;</span>
           <span class="font-bold text-[#123F5B]">{{ pickups.length }} retiros</span>
           <span>&middot;</span>
@@ -98,37 +98,22 @@
 
   <!-- ==================== VISTA CIUDADANA PARA VECINOS ==================== -->
   <ng-container *ngIf="!isStaff">
-    <!-- BANNER DE AVISO MUNICIPAL DIMAO: REPROGRAMACIÓN DE DÍA EN EL SECTOR DEL VECINO -->
-    <div *ngIf="avisoSectorActivo"
-         class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+    <!-- ==================== AVISOS VECINALES (ON-DEMAND) ==================== -->
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
       <div class="flex items-start sm:items-center gap-3.5">
-        <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center text-lg flex-shrink-0">
-          <i class="fa-solid fa-bullhorn"></i>
+        <div class="w-10 h-10 rounded-xl bg-blue-500 text-white flex items-center justify-center text-lg flex-shrink-0">
+          <i class="fa-solid fa-circle-info"></i>
         </div>
         <div>
           <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500 text-white">
-              Aviso DIMAO Puerto Varas
-            </span>
-            <span class="text-xs font-bold text-amber-900">
-              Reprogramación de Retiro en {{ currentSectorInfo?.nombre }}
+            <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-blue-500 text-white">
+              RecicLaGo Informa
             </span>
           </div>
           <p class="text-xs sm:text-sm text-slate-700 mt-1">
-            Atención vecinos: En la <strong class="text-slate-900">Semana {{ rotacionSemanal.slotSemana }}</strong>, el retiro habitual del día
-            <span class="line-through text-slate-400 font-semibold">{{ avisoSectorActivo.diaOriginal }}</span>
-            se realizará excepcionalmente el <strong class="text-[#123F5B] font-extrabold underline decoration-amber-500 decoration-2">{{ avisoSectorActivo.nuevoDia }}</strong>.
-          </p>
-          <p *ngIf="avisoSectorActivo.motivo" class="text-xs text-amber-800 font-medium mt-0.5 flex items-center gap-1.5">
-            <i class="fa-solid fa-circle-info text-amber-600 text-[11px]"></i>
-            <span>Motivo: {{ avisoSectorActivo.motivo }}</span>
+            Recuerda que el retiro es <strong class="text-slate-900">a pedido</strong>. Solicita tu retiro y un coordinador asignará un camión para pasar por tu domicilio.
           </p>
         </div>
-      </div>
-      <div class="flex items-center gap-2 self-end sm:self-center flex-shrink-0">
-        <span class="px-3 py-1.5 rounded-xl bg-white border border-amber-300 text-xs font-extrabold text-[#123F5B]">
-          Nuevo día: {{ avisoSectorActivo.nuevoDia }}
-        </span>
       </div>
     </div>
 
@@ -179,11 +164,11 @@
       <!-- Mini barra informativa del sector -->
       <div class="px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs">
         <div class="flex items-center gap-2 text-slate-700">
-          <i class="fa-regular fa-calendar-check text-[#22a652] text-sm"></i>
-          <span>Próximo retiro en tu sector: <strong class="text-[#123F5B]">{{ currentSectorInfo?.fechaTexto || currentSectorInfo?.dia }}</strong></span>
+          <i class="fa-solid fa-map-location-dot text-[#22a652] text-sm"></i>
+          <span>Sector actual: <strong class="text-[#123F5B]">{{ currentSectorInfo?.nombre }}</strong></span>
         </div>
         <div class="text-slate-500 font-medium">
-          Todo tipo de residuo reciclable
+          Todo tipo de residuo reciclable a pedido
         </div>
       </div>
 
