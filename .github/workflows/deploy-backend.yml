@@ -152,11 +152,14 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_BACKEND_SECRET_ACCESS_KEY || secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_BACKEND_SESSION_TOKEN || secrets.AWS_SESSION_TOKEN }}
           AWS_REGION: ${{ secrets.AWS_REGION || 'us-east-1' }}
+          RABBITMQ_USER: ${{ secrets.RABBITMQ_USER || 'guest' }}
+          RABBITMQ_PASS: ${{ secrets.RABBITMQ_PASS || 'guest' }}
+          RABBITMQ_ERLANG_COOKIE: ${{ secrets.RABBITMQ_ERLANG_COOKIE || 'reciclago_cookie_secreta' }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER || 'ubuntu' }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: REGISTRY,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_SESSION_TOKEN,AWS_REGION
+          envs: REGISTRY,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_SESSION_TOKEN,AWS_REGION,RABBITMQ_USER,RABBITMQ_PASS,RABBITMQ_ERLANG_COOKIE
           script: |
             set -e
             echo "Conectado exitosamente a la instancia EC2..."
@@ -223,8 +226,9 @@ jobs:
             POSTGRES_DB=reciclago_db
             POSTGRES_USER=reciclago
             POSTGRES_PASSWORD=reciclagopass
-            RABBITMQ_USER=guest
-            RABBITMQ_PASS=guest
+            RABBITMQ_USER=$RABBITMQ_USER
+            RABBITMQ_PASS=$RABBITMQ_PASS
+            RABBITMQ_ERLANG_COOKIE=$RABBITMQ_ERLANG_COOKIE
             ECR_REGISTRY=$REGISTRY
             IMAGE_TAG=latest
             EOF
