@@ -17,7 +17,7 @@ public class CertificateGenerationConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(CertificateGenerationConsumer.class);
 
-    @RabbitListener(queues = RabbitMQConfig.QUEUE_CERTIFICATE)
+    @RabbitListener(id = "certificate-listener", queues = RabbitMQConfig.QUEUE_CERTIFICATE)
     public void generateCertificate(CertificateEventDto certDto, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
         try {
             if (certDto == null || certDto.getCodigoRetiro() == null) {

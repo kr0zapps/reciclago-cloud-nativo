@@ -17,7 +17,7 @@ public class RouteDispatchConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(RouteDispatchConsumer.class);
 
-    @RabbitListener(queues = RabbitMQConfig.QUEUE_ROUTE)
+    @RabbitListener(id = "route-listener", queues = RabbitMQConfig.QUEUE_ROUTE)
     public void receiveRouteCommand(RouteEventDto routeDto, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
         try {
             if (routeDto == null || routeDto.getCodigoRetiro() == null) {

@@ -27,7 +27,7 @@ public class EmailNotificationConsumer {
     @Value("${spring.mail.username:}")
     private String mailFrom;
 
-    @RabbitListener(queues = RabbitMQConfig.QUEUE_EMAIL)
+    @RabbitListener(id = "email-listener", queues = RabbitMQConfig.QUEUE_EMAIL)
     public void receiveEmailCommand(EmailEventDto emailDto, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
         try {
             // Validación: si el correo es nulo o inválido, forzar error para mandar a DLQ

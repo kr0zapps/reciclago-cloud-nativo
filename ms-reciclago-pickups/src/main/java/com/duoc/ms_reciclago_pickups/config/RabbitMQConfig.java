@@ -99,4 +99,20 @@ public class RabbitMQConfig {
     public MessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
     }
+
+    // Constante para el TopicExchange
+    public static final String TOPIC_EXCHANGE_NAME = "reciclago.topic.exchange";
+
+    // Bean del Topic Exchange exigido por la pauta EP4
+    @Bean
+    public org.springframework.amqp.core.TopicExchange reciclagoTopicExchange() {
+        return new org.springframework.amqp.core.TopicExchange(TOPIC_EXCHANGE_NAME, true, false);
+    }
+
+    // Bean de RabbitAdmin para gestionar colas dinámicamente desde la API
+    @Bean
+    public org.springframework.amqp.rabbit.core.RabbitAdmin rabbitAdmin(org.springframework.amqp.rabbit.connection.ConnectionFactory connectionFactory) {
+        return new org.springframework.amqp.rabbit.core.RabbitAdmin(connectionFactory);
+    }
 }
+
