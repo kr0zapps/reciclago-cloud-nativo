@@ -94,33 +94,6 @@ public class RabbitMQConfig {
         return QueueBuilder.durable(QUEUE_CERTIFICATE).withArguments(args).build();
     }
 
-    // 5. Configuración de Topic Exchange (Requerimiento EP4)
-    public static final String TOPIC_EXCHANGE = "reciclago.topic.exchange";
-    public static final String QUEUE_TOPIC_NOTIFICACIONES = "q.topic.notificaciones";
-    public static final String ROUTING_KEY_TOPIC = "reciclago.notificaciones.*";
-
-    @Bean
-    public org.springframework.amqp.core.TopicExchange topicExchange() {
-        return new org.springframework.amqp.core.TopicExchange(TOPIC_EXCHANGE);
-    }
-
-    @Bean
-    public Queue topicNotificacionesQueue() {
-        return QueueBuilder.durable(QUEUE_TOPIC_NOTIFICACIONES).build();
-    }
-
-    @Bean
-    public Binding topicBinding() {
-        return BindingBuilder.bind(topicNotificacionesQueue()).to(topicExchange()).with(ROUTING_KEY_TOPIC);
-    }
-
-    // 6. RabbitAdmin para microservicio administrador (Requerimiento EP3)
-    @Bean
-    public org.springframework.amqp.rabbit.core.RabbitAdmin rabbitAdmin(
-            org.springframework.amqp.rabbit.connection.ConnectionFactory connectionFactory) {
-        return new org.springframework.amqp.rabbit.core.RabbitAdmin(connectionFactory);
-    }
-
     // Converter para enviar objetos como JSON en RabbitMQ
     @Bean
     public MessageConverter jsonMessageConverter() {
@@ -138,8 +111,8 @@ public class RabbitMQConfig {
 
     // Bean de RabbitAdmin para gestionar colas dinámicamente desde la API
     @Bean
-    public org.springframework.amqp.rabbit.core.RabbitAdmin rabbitAdmin(
-            org.springframework.amqp.rabbit.connection.ConnectionFactory connectionFactory) {
+    public org.springframework.amqp.rabbit.core.RabbitAdmin rabbitAdmin(org.springframework.amqp.rabbit.connection.ConnectionFactory connectionFactory) {
         return new org.springframework.amqp.rabbit.core.RabbitAdmin(connectionFactory);
     }
 }
+
