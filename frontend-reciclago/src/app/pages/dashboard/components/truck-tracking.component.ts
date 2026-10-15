@@ -1,251 +1,148 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Sector, Pickup } from '../data/sectors.data';
 
 @Component({
   selector: 'app-truck-tracking',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
-    <section class="bg-white rounded-3xl sm:rounded-[2.2rem] border border-[#E2E9E4] p-6 sm:p-10 shadow-xs relative card-hover anim-fade-up anim-delay-3">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-8 border-b border-[#EAEFE8] gap-4">
-        <div>
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#4F8A3D]">
-              Telemetría Operativa en Vivo
+    <div class="bg-white border border-[#E2E8F0] rounded-2xl p-4 sm:p-6 shadow-2xs">
+      
+      <!-- ==================== CASO 1: TIENE SOLICITUDES ACTIVAS ==================== -->
+      <div *ngIf="activePickup">
+        
+        <!-- Barra de Encabezado: Título y Selector de Pedido -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 mb-4 border-b border-[#E2E8F0]">
+          <div>
+            <span class="text-[11px] font-black uppercase tracking-wider text-[#22a652] block">
+              Rastreo en Vivo DIMAO
             </span>
-            <span *ngIf="activePickup" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-              Retiro #{{ activePickup.id }} • {{ activePickup.direccion }}
+            <h3 class="font-heading font-extrabold text-lg sm:text-xl text-[#123F5B]">
+              Estado de tu Retiro
+            </h3>
+          </div>
+
+          <!-- Selector de Solicitud (Si tiene más de una, o para cambiarla fácilmente) -->
+          <div *ngIf="userPickups.length > 1" class="flex items-center gap-2 flex-wrap">
+            <span class="text-xs font-bold text-gray-500">Cambiar pedido:</span>
+            <select
+              [ngModel]="activePickup.id"
+              (ngModelChange)="onSelectPickupId($event)"
+              class="bg-[#F8FAF7] border border-[#E2E8F0] rounded-xl px-2.5 py-1.5 text-xs font-bold text-[#123F5B] focus:outline-none focus:border-[#22a652]">
+              <option *ngFor="let p of userPickups" [value]="p.id">
+                #{{ p.id }} · {{ p.residuoNombre || 'Reciclaje' }} ({{ p.estado }})
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Tarjeta Informativa del Pedido que se está Rastreando -->
+        <div class="p-3 sm:p-4 rounded-xl bg-[#F8FAF7] border border-[#E2E8F0] mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-white border border-[#E2E8F0] text-[#22a652] flex items-center justify-center text-base shadow-2xs flex-shrink-0">
+              <i class="fa-solid fa-recycle"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-mono text-xs font-black px-2 py-0.5 rounded bg-white border border-[#E2E8F0] text-[#123F5B]">
+                  #{{ activePickup.id }}
+                </span>
+                <span class="font-heading font-black text-xs sm:text-sm text-[#123F5B]">
+                  {{ activePickup.direccion }}
+                </span>
+              </div>
+              <p class="text-xs text-gray-500 mt-0.5">
+                Material: <strong class="text-[#123F5B]">{{ activePickup.residuoNombre || 'Reciclaje Domiciliario' }}</strong>
+                <span class="text-gray-300 mx-1.5">•</span>
+                Fecha: <strong class="text-[#123F5B]">{{ activePickup.fechaTexto || activePickup.fecha || sector?.dia }}</strong>
+              </p>
+            </div>
+          </div>
+
+          <!-- Chip de Estado Oficial -->
+          <div class="flex items-center gap-2 self-start sm:self-auto flex-shrink-0">
+            <span class="px-3 py-1 rounded-full text-xs font-black tracking-wide" [ngClass]="getStatusBadgeClass(activePickup.estado)">
+              {{ activePickup.estado }}
             </span>
           </div>
-          <h3 class="font-heading font-extrabold text-2xl sm:text-3xl text-brand-navy">
-            Seguimiento del camión recolector
-          </h3>
-          <p class="text-base text-brand-muted mt-1">
-            Monitoreo cívico en tiempo real para {{ sector?.cuadrante || 'Puerto Varas' }}
-          </p>
         </div>
 
-        <!-- Badge dinámico de recorrido vinculado a la operación real -->
-        <div class="self-start sm:self-auto flex items-center gap-2">
-          <span *ngIf="effectiveEstado === 'EN_RUTA'" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#E8F3F7] text-[#123F5B] border border-[#CFE4ED] shadow-2xs animate-pulse">
-            <i class="fa-solid fa-truck-moving text-brand-lake text-sm"></i>
-            <span>Camión en ruta a tu frontis</span>
-          </span>
+        <!-- ==================== BARRA DE PROGRESO ACCESIBLE Y GRANDE ==================== -->
+        <div class="py-2 sm:py-4 px-1 sm:px-4">
+          <div class="relative flex items-center justify-between">
+            <!-- Línea de Fondo -->
+            <div class="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-2 bg-gray-200 rounded-full z-0"></div>
+            <!-- Línea de Progreso Activa -->
+            <div class="absolute left-6 top-1/2 -translate-y-1/2 h-2 bg-[#22a652] rounded-full z-0 transition-all duration-700" 
+                 [style.width]="getProgressBarWidth()"></div>
 
-          <span *ngIf="effectiveEstado === 'RETIRADO'" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200 shadow-2xs">
-            <i class="fa-solid fa-box-open text-amber-600 text-sm"></i>
-            <span>Retirado • En báscula digital</span>
-          </span>
+            <!-- Pasos -->
+            <div *ngFor="let step of steps; let i = index" class="relative z-10 flex flex-col items-center group cursor-default">
+              <!-- Círculo Grande con Ícono -->
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center text-xs sm:text-sm font-black transition-all duration-300 shadow-2xs"
+                   [ngClass]="getStepClass(i)">
+                <i [class]="step.icon"></i>
+              </div>
 
-          <span *ngIf="effectiveEstado === 'PESADO'" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#EBF5E7] text-emerald-900 border border-[#CDE8C7] shadow-2xs">
-            <i class="fa-solid fa-circle-check text-[#4F8A3D] text-sm"></i>
-            <span>Pesaje oficial listo ({{ activePickup?.kilosRecolectados || activePickup?.pesoRealKg || 0 }} kg)</span>
-          </span>
-
-          <span *ngIf="effectiveEstado === 'PROGRAMADO'" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-sky-50 text-sky-800 border border-sky-200 shadow-2xs">
-            <i class="fa-regular fa-calendar-check text-sky-600 text-sm"></i>
-            <span>Programado: {{ activePickup?.fechaTexto || sector?.dia }}</span>
-          </span>
-
-          <span *ngIf="effectiveEstado === 'SOLICITADO'" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 shadow-2xs">
-            <i class="fa-regular fa-clock text-amber-600 text-sm"></i>
-            <span>Solicitud en revisión</span>
-          </span>
-
-          <span *ngIf="effectiveEstado === 'SIN_SOLICITUD'" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#F8FAF7] text-slate-600 border border-[#DFE8E1] shadow-2xs">
-            <i class="fa-regular fa-clock text-slate-400 text-sm"></i>
-            <span>Próximo recorrido: {{ sector?.dia }}</span>
-          </span>
-        </div>
-      </div>
-
-      <!-- LÍNEA DE TIEMPO VISUAL AMPLIA (3 PASOS REACTIVOS A LA OPERACIÓN REAL DEL CHOFER) -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 relative">
-
-        <!-- ==================== PASO 1 ==================== -->
-        <!-- Paso 1: Completado si está programado, en ruta, retirado o pesado -->
-        <div *ngIf="effectiveEstado === 'PROGRAMADO' || effectiveEstado === 'EN_RUTA' || effectiveEstado === 'RETIRADO' || effectiveEstado === 'PESADO'"
-             class="p-5 sm:p-6 rounded-2xl bg-[#F4F9F2] border-2 border-[#CDE5C8] flex items-start gap-4 transition-transform hover:-translate-y-0.5 duration-200">
-          <div class="w-12 h-12 rounded-2xl bg-[#4F8A3D] text-white flex items-center justify-center text-xl flex-shrink-0 shadow-xs interactive-icon">
-            <i class="fa-solid fa-check"></i>
-          </div>
-          <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-[#4F8A3D]">Paso 1 • Completado</span>
-            <h4 class="font-heading font-bold text-lg text-brand-navy mt-0.5">Retiro programado</h4>
-            <p class="text-sm text-brand-muted mt-1 leading-relaxed">
-              Camión <strong class="text-slate-800">{{ activePickup?.camionPatente || sector?.patente || 'PV-RC-2026' }}</strong> asignado para el <strong class="text-[#123F5B]">{{ activePickup?.fechaTexto || sector?.dia }}</strong>.
-            </p>
-          </div>
-        </div>
-
-        <!-- Paso 1: En Revisión (cuando está SOLICITADO) -->
-        <div *ngIf="effectiveEstado === 'SOLICITADO'"
-             class="p-5 sm:p-6 rounded-2xl bg-amber-50/60 border-2 border-amber-300 flex items-start gap-4 transition-transform hover:-translate-y-0.5 duration-200">
-          <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-xl flex-shrink-0 shadow-xs interactive-icon animate-pulse">
-            <i class="fa-regular fa-clock"></i>
-          </div>
-          <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-amber-700">Paso 1 • En revisión</span>
-            <h4 class="font-heading font-bold text-lg text-brand-navy mt-0.5">Solicitud ingresada</h4>
-            <p class="text-sm text-brand-muted mt-1 leading-relaxed">
-              El Coordinador de Despacho está revisando la capacidad de tolva para asignar fecha oficial.
-            </p>
-          </div>
-        </div>
-
-        <!-- Paso 1: Agendado para sector (cuando no hay solicitud individual) -->
-        <div *ngIf="effectiveEstado === 'SIN_SOLICITUD'"
-             class="p-5 sm:p-6 rounded-2xl bg-[#F0F6F9] border-2 border-[#CFE4ED] flex items-start gap-4 transition-transform hover:-translate-y-0.5 duration-200">
-          <div class="w-12 h-12 rounded-2xl bg-brand-lake text-white flex items-center justify-center text-xl flex-shrink-0 shadow-xs interactive-icon">
-            <i class="fa-regular fa-calendar-check"></i>
-          </div>
-          <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-brand-lake">Paso 1 • Agendado</span>
-            <h4 class="font-heading font-bold text-lg text-brand-navy mt-0.5">Retiro regular comunal</h4>
-            <p class="text-sm text-brand-muted mt-1 leading-relaxed">
-              Cuadrante asignado para este <strong class="text-brand-navy">{{ sector?.dia }}</strong> ({{ sector?.horario }}).
-            </p>
-          </div>
-        </div>
-
-        <!-- ==================== PASO 2 ==================== -->
-        <!-- Paso 2: EN CURSO (cuando el chofer pulsó Iniciar Ruta) -->
-        <div *ngIf="effectiveEstado === 'EN_RUTA'"
-             class="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-[#EBF4F8] via-[#E2F0F5] to-[#D5E8F0] border-2 border-brand-lake shadow-md flex items-start gap-4 relative overflow-hidden ring-2 ring-sky-300">
-          <div class="w-12 h-12 rounded-2xl bg-brand-lake text-white flex items-center justify-center text-xl flex-shrink-0 shadow-sm relative z-10">
-            <i class="fa-solid fa-truck-moving anim-truck-gentle"></i>
-          </div>
-          <div class="flex-grow relative z-10 min-w-0">
-            <div class="flex items-center justify-between gap-2">
-              <span class="text-xs font-extrabold uppercase tracking-wider text-brand-lake">Paso 2 • En curso</span>
-              <span class="px-2.5 py-0.5 rounded-md bg-[#123F5B] text-white text-[11px] font-bold uppercase tracking-wider">
-                En ruta
+              <!-- Etiqueta del Paso -->
+              <span class="text-[11px] sm:text-xs font-bold mt-2 text-center transition-colors"
+                    [ngClass]="getTextClass(i)">
+                {{ step.label }}
+              </span>
+              <span class="text-[10px] text-gray-400 font-medium hidden sm:block text-center mt-0.5">
+                {{ step.sublabel }}
               </span>
             </div>
-            <h4 class="font-heading font-extrabold text-lg sm:text-xl text-brand-navy mt-0.5 truncate">
-              Camión en ruta al domicilio
-            </h4>
-            <div class="w-full h-1.5 bg-brand-lake/20 rounded-full mt-2 mb-2 overflow-hidden">
-              <div class="anim-route-flow h-full w-1/3 bg-brand-lake rounded-full"></div>
+          </div>
+        </div>
+
+        <!-- ==================== MENSAJE EXPLICATIVO PARA ABUELOS / CIUDADANOS ==================== -->
+        <div class="mt-4 sm:mt-5 p-3.5 sm:p-4 rounded-xl border transition-all"
+             [ngClass]="getFeedbackBoxClass()">
+          <div class="flex items-start gap-3">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0"
+                 [ngClass]="getFeedbackIconBoxClass()">
+              <i [class]="getFeedbackIcon()"></i>
             </div>
-            <p class="text-xs sm:text-sm text-brand-charcoal font-medium leading-tight">
-              Cuadrilla en trayecto hacia <strong class="text-[#123F5B]">{{ activePickup?.direccion || sector?.cuadrante }}</strong>.<br/>
-              <span class="text-emerald-700 font-bold text-xs">Camión {{ activePickup?.camionPatente || 'PV-RC-2026' }} con telemetría activa.</span>
-            </p>
-          </div>
-        </div>
-
-        <!-- Paso 2: COMPLETADO (cuando ya fue retirado o pesado) -->
-        <div *ngIf="effectiveEstado === 'RETIRADO' || effectiveEstado === 'PESADO'"
-             class="p-5 sm:p-6 rounded-2xl bg-[#F4F9F2] border-2 border-[#CDE5C8] flex items-start gap-4 transition-transform hover:-translate-y-0.5 duration-200">
-          <div class="w-12 h-12 rounded-2xl bg-[#4F8A3D] text-white flex items-center justify-center text-xl flex-shrink-0 shadow-xs interactive-icon">
-            <i class="fa-solid fa-box-open"></i>
-          </div>
-          <div class="min-w-0 flex-1">
-            <span class="text-xs font-bold uppercase tracking-wider text-[#4F8A3D]">Paso 2 • Completado</span>
-            <h4 class="font-heading font-bold text-lg text-brand-navy mt-0.5">Retiro en puerta realizado</h4>
-            <p class="text-sm text-brand-muted mt-1 leading-relaxed">
-              La cuadrilla municipal recogió los residuos en <strong class="text-slate-800">{{ activePickup?.direccion || 'tu frontis' }}</strong>.
-            </p>
-          </div>
-        </div>
-
-        <!-- Paso 2: EN ESPERA (cuando está SOLICITADO, PROGRAMADO o SIN_SOLICITUD) -->
-        <div *ngIf="effectiveEstado === 'SOLICITADO' || effectiveEstado === 'PROGRAMADO' || effectiveEstado === 'SIN_SOLICITUD'"
-             class="p-5 sm:p-6 rounded-2xl bg-[#F8FAF7] border border-[#E2E9E4] flex items-start gap-4 transition-transform hover:-translate-y-0.5 duration-200">
-          <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-500 border border-slate-200 flex items-center justify-center text-xl flex-shrink-0 interactive-icon">
-            <i class="fa-solid fa-warehouse"></i>
-          </div>
-          <div class="flex-grow min-w-0">
-            <div class="flex items-center justify-between gap-2">
-              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Paso 2 • En espera</span>
-              <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wider border border-slate-200">
-                En base DIMAO
-              </span>
+            <div>
+              <h4 class="font-heading font-black text-xs sm:text-sm" [ngClass]="getFeedbackTitleClass()">
+                {{ getFeedbackTitle() }}
+              </h4>
+              <p class="text-xs mt-0.5 leading-relaxed" [ngClass]="getFeedbackTextClass()">
+                {{ getFeedbackMessage() }}
+              </p>
             </div>
-            <h4 class="font-heading font-bold text-lg text-slate-700 mt-0.5">Camión preparado</h4>
-            <p class="text-sm text-brand-muted mt-1 leading-relaxed">
-              Unidad <strong class="text-slate-800">{{ activePickup?.camionPatente || sector?.patente || 'PV-RC-2026' }}</strong> saldrá a ruta en su horario programado.
-            </p>
-          </div>
-        </div>
-
-        <!-- ==================== PASO 3 ==================== -->
-        <!-- Paso 3: COMPLETADO (cuando el chofer registró el pesaje en báscula) -->
-        <div *ngIf="effectiveEstado === 'PESADO'"
-             class="p-5 sm:p-6 rounded-2xl bg-[#F4F9F2] border-2 border-[#4F8A3D] flex items-start gap-4 transition-transform hover:-translate-y-0.5 duration-200 ring-2 ring-emerald-300">
-          <div class="w-12 h-12 rounded-2xl bg-[#4F8A3D] text-white flex items-center justify-center text-xl flex-shrink-0 shadow-xs interactive-icon">
-            <i class="fa-solid fa-certificate"></i>
-          </div>
-          <div class="min-w-0 flex-1">
-            <span class="text-xs font-bold uppercase tracking-wider text-[#4F8A3D]">Paso 3 • Certificado</span>
-            <h4 class="font-heading font-extrabold text-lg text-brand-navy mt-0.5">Pesaje Oficial Concluido</h4>
-            <p class="text-sm text-slate-700 mt-1 leading-relaxed">
-              <strong class="text-emerald-900 font-extrabold text-base">{{ activePickup?.kilosRecolectados || activePickup?.pesoRealKg || 0 }} kg</strong> certificados en báscula de cabina. Trasladando a planta de valorización.
-            </p>
-          </div>
-        </div>
-
-        <!-- Paso 3: EN CURSO (cuando está RETIRADO pero falta pesar) -->
-        <div *ngIf="effectiveEstado === 'RETIRADO'"
-             class="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100/60 border-2 border-amber-400 flex items-start gap-4 transition-transform hover:-translate-y-0.5 duration-200 ring-2 ring-amber-300 animate-pulse">
-          <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-xl flex-shrink-0 shadow-xs interactive-icon">
-            <i class="fa-solid fa-scale-balanced"></i>
-          </div>
-          <div class="min-w-0 flex-1">
-            <span class="text-xs font-bold uppercase tracking-wider text-amber-800">Paso 3 • En curso</span>
-            <h4 class="font-heading font-extrabold text-lg text-amber-950 mt-0.5">Pesando en Báscula Digital</h4>
-            <p class="text-sm text-amber-900 mt-1 leading-relaxed">
-              El chofer está registrando los kilos oficiales en la balanza del camión en este momento.
-            </p>
-          </div>
-        </div>
-
-        <!-- Paso 3: PRÓXIMO PASO (cuando está EN_RUTA) -->
-        <div *ngIf="effectiveEstado === 'EN_RUTA'"
-             class="p-5 sm:p-6 rounded-2xl bg-sky-50/50 border border-sky-200 flex items-start gap-4 transition-transform hover:-translate-y-0.5 duration-200">
-          <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center text-xl flex-shrink-0 interactive-icon">
-            <i class="fa-solid fa-scale-balanced"></i>
-          </div>
-          <div class="min-w-0 flex-1">
-            <span class="text-xs font-bold uppercase tracking-wider text-sky-700">Paso 3 • Próximo</span>
-            <h4 class="font-heading font-bold text-lg text-slate-800 mt-0.5">Recepción y Pesaje</h4>
-            <p class="text-sm text-slate-600 mt-1 leading-relaxed">
-              Ten tus materiales listos en el frontis. Serán pesados en la balanza digital al momento del retiro.
-            </p>
-          </div>
-        </div>
-
-        <!-- Paso 3: PENDIENTE (cuando está SOLICITADO, PROGRAMADO o SIN_SOLICITUD) -->
-        <div *ngIf="effectiveEstado === 'SOLICITADO' || effectiveEstado === 'PROGRAMADO' || effectiveEstado === 'SIN_SOLICITUD'"
-             class="p-5 sm:p-6 rounded-2xl bg-[#F8FAF7] border border-[#E2E9E4] opacity-80 flex items-start gap-4 transition-transform hover:-translate-y-0.5 duration-200">
-          <div class="w-12 h-12 rounded-2xl bg-slate-200 text-slate-500 flex items-center justify-center text-xl flex-shrink-0 interactive-icon">
-            <i class="fa-solid fa-recycle"></i>
-          </div>
-          <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Paso 3 • Pendiente</span>
-            <h4 class="font-heading font-bold text-lg text-slate-700 mt-0.5">Retiro y pesaje</h4>
-            <p class="text-sm text-brand-muted mt-1 leading-relaxed">
-              Pesaje certificado en báscula del camión y emisión automática de trazabilidad a la DIMAO.
-            </p>
           </div>
         </div>
 
       </div>
 
-      <!-- NOTA INFORMATIVA CON IDENTIDAD LOCAL -->
-      <div class="mt-8 pt-6 border-t border-[#EEF3EF] flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-        <div class="flex items-center gap-2 text-brand-lake font-medium text-sm">
-          <i class="fa-solid fa-satellite-dish text-base"></i>
-          <span>Cuadrillas monitoreadas con telemetría GPS municipal en tiempo real.</span>
+      <!-- ==================== CASO 2: NO TIENE NINGÚN RETIRO SOLICITADO ==================== -->
+      <div *ngIf="!activePickup" class="py-5 px-3 text-center">
+        <div class="w-12 h-12 rounded-2xl bg-[#ecf7e6] text-[#22a652] flex items-center justify-center text-xl mx-auto mb-3 shadow-2xs">
+          <i class="fa-solid fa-calendar-check"></i>
         </div>
-        <div class="inline-flex items-center gap-2 text-xs font-semibold text-brand-navy bg-[#F4F8F4] px-3.5 py-1.5 rounded-xl border border-[#D8E6D9]">
-          <i class="fa-solid fa-shield-halved text-brand-green"></i>
-          <span>Trazabilidad certificada hacia planta de valorización</span>
-        </div>
+
+        <h3 class="font-heading font-black text-lg sm:text-xl text-[#123F5B] mb-1.5">
+          No tienes ningún retiro activo para rastrear
+        </h3>
+        
+        <p class="text-xs text-gray-500 max-w-md mx-auto mb-4 leading-relaxed">
+          El camión municipal pasa por <strong>{{ sector?.nombre }}</strong> los <strong class="text-[#22a652]">{{ sector?.dia }}</strong>. Agenda tu retiro para monitorear el camión en vivo.
+        </p>
+
+        <button
+          type="button"
+          (click)="requestRetiroClick.emit()"
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white font-black text-xs uppercase tracking-wider cursor-pointer shadow-sm transition-all">
+          <i class="fa-solid fa-circle-plus text-sm"></i>
+          <span>Pedir Retiro de Reciclaje Ahora</span>
+        </button>
       </div>
-    </section>
+
+    </div>
   `
 })
 export class TruckTrackingComponent {
@@ -253,32 +150,175 @@ export class TruckTrackingComponent {
   @Input() pickups: Pickup[] = [];
   @Input() userEmail: string = '';
   @Input() isCamionEnRuta: boolean = false;
+  @Input() selectedPickup: Pickup | null = null;
 
-  get activePickup(): Pickup | undefined {
-    if (!this.pickups || this.pickups.length === 0) return undefined;
+  @Output() pickupSelected = new EventEmitter<Pickup>();
+  @Output() requestRetiroClick = new EventEmitter<void>();
+
+  steps = [
+    { label: '1. Solicitado', state: 'SOLICITADO', icon: 'fa-solid fa-file-lines', sublabel: 'Aviso recibido' },
+    { label: '2. Programado', state: 'PROGRAMADO', icon: 'fa-solid fa-calendar-check', sublabel: 'Cuadrilla asignada' },
+    { label: '3. En camino', state: 'EN_RUTA', icon: 'fa-solid fa-truck-fast', sublabel: 'Recorriendo sector' },
+    { label: '4. Retirado', state: 'RETIRADO', icon: 'fa-solid fa-house-circle-check', sublabel: 'Retirado en puerta' },
+    { label: '5. Pesado', state: 'PESADO', icon: 'fa-solid fa-scale-balanced', sublabel: 'Pesaje certificado' }
+  ];
+
+  get userPickups(): Pickup[] {
+    if (!this.pickups?.length) return [];
     if (this.userEmail) {
-      const mine = this.pickups.filter(p => p.vecinoEmail && p.vecinoEmail.toLowerCase() === this.userEmail.toLowerCase() && p.estado !== 'CANCELADO');
-      if (mine.length > 0) {
-        return mine.find(p => p.estado === 'EN_RUTA')
-          || mine.find(p => p.estado === 'RETIRADO')
-          || mine.find(p => p.estado === 'PROGRAMADO')
-          || mine.find(p => p.estado === 'SOLICITADO')
-          || mine[0];
-      }
+      const mine = this.pickups.filter(p => p.vecinoEmail?.toLowerCase() === this.userEmail.toLowerCase() && p.estado !== 'CANCELADO');
+      if (mine.length > 0) return mine;
     }
-    return this.pickups.find(p => p.estado === 'EN_RUTA')
-      || this.pickups.find(p => p.estado === 'RETIRADO')
-      || this.pickups.find(p => p.estado === 'PROGRAMADO')
-      || this.pickups.find(p => p.estado === 'SOLICITADO');
+    return this.pickups.filter(p => p.estado !== 'CANCELADO');
   }
 
-  get effectiveEstado(): 'SIN_SOLICITUD' | 'SOLICITADO' | 'PROGRAMADO' | 'EN_RUTA' | 'RETIRADO' | 'PESADO' {
-    if (this.activePickup && this.activePickup.estado) {
-      const st = this.activePickup.estado.toUpperCase();
-      if (st === 'EN_RUTA' || st === 'RETIRADO' || st === 'PESADO' || st === 'PROGRAMADO' || st === 'SOLICITADO') {
-        return st as 'SOLICITADO' | 'PROGRAMADO' | 'EN_RUTA' | 'RETIRADO' | 'PESADO';
-      }
+  get activePickup(): Pickup | null {
+    if (this.selectedPickup) return this.selectedPickup;
+    if (this.userPickups.length > 0) {
+      return this.userPickups.find(p => p.estado === 'EN_RUTA')
+        || this.userPickups.find(p => p.estado === 'RETIRADO')
+        || this.userPickups.find(p => p.estado === 'PROGRAMADO')
+        || this.userPickups.find(p => p.estado === 'SOLICITADO')
+        || this.userPickups[0];
     }
-    return this.isCamionEnRuta ? 'EN_RUTA' : 'SIN_SOLICITUD';
+    return null;
+  }
+
+  onSelectPickupId(id: any): void {
+    const found = this.userPickups.find(p => p.id === Number(id));
+    if (found) {
+      this.pickupSelected.emit(found);
+    }
+  }
+
+  get effectiveEstado(): string {
+    if (this.activePickup?.estado) {
+      return this.activePickup.estado.toUpperCase();
+    }
+    return 'SOLICITADO';
+  }
+
+  getCurrentStepIndex(): number {
+    return this.steps.findIndex(s => s.state === this.effectiveEstado);
+  }
+
+  getProgressBarWidth(): string {
+    const index = this.getCurrentStepIndex();
+    if (index <= 0) return '0%';
+    const pct = (index / (this.steps.length - 1)) * 100;
+    return `calc(${pct}% - 2rem)`;
+  }
+
+  getStepClass(index: number): string {
+    const current = this.getCurrentStepIndex();
+    if (index < current) {
+      // Completado
+      return 'bg-[#22a652] text-white ring-4 ring-[#ecf7e6] border-2 border-[#22a652]';
+    } else if (index === current) {
+      // En curso / actual
+      return 'bg-[#123F5B] text-white ring-4 ring-[#123F5B]/20 border-2 border-[#123F5B] scale-110';
+    }
+    // Futuro
+    return 'bg-white text-gray-400 border-2 border-gray-200';
+  }
+
+  getTextClass(index: number): string {
+    const current = this.getCurrentStepIndex();
+    if (index === current) {
+      return 'text-[#123F5B] font-extrabold text-sm scale-105';
+    } else if (index < current) {
+      return 'text-[#22a652] font-bold';
+    }
+    return 'text-gray-400 font-medium';
+  }
+
+  getStatusBadgeClass(estado?: string): string {
+    switch (estado?.toUpperCase()) {
+      case 'EN_RUTA': return 'bg-amber-100 text-amber-900 border border-amber-300';
+      case 'PROGRAMADO': return 'bg-sky-100 text-sky-900 border border-sky-300';
+      case 'RETIRADO': return 'bg-emerald-100 text-emerald-900 border border-emerald-300';
+      case 'PESADO': return 'bg-purple-100 text-purple-900 border border-purple-300';
+      default: return 'bg-gray-100 text-gray-800 border border-gray-300';
+    }
+  }
+
+  getFeedbackBoxClass(): string {
+    switch (this.effectiveEstado) {
+      case 'EN_RUTA': return 'bg-amber-50/80 border-amber-200 text-amber-950';
+      case 'RETIRADO': return 'bg-emerald-50/80 border-emerald-200 text-emerald-950';
+      case 'PESADO': return 'bg-purple-50/80 border-purple-200 text-purple-950';
+      case 'PROGRAMADO': return 'bg-sky-50/80 border-sky-200 text-sky-950';
+      default: return 'bg-gray-50 border-gray-200 text-gray-800';
+    }
+  }
+
+  getFeedbackIconBoxClass(): string {
+    switch (this.effectiveEstado) {
+      case 'EN_RUTA': return 'bg-amber-500 text-white';
+      case 'RETIRADO': return 'bg-emerald-600 text-white';
+      case 'PESADO': return 'bg-purple-600 text-white';
+      case 'PROGRAMADO': return 'bg-sky-600 text-white';
+      default: return 'bg-[#123F5B] text-white';
+    }
+  }
+
+  getFeedbackIcon(): string {
+    switch (this.effectiveEstado) {
+      case 'EN_RUTA': return 'fa-solid fa-truck-fast';
+      case 'RETIRADO': return 'fa-solid fa-house-circle-check';
+      case 'PESADO': return 'fa-solid fa-scale-balanced';
+      case 'PROGRAMADO': return 'fa-solid fa-calendar-check';
+      default: return 'fa-solid fa-clock';
+    }
+  }
+
+  getFeedbackTitle(): string {
+    switch (this.effectiveEstado) {
+      case 'EN_RUTA': return '¡El camión va en camino a tu sector!';
+      case 'RETIRADO': return 'Tus residuos ya fueron retirados en tu puerta';
+      case 'PESADO': return '¡Retiro completado y certificado con éxito!';
+      case 'PROGRAMADO': return 'Tu retiro está programado';
+      default: return 'Solicitud en revisión municipal';
+    }
+  }
+
+  getFeedbackTitleClass(): string {
+    switch (this.effectiveEstado) {
+      case 'EN_RUTA': return 'text-amber-900';
+      case 'RETIRADO': return 'text-emerald-900';
+      case 'PESADO': return 'text-purple-900';
+      case 'PROGRAMADO': return 'text-sky-900';
+      default: return 'text-[#123F5B]';
+    }
+  }
+
+  getFeedbackTextClass(): string {
+    switch (this.effectiveEstado) {
+      case 'EN_RUTA': return 'text-amber-800';
+      case 'RETIRADO': return 'text-emerald-800';
+      case 'PESADO': return 'text-purple-800';
+      case 'PROGRAMADO': return 'text-sky-800';
+      default: return 'text-gray-600';
+    }
+  }
+
+  getFeedbackMessage(): string {
+    const camion = this.activePickup?.camionPatente || 'PV-RC-2026';
+    const material = this.activePickup?.residuoNombre || 'Reciclaje';
+    const fecha = this.activePickup?.fechaTexto || this.sector?.dia || 'esta semana';
+    const kilos = this.activePickup?.kilosRecolectados || 0;
+
+    switch (this.effectiveEstado) {
+      case 'EN_RUTA':
+        return `La cuadrilla municipal se encuentra en recorrido con el camión patente ${camion}. Asegúrate de tener tus bolsas o contenedores de ${material} afuera de tu domicilio.`;
+      case 'RETIRADO':
+        return `La cuadrilla ya pasó por tu domicilio y recogió tus residuos de ${material}. El camión se dirige al centro de acopio para el pesaje digital oficial.`;
+      case 'PESADO':
+        return `Se registró un pesaje oficial de ${kilos} kg en la báscula municipal. Tu certificado de reciclaje ha sido emitido bajo la Ley REP. ¡Muchas gracias por cuidar Puerto Varas!`;
+      case 'PROGRAMADO':
+        return `El retiro fue asignado para el día ${fecha}. Recuerda dejar los residuos limpios y secos en tu frontis antes de las 08:00 hrs de ese día.`;
+      default:
+        return 'Tu aviso de retiro fue recibido en la plataforma. El coordinador de DIMAO está organizando la cuadrilla y te notificará la fecha oficial de paso.';
+    }
   }
 }

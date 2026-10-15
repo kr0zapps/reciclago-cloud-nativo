@@ -1,6 +1,7 @@
-import { Component, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Output, EventEmitter, OnInit, AfterViewInit, OnDestroy, ElementRef, ChangeDetectorRef, NgZone, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { BffService } from '../../../services/bff.service';
 
 @Component({
   selector: 'app-home-impact',
@@ -8,155 +9,92 @@ import { RouterModule } from '@angular/router';
   imports: [CommonModule, RouterModule],
   template: `
     <!-- BEGIN: ImpactSection -->
-    <section class="relative py-16 sm:py-20 bg-gradient-to-b from-sky-50/70 via-emerald-50/30 to-white overflow-hidden border-t border-slate-100" id="impacto">
-      <!-- Watermarked volcano silhouette background -->
-      <div class="absolute inset-0 opacity-15 pointer-events-none flex items-end justify-center">
-        <svg class="w-full h-auto text-sky-700 max-h-96" fill="currentColor" viewBox="0 0 1200 350">
-          <path d="M0,350 L350,140 L450,220 L650,40 L850,230 L1000,160 L1200,350 Z"></path>
-        </svg>
-      </div>
-
+    <section class="relative py-12 sm:py-16 bg-white overflow-hidden border-b border-slate-200" id="impacto">
       <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Section Heading -->
-        <div class="mb-12">
-          <span class="inline-block px-3.5 py-1 rounded-full bg-cyan-100 text-cyan-900 font-bold text-xs mb-3 shadow-2xs">
-            Nuestra huella
-          </span>
-          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a233b] tracking-tight mb-2 font-heading">
-            Impacto en la comuna
+        
+        <!-- Encabezado de Sección Modern Clean -->
+        <div class="mb-8 text-center sm:text-left">
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-heading mb-1.5">
+            Impacto en Puerto Varas
           </h2>
-          <p class="text-xs sm:text-sm text-slate-600 max-w-xl">
-            Cada kilo reciclado cuenta. Así avanzamos juntos hacia una Puerto Varas más limpia y sustentable.
+          <p class="text-xs sm:text-sm text-slate-500 max-w-xl font-sans">
+            Seguimiento del programa municipal de retiro selectivo y reciclaje domiciliario.
           </p>
         </div>
 
-        <!-- Mobile View: Franja compacta con 3 métricas (md:hidden) -->
-        <div class="md:hidden bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80 mb-10">
-          <div class="grid grid-cols-3 divide-x divide-slate-100 text-center">
-            <div class="px-1.5">
-              <p class="text-lg sm:text-xl font-black text-[#0a233b] font-heading leading-tight">
-                248.650
-              </p>
-              <span class="block text-[11px] font-bold text-emerald-700 mt-0.5">kg reciclados</span>
-              <span class="block text-[9px] text-slate-400">Certificados</span>
+        <!-- 3 Métricas en 1 Sola Fila (CERO DESLIZAR en Móvil y Desktop) -->
+        <div class="grid grid-cols-3 gap-1.5 sm:gap-4 mb-4 sm:mb-6">
+          
+          <!-- Métrica 1: Kilos -->
+          <div class="bg-slate-50/80 rounded-xl p-2 sm:p-4 text-center border border-slate-200/90 shadow-2xs hover:bg-white transition-all flex flex-col justify-center items-center group">
+            <div class="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 rounded-md sm:rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-[10px] sm:text-xs shadow-2xs">
+              <i class="fa-solid fa-scale-balanced"></i>
             </div>
-            <div class="px-1.5">
-              <p class="text-lg sm:text-xl font-black text-[#0a233b] font-heading leading-tight">
-                32%
-              </p>
-              <span class="block text-[11px] font-bold text-emerald-700 mt-0.5">menos residuos</span>
-              <span class="block text-[9px] text-slate-400">En vertederos</span>
-            </div>
-            <div class="px-1.5">
-              <p class="text-lg sm:text-xl font-black text-[#0a233b] font-heading leading-tight">
-                4
-              </p>
-              <span class="block text-[11px] font-bold text-emerald-700 mt-0.5">camiones</span>
-              <span class="block text-[9px] text-slate-400">Activos en ruta</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Desktop View: 3 Metrics Cards (hidden md:grid) -->
-        <div class="hidden md:grid md:grid-cols-3 gap-6 mb-16">
-
-          <!-- Métrica 1: Kilos certificados -->
-          <div class="bg-white rounded-2xl p-7 sm:p-8 text-center shadow-xs hover:shadow-md border border-slate-100 transition-all duration-300">
-            <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-emerald-50 flex items-center justify-center text-[#206935]">
-              <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                <path d="M12 3v2.05c-3.95.49-7 3.85-7 7.95 0 3.1 1.77 5.79 4.38 7.12L10.5 19H12v2H6v-2h2.5l.88-.72C6.18 17.02 4 13.8 4 10c0-4.08 3.05-7.44 7-7.95V0h2v2.05c3.95.49 7 3.85 7 7.95 0 3.8-2.18 7.02-5.38 8.28l.88.72H18v2h-6v-2h1.5l1.12-1.12C17.23 15.79 19 13.1 19 10c0-4.1-3.05-7.46-7-7.95V0h-2v3zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"></path>
-              </svg>
-            </div>
-            <p class="text-3xl sm:text-4xl font-black text-[#0a233b] mb-1 font-heading">
-              248.650 kg
+            <p class="text-sm sm:text-2xl md:text-3xl font-extrabold text-slate-900 mb-0.5 font-heading tracking-tight">
+              {{ displayKg }} <span class="text-[10px] sm:text-sm font-bold text-emerald-600">kg</span>
             </p>
-            <h3 class="text-xs sm:text-sm font-bold text-slate-700 mb-1">
-              Kilos de reciclaje certificados
-            </h3>
-            <p class="text-[11px] text-slate-400 font-medium">
-              Desde el inicio del programa
-            </p>
+            <h3 class="text-[10px] sm:text-xs md:text-sm font-heading font-bold text-slate-800 leading-tight">Kilos Recolectados</h3>
+            <p class="hidden sm:block text-[11px] text-slate-500 mt-0.5 leading-tight">Pesado y retirado en ruta</p>
           </div>
 
-          <!-- Métrica 2: Disminución en vertederos -->
-          <div class="bg-white rounded-2xl p-7 sm:p-8 text-center shadow-xs hover:shadow-md border border-slate-100 transition-all duration-300">
-            <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-emerald-50 flex items-center justify-center text-[#206935]">
-              <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5zm4 4h-2v-2h2v2zm0-4h-2V7h2v5z"></path>
-              </svg>
+          <!-- Métrica 2: Meta Comunal (Opción A) -->
+          <div class="bg-slate-50/80 rounded-xl p-2 sm:p-4 text-center border border-slate-200/90 shadow-2xs hover:bg-white transition-all flex flex-col justify-center items-center group">
+            <div class="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 rounded-md sm:rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-[10px] sm:text-xs shadow-2xs">
+              <i class="fa-solid fa-leaf"></i>
             </div>
-            <p class="text-3xl sm:text-4xl font-black text-[#0a233b] mb-1 font-heading">
-              32%
+            <p class="text-sm sm:text-2xl md:text-3xl font-extrabold text-slate-900 mb-0.5 font-heading tracking-tight">
+              {{ currentPercent }}%
             </p>
-            <h3 class="text-xs sm:text-sm font-bold text-slate-700 mb-1">
-              Disminución de carga en vertederos provinciales
-            </h3>
-            <p class="text-[11px] text-slate-400 font-medium">
-              vs. año anterior
-            </p>
+            <h3 class="text-[10px] sm:text-xs md:text-sm font-heading font-bold text-slate-800 leading-tight">Meta de Reciclaje</h3>
+            <p class="hidden sm:block text-[11px] text-slate-500 mt-0.5 leading-tight">Menos residuos a vertedero</p>
           </div>
 
-          <!-- Métrica 3: Capacidad activa -->
-          <div class="bg-white rounded-2xl p-7 sm:p-8 text-center shadow-xs hover:shadow-md border border-slate-100 transition-all duration-300">
-            <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-emerald-50 flex items-center justify-center text-[#206935]">
-              <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                <path d="M20 8h-3V4H1v13h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zm-5-2v2H4V6h11zm-9 12c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm12 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm0-4h-2.5l-2-2.5H15V14h3v-2z"></path>
-              </svg>
+          <!-- Métrica 3: Cobertura Comunal (Opción A) -->
+          <div class="bg-slate-50/80 rounded-xl p-2 sm:p-4 text-center border border-slate-200/90 shadow-2xs hover:bg-white transition-all flex flex-col justify-center items-center group">
+            <div class="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 rounded-md sm:rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-[10px] sm:text-xs shadow-2xs">
+              <i class="fa-solid fa-truck-fast"></i>
             </div>
-            <p class="text-3xl sm:text-4xl font-black text-[#0a233b] mb-1 font-heading">
-              4
+            <p class="text-sm sm:text-2xl md:text-3xl font-extrabold text-slate-900 mb-0.5 font-heading tracking-tight">
+              4 <span class="text-[10px] sm:text-sm font-bold text-emerald-600">sectores</span>
             </p>
-            <h3 class="text-xs sm:text-sm font-bold text-slate-700 mb-1">
-              Capacidad activa de camiones
-            </h3>
-            <p class="text-[11px] text-slate-400 font-medium">
-              En operación diaria
-            </p>
+            <h3 class="text-[10px] sm:text-xs md:text-sm font-heading font-bold text-slate-800 leading-tight">Cobertura Comunal</h3>
+            <p class="hidden sm:block text-[11px] text-slate-500 mt-0.5 leading-tight">Rutas semanales activas</p>
           </div>
 
         </div>
 
-        <!-- Panoramic Scenic Banner: ¿Necesitas un retiro especial? -->
-        <div class="relative rounded-3xl overflow-hidden shadow-md border border-slate-100 min-h-[190px] sm:min-h-[220px] flex items-center">
-          <!-- Scenic background photo: Lake, flowers, and volcano -->
+        <!-- Banner Retiro Especial Compacto -->
+        <div class="relative rounded-xl overflow-hidden shadow-sm border border-slate-800 bg-slate-950 min-h-[120px] sm:min-h-[140px] flex items-center">
           <img
-            alt="Paisaje Lago Llanquihue y flores Puerto Varas"
-            class="absolute inset-0 w-full h-full object-cover object-center"
             src="assets/stitch/cta_lake_flowers.png"
+            alt="Paisaje Lago Llanquihue y flores Puerto Varas"
+            class="absolute right-0 inset-y-0 w-full md:w-3/5 h-full object-cover object-center opacity-65"
           />
-          <div class="absolute inset-0 bg-gradient-to-r from-white/95 via-white/90 to-white/40 md:to-white/20"></div>
-
-          <!-- Content Box -->
-          <div class="relative z-10 p-6 sm:p-10 w-full flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div class="flex items-start gap-4 max-w-xl">
-              <div class="shrink-0 w-12 h-12 rounded-full bg-[#dcf2e3] flex items-center justify-center text-[#206935] mt-1 shadow-xs">
-                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                  <path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 0 0 8 20C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z"></path>
-                </svg>
+          <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/95 to-slate-950/20 sm:to-transparent"></div>
+          
+          <div class="relative z-10 p-4 sm:p-6 w-full flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-5">
+            <div class="flex items-start gap-3 max-w-xl">
+              <div class="shrink-0 w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mt-0.5 shadow-2xs">
+                <i class="fa-solid fa-truck-ramp-box text-sm"></i>
               </div>
               <div>
-                <h2 class="text-xl sm:text-2xl lg:text-3xl font-black text-[#0a233b] tracking-tight mb-1 font-heading">
-                  ¿Necesitas un retiro especial?
-                </h2>
-                <p class="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
-                  Solicita recolección programada para podas, escombros o materiales fuera de tu cuadrante semanal.
+                <h3 class="text-base sm:text-lg font-extrabold text-white tracking-tight mb-0.5 font-heading">
+                  ¿Muebles viejos o escombros?
+                </h3>
+                <p class="text-xs text-slate-300 font-sans leading-snug">
+                  Coordina el retiro especial a domicilio directamente con el servicio municipal.
                 </p>
               </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
-              <a
-                routerLink="/dashboard"
-                class="inline-flex items-center justify-center gap-2 bg-[#286f34] hover:bg-[#205b2a] text-white text-xs sm:text-sm font-bold py-3 px-6 rounded-xl transition-all shadow-sm hover:shadow group cursor-pointer text-center">
-                <span>Agendar retiro especial</span>
-                <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+            <!-- Botones Compactos en 1 Fila -->
+            <div class="flex items-center gap-2 shrink-0">
+              <a routerLink="/dashboard" class="flex-1 sm:flex-initial text-center inline-flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs py-2 px-3.5 rounded-lg transition shadow-xs cursor-pointer font-heading">
+                <span>Agendar Retiro</span>
+                <i class="fa-solid fa-arrow-right text-[9px]"></i>
               </a>
-              <button
-                type="button"
-                (click)="openInfoModal.emit()"
-                class="inline-flex items-center justify-center gap-1.5 bg-white/80 hover:bg-white text-slate-700 text-xs font-semibold py-2.5 px-4 rounded-xl border border-slate-200 transition-all cursor-pointer">
-                <i class="fa-solid fa-circle-question text-emerald-600"></i>
-                <span>Preguntas frecuentes</span>
+              <button type="button" (click)="openInfoModal.emit()" class="flex-1 sm:flex-initial text-center px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition border border-white/20 shadow-2xs cursor-pointer font-heading">
+                Preguntas
               </button>
             </div>
           </div>
@@ -167,6 +105,152 @@ import { RouterModule } from '@angular/router';
     <!-- END: ImpactSection -->
   `
 })
-export class HomeImpactComponent {
+export class HomeImpactComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output() openInfoModal = new EventEmitter<void>();
+
+  targetKg = 14820;
+  targetPercent = 25;
+  targetTrucks = 4;
+
+  currentKg = 0;
+  currentPercent = 0;
+  currentTrucks = 0;
+  displayKg = '0';
+  isVisible = false;
+  isLiveConnected = false;
+  liveKilosEnVivo = 0;
+
+  private observer?: IntersectionObserver;
+  private animFrameId?: number;
+  private readonly isBrowser: boolean;
+
+  constructor(
+    private readonly el: ElementRef,
+    private readonly cdr: ChangeDetectorRef,
+    private readonly ngZone: NgZone,
+    private readonly bffService: BffService,
+    @Inject(PLATFORM_ID) platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
+
+  ngOnInit(): void {
+    this.cargarMetricasEnVivo();
+    if (!this.isBrowser) {
+      this.currentKg = this.targetKg;
+      this.currentPercent = this.targetPercent;
+      this.currentTrucks = this.targetTrucks;
+      this.displayKg = this.targetKg.toLocaleString('es-CL');
+      this.isVisible = true;
+    }
+  }
+
+  private updateMetricsFromData(data: any): void {
+    this.isLiveConnected = true;
+    if (data.kilosCertificados !== undefined && data.kilosCertificados !== null) this.targetKg = Number(data.kilosCertificados);
+    if (data.porcentajeVertederos !== undefined && data.porcentajeVertederos !== null) this.targetPercent = Number(data.porcentajeVertederos);
+    if (data.camionesOperativos !== undefined && data.camionesOperativos !== null) this.targetTrucks = Number(data.camionesOperativos);
+    if (data.kilosEnVivo !== undefined && data.kilosEnVivo !== null) this.liveKilosEnVivo = Number(data.kilosEnVivo);
+    if (this.isVisible) {
+      this.startCountAnimation();
+    } else {
+      this.displayKg = this.targetKg.toLocaleString('es-CL');
+    }
+    this.cdr.markForCheck();
+  }
+
+  private loadTrucksFallback(): void {
+    this.bffService.getCamiones().subscribe({
+      next: (camiones) => {
+        if (camiones && camiones.length > 0) {
+          this.targetTrucks = camiones.length;
+          this.isLiveConnected = true;
+          this.cdr.markForCheck();
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  cargarMetricasEnVivo(): void {
+    this.bffService.getImpactoComunal().subscribe({
+      next: (data) => {
+        if (data) {
+          this.updateMetricsFromData(data);
+        }
+      },
+      error: () => this.loadTrucksFallback()
+    });
+  }
+
+  ngAfterViewInit(): void {
+    if (!this.isBrowser) return;
+
+    if ('IntersectionObserver' in window) {
+      this.observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          this.isVisible = true;
+          this.cdr.markForCheck();
+          this.observer?.disconnect();
+          this.startCountAnimation();
+        }
+      }, { threshold: 0.15 });
+
+      this.observer.observe(this.el.nativeElement);
+    } else {
+      this.isVisible = true;
+      this.startCountAnimation();
+    }
+  }
+
+  startCountAnimation(): void {
+    const duration = 1500;
+    const startTime = performance.now();
+
+    this.ngZone.runOutsideAngular(() => {
+      const step = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing: easeOutCubic
+        const ease = 1 - Math.pow(1 - progress, 3);
+
+        const valKg = Math.floor(ease * this.targetKg);
+        const valPercent = Math.floor(ease * this.targetPercent);
+        const valTrucks = Math.floor(ease * this.targetTrucks);
+
+        this.ngZone.run(() => {
+          this.currentKg = valKg;
+          this.displayKg = valKg.toLocaleString('es-CL');
+          this.currentPercent = valPercent;
+          this.currentTrucks = valTrucks;
+          this.cdr.markForCheck();
+        });
+
+        if (progress < 1) {
+          this.animFrameId = requestAnimationFrame(step);
+        } else {
+          this.ngZone.run(() => {
+            this.currentKg = this.targetKg;
+            this.displayKg = this.targetKg.toLocaleString('es-CL');
+            this.currentPercent = this.targetPercent;
+            this.currentTrucks = this.targetTrucks;
+            this.cdr.markForCheck();
+          });
+        }
+      };
+
+      this.animFrameId = requestAnimationFrame(step);
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+    if (this.animFrameId) {
+      cancelAnimationFrame(this.animFrameId);
+    }
+  }
 }
+

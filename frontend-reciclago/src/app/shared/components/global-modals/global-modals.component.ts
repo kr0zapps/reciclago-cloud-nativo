@@ -16,17 +16,17 @@ import { ContactModalComponent } from './contact-modal.component';
   template: `
     <app-how-it-works-modal
       [isOpen]="showHowItWorks"
-      (close)="closeHowItWorks.emit()">
+      (modalClose)="closeHowItWorks.emit()">
     </app-how-it-works-modal>
 
     <app-materials-modal
       [isOpen]="showMaterials"
-      (close)="closeMaterials.emit()">
+      (modalClose)="closeMaterials.emit()">
     </app-materials-modal>
 
     <app-contact-modal
       [isOpen]="showContact"
-      (close)="closeContact.emit()">
+      (modalClose)="closeContact.emit()">
     </app-contact-modal>
   `
 })

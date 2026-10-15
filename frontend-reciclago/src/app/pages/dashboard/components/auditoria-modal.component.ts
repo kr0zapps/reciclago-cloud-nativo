@@ -8,13 +8,13 @@ import { Pickup } from '../data/sectors.data';
   imports: [CommonModule],
   template: `
     <div *ngIf="isOpen"
-         (click)="close.emit()"
+         (click)="modalClose.emit()"
          class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
       
       <div (click)="$event.stopPropagation()"
-           class="relative w-full max-w-3xl bg-white rounded-[2rem] shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto">
+           class="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto">
         
-        <div class="h-1.5 w-full bg-gradient-to-r from-[#123F5B] via-[#38BDF8] to-[#4F8A3D]"></div>
+        <div class="h-1.5 w-full bg-[#123F5B]"></div>
 
         <div class="px-6 sm:px-8 pt-6 pb-4 border-b border-[#E2E9E4] flex items-center justify-between bg-[#F8FAF7]">
           <div class="flex items-center gap-3.5">
@@ -22,15 +22,12 @@ import { Pickup } from '../data/sectors.data';
               <i class="fa-solid fa-clipboard-list"></i>
             </div>
             <div>
-              <span class="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-slate-400 block">
-                DIMAO • Registro Oficial
-              </span>
-              <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy leading-tight">
+              <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-[#123F5B] leading-tight">
                 Auditoría Histórica Comunal
               </h3>
             </div>
           </div>
-          <button (click)="close.emit()" type="button" class="w-9 h-9 rounded-full bg-white border border-[#DFE8E1] hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-sm transition-colors shadow-xs cursor-pointer" aria-label="Cerrar">
+          <button (click)="modalClose.emit()" type="button" class="w-9 h-9 rounded-full bg-white border border-[#DFE8E1] hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-sm transition-colors shadow-xs cursor-pointer" aria-label="Cerrar">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -90,7 +87,7 @@ import { Pickup } from '../data/sectors.data';
 
         <div class="px-6 sm:px-8 py-4 bg-[#F8FAF7] border-t border-[#E2E9E4] flex items-center justify-between">
           <span class="text-xs text-slate-500 font-medium">Trazabilidad DIMAO Puerto Varas</span>
-          <button (click)="close.emit()" type="button" class="btn-stitch-primary px-5 py-2 text-xs font-bold cursor-pointer">
+          <button (click)="modalClose.emit()" type="button" class="btn-stitch-primary px-5 py-2 text-xs font-bold cursor-pointer">
             Cerrar
           </button>
         </div>
@@ -105,6 +102,7 @@ export class AuditoriaModalComponent {
   @Input() totalPages: number = 1;
   @Input() totalElements: number = 0;
 
-  @Output() close = new EventEmitter<void>();
+  @Output() modalClose = new EventEmitter<void>();
   @Output() changePage = new EventEmitter<number>();
 }
+

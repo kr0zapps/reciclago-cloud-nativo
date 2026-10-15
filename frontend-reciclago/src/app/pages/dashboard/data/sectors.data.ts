@@ -24,6 +24,9 @@ export interface Sector {
   waypoints: Waypoint[];
   enRuta?: boolean;
   fechaTexto?: string;
+  diaModificado?: boolean;
+  diaOriginal?: string;
+  motivoModificacion?: string;
 }
 
 export interface Residuo {
@@ -39,18 +42,25 @@ export interface Residuo {
   semanal?: boolean;
 }
 
+export type EstadoCamion = 'DISPONIBLE' | 'EN_RUTA' | 'MANTENIMIENTO';
+
 export interface Camion {
   id: number;
   patente: string;
   capacidadKilos?: number;
   capacidadMaximaKg?: number;
-  estado?: string;
+  capacidadTotalKg?: number;
+  capacidadDisponibleKg?: number;
+  modelo?: string;
+  estado?: EstadoCamion;
 }
 
 export interface Pickup {
   id: number;
   fecha?: string;
   fechaTexto?: string;
+  fechaProgramada?: string;
+  codigoRetiro?: string;
   residuoNombre?: string;
   kilosRecolectados?: number;
   pesoRealKg?: number;
@@ -58,8 +68,11 @@ export interface Pickup {
   direccion?: string;
   estado?: string;
   comentarios?: string;
+  observaciones?: string;
+  motivoCancelacion?: string;
   camionPatente?: string;
   camionId?: number;
+  vecinoNombre?: string;
   vecinoEmail?: string;
 }
 
@@ -356,8 +369,236 @@ export const DEFAULT_RESIDUOS: Residuo[] = [
 export const DEFAULT_CAMIONES: Camion[] = [
   { id: 1, patente: 'PV-RC-2026', capacidadKilos: 1500, estado: 'DISPONIBLE' },
   { id: 2, patente: 'PV-RC-2027', capacidadKilos: 3000, estado: 'DISPONIBLE' },
-  { id: 3, patente: 'PV-RC-2028', capacidadKilos: 2000, estado: 'EN_BASE' }
+  { id: 3, patente: 'PV-RC-2028', capacidadKilos: 2000, estado: 'DISPONIBLE' }
 ];
+
+/**
+ * Interfaz que modela la respuesta del endpoint
+ * GET /api/catalog/rotacion/semanal del BFF/Catálogo.
+ */
+export interface RotacionSemanal {
+  numSemanaISO: number;
+  slotSemana: number;           // 1=Vidrio, 2=Cartón, 3=Plástico, 4=Latas
+  residuoCodigo: string;        // ej: 'VIDRIO', 'CARTON_PAPEL', 'PLASTICO_PET', 'LATAS_METALES'
+  residuoNombre: string;        // ej: 'Plásticos (PET y PEAD)'
+  descripcion: string | null;
+  instrucciones: string | null;
+  categoria: string | null;     // ej: 'PLASTICO'
+  precioPorKg: number | null;
+  vigenciaDesde: string;        // ISO date: '2026-09-21'
+  vigenciaHasta: string;        // ISO date: '2026-09-27'
+  residuoId?: number | null;
+}
+
+export interface RotacionConfig {
+  modo: 'AUTOMATICO' | 'MANUAL';
+  overrideCodigoResiduo: string | null;
+  numSemanaActual: number;
+  slotSemanaActual: number;
+  residuoSemanalActual?: RotacionSemanal;
+  semanas: Array<{
+    slot: number;
+    codigo: string;
+    nombre: string;
+    categoria: string;
+    descripcion?: string;
+  }>;
+  sectoresOverrides?: Record<string, { dia?: string; materialCodigo?: string; materialNombre?: string }>;
+}
+
+export const SEMANAS_ROTACION_DEFAULT = [
+  { slot: 1, codigo: 'VIDRIO', nombre: 'Vidrio', categoria: 'VIDRIO', descripcion: 'Botellas, frascos y recipientes de vidrio limpios' },
+  { slot: 2, codigo: 'CARTON_PAPEL', nombre: 'Cartón y Papel', categoria: 'CARTON', descripcion: 'Cajas secas, periódicos, papel blanco y embalaje aplanado' },
+  { slot: 3, codigo: 'PLASTICO_PET', nombre: 'Plásticos (PET y PEAD)', categoria: 'PLASTICO', descripcion: 'Botellas plásticas compactadas, bidones y envases limpios' },
+  { slot: 4, codigo: 'LATAS_METALES', nombre: 'Latas y Metales', categoria: 'LATAS', descripcion: 'Aluminio de bebidas, hojalata y conservas limpias' },
+];
+
+export function loadLocalRotacionConfig(): { modo: 'AUTOMATICO' | 'MANUAL'; overrideCodigoResiduo: string | null } {
+  try {
+    const raw = localStorage.getItem('reciclago_rotacion_config');
+    if (raw) {
+      return JSON.parse(raw);
+    }
+  } catch {}
+  return { modo: 'AUTOMATICO', overrideCodigoResiduo: null };
+}
+
+export function saveLocalRotacionConfig(config: { modo: 'AUTOMATICO' | 'MANUAL'; overrideCodigoResiduo: string | null }): void {
+  try {
+    localStorage.setItem('reciclago_rotacion_config', JSON.stringify(config));
+  } catch {}
+}
+
+export interface SectorScheduleOverride {
+  semana: number;           // 1, 2, 3, 4
+  sectorNombre: string;     // ej: 'Costanera Sur y Llanquihue Sur'
+  diaOriginal: string;      // ej: 'Martes'
+  nuevoDia: string;         // ej: 'Miércoles'
+  motivo?: string;          // ej: 'Feriado irrenunciable'
+  fechaModificacion: string;
+}
+
+export function loadScheduleOverrides(): SectorScheduleOverride[] {
+  try {
+    const raw = localStorage.getItem('reciclago_schedule_overrides');
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return [];
+}
+
+export function saveScheduleOverrides(overrides: SectorScheduleOverride[]): void {
+  try {
+    localStorage.setItem('reciclago_schedule_overrides', JSON.stringify(overrides));
+  } catch {}
+}
+
+export function getScheduleOverrideForSector(sectorNombre: string, semana: number): SectorScheduleOverride | null {
+  const overrides = loadScheduleOverrides();
+  return overrides.find(o =>
+    (o.sectorNombre === sectorNombre || sectorNombre.includes(o.sectorNombre) || o.sectorNombre.includes(sectorNombre)) &&
+    o.semana === semana
+  ) || null;
+}
+
+export function getAllAvisosParaSemana(semana: number): SectorScheduleOverride[] {
+  const overrides = loadScheduleOverrides();
+  return overrides.filter(o => o.semana === semana);
+}
+
+export function loadLocalSectorOverrides(): Record<string, { dia?: string; material?: string; materialPrincipal?: string }> {
+  try {
+    const raw = localStorage.getItem('reciclago_sectors_override');
+    if (raw) {
+      return JSON.parse(raw);
+    }
+  } catch {}
+  return {};
+}
+
+export function saveLocalSectorOverrides(overrides: Record<string, { dia?: string; material?: string; materialPrincipal?: string }>): void {
+  try {
+    localStorage.setItem('reciclago_sectors_override', JSON.stringify(overrides));
+  } catch {}
+}
+
+export function aplicarSectorOverrides(sectores: Sector[], semana?: number): Sector[] {
+  const scheduleOverrides = loadScheduleOverrides();
+  const legacyOverrides = loadLocalSectorOverrides();
+
+  return sectores.map(s => {
+    let diaActual = s.dia;
+    let diaModificado = false;
+    let diaOriginal = s.dia;
+    let motivo = '';
+
+    if (semana) {
+      const match = scheduleOverrides.find(o =>
+        (o.sectorNombre === s.nombre || s.nombre.includes(o.sectorNombre) || o.sectorNombre.includes(s.nombre)) &&
+        o.semana === semana
+      );
+      if (match) {
+        diaActual = match.nuevoDia;
+        diaModificado = true;
+        diaOriginal = match.diaOriginal;
+        motivo = match.motivo || '';
+      }
+    } else if (scheduleOverrides.length > 0) {
+      // Si no se especifica semana, buscar el override más reciente para este sector
+      const match = scheduleOverrides.find(o =>
+        (o.sectorNombre === s.nombre || s.nombre.includes(o.sectorNombre) || o.sectorNombre.includes(s.nombre))
+      );
+      if (match) {
+        diaActual = match.nuevoDia;
+        diaModificado = true;
+        diaOriginal = match.diaOriginal;
+        motivo = match.motivo || '';
+      }
+    }
+
+    if (!diaModificado) {
+      const ov = legacyOverrides[s.nombre] || legacyOverrides[s.sector] || legacyOverrides[s.cuadrante];
+      if (ov?.dia) {
+        diaActual = ov.dia;
+      }
+    }
+
+    const legacyOv = legacyOverrides[s.nombre] || legacyOverrides[s.sector] || legacyOverrides[s.cuadrante];
+
+    return {
+      ...s,
+      dia: diaActual,
+      material: legacyOv?.material || s.material,
+      materialPrincipal: legacyOv?.materialPrincipal || s.materialPrincipal,
+      diaModificado,
+      diaOriginal,
+      motivoModificacion: motivo
+    };
+  });
+}
+
+/**
+ * Catálogo local de los 4 residuos rotativos.
+ * Espeja la lógica de RotacionSemanalService.java.
+ * Sólo se usa como fallback offline cuando el catálogo no responde.
+ */
+const ROTACION_FALLBACK: Pick<RotacionSemanal, 'slotSemana' | 'residuoCodigo' | 'residuoNombre' | 'categoria'>[] = [
+  { slotSemana: 1, residuoCodigo: 'VIDRIO',        residuoNombre: 'Vidrio',                categoria: 'VIDRIO'   },
+  { slotSemana: 2, residuoCodigo: 'CARTON_PAPEL',  residuoNombre: 'Cartón y Papel',         categoria: 'CARTON'   },
+  { slotSemana: 3, residuoCodigo: 'PLASTICO_PET',  residuoNombre: 'Plásticos (PET y PEAD)', categoria: 'PLASTICO' },
+  { slotSemana: 4, residuoCodigo: 'LATAS_METALES', residuoNombre: 'Latas y Metales',        categoria: 'LATAS'    },
+];
+
+/**
+ * Calcula la rotación semanal local (fallback offline).
+ * Usa el número de semana ISO del año actual, igual que el backend.
+ * Considera override manual guardado en localStorage si existe.
+ * @returns RotacionSemanal con datos mínimos para que el UI no muestre vacío.
+ */
+export function calcularRotacionLocal(): RotacionSemanal {
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((now.getTime() - startOfYear.getTime()) / 86_400_000) + 1;
+  const numSemanaISO = Math.ceil(dayOfYear / 7);
+  const mod = numSemanaISO % 4;
+  const slot = mod === 0 ? 4 : mod;
+
+  const localConfig = loadLocalRotacionConfig();
+  let entry = ROTACION_FALLBACK[slot - 1];
+
+  if (localConfig.modo === 'MANUAL' && localConfig.overrideCodigoResiduo) {
+    const overrideFound = ROTACION_FALLBACK.find(r => r.residuoCodigo === localConfig.overrideCodigoResiduo);
+    if (overrideFound) {
+      entry = overrideFound;
+    }
+  }
+
+  // Calcular inicio y fin de la semana actual (lunes a domingo)
+  const diaSemana = now.getDay(); // 0=Dom, 1=Lun...
+  const diffLunes = (diaSemana === 0 ? -6 : 1 - diaSemana);
+  const lunes = new Date(now);
+  lunes.setDate(now.getDate() + diffLunes);
+  const domingo = new Date(lunes);
+  domingo.setDate(lunes.getDate() + 6);
+
+  const toISO = (d: Date) => d.toISOString().split('T')[0];
+
+  return {
+    numSemanaISO,
+    slotSemana: entry.slotSemana,
+    residuoCodigo: entry.residuoCodigo,
+    residuoNombre: entry.residuoNombre,
+    descripcion: null,
+    instrucciones: null,
+    categoria: entry.categoria,
+    precioPorKg: null,
+    vigenciaDesde: toISO(lunes),
+    vigenciaHasta: toISO(domingo),
+    residuoId: null,
+  };
+}
+
+/** Fallback estático para demo offline. Se genera una vez al importar el módulo. */
+export const DEFAULT_ROTACION_SEMANAL: RotacionSemanal = calcularRotacionLocal();
 
 export function getNextDateForDay(dayName: string): string {
   const daysMap: Record<string, number> = {
@@ -371,7 +612,9 @@ export function getNextDateForDay(dayName: string): string {
     return `¡Hoy (${dayName})! Recorrido en curso`;
   }
   if (diff < 0) diff += 7;
-  const nextDate = new Date(now.getTime() + diff * 24 * 60 * 60 * 1000);
+  const nextDate = new Date(now);
+  nextDate.setDate(now.getDate() + diff);
   const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   return `${dayName} ${String(nextDate.getDate()).padStart(2, '0')} ${months[nextDate.getMonth()]}`;
 }
+

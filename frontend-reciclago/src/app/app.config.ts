@@ -1,5 +1,5 @@
 import { ApplicationConfig, APP_INITIALIZER } from '@angular/core';
-import { provideRouter, withViewTransitions, withHashLocation } from '@angular/router';
+import { provideRouter, withViewTransitions, withHashLocation, withInMemoryScrolling } from '@angular/router';
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
 import { MsalService, MSAL_INSTANCE, MsalGuard, MsalInterceptor, MSAL_INTERCEPTOR_CONFIG, MSAL_GUARD_CONFIG, MsalBroadcastService } from '@azure/msal-angular';
@@ -30,9 +30,9 @@ export function MSALInstanceFactory(): IPublicClientApplication {
       setActiveAccount: () => {},
       handleRedirectPromise: () => Promise.resolve(null),
       loginRedirect: () => Promise.resolve(),
-      loginPopup: () => Promise.reject('MSAL not active in this environment'),
+      loginPopup: () => Promise.reject(new Error('MSAL not active in this environment')),
       logoutRedirect: () => Promise.resolve(),
-      acquireTokenSilent: () => Promise.reject('MSAL not active in this environment')
+      acquireTokenSilent: () => Promise.reject(new Error('MSAL not active in this environment'))
     } as unknown as IPublicClientApplication;
   }
 }
@@ -53,7 +53,12 @@ export function MSALInitializerFactory(msalInstance: IPublicClientApplication) {
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes, withViewTransitions({ skipInitialTransition: false }), withHashLocation()),
+    provideRouter(
+      routes,
+      withViewTransitions({ skipInitialTransition: false }),
+      withHashLocation(),
+      withInMemoryScrolling({ scrollPositionRestoration: 'top', anchorScrolling: 'enabled' })
+    ),
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimations(),
     {
@@ -98,6 +103,9 @@ export const appConfig: ApplicationConfig = {
           ['http://localhost:8080/api/*', environment.apiConfig.scopes],
           ['http://localhost:8080/api*', environment.apiConfig.scopes],
           ['http://localhost:8080/api', environment.apiConfig.scopes],
+          [`${environment.apiConfig.uri}/api/*`, environment.apiConfig.scopes],
+          [`${environment.apiConfig.uri}/api*`, environment.apiConfig.scopes],
+          [`${environment.apiConfig.uri}/api`, environment.apiConfig.scopes],
           ['/api/*', environment.apiConfig.scopes],
           ['/api*', environment.apiConfig.scopes],
           ['/api', environment.apiConfig.scopes]

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BffService } from '../../../../services/bff.service';
@@ -11,13 +11,16 @@ import { Pickup } from '../../data/sectors.data';
   template: `
     <div *ngIf="isOpen"
          (click)="onClose()"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="modal-cancelar-title"
          class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
       
       <div (click)="$event.stopPropagation()"
-           class="relative w-full max-w-md bg-white rounded-[2rem] shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel p-6 sm:p-7 text-slate-800 my-auto">
+           class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel p-6 sm:p-7 text-slate-800 my-auto">
         
         <!-- Franja de acento superior institucional -->
-        <div class="h-1.5 -mx-7 -mt-7 mb-5 bg-gradient-to-r from-rose-500 via-rose-400 to-amber-500"></div>
+        <div class="h-1.5 -mx-7 -mt-7 mb-5 bg-red-600"></div>
 
         <!-- Encabezado del modal -->
         <div class="flex items-center justify-between mb-3">
@@ -26,13 +29,12 @@ import { Pickup } from '../../data/sectors.data';
               <i class="fa-solid fa-ban"></i>
             </div>
             <div>
-              <span class="text-[10px] font-black uppercase tracking-wider text-rose-600 block">Gestión de Excepciones</span>
-              <h3 class="font-heading font-extrabold text-lg sm:text-xl text-[#123F5B]">
+              <h3 id="modal-cancelar-title" class="font-heading font-extrabold text-lg sm:text-xl text-[#123F5B]">
                 Cancelar Solicitud #{{ pickup?.id }}
               </h3>
             </div>
           </div>
-          <button (click)="onClose()" type="button" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-colors cursor-pointer">
+          <button (click)="onClose()" type="button" aria-label="Cerrar modal de cancelación" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-colors cursor-pointer">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -46,8 +48,15 @@ import { Pickup } from '../../data/sectors.data';
         <!-- Formulario de Cancelación -->
         <div class="space-y-3.5 text-left">
           <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Motivo de Cancelación</label>
-            <input type="text" [(ngModel)]="actionMotivo" class="input-stitch w-full py-2 px-3 text-sm" placeholder="Ej: Domicilio cerrado, material inadecuado o reprogramado">
+            <label for="motivoCancelacionInput" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">
+              Motivo de Cancelación
+            </label>
+            <input id="motivoCancelacionInput"
+                   type="text"
+                   [(ngModel)]="actionMotivo"
+                   class="input-stitch w-full py-2 px-3 text-sm"
+                   placeholder="Ej: Domicilio cerrado, material inadecuado o reprogramado"
+                   aria-required="true">
           </div>
           <p class="text-xs text-slate-500">
             <i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1"></i> Esta acción cancela la orden y notificará al vecino por correo municipal.
@@ -55,13 +64,13 @@ import { Pickup } from '../../data/sectors.data';
         </div>
 
         <!-- Banner de Error Sobrio -->
-        <div *ngIf="errorMessage" class="mt-4 p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 text-xs flex items-start gap-2.5 text-left">
+        <div *ngIf="errorMessage" role="alert" aria-live="polite" class="mt-4 p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 text-xs flex items-start gap-2.5 text-left">
           <i class="fa-solid fa-circle-exclamation text-amber-600 text-base mt-0.5 flex-shrink-0"></i>
           <div class="flex-1 min-w-0">
             <span class="font-bold block text-sm text-amber-950">{{ errorTitle }}</span>
             <span class="text-xs text-amber-900 leading-relaxed mt-0.5 block">{{ errorMessage }}</span>
           </div>
-          <button (click)="errorMessage = ''" type="button" class="text-amber-500 hover:text-amber-800 text-xs cursor-pointer">
+          <button (click)="errorMessage = ''" type="button" aria-label="Cerrar aviso" class="text-amber-500 hover:text-amber-800 text-xs cursor-pointer">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -82,9 +91,9 @@ import { Pickup } from '../../data/sectors.data';
 })
 export class CancelarModalComponent implements OnChanges, OnDestroy {
   @Input() isOpen: boolean = false;
-  @Input() pickup: Pickup | any = null;
+  @Input() pickup: Pickup | null = null;
 
-  @Output() close = new EventEmitter<void>();
+  @Output() modalClose = new EventEmitter<void>();
   @Output() actionCompleted = new EventEmitter<void>();
 
   actionMotivo = '';
@@ -92,7 +101,14 @@ export class CancelarModalComponent implements OnChanges, OnDestroy {
   errorMessage = '';
   errorTitle = 'Aviso de Cancelación';
 
-  constructor(private bffService: BffService) {}
+  constructor(private readonly bffService: BffService) {}
+
+  @HostListener('document:keydown.escape')
+  handleEscape(): void {
+    if (this.isOpen && !this.isSubmitting) {
+      this.onClose();
+    }
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isOpen']) {
@@ -116,7 +132,7 @@ export class CancelarModalComponent implements OnChanges, OnDestroy {
   onClose(): void {
     this.errorMessage = '';
     document.body.style.overflow = '';
-    this.close.emit();
+    this.modalClose.emit();
   }
 
   confirmarCancelacion(): void {

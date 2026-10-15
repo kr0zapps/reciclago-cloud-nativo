@@ -1,8 +1,8 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BffService } from '../../../../services/bff.service';
-import { Pickup, Camion, Sector, DEFAULT_SECTORES } from '../../data/sectors.data';
+import { Pickup, Camion, Sector } from '../../data/sectors.data';
 import { DateOption, TimeSlot } from './programar-modal.component';
 import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
 
@@ -13,14 +13,16 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
   template: `
     <div *ngIf="isOpen"
          (click)="onClose()"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="modal-chofer-title"
          class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
       
       <div (click)="$event.stopPropagation()"
-           class="relative w-full max-w-lg bg-white rounded-[2rem] shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel p-6 sm:p-7 text-slate-800 my-auto">
+           class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel p-6 sm:p-7 text-slate-800 my-auto">
         
         <!-- Franja de acento superior institucional -->
-        <div class="h-1.5 -mx-7 -mt-7 mb-5"
-             [ngClass]="actionType === 'en-ruta' ? 'bg-gradient-to-r from-[#123F5B] via-[#38BDF8] to-[#4F8A3D]' : 'bg-gradient-to-r from-amber-500 to-emerald-600'"></div>
+        <div class="h-1.5 -mx-7 -mt-7 mb-5 bg-[#123F5B] rounded-t-2xl"></div>
 
         <!-- Encabezado del modal -->
         <div class="flex items-center justify-between mb-3">
@@ -33,12 +35,12 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
               <span class="text-[10px] font-black uppercase tracking-wider text-slate-500 block">
                 {{ actionType === 'en-ruta' ? 'Despacho y Salida a Ruta' : 'Operación de Cabina' }}
               </span>
-              <h3 class="font-heading font-extrabold text-lg sm:text-xl text-[#123F5B]">
+              <h3 id="modal-chofer-title" class="font-heading font-extrabold text-lg sm:text-xl text-[#123F5B]">
                 {{ actionType === 'en-ruta' ? 'Despachar a Ruta' : 'Confirmar Retiro' }} #{{ pickup?.id }}
               </h3>
             </div>
           </div>
-          <button (click)="onClose()" type="button" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-colors cursor-pointer">
+          <button (click)="onClose()" type="button" aria-label="Cerrar modal de cabina" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-colors cursor-pointer">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -65,9 +67,9 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
               <i class="fa-regular fa-clock"></i>
             </div>
             <div>
-              <p class="text-sm font-bold text-amber-950">Esperando Visto Bueno del Coordinador</p>
+              <p class="text-sm font-bold text-amber-950">Esta solicitud debe ser programada primero.</p>
               <p class="text-xs text-amber-900 leading-relaxed mt-1">
-                Debes esperar el visto bueno de tu Coordinador para seguir esta orden. La solicitud aún está en estado <strong>SOLICITADO</strong> y debe ser programada con fecha y camión asignado antes de salir a ruta.
+                La solicitud aún está en estado <strong>SOLICITADO</strong> y debe ser programada con fecha y camión asignado antes de salir a ruta.
               </p>
             </div>
           </div>
@@ -93,9 +95,9 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
             </div>
 
             <div class="mt-2 text-[11px] text-slate-700 space-y-0.5">
-              <div>Fecha: <strong class="text-brand-navy">{{ selectedFechaFullText }}</strong></div>
-              <div>Hora: <strong class="text-brand-navy">{{ selectedHora }} hrs</strong> ({{ selectedPeriodo }})</div>
-              <div>Cuadrilla: <strong class="text-brand-navy">{{ actionCamionPatente }}</strong></div>
+              <div>Fecha: <strong class="text-[#123F5B]">{{ selectedFechaFullText }}</strong></div>
+              <div>Hora: <strong class="text-[#123F5B]">{{ selectedHora }} hrs</strong> ({{ selectedPeriodo }})</div>
+              <div>Cuadrilla: <strong class="text-[#123F5B]">{{ actionCamionPatente }}</strong></div>
             </div>
           </div>
 
@@ -117,7 +119,7 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
                         (click)="seleccionarFecha(d.value)"
                         type="button"
                         class="p-2 rounded-xl text-left border-2 transition-all cursor-pointer flex flex-col justify-between"
-                        [ngClass]="selectedFecha === d.value ? 'bg-[#123F5B] text-white border-[#123F5B] shadow-2xs font-bold ring-1 ring-sky-300' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'">
+                        [ngClass]="selectedFecha === d.value ? 'bg-[#ecf7e6] border-[#22a652]' : 'bg-white border-gray-200'">
                   <div>
                     <div class="flex items-center justify-between">
                       <span class="text-[9px] font-black uppercase opacity-80">{{ d.diaSemana }}</span>
@@ -145,7 +147,7 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
                         (click)="seleccionarHora(slot.value)"
                         type="button"
                         class="py-1.5 px-1 rounded-lg text-center border transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5"
-                        [ngClass]="selectedHora === slot.value ? 'bg-[#4F8A3D] text-white border-[#4F8A3D] font-bold shadow-2xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'">
+                        [ngClass]="selectedHora === slot.value ? 'bg-[#ecf7e6] border-[#22a652]' : 'bg-white border-gray-200'">
                   <span class="text-xs font-bold">{{ slot.label }}</span>
                   <span class="text-[8.5px] font-medium opacity-80">{{ slot.periodo }}</span>
                 </button>
@@ -154,19 +156,49 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
 
             <!-- 3. Camión si hay disponibles -->
             <div *ngIf="camionesDisponibles && camionesDisponibles.length > 0">
-              <label class="block text-[11px] font-bold uppercase tracking-wider text-[#123F5B] mb-1">
-                Camión Asignado
-              </label>
-              <select [(ngModel)]="actionCamionPatente" (ngModelChange)="hasScheduleChanges = true" class="select-stitch w-full py-1.5 px-2.5 text-xs font-medium bg-white">
-                <option *ngFor="let c of camionesDisponibles" [value]="c.patente">
-                  {{ c.patente }} ({{ (c.estado === 'ACTIVO' || !c.estado) ? 'Operativo' : c.estado }})
-                </option>
-              </select>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-[#123F5B]">
+                  Camión Asignado
+                </label>
+                <span class="text-[9.5px] font-semibold text-slate-500">
+                  {{ activeCamionesCount }} disponibles de {{ camionesDisponibles.length }}
+                </span>
+              </div>
+
+              <!-- Grilla de Tarjetas de Camión -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <button *ngFor="let c of camionesDisponibles"
+                        (click)="seleccionarCamion(c)"
+                        [disabled]="c.estado === 'MANTENIMIENTO'"
+                        type="button"
+                        class="p-2 rounded-xl text-left border transition-all flex flex-col justify-between gap-1 relative cursor-pointer"
+                        [ngClass]="c.estado === 'MANTENIMIENTO'
+                          ? 'bg-slate-50 border-slate-200 opacity-50 cursor-not-allowed text-slate-400'
+                          : (actionCamionPatente === c.patente
+                            ? 'bg-[#ecf7e6] border-[#22a652]'
+                            : 'bg-white border-gray-200 hover:border-slate-300 hover:bg-slate-50/80 text-slate-700')">
+                  <div class="flex items-center justify-between gap-1">
+                    <div class="flex items-center gap-1.5">
+                      <i class="fa-solid fa-truck-front text-xs"
+                         [ngClass]="actionCamionPatente === c.patente ? 'text-[#4F8A3D]' : 'text-slate-400'"></i>
+                      <span class="text-xs font-black tracking-tight font-mono">{{ c.patente }}</span>
+                    </div>
+                    <i *ngIf="actionCamionPatente === c.patente" class="fa-solid fa-circle-check text-xs text-[#4F8A3D]"></i>
+                  </div>
+                  <div class="flex items-center justify-between text-[9px] pt-1 border-t border-slate-100">
+                    <span class="font-medium text-slate-500">{{ c.capacidadKilos || 1500 }} kg</span>
+                    <span class="px-1.5 py-0.5 rounded-full font-bold"
+                          [ngClass]="c.estado === 'MANTENIMIENTO' ? 'bg-rose-100 text-rose-700' : (c.estado === 'EN_RUTA' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800')">
+                      {{ c.estado === 'MANTENIMIENTO' ? 'En Taller' : (c.estado === 'EN_RUTA' ? 'En Ruta' : 'Disponible') }}
+                    </span>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
 
           <p class="text-xs text-slate-600 leading-relaxed px-1">
-            Al confirmar, el estado pasará a <strong>EN_RUTA</strong>, habilitando la telemetría GPS y notificando al vecino.
+            El retiro pasará a estado En Ruta.
           </p>
         </div>
 
@@ -179,13 +211,13 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
         </div>
 
         <!-- Banner de Error Sobrio -->
-        <div *ngIf="errorMessage" class="mt-4 p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 text-xs flex items-start gap-2.5 text-left">
+        <div *ngIf="errorMessage" role="alert" aria-live="polite" class="mt-4 p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 text-xs flex items-start gap-2.5 text-left">
           <i class="fa-solid fa-circle-exclamation text-amber-600 text-base mt-0.5 flex-shrink-0"></i>
           <div class="flex-1 min-w-0">
             <span class="font-bold block text-sm text-amber-950">{{ errorTitle }}</span>
             <span class="text-xs text-amber-900 leading-relaxed mt-0.5 block">{{ errorMessage }}</span>
           </div>
-          <button (click)="errorMessage = ''" type="button" class="text-amber-500 hover:text-amber-800 text-xs cursor-pointer">
+          <button (click)="errorMessage = ''" type="button" aria-label="Cerrar aviso" class="text-amber-500 hover:text-amber-800 text-xs cursor-pointer">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -210,11 +242,11 @@ import { detectSector, DAY_NAME_TO_NUMBER } from '../../utils/sector.utils';
 })
 export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
   @Input() isOpen: boolean = false;
-  @Input() pickup: Pickup | any = null;
+  @Input() pickup: Pickup | null = null;
   @Input() actionType: 'en-ruta' | 'retirado' = 'en-ruta';
-  @Input() camionesDisponibles: Camion[] | any[] = [];
+  @Input() camionesDisponibles: Camion[] = [];
 
-  @Output() close = new EventEmitter<void>();
+  @Output() modalClose = new EventEmitter<void>();
   @Output() actionCompleted = new EventEmitter<void>();
 
   isSubmitting = false;
@@ -230,7 +262,7 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
   nextDateOptions: DateOption[] = [];
   availableTimeSlots: TimeSlot[] = [];
 
-  constructor(private bffService: BffService) {}
+  constructor(private readonly bffService: BffService) {}
 
   get isBlocked(): boolean {
     return this.actionType === 'en-ruta' && this.pickup?.estado === 'SOLICITADO';
@@ -279,44 +311,80 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
     return found ? found.periodo : 'Turno Oficial';
   }
 
+  private handleIsOpenChange(): void {
+    this.errorMessage = '';
+    this.showAdjustSchedule = false;
+    this.hasScheduleChanges = false;
+    if (this.isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }
+
+  private handlePickupChange(): void {
+    if (!this.pickup) return;
+    this.errorMessage = '';
+    this.hasScheduleChanges = false;
+    this.showAdjustSchedule = false;
+    this.computeDateAndHourOptions();
+
+    const fallbackPatente = this.sectorDetected.patente || 'PV-RC-2026';
+    this.actionCamionPatente = this.getValidCamionPatente(this.pickup.camionPatente || fallbackPatente);
+
+    if (this.pickup.fechaProgramada) {
+      const parts = String(this.pickup.fechaProgramada).split('T');
+      if (parts[0]) {
+        this.selectedFecha = parts[0];
+        this.ensureFechaInOptions(parts[0]);
+      }
+      if (parts[1]) {
+        const hora = parts[1].substring(0, 5);
+        this.selectedHora = hora;
+        this.ensureHoraInSlots(hora);
+      }
+    } else if (this.nextDateOptions.length > 0) {
+      this.selectedFecha = this.nextDateOptions[0].value;
+    }
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isOpen']) {
-      this.errorMessage = '';
-      this.showAdjustSchedule = false;
-      this.hasScheduleChanges = false;
-      if (this.isOpen) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = '';
-      }
+      this.handleIsOpenChange();
+    }
+    if (changes['camionesDisponibles']) {
+      this.actionCamionPatente = this.getValidCamionPatente(this.actionCamionPatente);
     }
     if (changes['pickup'] && this.pickup) {
-      this.errorMessage = '';
-      this.hasScheduleChanges = false;
-      this.showAdjustSchedule = false;
-      this.computeDateAndHourOptions();
-
-      if (this.pickup.camionPatente) {
-        this.actionCamionPatente = this.pickup.camionPatente;
-      } else {
-        this.actionCamionPatente = this.sectorDetected.patente || 'PV-RC-2026';
-      }
-
-      if (this.pickup.fechaProgramada) {
-        const parts = String(this.pickup.fechaProgramada).split('T');
-        if (parts[0]) {
-          this.selectedFecha = parts[0];
-          this.ensureFechaInOptions(parts[0]);
-        }
-        if (parts[1]) {
-          const hora = parts[1].substring(0, 5);
-          this.selectedHora = hora;
-          this.ensureHoraInSlots(hora);
-        }
-      } else if (this.nextDateOptions.length > 0) {
-        this.selectedFecha = this.nextDateOptions[0].value;
-      }
+      this.handlePickupChange();
     }
+  }
+
+  get activeCamionesCount(): number {
+    return (this.camionesDisponibles || []).filter(c => c.estado !== 'MANTENIMIENTO').length;
+  }
+
+  seleccionarCamion(c: Camion): void {
+    if (c.estado === 'MANTENIMIENTO') return;
+    this.actionCamionPatente = c.patente;
+    this.hasScheduleChanges = true;
+  }
+
+  @HostListener('document:keydown.escape')
+  handleEscape(): void {
+    if (this.isOpen && !this.isSubmitting) {
+      this.onClose();
+    }
+  }
+
+  getValidCamionPatente(desiredPatente: string): string {
+    const list = this.camionesDisponibles || [];
+    const desired = list.find(c => c.patente === desiredPatente);
+    if (desired && desired.estado !== 'MANTENIMIENTO') {
+      return desired.patente;
+    }
+    const primerDisponible = list.find(c => c.estado !== 'MANTENIMIENTO');
+    return primerDisponible ? primerDisponible.patente : desiredPatente;
   }
 
   ngOnDestroy(): void {
@@ -341,14 +409,19 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
     const dates: DateOption[] = [];
     const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     const now = new Date();
-    const targetDays = this.allowedDayNumbers;
+
+    let targetDays = this.allowedDayNumbers;
+    if (!targetDays || targetDays.length === 0) {
+      targetDays = [1, 2, 3, 4, 5]; // Días hábiles por defecto
+    }
     let checkDate = new Date(now);
     checkDate.setDate(checkDate.getDate() + 1);
 
     const sublabels = ['Próximo recorrido', 'Semana siguiente', 'En 2 semanas', 'En 3 semanas'];
     let count = 0;
+    let maxIterations = 60; // Protección contra bucle infinito
 
-    while (dates.length < 4) {
+    while (dates.length < 4 && maxIterations-- > 0) {
       if (targetDays.includes(checkDate.getDay())) {
         const y = checkDate.getFullYear();
         const m = String(checkDate.getMonth() + 1).padStart(2, '0');
@@ -425,7 +498,7 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
   onClose(): void {
     this.errorMessage = '';
     document.body.style.overflow = '';
-    this.close.emit();
+    this.modalClose.emit();
   }
 
   confirmarOperacion(): void {
@@ -433,10 +506,19 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
     this.isSubmitting = true;
     this.errorMessage = '';
 
+    if (this.actionType === 'en-ruta') {
+      const camionSeleccionado = (this.camionesDisponibles || []).find(c => c.patente === this.actionCamionPatente);
+      if (camionSeleccionado?.estado === 'MANTENIMIENTO') {
+        this.errorMessage = `El camión ${camionSeleccionado.patente} se encuentra en taller/mantenimiento y no puede iniciar ruta.`;
+        this.isSubmitting = false;
+        return;
+      }
+    }
+
     // Si se modificó la programación antes de despachar a cuadrilla, guardar primero
     if (this.actionType === 'en-ruta' && this.hasScheduleChanges && this.selectedFecha && this.selectedHora) {
       const camionSeleccionado = this.camionesDisponibles.find(c => c.patente === this.actionCamionPatente) || this.camionesDisponibles[0];
-      const camionId = camionSeleccionado ? camionSeleccionado.id : 1;
+      const camionId = camionSeleccionado?.id ?? 1;
       const isoDateTime = `${this.selectedFecha}T${this.selectedHora}:00`;
 
       this.bffService.programarPickup(this.pickup.id, {
@@ -447,9 +529,10 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
         next: () => {
           this.procederConDespacho();
         },
-        error: () => {
+        error: (err: any) => {
           this.isSubmitting = false;
-          this.errorMessage = 'No se pudo actualizar la programación antes de despachar.';
+          const detail = err?.error?.error || err?.error?.message || (typeof err?.error === 'string' ? err.error : null);
+          this.errorMessage = detail || 'No se pudo actualizar la programación antes de despachar.';
         }
       });
     } else {
@@ -458,6 +541,7 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
   }
 
   private procederConDespacho(): void {
+    if (!this.pickup) return;
     const obs = this.actionType === 'en-ruta'
       ? this.bffService.enRutaPickup(this.pickup.id)
       : this.bffService.retiradoPickup(this.pickup.id);
@@ -485,3 +569,4 @@ export class ChoferOperacionModalComponent implements OnChanges, OnDestroy {
     });
   }
 }
+

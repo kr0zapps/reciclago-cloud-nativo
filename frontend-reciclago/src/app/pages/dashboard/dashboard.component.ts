@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BffService } from '../../services/bff.service';
 import { MsalService } from '@azure/msal-angular';
+import { Subject, interval } from 'rxjs';
+import { takeUntil, switchMap } from 'rxjs/operators';
 
 import { HeroPickupComponent } from './components/hero-pickup.component';
 import { TruckTrackingComponent } from './components/truck-tracking.component';
@@ -29,8 +31,13 @@ import {
   Pickup,
   DEFAULT_SECTORES,
   DEFAULT_RESIDUOS,
-  DEFAULT_CAMIONES,
-  getNextDateForDay
+  DEFAULT_ROTACION_SEMANAL,
+  RotacionSemanal,
+  getNextDateForDay,
+  aplicarSectorOverrides,
+  calcularRotacionLocal,
+  getScheduleOverrideForSector,
+  SectorScheduleOverride
 } from './data/sectors.data';
 import { DAY_NAME_TO_NUMBER } from './utils/sector.utils';
 
@@ -60,22 +67,46 @@ import { DAY_NAME_TO_NUMBER } from './utils/sector.utils';
   templateUrl: './dashboard.component.html'
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+  private readonly POLLING_INTERVAL_MS = 20_000;
+
   userName = '';
   userEmail = '';
   userRoles: string[] = [];
 
-  sectores: Sector[] = [...DEFAULT_SECTORES];
+  sectores: Sector[] = aplicarSectorOverrides([...DEFAULT_SECTORES]);
   selectedSector = 'Costanera Sur y Llanquihue Sur';
   userActiveAddress = 'Calle Los Guindos 450, Costanera, Puerto Varas';
 
   residuos: Residuo[] = [...DEFAULT_RESIDUOS];
   pickups: Pickup[] = [];
-  camionesDisponibles: Camion[] = [...DEFAULT_CAMIONES];
+  /**
+   * Inicializado vacío: si el catálogo responde, se reemplaza con datos reales de PostgreSQL.
+   * Si falla, loadCamiones() deja el array vacío para que el admin vea que no hay datos reales.
+   */
+  camionesDisponibles: Camion[] = [];
+
+  /**
+   * Indica si el catálogo de camiones está disponible.
+   * false = microservicio caído, null = cargando, true = datos reales recibidos.
+   */
+  catalogoDisponible: boolean | null = null;
+
+  /**
+   * Rotación semanal de residuos desde ms-reciclago-catalog.
+   * Inicializado con el fallback calculado localmente (misma lógica que el backend).
+   * Se reemplaza con datos reales cuando el catálogo responde.
+   */
+  rotacionSemanal: RotacionSemanal = DEFAULT_ROTACION_SEMANAL;
 
   showRutaModal = false;
   showActionModal = false;
   selectedPickupForAction: Pickup | null = null;
   actionType: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar' = 'programar';
+
+  /** Pickup seleccionado por el vecino desde el historial para ver en el tracker */
+  selectedTrackingPickup: Pickup | null = null;
+  activeVecinoTab: 'seguimiento' | 'solicitar' | 'historial' = 'seguimiento';
 
   truckSimulationRunning = true;
   truckSpeed = 1;
@@ -96,6 +127,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
       ...sec,
       fechaTexto: getNextDateForDay(sec.dia)
     };
+  }
+
+  get avisoSectorActivo(): SectorScheduleOverride | null {
+    const sec = this.currentSectorInfo;
+    if (!sec) return null;
+    const semana = this.rotacionSemanal?.slotSemana || 3;
+    return getScheduleOverrideForSector(sec.nombre, semana);
   }
 
   get isStaff(): boolean {
@@ -123,18 +161,44 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return activeP?.camionPatente || this.currentSectorInfo?.patente || 'PV-RC-2026';
   }
 
+  get totalKilosReciclados(): number {
+    return this.pickups
+      .filter(p => (p.estado === 'completado' || p.estado === 'PESADO' || p.estado === 'RETIRADO') && p.kilosRecolectados)
+      .reduce((sum, p) => sum + (Number(p.kilosRecolectados) || 0), 0);
+  }
+
+  /**
+   * Nombre del residuo que se recolecta esta semana según la rotación municipal.
+   * Usa el dato real del catálogo; si no está disponible, usa el fallback local.
+   */
+  get materialSemanalNombre(): string {
+    return this.rotacionSemanal?.residuoNombre || DEFAULT_ROTACION_SEMANAL.residuoNombre;
+  }
+
+  /**
+   * Código del residuo semanal (ej: 'PLASTICO_PET').
+   * Útil para lógica condicional en subcomponentes.
+   */
+  get materialSemanalCodigo(): string {
+    return this.rotacionSemanal?.residuoCodigo || DEFAULT_ROTACION_SEMANAL.residuoCodigo;
+  }
+
   constructor(
-    private bffService: BffService,
-    private authService: MsalService
+    private readonly bffService: BffService,
+    private readonly authService: MsalService
   ) {}
 
   ngOnInit(): void {
-    const account = this.authService.instance.getActiveAccount() || this.authService.instance.getAllAccounts()[0];
+    const account = this.authService.instance?.getActiveAccount?.() || this.authService.instance?.getAllAccounts?.()[0];
     if (account) {
       this.userName = account.name || account.username || '';
       const claims = account.idTokenClaims as Record<string, any> | undefined;
       if (claims) {
-        if (claims['roles']) this.userRoles = [...claims['roles']];
+        if (Array.isArray(claims['roles'])) {
+          this.userRoles = [...claims['roles']];
+        } else if (typeof claims['roles'] === 'string') {
+          this.userRoles = [claims['roles']];
+        }
         this.userEmail = (claims['preferred_username'] || claims['upn'] || account.username || '') as string;
       } else {
         this.userEmail = account.username || '';
@@ -146,17 +210,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
     // Sincronizar roles desde el Access Token a través de /api/me
     this.bffService.getProfile().subscribe({
       next: (profile) => {
-        if (profile && Array.isArray(profile.roles) && profile.roles.length > 0) {
+        let changed = false;
+        if (profile?.roles && Array.isArray(profile.roles) && profile.roles.length > 0) {
           this.userRoles = Array.from(new Set([...this.userRoles, ...profile.roles]));
           this.syncDefaultStaffRole();
+          changed = true;
         }
-        if (profile && (profile.email || profile.username) && !this.userEmail) {
-          this.userEmail = profile.email || profile.username || '';
+        if ((profile?.email || profile?.username) && !this.userEmail) {
+          this.userEmail = profile?.email || profile?.username || '';
+          changed = true;
         }
-        if (profile && profile.name && !this.userName) {
+        if (profile?.name && !this.userName) {
           this.userName = profile.name;
         }
-        this.loadPickups();
+        if (changed) {
+          this.loadPickups();
+        }
       },
       error: () => {}
     });
@@ -164,17 +233,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.truckWaypoints = this.currentSectorInfo?.waypoints || [];
     this.loadResiduos();
     this.loadPickups();
+    this.startPickupPolling();
     this.loadCuadrantes();
     this.loadCamiones();
+    this.loadRotacionSemanal();
     this.loadLiveTracking();
     this.startTruckSimulation();
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     if (this.truckTimer) {
       clearInterval(this.truckTimer);
       this.truckTimer = null;
     }
+    document.body.style.overflow = '';
   }
 
   syncDefaultStaffRole(): void {
@@ -191,6 +265,33 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.activeStaffRole = role;
   }
 
+  isSectorDropdownOpen = false;
+
+  toggleSectorDropdown(event?: Event): void {
+    event?.stopPropagation();
+    event?.preventDefault();
+    this.isSectorDropdownOpen = !this.isSectorDropdownOpen;
+  }
+
+  selectSector(sectorNombre: string): void {
+    this.selectedSector = sectorNombre;
+    this.isSectorDropdownOpen = false;
+    this.onHeaderSectorChange();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target?.closest('.sector-dropdown-container')) {
+      this.isSectorDropdownOpen = false;
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    this.isSectorDropdownOpen = false;
+  }
+
   onHeaderSectorChange(): void {
     this.onSectorSelect(this.selectedSector);
   }
@@ -204,10 +305,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   startTruckSimulation(): void {
-    if (this.truckTimer) clearInterval(this.truckTimer);
-    const intervalMs = this.truckSpeed === 2 ? 1800 : 3500;
+    if (this.truckTimer) {
+      clearInterval(this.truckTimer);
+      this.truckTimer = null;
+    }
+    const intervalMs = this.truckSpeed === 2 ? 1500 : 3000;
     this.truckTimer = setInterval(() => {
-      if (this.truckSimulationRunning && this.isCamionEnRuta && this.truckWaypoints.length > 0) {
+      if (this.truckSimulationRunning && this.truckWaypoints.length > 0) {
         this.currentTruckIndex = (this.currentTruckIndex + 1) % this.truckWaypoints.length;
       }
     }, intervalMs);
@@ -230,9 +334,36 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   loadResiduos(): void {
     this.bffService.getResiduos().subscribe({
-      next: (data) => this.residuos = (data && data.length > 0) ? data : [...DEFAULT_RESIDUOS],
-      error: () => this.residuos = [...DEFAULT_RESIDUOS]
+      next: (data) => {
+        this.residuos = (data?.length) ? data : [...DEFAULT_RESIDUOS];
+      },
+      error: () => {
+        this.residuos = [...DEFAULT_RESIDUOS];
+      }
     });
+  }
+
+  private formatPickupFechaTexto(p: any): string {
+    if (p.fechaProgramada) {
+      return new Date(p.fechaProgramada).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
+    }
+    if (p.fechaTexto) {
+      return p.fechaTexto;
+    }
+    if (p.fechaSolicitud) {
+      return new Date(p.fechaSolicitud).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
+    }
+    return 'Hoy';
+  }
+
+  private resolveKilosRecolectados(p: any): number | null {
+    if (p.pesoRealKg != null) {
+      return p.pesoRealKg;
+    }
+    if (p.estado === 'PESADO') {
+      return p.kilosRecolectados ?? null;
+    }
+    return null;
   }
 
   loadPickups(): void {
@@ -241,17 +372,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: (data) => {
         if (Array.isArray(data)) {
           const filtered = (!this.isStaff && this.userEmail)
-            ? data.filter((p: any) => p.vecinoEmail && p.vecinoEmail.toLowerCase() === this.userEmail.toLowerCase())
+            ? data.filter((p: any) => p.vecinoEmail?.toLowerCase() === this.userEmail.toLowerCase())
             : data;
           this.pickups = filtered.map((p: any) => ({
             ...p,
             fecha: p.fechaSolicitud ? p.fechaSolicitud.split('T')[0] : (p.fecha || ''),
-            fechaTexto: p.fechaProgramada 
-              ? new Date(p.fechaProgramada).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' })
-              : (p.fechaTexto || (p.fechaSolicitud ? new Date(p.fechaSolicitud).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' }) : 'Hoy')),
-            kilosRecolectados: p.pesoRealKg != null ? p.pesoRealKg : (p.estado === 'PESADO' ? (p.kilosRecolectados || null) : null),
-            pesoRealKg: p.pesoRealKg != null ? p.pesoRealKg : null,
-            pesoEstimadoKg: p.pesoEstimadoKg != null ? p.pesoEstimadoKg : null,
+            fechaTexto: this.formatPickupFechaTexto(p),
+            kilosRecolectados: this.resolveKilosRecolectados(p),
+            pesoRealKg: p.pesoRealKg ?? null,
+            pesoEstimadoKg: p.pesoEstimadoKg ?? null,
             comentarios: p.observaciones || p.comentarios || ''
           }));
         } else {
@@ -260,6 +389,31 @@ export class DashboardComponent implements OnInit, OnDestroy {
       },
       error: () => this.pickups = []
     });
+  }
+
+  private startPickupPolling(): void {
+    if (this.isStaff) return;
+    interval(this.POLLING_INTERVAL_MS)
+      .pipe(
+        takeUntil(this.destroy$),
+        switchMap(() => {
+          const emailFilter = this.userEmail || '';
+          return this.bffService.getPickups(emailFilter);
+        })
+      )
+      .subscribe({
+        next: (data: any[]) => {
+          this.pickups = (data || []).map((p: any) => ({
+            ...p,
+            fecha: p.fechaProgramada || p.fecha || '',
+            fechaTexto: p.fechaProgramada
+              ? new Date(p.fechaProgramada).toLocaleDateString('es-CL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+              : (p.fechaTexto || ''),
+            kilosRecolectados: p.pesoRealKg ?? p.pesoEstimadoKg ?? p.kilosRecolectados ?? null,
+          }));
+        },
+        error: () => { /* silent retry on next interval */ }
+      });
   }
 
   loadCuadrantes(): void {
@@ -278,6 +432,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
               (sec as any).enRuta = Boolean(c.camionEnRuta);
             }
           });
+          this.sectores = aplicarSectorOverrides(this.sectores, this.rotacionSemanal?.slotSemana);
         }
       },
       error: () => {}
@@ -285,10 +440,74 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   loadCamiones(): void {
+    this.catalogoDisponible = null; // cargando...
     this.bffService.getCamiones().subscribe({
-      next: (data) => { if (data && data.length > 0) this.camionesDisponibles = data; },
-      error: () => {}
+      next: (data) => {
+        if (data && data.length > 0) {
+          this.catalogoDisponible = true;
+          // Mapear capacidadTotalKg -> capacidadKilos para compatibilidad con el template
+          this.camionesDisponibles = data.map((c: any) => ({
+            ...c,
+            capacidadKilos: c.capacidadKilos ?? c.capacidadTotalKg ?? c.capacidadMaximaKg ?? 0
+          }));
+        } else {
+          // Respuesta vacía: catálogo sin datos aún (seed no ejecutado)
+          this.catalogoDisponible = false;
+          this.camionesDisponibles = [];
+        }
+      },
+      // Catálogo no disponible: dejar vacío, no mostrar mocks que confunden
+      error: () => {
+        this.catalogoDisponible = false;
+        this.camionesDisponibles = [];
+      }
     });
+  }
+
+  /**
+   * Carga la rotación semanal de residuos desde ms-reciclago-catalog vía BFF.
+   * Si el catálogo no está disponible, mantiene el fallback calculado localmente
+   * (con soporte de override manual persistido en localStorage).
+   */
+  loadRotacionSemanal(): void {
+    this.bffService.getRotacionSemanal().subscribe({
+      next: (data) => {
+        if (data && data.residuoCodigo && !data.error) {
+          this.rotacionSemanal = data as RotacionSemanal;
+        } else {
+          this.rotacionSemanal = calcularRotacionLocal();
+        }
+        this.sectores = aplicarSectorOverrides(this.sectores, this.rotacionSemanal?.slotSemana);
+        this.truckWaypoints = this.currentSectorInfo?.waypoints || [];
+      },
+      error: () => {
+        this.rotacionSemanal = calcularRotacionLocal();
+        this.sectores = aplicarSectorOverrides(this.sectores, this.rotacionSemanal?.slotSemana);
+        this.truckWaypoints = this.currentSectorInfo?.waypoints || [];
+      }
+    });
+  }
+
+  onRotacionModificada(): void {
+    this.loadRotacionSemanal();
+  }
+
+  onSectoresModificados(sectoresActualizados: Sector[]): void {
+    this.sectores = [...sectoresActualizados];
+    this.truckWaypoints = this.currentSectorInfo?.waypoints || [];
+  }
+
+  onPickupSelectedForTracking(pickup: Pickup): void {
+    this.selectedTrackingPickup = pickup;
+    this.activeVecinoTab = 'seguimiento';
+  }
+
+  onCamionEstadoCambiado(camionActualizado: Camion): void {
+    const index = this.camionesDisponibles.findIndex(c => c.id === camionActualizado.id || c.patente === camionActualizado.patente);
+    if (index !== -1) {
+      this.camionesDisponibles[index] = { ...this.camionesDisponibles[index], ...camionActualizado };
+      this.camionesDisponibles = [...this.camionesDisponibles];
+    }
   }
 
   loadLiveTracking(): void {
@@ -327,32 +546,31 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (nuevo.direccion) {
       this.userActiveAddress = nuevo.direccion;
     }
+    this.selectedTrackingPickup = nuevo;
+    this.activeVecinoTab = 'seguimiento';
     this.loadPickups();
   }
 
-  onStaffPickupCreated(data: { direccion: string; residuoId: string | number; comentarios?: string }): void {
+  onStaffPickupCreated(data: any): void {
+    const resObj = this.residuos.find(r => r.id === Number(data.residuoId));
     const payload = {
-      ciudadanoEmail: 'vecino.contacto@puertovaras.cl',
+      vecinoEmail: data.vecinoEmail || 'vecino.contacto@puertovaras.cl',
+      vecinoNombre: data.vecinoNombre || 'Vecino Puerto Varas',
       direccion: data.direccion,
-      residuoId: Number(data.residuoId),
-      comentarios: data.comentarios || ''
+      comuna: data.comuna || 'Puerto Varas',
+      residuoId: Number(data.residuoId || 1),
+      residuoNombre: data.residuoNombre || (resObj?.nombre ?? 'Vidrio'),
+      pesoEstimadoKg: Number(data.pesoEstimadoKg) || 5.0,
+      comentarios: data.comentarios || '',
+      observaciones: data.observaciones || data.comentarios || ''
     };
     this.bffService.createPickup(payload).subscribe({
       next: (created) => {
         this.pickups.unshift(created);
         this.loadPickups();
       },
-      error: () => {
-        const fallback: Pickup = {
-          id: Math.floor(Math.random() * 9000) + 1000,
-          direccion: data.direccion,
-          residuoNombre: this.residuos.find(r => r.id === Number(data.residuoId))?.nombre || 'Reciclaje',
-          estado: 'SOLICITADO',
-          comentarios: data.comentarios,
-          fechaTexto: 'Por confirmar',
-          fecha: new Date().toISOString()
-        };
-        this.pickups.unshift(fallback);
+      error: (err) => {
+        console.error('Error al registrar solicitud en microservicio:', err);
       }
     });
   }

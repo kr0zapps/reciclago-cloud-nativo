@@ -68,6 +68,67 @@ public class CamionController {
         }
     }
 
+    @PatchMapping("/patente/{patente}/reducir-capacidad")
+    public ResponseEntity<Camion> reducirCapacidadPorPatente(@PathVariable String patente, @RequestParam Double pesoKg) {
+        try {
+            Camion actualizado = camionService.reducirCapacidadPorPatente(patente, pesoKg);
+            return ResponseEntity.ok(actualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/{id}/restituir-capacidad")
+    public ResponseEntity<Camion> restituirCapacidad(@PathVariable Long id, @RequestParam Double pesoKg) {
+        try {
+            Camion actualizado = camionService.restituirCapacidad(id, pesoKg);
+            return ResponseEntity.ok(actualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/patente/{patente}/restituir-capacidad")
+    public ResponseEntity<Camion> restituirCapacidadPorPatente(@PathVariable String patente, @RequestParam Double pesoKg) {
+        try {
+            Camion actualizado = camionService.restituirCapacidadPorPatente(patente, pesoKg);
+            return ResponseEntity.ok(actualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<Camion> actualizarEstado(@PathVariable Long id, @RequestParam String estado) {
+        try {
+            com.duoc.ms_reciclago_catalog.model.EstadoCamion estadoEnum = com.duoc.ms_reciclago_catalog.model.Camion.parseEstado(estado);
+            Camion actualizado = camionService.actualizarEstado(id, estadoEnum);
+            return ResponseEntity.ok(actualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * Actualiza el estado de un camión por su patente.
+     * Endpoint de sincronización usado por ms-reciclago-pickups cuando
+     * el camión transita entre estados operativos (EN_RUTA, DISPONIBLE, etc.).
+     *
+     * PATCH /api/catalog/camiones/patente/PV-RC-2026/estado?estado=EN_RUTA
+     */
+    @PatchMapping("/patente/{patente}/estado")
+    public ResponseEntity<Camion> actualizarEstadoPorPatente(
+            @PathVariable String patente,
+            @RequestParam String estado) {
+        try {
+            com.duoc.ms_reciclago_catalog.model.EstadoCamion estadoEnum = com.duoc.ms_reciclago_catalog.model.Camion.parseEstado(estado);
+            Camion actualizado = camionService.actualizarEstadoPorPatente(patente, estadoEnum);
+            return ResponseEntity.ok(actualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         camionService.eliminar(id);

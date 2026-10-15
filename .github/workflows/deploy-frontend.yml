@@ -33,16 +33,30 @@ jobs:
       - name: 🌐 Inyectar URL del Backend en environment.prod.ts
         working-directory: ./frontend-reciclago
         env:
+          APIGW_URL: ${{ secrets.APIGW_URL }}
           EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
-          if [ -n "$EC2_HOST" ]; then
-            BACKEND_URL="http://${EC2_HOST}:8080"
-            echo "✅ Inyectando URL del backend: $BACKEND_URL"
-            sed -i "s|BACKEND_API_URL_PLACEHOLDER|${BACKEND_URL}|g" src/environments/environment.prod.ts
+          # Prioridad: APIGW_URL (API Gateway) > EC2_HOST (acceso directo)
+          APIGW_CLEAN=$(echo "$APIGW_URL" | tr -d '\r\n ')
+          EC2_CLEAN=$(echo "$EC2_HOST" | tr -d '\r\n ')
+
+          if [ -n "$APIGW_CLEAN" ]; then
+            # Usar URL del API Gateway (producción correcta con JWT Authorizer)
+            BACKEND_URL="$APIGW_CLEAN"
+            echo "✅ Usando API Gateway URL como backend"
+          elif [ -n "$EC2_CLEAN" ]; then
+            # Fallback: acceso directo al EC2 (sin API Gateway)
+            BACKEND_URL="http://${EC2_CLEAN}:8080"
+            echo "⚠️ APIGW_URL no definido. Usando EC2 directamente como fallback."
           else
-            echo "⚠️ Secret EC2_HOST no definido. La URL del backend quedará como placeholder."
-            echo "   Configura el secret EC2_HOST en GitHub Settings > Secrets con la IP pública del EC2."
+            echo "❌ Ni APIGW_URL ni EC2_HOST están definidos. El frontend usará el placeholder."
           fi
+
+          if [ -n "$BACKEND_URL" ]; then
+            sed -i "s|BACKEND_API_URL_PLACEHOLDER|${BACKEND_URL}|g" src/environments/environment.prod.ts
+            echo "✅ URL del backend inyectada correctamente."
+          fi
+
 
       - name: 🏗️ Compilar Frontend Angular en modo Producción
         working-directory: ./frontend-reciclago
@@ -60,7 +74,8 @@ jobs:
         run: |
           BUCKET="${{ secrets.S3_BUCKET_NAME || 'reciclago-frontend-puertovaras' }}"
           aws s3 sync ./frontend-reciclago/dist/frontend-reciclago/browser s3://$BUCKET --delete
+          aws s3 cp ./frontend-reciclago/dist/frontend-reciclago/browser/index.html s3://$BUCKET/index.html --cache-control "no-cache, no-store, must-revalidate" --content-type text/html
           for route in dashboard login pickups catalog reports audit auth; do
-            aws s3 cp ./frontend-reciclago/dist/frontend-reciclago/browser/index.html s3://$BUCKET/$route --content-type text/html
+            aws s3 cp ./frontend-reciclago/dist/frontend-reciclago/browser/index.html s3://$BUCKET/$route --cache-control "no-cache, no-store, must-revalidate" --content-type text/html
           done
           echo "✅ Despliegue a S3 completado con éxito."

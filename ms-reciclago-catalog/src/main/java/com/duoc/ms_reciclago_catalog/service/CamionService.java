@@ -1,16 +1,20 @@
 package com.duoc.ms_reciclago_catalog.service;
 
 import com.duoc.ms_reciclago_catalog.model.Camion;
+import com.duoc.ms_reciclago_catalog.model.EstadoCamion;
 import com.duoc.ms_reciclago_catalog.repository.CamionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @Transactional
 public class CamionService {
+
+    private static final String CAMION_NO_ENCONTRADO_CON_ID = "Camión no encontrado con id: ";
 
     private final CamionRepository camionRepository;
 
@@ -22,8 +26,17 @@ public class CamionService {
         return camionRepository.findAll();
     }
 
-    public List<Camion> obtenerPorEstado(String estado) {
+    public List<Camion> obtenerPorEstado(EstadoCamion estado) {
         return camionRepository.findByEstado(estado);
+    }
+
+    public List<Camion> obtenerPorEstado(String estado) {
+        try {
+            EstadoCamion enumVal = Camion.parseEstado(estado);
+            return camionRepository.findByEstado(enumVal);
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 
     public Optional<Camion> obtenerPorId(Long id) {
@@ -49,7 +62,41 @@ public class CamionService {
             c.setCapacidadDisponibleKg(detalles.getCapacidadDisponibleKg());
             c.setEstado(detalles.getEstado());
             return camionRepository.save(c);
-        }).orElseThrow(() -> new RuntimeException("Camión no encontrado con id: " + id));
+        }).orElseThrow(() -> new RuntimeException(CAMION_NO_ENCONTRADO_CON_ID + id));
+    }
+
+    public Camion actualizarEstado(Long id, EstadoCamion nuevoEstado) {
+        return camionRepository.findById(id).map(c -> {
+            c.setEstado(nuevoEstado);
+            return camionRepository.save(c);
+        }).orElseThrow(() -> new RuntimeException(CAMION_NO_ENCONTRADO_CON_ID + id));
+    }
+
+    public Camion actualizarEstado(Long id, String nuevoEstado) {
+        return actualizarEstado(id, Camion.parseEstado(nuevoEstado));
+    }
+
+    /**
+     * Actualiza el estado de un camión buscando por patente.
+     * Útil para sincronización desde ms-reciclago-pickups, que conoce la
+     * patente del camión pero no su ID interno del catálogo.
+     *
+     * @param patente      Patente del camión (ej: "PV-RC-2026")
+     * @param nuevoEstado  Nuevo estado a asignar
+     * @return Camión actualizado
+     * @throws RuntimeException si no se encuentra un camión con esa patente
+     */
+    public Camion actualizarEstadoPorPatente(String patente, EstadoCamion nuevoEstado) {
+        return camionRepository.findByPatente(patente)
+                .map(c -> {
+                    c.setEstado(nuevoEstado);
+                    return camionRepository.save(c);
+                })
+                .orElseThrow(() -> new RuntimeException("Camión no encontrado con patente: " + patente));
+    }
+
+    public Camion actualizarEstadoPorPatente(String patente, String nuevoEstado) {
+        return actualizarEstadoPorPatente(patente, Camion.parseEstado(nuevoEstado));
     }
 
     public Camion reducirCapacidad(Long id, Double pesoKg) {
@@ -58,10 +105,40 @@ public class CamionService {
             double restar = pesoKg != null ? pesoKg : 0.0;
             c.setCapacidadDisponibleKg(Math.max(0.0, actual - restar));
             return camionRepository.save(c);
-        }).orElseThrow(() -> new RuntimeException("Camión no encontrado con id: " + id));
+        }).orElseThrow(() -> new RuntimeException(CAMION_NO_ENCONTRADO_CON_ID + id));
+    }
+
+    public Camion reducirCapacidadPorPatente(String patente, Double pesoKg) {
+        return camionRepository.findByPatente(patente).map(c -> {
+            double actual = c.getCapacidadDisponibleKg() != null ? c.getCapacidadDisponibleKg() : c.getCapacidadTotalKg();
+            double restar = pesoKg != null ? pesoKg : 0.0;
+            c.setCapacidadDisponibleKg(Math.max(0.0, actual - restar));
+            return camionRepository.save(c);
+        }).orElseThrow(() -> new RuntimeException("Camión no encontrado con patente: " + patente));
+    }
+
+    public Camion restituirCapacidad(Long id, Double pesoKg) {
+        return camionRepository.findById(id).map(c -> {
+            double actual = c.getCapacidadDisponibleKg() != null ? c.getCapacidadDisponibleKg() : 0.0;
+            double sumar = pesoKg != null ? pesoKg : 0.0;
+            double total = c.getCapacidadTotalKg() != null ? c.getCapacidadTotalKg() : 1500.0;
+            c.setCapacidadDisponibleKg(Math.min(total, actual + sumar));
+            return camionRepository.save(c);
+        }).orElseThrow(() -> new RuntimeException(CAMION_NO_ENCONTRADO_CON_ID + id));
+    }
+
+    public Camion restituirCapacidadPorPatente(String patente, Double pesoKg) {
+        return camionRepository.findByPatente(patente).map(c -> {
+            double actual = c.getCapacidadDisponibleKg() != null ? c.getCapacidadDisponibleKg() : 0.0;
+            double sumar = pesoKg != null ? pesoKg : 0.0;
+            double total = c.getCapacidadTotalKg() != null ? c.getCapacidadTotalKg() : 1500.0;
+            c.setCapacidadDisponibleKg(Math.min(total, actual + sumar));
+            return camionRepository.save(c);
+        }).orElseThrow(() -> new RuntimeException("Camión no encontrado con patente: " + patente));
     }
 
     public void eliminar(Long id) {
         camionRepository.deleteById(id);
     }
 }
+

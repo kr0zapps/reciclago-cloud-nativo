@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -7,94 +7,129 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <!-- BEGIN: HeroSection -->
-    <section class="relative min-h-screen flex flex-col justify-center bg-[#041624] text-white overflow-hidden" id="inicio">
+    <!-- BEGIN: HeroSection Puerto Varas Recicla -->
+    <section class="relative min-h-[100dvh] lg:min-h-screen flex flex-col justify-between bg-[#041624] text-white overflow-hidden" id="inicio">
       
-      <!-- 1. Fondo Panorámico Fotográfico Ultrawide a Pantalla Completa con Volcán Osorno y Lago Llanquihue -->
-      <div class="absolute inset-0 z-0 pointer-events-none">
+      <!-- 1. Escenario Fotográfico: Volcán Osorno y Lago Llanquihue al atardecer -->
+      <div class="absolute inset-0 -bottom-2 z-0 pointer-events-none overflow-hidden">
         <img
-          alt="Lago Llanquihue y Volcán Osorno - Puerto Varas"
-          class="w-full h-full object-cover object-[center_35%] lg:object-[center_38%]"
+          alt="Lago Llanquihue y Volcán Osorno al atardecer - Puerto Varas"
+          class="w-full h-full object-cover object-[center_35%] sm:object-[center_38%] lg:object-[center_42%] scale-105 select-none pointer-events-none transition-transform duration-100 ease-out will-change-transform"
+          [ngStyle]="{ transform: 'translate3d(0, ' + parallaxOffset + 'px, 0)' }"
           src="assets/ultrawide.jpg"
         />
 
-        <!-- Overlay Direccional Sutil (Oscuro sólido en el cuadrante superior/izquierdo para contraste tipográfico, transparente en el volcán) -->
-        <div class="hidden lg:block absolute inset-0 bg-gradient-to-r from-[#041624]/95 via-[#041624]/75 via-45% to-transparent to-75%"></div>
+        <!-- Viñeta Superior para Contraste Impecable del Header Transparente -->
+        <div class="absolute top-0 inset-x-0 h-36 bg-gradient-to-b from-[#041624]/90 via-[#041624]/50 to-transparent"></div>
 
-        <!-- Overlay Direccional en Móvil / Tablet -->
-        <div class="lg:hidden absolute inset-0 bg-gradient-to-b from-[#041624]/95 via-[#041624]/75 to-[#041624]/45"></div>
+        <!-- Overlays Fotográficos Limpios (Cero neón, contraste natural y uniforme) -->
+        <div class="hidden lg:block absolute inset-0 hero-overlay-desktop"></div>
+        <div class="lg:hidden absolute inset-0 hero-overlay-mobile"></div>
 
-        <!-- Sombra de anclaje inferior natural sobre la fotografía -->
-        <div class="absolute bottom-0 inset-x-0 h-28 sm:h-36 bg-gradient-to-t from-[#041624]/90 via-[#041624]/40 to-transparent"></div>
+        <!-- Sombra de anclaje inferior hacia el fondo de la página -->
+        <div class="absolute -bottom-2 inset-x-0 h-28 sm:h-36 bg-gradient-to-t from-[#041624] via-[#041624]/80 to-transparent"></div>
       </div>
 
+      <!-- 2. Espaciador Superior para Compensar el Header Sticky -->
+      <div class="h-16 sm:h-20 lg:h-24 flex-shrink-0 pointer-events-none"></div>
 
+      <!-- 3. Contenido Editorial Principal: Monumental, Centrado e Imponente -->
+      <div class="relative z-10 max-w-5xl mx-auto px-4 py-6 sm:py-10 w-full my-auto text-center flex flex-col items-center justify-center">
 
-      <!-- 3. Contenido Editorial Principal con Cursiva Flotante a la Derecha (Sin Cards) -->
-      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 lg:pt-36 pb-20 sm:pb-24 lg:pb-28 w-full">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <!-- Titular Monumental en Cursiva -->
+        <h1 class="font-script font-bold text-6xl sm:text-7xl md:text-8xl text-white leading-none mt-6 sm:mt-10 drop-shadow-xl">
+          <span class="block">Reciclaje Comunal</span>
+          <span class="block">Puerto Varas</span>
+        </h1>
 
-          <!-- Columna Izquierda: Mensaje Central Comunal -->
-          <div class="lg:col-span-7 xl:col-span-8 max-w-2xl">
-            <!-- Eyebrow: PORTAL AMBIENTAL CIUDADANO · RECICLAGOO -->
-            <div class="text-xs sm:text-sm font-bold text-[#22c55e] tracking-widest uppercase mb-3.5 drop-shadow-sm">
-              PORTAL AMBIENTAL CIUDADANO · RECICLAGOO
+        <!-- Subtítulo Corto -->
+        <p class="text-sm sm:text-lg md:text-xl text-white/90 font-medium max-w-xl mx-auto mt-4 sm:mt-5 mb-8 sm:mb-10 drop-shadow-md leading-relaxed">
+          Retiro domiciliario a pedido y pesaje digital para proteger nuestro lago.
+        </p>
+
+        <!-- Botones de Acción Agrupados Elegantes -->
+        <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 w-full px-2">
+          <a
+            routerLink="/dashboard"
+            class="inline-flex items-center justify-center gap-2.5 min-h-[44px] sm:min-h-[50px] px-6 sm:px-8 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white font-extrabold text-sm tracking-wide shadow-xl shadow-emerald-950/50 border-none transition-all active:scale-[0.98] cursor-pointer">
+            <span>Pedir Retiro (Portal Vecinal)</span>
+            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </a>
+
+          <a
+            href="#cuadrantes"
+            (click)="scrollToSection($event, 'cuadrantes')"
+            class="inline-flex items-center justify-center gap-2.5 min-h-[44px] sm:min-h-[50px] px-5 sm:px-7 rounded-xl bg-[#092232]/80 hover:bg-[#123F5B] text-white font-semibold text-sm border border-white/20 backdrop-blur-md shadow-lg transition-all active:scale-[0.98] cursor-pointer">
+            <i class="fa-solid fa-map-location-dot text-[#22a652]"></i>
+            <span>Ver Estado de Sectores</span>
+          </a>
+        </div>
+
+        <!-- Fila de materiales aceptados (Limpia y sin tarjeta de fondo) -->
+        <div class="mt-8 sm:mt-12 w-full max-w-2xl mx-auto">
+          <p class="text-white font-bold text-sm sm:text-base mb-4 drop-shadow-md uppercase tracking-wider">¿Qué puedes reciclar con nosotros?</p>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+            <div class="flex flex-col items-center gap-2 transition-transform hover:scale-110">
+              <i class="fa-solid fa-wine-bottle text-[#22a652] text-3xl sm:text-4xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"></i>
+              <span class="text-white text-sm font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">Vidrio</span>
             </div>
-
-            <!-- Título Principal con Tipografía de Impacto Condensada: JUNTOS CUIDAMOS PUERTO VARAS -->
-            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight uppercase leading-[0.95] mb-5 font-heading drop-shadow-md">
-              JUNTOS CUIDAMOS<br />
-              PUERTO VARAS
-            </h1>
-
-            <!-- Bajada / Subtítulo Oficial -->
-            <p class="text-sm sm:text-base lg:text-lg text-slate-100 font-normal leading-relaxed max-w-xl mb-8 drop-shadow-sm">
-              Reciclar hoy, es construir el futuro sustentable que queremos para nuestra comuna y la cuenca del Lago Llanquihue.
-            </p>
-
-            <!-- Botones de Acción Sobrios y Directos -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
-              <!-- Botón Primario Verde Sólido -->
-              <a
-                routerLink="/dashboard"
-                class="inline-flex items-center justify-center gap-2.5 bg-[#22a652] hover:bg-[#1b8e45] text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider px-7 py-4 rounded-lg transition-all cursor-pointer text-center shadow-lg shadow-emerald-950/40">
-                <i class="fa-solid fa-recycle text-sm"></i>
-                <span>Ingresar al Portal Vecinal</span>
-              </a>
-
-              <!-- Botón Secundario Outline con Fondo Translúcido -->
-              <a
-                href="#cuadrantes"
-                class="inline-flex items-center justify-center gap-2 border border-white/80 hover:border-white bg-[#041624]/40 hover:bg-[#041624]/70 text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider px-7 py-4 rounded-lg backdrop-blur-xs transition-all cursor-pointer text-center">
-                <i class="fa-solid fa-location-dot text-sm text-emerald-400"></i>
-                <span>Ver Cuadrantes de Reciclaje</span>
-              </a>
+            <div class="flex flex-col items-center gap-2 transition-transform hover:scale-110">
+              <i class="fa-solid fa-box-open text-[#22a652] text-3xl sm:text-4xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"></i>
+              <span class="text-white text-sm font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">Cartón / Papel</span>
             </div>
-          </div>
-
-          <!-- Columna Derecha: Lema Manuscrito Cursivo Suelto sobre el Lago (Sin Cards) -->
-          <div class="lg:col-span-5 xl:col-span-4 hidden lg:flex justify-end items-center pointer-events-none pr-4 lg:pr-8">
-            <div class="text-right rotate-[-5deg] anim-float select-none">
-              <p class="font-script text-white text-4xl xl:text-5xl font-bold leading-snug drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]">
-                Reciclar también es<br>cuidar nuestro<br>lago
-              </p>
+            <div class="flex flex-col items-center gap-2 transition-transform hover:scale-110">
+              <i class="fa-solid fa-bottle-water text-[#22a652] text-3xl sm:text-4xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"></i>
+              <span class="text-white text-sm font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">Plástico (PET)</span>
+            </div>
+            <div class="flex flex-col items-center gap-2 transition-transform hover:scale-110">
+              <i class="fa-solid fa-boxes-stacked text-[#22a652] text-3xl sm:text-4xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"></i>
+              <span class="text-white text-sm font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">Latas</span>
             </div>
           </div>
         </div>
+
       </div>
 
-      <!-- Indicador sutil de scroll hacia el ciclo comunal -->
-      <a href="#como-funciona"
-         class="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 hidden sm:flex flex-col items-center gap-1.5 text-white/60 hover:text-white transition-colors group cursor-pointer"
-         aria-label="Ir a la sección ¿Cómo funciona?">
-        <span class="text-[10px] font-bold tracking-widest uppercase opacity-75 group-hover:opacity-100 transition-opacity">Conoce el ciclo</span>
-        <i class="fa-solid fa-chevron-down text-xs animate-bounce"></i>
-      </a>
+      <!-- 4. Scroll Indicator Abajo al Centro -->
+      <div class="relative z-10 pb-5 sm:pb-7 flex justify-center pointer-events-auto anim-fade-up">
+        <a
+          href="#como-funciona"
+          (click)="scrollToSection($event, 'como-funciona')"
+          class="inline-flex flex-col items-center gap-1.5 text-white/70 hover:text-white transition-colors duration-300 group cursor-pointer font-heading"
+          aria-label="Conoce el ciclo de reciclaje municipal">
+          <p class="text-[11px] font-bold tracking-[0.2em] uppercase opacity-80 group-hover:opacity-100 transition-opacity m-0">
+            Conoce el ciclo
+          </p>
+          <div class="anim-float-subtle">
+            <i class="fa-solid fa-chevron-down text-xs text-white/80 group-hover:text-white transition-colors"></i>
+          </div>
+        </a>
+      </div>
 
     </section>
     <!-- END: HeroSection -->
   `
 })
-export class HomeHeroComponent {}
+export class HomeHeroComponent {
+  parallaxOffset = 0;
 
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    if (typeof window !== 'undefined') {
+      const scroll = window.scrollY;
+      if (scroll <= 850) {
+        this.parallaxOffset = Math.round(scroll * 0.15);
+      }
+    }
+  }
 
+  scrollToSection(event: Event, sectionId: string): void {
+    event.preventDefault();
+    if (typeof document !== 'undefined') {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }
+}

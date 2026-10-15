@@ -6,6 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * Inicializador de datos de prueba para el ambiente de desarrollo.
@@ -14,6 +15,8 @@ import java.time.LocalDateTime;
  */
 @Configuration
 public class DataInitializer implements CommandLineRunner {
+
+    private static final String COMUNA_PUERTO_VARAS = "Puerto Varas";
 
     private final PickupRepository pickupRepository;
 
@@ -24,69 +27,63 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (pickupRepository.count() == 0) {
+            ZoneId zoneId = ZoneId.systemDefault();
+
             // Retiro PROGRAMADO — Cuadrante 1 (Puerto Chico), Cartón/Papel, Lunes
-            pickupRepository.save(new Pickup(
-                    null,
-                    "RET-PV-SEED01",
-                    "Juan Pérez",
-                    "jon.vidals@duocuc.cl",
-                    "Av. Puerto Chico 234",
-                    "Puerto Varas",
-                    1L,
-                    "Cartón y Papel",
-                    1L,
-                    "PV-RC-2026",
-                    15.5,
-                    null,
-                    "PROGRAMADO",
-                    LocalDateTime.now().minusDays(1),
-                    LocalDateTime.now().plusDays(1),
-                    null,
-                    "Cajas de cartón desarmadas en el portón"
-            ));
+            pickupRepository.save(Pickup.builder()
+                    .codigoRetiro("RET-PV-SEED01")
+                    .vecinoNombre("Juan Pérez")
+                    .vecinoEmail("jon.vidals@duocuc.cl")
+                    .direccion("Av. Puerto Chico 234")
+                    .comuna(COMUNA_PUERTO_VARAS)
+                    .residuoId(1L)
+                    .residuoNombre("Cartón y Papel")
+                    .camionId(1L)
+                    .camionPatente("PV-RC-2026")
+                    .pesoEstimadoKg(15.5)
+                    .estado("PROGRAMADO")
+                    .fechaSolicitud(LocalDateTime.now(zoneId).minusDays(1))
+                    .fechaProgramada(LocalDateTime.now(zoneId).plusDays(1))
+                    .observaciones("Cajas de cartón desarmadas en el portón")
+                    .build()
+            );
 
             // Retiro SOLICITADO — Cuadrante 2 (Costanera Sur), Vidrio, Martes
-            pickupRepository.save(new Pickup(
-                    null,
-                    "RET-PV-SEED02",
-                    "María González",
-                    "maria.gonzalez@puertovaras.cl",
-                    "Costanera Sur 567",
-                    "Puerto Varas",
-                    2L,
-                    "Vidrio",
-                    null,
-                    null,
-                    45.0,
-                    null,
-                    "SOLICITADO",
-                    LocalDateTime.now(),
-                    null,
-                    null,
-                    "Botellas de vidrio clasificadas por color"
-            ));
+            pickupRepository.save(Pickup.builder()
+                    .codigoRetiro("RET-PV-SEED02")
+                    .vecinoNombre("María González")
+                    .vecinoEmail("maria.gonzalez@puertovaras.cl")
+                    .direccion("Costanera Sur 567")
+                    .comuna(COMUNA_PUERTO_VARAS)
+                    .residuoId(2L)
+                    .residuoNombre("Vidrio")
+                    .pesoEstimadoKg(45.0)
+                    .estado("SOLICITADO")
+                    .fechaSolicitud(LocalDateTime.now(zoneId))
+                    .observaciones("Botellas de vidrio clasificadas por color")
+                    .build()
+            );
 
             // Retiro PESADO — Cuadrante 3 (Ensenada), Plásticos, Miércoles
-            pickupRepository.save(new Pickup(
-                    null,
-                    "RET-PV-SEED03",
-                    "Carlos Silva",
-                    "carlos.silva@puertovaras.cl",
-                    "Camino Ensenada 890",
-                    "Puerto Varas",
-                    3L,
-                    "Plástico PET",
-                    2L,
-                    "PV-RC-2027",
-                    80.0,
-                    82.4,
-                    "PESADO",
-                    LocalDateTime.now().minusDays(3),
-                    LocalDateTime.now().minusDays(2),
-                    LocalDateTime.now().minusDays(2),
-                    "Envases plásticos limpios y compactados"
-            ));
+            pickupRepository.save(Pickup.builder()
+                    .codigoRetiro("RET-PV-SEED03")
+                    .vecinoNombre("Carlos Silva")
+                    .vecinoEmail("carlos.silva@puertovaras.cl")
+                    .direccion("Camino Ensenada 890")
+                    .comuna(COMUNA_PUERTO_VARAS)
+                    .residuoId(3L)
+                    .residuoNombre("Plástico PET")
+                    .camionId(2L)
+                    .camionPatente("PV-RC-2027")
+                    .pesoEstimadoKg(80.0)
+                    .pesoRealKg(82.4)
+                    .estado("PESADO")
+                    .fechaSolicitud(LocalDateTime.now(zoneId).minusDays(3))
+                    .fechaProgramada(LocalDateTime.now(zoneId).minusDays(2))
+                    .fechaCompletado(LocalDateTime.now(zoneId).minusDays(2))
+                    .observaciones("Envases plásticos limpios y compactados")
+                    .build()
+            );
         }
     }
 }
-

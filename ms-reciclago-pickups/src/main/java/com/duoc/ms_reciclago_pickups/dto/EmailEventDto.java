@@ -2,6 +2,7 @@ package com.duoc.ms_reciclago_pickups.dto;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public class EmailEventDto implements Serializable {
     private String codigoRetiro;
@@ -22,7 +23,7 @@ public class EmailEventDto implements Serializable {
         this.asunto = asunto;
         this.mensaje = mensaje;
         this.nuevoEstado = nuevoEstado;
-        this.fechaEvento = fechaEvento != null ? fechaEvento : LocalDateTime.now();
+        this.fechaEvento = fechaEvento != null ? fechaEvento : LocalDateTime.now(ZoneId.systemDefault());
     }
 
     public String getCodigoRetiro() {

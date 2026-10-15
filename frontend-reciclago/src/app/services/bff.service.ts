@@ -17,7 +17,7 @@ export interface UserProfile {
 export class BffService {
   private readonly baseUrl = environment.apiConfig?.uri || 'http://localhost:8080';
 
-  constructor(private http: HttpClient) { }
+  constructor(private readonly http: HttpClient) { }
 
   getProfile(): Observable<UserProfile> {
     return this.http.get<UserProfile>(`${this.baseUrl}/api/me`);
@@ -41,6 +41,14 @@ export class BffService {
 
   getCamiones(): Observable<Camion[]> {
     return this.http.get<Camion[]>(`${this.baseUrl}/api/catalog/camiones`);
+  }
+
+  getImpactoComunal(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/api/citizens/impacto`);
+  }
+
+  actualizarEstadoCamion(id: number, estado: string): Observable<Camion> {
+    return this.http.patch<Camion>(`${this.baseUrl}/api/catalog/camiones/${id}/estado?estado=${encodeURIComponent(estado)}`, {});
   }
 
   getTarifas(): Observable<any[]> {
@@ -130,4 +138,35 @@ export class BffService {
   getPublicStatus(): Observable<any> {
     return this.http.get(`${this.baseUrl}/public/status`);
   }
+
+  /**
+   * Retorna la rotación semanal de residuos domiciliarios desde ms-reciclago-catalog.
+   * Respuesta incluye: residuoCodigo, residuoNombre, descripcion, instrucciones,
+   * slotSemana, numSemanaISO, vigenciaDesde, vigenciaHasta, categoria, precioPorKg.
+   *
+   * @param fecha Opcional. Fecha ISO yyyy-MM-dd para consulta de semanas pasadas o futuras.
+   */
+  getRotacionSemanal(fecha?: string): Observable<any> {
+    const url = fecha
+      ? `${this.baseUrl}/api/catalog/rotacion/semanal?fecha=${encodeURIComponent(fecha)}`
+      : `${this.baseUrl}/api/catalog/rotacion/semanal`;
+    return this.http.get(url);
+  }
+
+  getRotacionConfig(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/api/catalog/rotacion/config`);
+  }
+
+  actualizarRotacionConfig(payload: { modo: string; overrideCodigoResiduo?: string | null }): Observable<any> {
+    return this.http.put(`${this.baseUrl}/api/catalog/rotacion/config`, payload);
+  }
+
+  resetRotacionConfig(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/api/catalog/rotacion/reset`, {});
+  }
+
+  actualizarSectorRotacion(sectorNombre: string, payload: { dia?: string; materialCodigo?: string; materialNombre?: string }): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/api/catalog/rotacion/sector/${encodeURIComponent(sectorNombre)}`, payload);
+  }
 }
+

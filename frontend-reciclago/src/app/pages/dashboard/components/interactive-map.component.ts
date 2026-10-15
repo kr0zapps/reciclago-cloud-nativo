@@ -7,28 +7,27 @@ import { Sector, Waypoint } from '../data/sectors.data';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="bg-white rounded-3xl border border-[#E2E9E4] p-7 sm:p-9 flex flex-col justify-between shadow-xs card-hover h-full">
+    <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 flex flex-col justify-between shadow-xs card-hover h-full">
       <div class="space-y-4">
-        <div class="w-12 h-12 rounded-2xl bg-[#E8F3F7] text-brand-lake flex items-center justify-center text-2xl interactive-icon">
+        <div class="w-12 h-12 rounded-xl bg-gray-50 text-[#123F5B] flex items-center justify-center text-2xl interactive-icon">
           <i class="fa-solid fa-map-location-dot"></i>
         </div>
         <div>
-          <span class="text-xs font-bold uppercase tracking-wider text-brand-lake">Mapa barrial interactivo</span>
-          <h3 class="font-heading font-extrabold text-2xl text-brand-navy mt-1">Mapa de recorrido vecinal</h3>
+          <h3 class="font-heading font-extrabold text-2xl text-[#123F5B]">Mapa de recorrido vecinal</h3>
         </div>
-        <p class="text-[16px] text-brand-muted leading-relaxed">
+        <p class="text-sm sm:text-base text-gray-500 leading-relaxed">
           Consulta cuándo pasa el camión por tu calle y revisa el cuadrante comunal por días y tipos de materiales en toda la comuna.
         </p>
 
         <!-- Lienzo de Calles y Simulación -->
-        <div class="rounded-2xl bg-[#F0F6F9] border-2 border-[#D4E6EF] p-4 sm:p-5 relative overflow-hidden shadow-xs">
+        <div class="rounded-xl bg-[#F0F6F9] border border-[#D4E6EF] p-4 sm:p-5 relative overflow-hidden shadow-xs">
           <div class="flex items-center justify-between gap-2 mb-3">
             <div class="flex items-center gap-2">
-              <i class="fa-solid fa-compass text-brand-lake text-lg"></i>
-              <span class="font-bold text-sm text-brand-navy">{{ sector?.cuadrante }}</span>
+              <i class="fa-solid fa-compass text-[#123F5B] text-base"></i>
+              <span class="font-bold text-sm text-[#123F5B]">{{ sector.cuadrante }}</span>
             </div>
-            <span class="inline-flex items-center gap-1.5 text-xs bg-white px-2.5 py-1 rounded-md text-brand-lake font-bold border border-[#CCE1EC] shadow-xs">
-              <i class="fa-solid text-[10px]" [ngClass]="truckSimulationRunning ? 'fa-route text-[#4F8A3D]' : 'fa-circle-pause text-slate-400'"></i>
+            <span class="inline-flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+              <i class="fa-solid text-[9px]" [ngClass]="truckSimulationRunning ? 'fa-circle text-[#4F8A3D]' : 'fa-circle text-slate-400'"></i>
               <span>{{ truckSimulationRunning ? 'En circulación' : 'Pausado' }}</span>
             </span>
           </div>
@@ -36,7 +35,7 @@ import { Sector, Waypoint } from '../data/sectors.data';
           <!-- Mapa Vectorial de Calles -->
           <div class="h-44 sm:h-48 w-full bg-white rounded-xl relative p-2 overflow-hidden border border-[#E1EDF2] select-none">
             <!-- Lago Llanquihue -->
-            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-3xl flex flex-col items-center justify-center text-[10px] font-extrabold text-brand-lake border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
+            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-2xl flex flex-col items-center justify-center text-[10px] font-extrabold text-[#123F5B] border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
               <div class="flex items-center gap-1.5 opacity-90">
                 <i class="fa-solid fa-water text-xs text-sky-500"></i>
                 <span>Lago Llanquihue</span>
@@ -86,7 +85,7 @@ import { Sector, Waypoint } from '../data/sectors.data';
                   <i class="fa-solid fa-truck-fast text-[11px] text-white"></i>
                 </div>
                 <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-[#041D2D] text-white text-[8px] font-bold px-1.5 py-0.2 rounded-md shadow whitespace-nowrap border border-slate-700">
-                  {{ activeCamionPatente || sector?.patente || 'PV-RC-2026' }}
+                  {{ activeCamionPatente || sector.patente || 'PV-RC-2026' }}
                 </div>
               </div>
             </div>
@@ -96,18 +95,14 @@ import { Sector, Waypoint } from '../data/sectors.data';
           <div class="mt-3 bg-white/95 rounded-xl p-3 border border-[#D0E2EC] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#E6F4EA] text-[#2C6E25] border border-[#C6E6C0]">
-                  <i class="fa-solid fa-satellite-dish text-[10px] text-[#4F8A3D]"></i>
-                  <span>GPS Puerto Varas</span>
-                </span>
                 <span class="text-xs font-bold text-[#123F5B] truncate">{{ activeWaypoint.name }}</span>
               </div>
               <p class="text-[11px] text-[#546571] mt-0.5 flex items-center gap-2 flex-wrap">
                 <span>{{ activeWaypoint.detail }}</span>
                 <span class="text-slate-300">•</span>
-                <span class="font-bold text-[#4F8A3D]"><i class="fa-solid fa-clock text-[10px] mr-0.5"></i> ETA: {{ activeWaypoint.eta }}</span>
+                <span class="font-medium text-slate-600"><i class="fa-regular fa-clock text-[10px] mr-0.5"></i> ETA: {{ activeWaypoint.eta }}</span>
                 <span class="text-slate-300">•</span>
-                <span class="font-semibold text-slate-600"><i class="fa-solid fa-route text-[10px] mr-0.5"></i> {{ activeWaypoint.distancia }}</span>
+                <span class="font-medium text-slate-600"><i class="fa-solid fa-route text-[10px] mr-0.5"></i> {{ activeWaypoint.distancia }}</span>
               </p>
             </div>
 
@@ -128,7 +123,7 @@ import { Sector, Waypoint } from '../data/sectors.data';
       </div>
 
       <div class="pt-6">
-        <button (click)="openRutaModal.emit()" type="button" class="btn-action inline-flex items-center justify-start gap-2.5 text-brand-lake hover:text-brand-navy font-bold text-base transition-colors py-2 cursor-pointer">
+        <button (click)="openRutaModal.emit()" type="button" class="btn-action inline-flex items-center justify-start gap-2.5 text-[#123F5B] hover:text-[#123F5B] font-bold text-base transition-colors py-2 cursor-pointer">
           <span>Ver mi recorrido comunal completo</span>
           <i class="fa-solid fa-arrow-right text-sm btn-arrow"></i>
         </button>
@@ -137,7 +132,7 @@ import { Sector, Waypoint } from '../data/sectors.data';
   `
 })
 export class InteractiveMapComponent {
-  @Input() sector!: Sector | any;
+  @Input() sector!: Sector;
   @Input() activeWaypoint!: Waypoint;
   @Input() truckSimulationRunning: boolean = true;
   @Input() truckSpeed: number = 1;
@@ -148,3 +143,4 @@ export class InteractiveMapComponent {
   @Output() resetSimulation = new EventEmitter<void>();
   @Output() openRutaModal = new EventEmitter<void>();
 }
+

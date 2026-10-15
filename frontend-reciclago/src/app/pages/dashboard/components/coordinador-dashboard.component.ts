@@ -1,7 +1,9 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, OnDestroy, SimpleChanges, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data';
+import { Sector, Camion, Residuo, Pickup, Waypoint, RotacionSemanal } from '../data/sectors.data';
+import { formatRut, validateRut } from '../../../shared/utils/rut.utils';
+import { formatChileanPhone, validateChileanPhone } from '../../../shared/utils/phone.utils';
 
 @Component({
   selector: 'app-coordinador-dashboard',
@@ -9,129 +11,171 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
   imports: [CommonModule, FormsModule],
   template: `
     <div class="space-y-6 sm:space-y-8">
-      <!-- ==================== 1. ENCABEZADO DE DESPACHO Y MESA DE AYUDA ==================== -->
-      <section class="bg-white rounded-2xl p-5 sm:p-6 border border-[#E2E9E4] shadow-xs">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          <div>
-            <div class="flex items-center gap-2 text-xs font-bold text-[#1F6685] mb-1">
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#1F6685]/10 text-[#1F6685] uppercase tracking-wider text-[10px] font-black">
-                <i class="fa-solid fa-headset text-xs"></i> Despacho Logístico
-              </span>
-              <span class="text-slate-300">•</span>
-              <span class="text-slate-500">Sector de Planificación: <strong class="text-brand-navy">{{ sector?.cuadrante || sector?.nombre || 'Puerto Varas' }}</strong></span>
-            </div>
-            <h2 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy">
-              Consola de Programación, Asignación y Atención Vecinal
-            </h2>
-            <p class="text-xs text-slate-500 mt-0.5">
-              Recepción telefónica ciudadana, asignación de cuadrillas y despacho de camiones en ruta.
-            </p>
+      <!-- Banner de Alerta Operativa DIMAO para Coordinación de Rutas -->
+      <div *ngIf="sectoresReprogramados.length > 0"
+           class="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border-2 border-amber-300 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-start gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center text-lg flex-shrink-0 shadow-xs">
+            <i class="fa-solid fa-triangle-exclamation"></i>
           </div>
-
-          <!-- Botón de Atención Primaria -->
-          <div class="flex items-center gap-3 flex-shrink-0">
-            <button (click)="openNuevoRetiroModal()"
-                    type="button"
-                    class="inline-flex items-center gap-2.5 px-5 py-3 rounded-xl bg-[#1F6685] hover:bg-[#164E66] text-white text-sm font-bold shadow-xs transition-all cursor-pointer">
-              <i class="fa-solid fa-phone-volume text-sm"></i>
-              <span>+ Ingresar Solicitud Telefónica</span>
-            </button>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-amber-600 text-white">
+                Alerta de Despacho DIMAO
+              </span>
+              <span class="text-xs font-bold text-amber-950">
+                Sectores con Reprogramación de Día (Semana {{ rotacionSemanal?.slotSemana || 'Actual' }})
+              </span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-700 mt-1">
+              Atención cuadrilla: Los siguientes sectores han sido reprogramados excepcionalmente por la administración comunal:
+            </p>
+            <div class="flex flex-wrap gap-2 mt-2">
+              <span *ngFor="let s of sectoresReprogramados"
+                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-amber-300 text-xs font-bold text-[#123F5B] shadow-2xs">
+                <i class="fa-solid fa-map-pin text-amber-600 text-[11px]"></i>
+                <strong>{{ s.nombre }}:</strong>
+                <span class="line-through text-slate-400">{{ s.diaOriginal }}</span>
+                <i class="fa-solid fa-arrow-right text-[10px] text-amber-600"></i>
+                <span class="text-[#22a652] font-extrabold">{{ s.dia }}</span>
+                <span *ngIf="s.motivoModificacion" class="text-slate-500 font-normal">({{ s.motivoModificacion }})</span>
+              </span>
+            </div>
           </div>
         </div>
-      </section>
+        <div class="self-end md:self-center flex-shrink-0 text-right">
+          <span class="text-[11px] font-bold text-amber-900 bg-amber-100/80 px-2.5 py-1 rounded-lg border border-amber-200">
+            Ajustar Hoja de Ruta
+          </span>
+        </div>
+      </div>
 
       <!-- ==================== 2. PIPELINE DE DESPACHO EN TIEMPO REAL ==================== -->
-      <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+      <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Tarjeta 1: Solicitudes Entrantes (Por Asignar) -->
-        <div class="bg-white rounded-2xl p-5 border-2 shadow-xs flex flex-col justify-between"
-             [ngClass]="countPendientes > 0 ? 'border-amber-300/80 bg-amber-50/20' : 'border-[#E2E9E4]'">
+        <div class="bg-white rounded-xl p-5 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between"
+             [ngClass]="countPendientes > 0 ? 'border-amber-300 bg-amber-50/30' : ''">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-900">Por Programar</span>
-            <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-xs font-bold">
+            <span class="text-xs font-semibold text-gray-500">Por programar</span>
+            <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center text-xs font-bold border border-amber-200">
               <i class="fa-solid fa-inbox"></i>
             </div>
           </div>
           <div class="mt-3">
-            <div class="text-3xl sm:text-4xl font-black font-heading text-amber-900">{{ countPendientes }}</div>
-            <p class="text-xs text-amber-800 mt-1 font-semibold">
-              {{ countPendientes > 0 ? 'Esperando asignación a camión' : 'Bandeja al día' }}
+            <div class="text-3xl font-extrabold font-heading text-[#123F5B]">{{ countPendientes }}</div>
+            <p class="text-xs text-gray-500 mt-1">
+              {{ countPendientes > 0 ? 'Esperando asignación' : 'Bandeja al día' }}
             </p>
           </div>
         </div>
 
         <!-- Tarjeta 2: Listos para Despacho (Programados) -->
-        <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-xl p-5 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Programados</span>
-            <div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center text-xs font-bold border border-sky-200">
+            <span class="text-xs font-semibold text-gray-500">Programados</span>
+            <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center text-xs font-bold border border-sky-200">
               <i class="fa-solid fa-calendar-check"></i>
             </div>
           </div>
           <div class="mt-3">
-            <div class="text-3xl sm:text-4xl font-black font-heading text-brand-navy">{{ countProgramados }}</div>
-            <p class="text-xs text-slate-500 mt-1">Con fecha y sector asignado</p>
+            <div class="text-3xl font-extrabold font-heading text-[#123F5B]">{{ countProgramados }}</div>
+            <p class="text-xs text-gray-500 mt-1">Con fecha y cuadrilla</p>
           </div>
         </div>
 
         <!-- Tarjeta 3: Cuadrillas en Ruta -->
-        <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-xl p-5 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">En Ruta</span>
-            <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center text-xs font-bold border border-indigo-200">
+            <span class="text-xs font-semibold text-gray-500">En ruta</span>
+            <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center text-xs font-bold border border-indigo-200">
               <i class="fa-solid fa-truck-fast"></i>
             </div>
           </div>
           <div class="mt-3">
-            <div class="text-3xl sm:text-4xl font-black font-heading text-[#1F6685]">{{ countEnRuta }}</div>
-            <p class="text-xs text-slate-500 mt-1">Recorriendo direcciones</p>
+            <div class="text-3xl font-extrabold font-heading text-[#123F5B]">{{ countEnRuta }}</div>
+            <p class="text-xs text-gray-500 mt-1">Recorriendo sectores</p>
           </div>
         </div>
 
         <!-- Tarjeta 4: Camiones Operables -->
-        <div class="bg-white rounded-2xl p-5 border border-[#E2E9E4] shadow-xs flex flex-col justify-between">
+        <div class="bg-white rounded-xl p-5 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Flota Activa</span>
-            <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs font-bold border border-emerald-200">
+            <span class="text-xs font-semibold text-gray-500">Flota activa</span>
+            <div class="w-8 h-8 rounded-lg bg-[#ecf7e6] text-[#22a652] flex items-center justify-center text-xs font-bold border border-[#E2E8F0]">
               <i class="fa-solid fa-truck"></i>
             </div>
           </div>
           <div class="mt-3">
-            <div class="text-3xl sm:text-4xl font-black font-heading text-emerald-800">
+            <div class="text-3xl font-extrabold font-heading text-[#123F5B]">
               {{ camionesDisponiblesCount }} / {{ camiones.length }}
             </div>
-            <p class="text-xs text-slate-500 mt-1">Unidades operativas hoy</p>
+            <p class="text-xs text-gray-500 mt-1">
+              {{ catalogoDisponible === false ? 'Catálogo desconectado' : 'Unidades operativas' }}
+            </p>
           </div>
         </div>
       </section>
 
+      <!-- ==================== SELECTOR DE MÓDULO EJECUTIVO (TABS) ==================== -->
+      <div class="flex items-center justify-between pb-1 border-b border-[#E2E8F0] flex-wrap gap-3">
+        <div class="inline-flex rounded-xl p-1 bg-gray-100 border border-[#E2E8F0] shadow-2xs">
+          <button (click)="activeCoordTab = 'planilla'"
+                  type="button"
+                  [ngClass]="activeCoordTab === 'planilla' ? 'bg-white text-[#123F5B] shadow-2xs font-bold' : 'text-gray-600 hover:text-gray-900 font-medium'"
+                  class="px-4 py-2 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-2">
+            <i class="fa-solid fa-list-check"></i>
+            <span>Planilla de Despacho</span>
+            <span class="text-[11px] font-mono px-1.5 py-0.2 rounded"
+                  [ngClass]="activeCoordTab === 'planilla' ? 'bg-[#123F5B] text-white' : 'bg-gray-200 text-gray-700'">
+              {{ pickups.length }}
+            </span>
+          </button>
+
+          <button (click)="activeCoordTab = 'mapa'"
+                  type="button"
+                  [ngClass]="activeCoordTab === 'mapa' ? 'bg-white text-[#123F5B] shadow-2xs font-bold' : 'text-gray-600 hover:text-gray-900 font-medium'"
+                  class="px-4 py-2 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-2">
+            <i class="fa-solid fa-map-location-dot"></i>
+            <span>Monitoreo en Terreno</span>
+          </button>
+        </div>
+
+        <button (click)="openNuevoRetiroModal()"
+                type="button"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#22a652] hover:bg-[#1b8e45] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer">
+          <i class="fa-solid fa-plus text-xs"></i>
+          <span>Ingresar Solicitud</span>
+        </button>
+      </div>
+
       <!-- ==================== 3. PLANILLA DE DESPACHO Y ASIGNACIÓN DE RUTAS ==================== -->
-      <section class="bg-white rounded-3xl border border-[#E2E9E4] shadow-xs overflow-hidden">
-        <div class="p-6 border-b border-[#EAEFE8] space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <section *ngIf="activeCoordTab === 'planilla'" class="bg-white rounded-xl border border-[#E2E8F0] shadow-2xs overflow-hidden">
+        <div class="p-6 border-b border-[#E2E8F0] space-y-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
             <div>
-              <span class="text-xs font-bold uppercase tracking-wider text-[#1F6685]">Control Operativo de Calle</span>
-              <h3 class="font-heading font-extrabold text-2xl text-brand-navy mt-0.5">
-                Planilla de Despacho y Gestión de Rutas
+              <h3 class="font-heading font-extrabold text-xl text-[#123F5B]">
+                Planilla de Despacho
               </h3>
+              <p class="text-xs text-gray-500 mt-0.5">Control de solicitudes domiciliarias y asignación a cuadrillas</p>
             </div>
 
             <!-- Filtros de Sector y Tamaño de Página -->
-            <div class="flex items-center gap-3 flex-wrap">
+            <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
               <div class="flex items-center gap-1.5">
-                <span class="text-xs font-bold text-slate-500">Sector:</span>
+                <span class="text-xs font-semibold text-slate-500">Sector:</span>
                 <select [(ngModel)]="filterSector"
                         (ngModelChange)="onFilterSectorChange()"
-                        class="select-stitch py-1.5 px-3 text-xs font-bold text-[#1F6685] bg-[#F8FAF7]">
+                        class="select-stitch py-1.5 px-3 text-xs font-bold text-[#123F5B] bg-[#F8FAF7] border border-slate-200 rounded-xl">
                   <option value="ALL">Todos los Sectores</option>
                   <option *ngFor="let s of sectores" [value]="s.nombre">{{ s.nombre }}</option>
                 </select>
               </div>
 
               <div class="flex items-center gap-1.5">
-                <span class="text-xs font-bold text-slate-500">Filas:</span>
+                <span class="text-xs font-semibold text-slate-500">Filas:</span>
                 <select [(ngModel)]="pageSize"
                         (ngModelChange)="onPageSizeChange()"
-                        class="select-stitch py-1.5 px-2 text-xs font-bold text-[#1F6685] bg-[#F8FAF7]">
+                        class="select-stitch py-1.5 px-2 text-xs font-bold text-[#123F5B] bg-[#F8FAF7] border border-slate-200 rounded-xl">
                   <option [value]="5">5</option>
                   <option [value]="10">10</option>
                   <option [value]="20">20</option>
@@ -140,80 +184,94 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
             </div>
           </div>
 
-          <!-- Pestañas de Estado Logísticas -->
-          <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-bold">
+          <!-- Pestañas de Estado Logísticas Unificadas (Segmented Control) -->
+          <div class="bg-slate-100/90 p-1 rounded-xl inline-flex items-center gap-1 border border-slate-200/80 overflow-x-auto no-scrollbar max-w-full">
             <button (click)="onFilterStatusChange('ALL')"
                     type="button"
-                    class="px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
-                    [ngClass]="filterStatus === 'ALL' ? 'bg-[#1F6685] text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'">
-              Todos ({{ pickups.length }})
+                    class="px-3 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                    [ngClass]="filterStatus === 'ALL' ? 'bg-white text-[#123F5B] font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900 font-medium'">
+              <span>Todos</span>
+              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded"
+                    [ngClass]="filterStatus === 'ALL' ? 'bg-[#123F5B] text-white' : 'bg-slate-200/70 text-slate-700'">{{ pickups.length }}</span>
             </button>
 
             <button (click)="onFilterStatusChange('SOLICITADO')"
                     type="button"
-                    class="px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
-                    [ngClass]="filterStatus === 'SOLICITADO' ? 'bg-amber-600 text-white shadow-xs' : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200/60'">
-              Por Programar ({{ countPendientes }})
+                    class="px-3 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                    [ngClass]="filterStatus === 'SOLICITADO' ? 'bg-white text-[#123F5B] font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900 font-medium'">
+              <span>Por Programar</span>
+              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded"
+                    [ngClass]="filterStatus === 'SOLICITADO' ? 'bg-amber-600 text-white' : 'bg-slate-200/70 text-slate-700'">{{ countPendientes }}</span>
             </button>
 
             <button (click)="onFilterStatusChange('PROGRAMADO')"
                     type="button"
-                    class="px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
-                    [ngClass]="filterStatus === 'PROGRAMADO' ? 'bg-sky-700 text-white shadow-xs' : 'bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200/60'">
-              Programados ({{ countProgramados }})
+                    class="px-3 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                    [ngClass]="filterStatus === 'PROGRAMADO' ? 'bg-white text-[#123F5B] font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900 font-medium'">
+              <span>Programados</span>
+              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded"
+                    [ngClass]="filterStatus === 'PROGRAMADO' ? 'bg-sky-600 text-white' : 'bg-slate-200/70 text-slate-700'">{{ countProgramados }}</span>
             </button>
 
             <button (click)="onFilterStatusChange('EN_RUTA')"
                     type="button"
-                    class="px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
-                    [ngClass]="filterStatus === 'EN_RUTA' ? 'bg-indigo-700 text-white shadow-xs' : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200/60'">
-              En Ruta ({{ countEnRuta }})
+                    class="px-3 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                    [ngClass]="filterStatus === 'EN_RUTA' ? 'bg-white text-[#123F5B] font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900 font-medium'">
+              <span>En Ruta</span>
+              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded"
+                    [ngClass]="filterStatus === 'EN_RUTA' ? 'bg-indigo-600 text-white' : 'bg-slate-200/70 text-slate-700'">{{ countEnRuta }}</span>
             </button>
 
             <button (click)="onFilterStatusChange('RETIRADO')"
                     type="button"
-                    class="px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
-                    [ngClass]="filterStatus === 'RETIRADO' ? 'bg-emerald-700 text-white shadow-xs' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200/60'">
-              Retirados ({{ countRetirados }})
+                    class="px-3 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                    [ngClass]="filterStatus === 'RETIRADO' ? 'bg-white text-[#123F5B] font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900 font-medium'">
+              <span>Retirados</span>
+              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded"
+                    [ngClass]="filterStatus === 'RETIRADO' ? 'bg-emerald-600 text-white' : 'bg-slate-200/70 text-slate-700'">{{ countRetirados }}</span>
             </button>
           </div>
         </div>
 
         <!-- Lista de Despacho -->
-        <div class="divide-y divide-[#EEF3EF]">
+        <div class="divide-y divide-[#E2E8F0]">
           <div *ngFor="let p of paginatedPickups"
-               class="p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:bg-[#F9FAF8] transition-colors">
+               class="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-[#F9FAF8] transition-colors">
             
-            <div class="flex items-start sm:items-center gap-4 min-w-0 flex-1">
-              <div class="w-12 h-12 rounded-2xl bg-sky-50 text-[#1F6685] flex items-center justify-center text-xl flex-shrink-0 border border-sky-200 shadow-2xs">
+            <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0 flex-1">
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-sky-50 text-[#123F5B] flex items-center justify-center text-lg sm:text-xl flex-shrink-0 border border-sky-100">
                 <i class="fa-solid fa-route"></i>
               </div>
 
               <div class="min-w-0 flex-1">
-                <div class="flex items-center gap-2.5 flex-wrap">
+                <div class="flex items-center gap-2 flex-wrap">
                   <span class="text-xs font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
                     #{{ p.id }}
                   </span>
-                  <h4 class="font-heading font-bold text-base sm:text-lg text-brand-navy">
+                  <h4 class="font-heading font-bold text-base sm:text-lg text-[#123F5B] truncate">
                     {{ p.direccion }}
                   </h4>
-                  <span class="text-xs font-bold text-[#1F6685] px-2.5 py-0.5 rounded-lg bg-sky-50 border border-sky-200">
+                  <span class="text-xs font-medium text-[#123F5B] px-2.5 py-0.5 rounded-lg bg-sky-50 border border-sky-200/70">
                     {{ p.residuoNombre || 'Reciclaje Domiciliario' }}
                   </span>
                 </div>
 
-                <div class="text-xs text-slate-500 mt-1 flex items-center gap-2 flex-wrap">
+                <div class="text-xs text-slate-500 mt-1.5 flex items-center gap-2 flex-wrap">
                   <span><i class="fa-regular fa-calendar text-slate-400 mr-1"></i>{{ p.fechaTexto || p.fecha || 'Sin fecha' }}</span>
-                  <span class="text-slate-300" *ngIf="p.pesoEstimadoKg">•</span>
-                  <span *ngIf="p.pesoEstimadoKg" class="font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                    <i class="fa-solid fa-weight-hanging mr-1 text-slate-400"></i>Est: {{ p.pesoEstimadoKg }} kg
-                  </span>
-                  <span class="text-slate-300" *ngIf="p.kilosRecolectados">•</span>
-                  <span *ngIf="p.kilosRecolectados" class="font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                    <i class="fa-solid fa-scale-balanced mr-1"></i>{{ p.kilosRecolectados }} kg pesados
-                  </span>
+                  <ng-container *ngIf="p.pesoEstimadoKg">
+                    <span class="text-slate-300">•</span>
+                    <span class="font-medium text-slate-600">
+                      Est: {{ p.pesoEstimadoKg }} kg
+                    </span>
+                  </ng-container>
+                  <ng-container *ngIf="p.kilosRecolectados">
+                    <span class="text-slate-300">•</span>
+                    <span class="font-bold text-emerald-800">
+                      <i class="fa-solid fa-scale-balanced mr-1"></i>{{ p.kilosRecolectados }} kg pesados
+                    </span>
+                  </ng-container>
                   <span class="text-slate-300">•</span>
-                  <span *ngIf="p.comentarios" class="text-slate-600 font-medium">
+                  <span *ngIf="p.comentarios" class="text-slate-600 italic">
                     "{{ p.comentarios }}"
                   </span>
                   <span *ngIf="!p.comentarios" class="text-slate-400 italic">
@@ -223,41 +281,40 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
               </div>
             </div>
 
-            <!-- Botones de Coordinación -->
-            <div class="flex items-center gap-3 flex-wrap self-start lg:self-center flex-shrink-0">
+            <!-- Botones y Acciones de Coordinación -->
+            <div class="flex items-center gap-2.5 flex-wrap self-start md:self-center flex-shrink-0 w-full md:w-auto justify-between md:justify-end pt-2 md:pt-0 border-t md:border-t-0 border-slate-100">
               <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold border shadow-2xs"
                     [ngClass]="getStatusBadgeClass(p.estado)">
                 <i [ngClass]="getStatusIconClass(p.estado)"></i>
                 <span>{{ p.estado }}</span>
               </span>
 
-              <div class="flex items-center gap-1.5">
+              <div class="flex items-center gap-1.5 flex-wrap">
                 <!-- 1. SOLICITADO -> Programar -->
                 <button *ngIf="p.estado === 'SOLICITADO'"
                         (click)="requestAction(p, 'programar')"
                         type="button"
-                        class="px-4 py-2 rounded-xl text-xs font-bold bg-[#1F6685] hover:bg-[#164E66] text-white transition-all cursor-pointer shadow-xs flex items-center gap-1.5">
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#123F5B] hover:bg-[#164E66] text-white transition-all cursor-pointer shadow-xs flex items-center gap-1.5">
                   <i class="fa-regular fa-calendar-check text-xs"></i>
-                  <span>Programar en Ruta</span>
+                  <span>Programar</span>
                 </button>
 
-                <!-- 2. PROGRAMADO -> Editar / Re-programar antes de que el chofer inicie ruta -->
+                <!-- 2. PROGRAMADO -> Editar y Despachar -->
                 <button *ngIf="p.estado === 'PROGRAMADO'"
                         (click)="requestAction(p, 'programar')"
                         type="button"
-                        class="px-3.5 py-2 rounded-xl text-xs font-bold bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5"
-                        title="Editar fecha, horario o camión asignado antes de iniciar ruta">
-                  <i class="fa-solid fa-pen-to-square text-xs text-sky-600"></i>
+                        class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5"
+                        title="Editar fecha, horario o cuadrilla asignada">
+                  <i class="fa-solid fa-pen-to-square text-xs text-slate-500"></i>
                   <span>Editar</span>
                 </button>
 
-                <!-- Despachar a Cuadrilla -->
                 <button *ngIf="p.estado === 'PROGRAMADO'"
                         (click)="requestAction(p, 'en-ruta')"
                         type="button"
-                        class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white transition-all cursor-pointer shadow-xs flex items-center gap-1.5">
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white transition-all cursor-pointer shadow-xs flex items-center gap-1.5">
                   <i class="fa-solid fa-truck-fast text-xs"></i>
-                  <span>Despachar a Cuadrilla</span>
+                  <span>Despachar</span>
                 </button>
 
                 <!-- 3. EN_RUTA -> Retirado -->
@@ -273,16 +330,10 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
                 <button *ngIf="p.estado === 'RETIRADO'"
                         (click)="requestAction(p, 'pesado')"
                         type="button"
-                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#4F8A3D] hover:bg-[#3D6E2E] text-white transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#22a652] hover:bg-[#1b8e45] text-white transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
                   <i class="fa-solid fa-scale-balanced text-xs"></i>
                   <span>Registrar Báscula</span>
                 </button>
-
-                <div *ngIf="p.estado === 'PESADO'"
-                     class="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#EBF5E7] text-emerald-900 border border-[#CDE8C7] flex items-center gap-1">
-                  <i class="fa-solid fa-check text-emerald-600 text-xs"></i>
-                  <span>{{ p.kilosRecolectados ? p.kilosRecolectados + ' kg' : 'Pesado' }}</span>
-                </div>
               </div>
             </div>
           </div>
@@ -291,13 +342,13 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
             <div class="w-12 h-12 mx-auto rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center text-lg mb-2">
               <i class="fa-solid fa-inbox"></i>
             </div>
-            <p class="font-bold text-brand-navy text-sm">No hay retiros en este filtro</p>
+            <p class="font-bold text-[#123F5B] text-sm">No hay retiros en este filtro</p>
             <p class="text-xs text-slate-500 mt-0.5">Selecciona otra pestaña o cambia de sector.</p>
           </div>
         </div>
 
         <!-- Paginación -->
-        <div *ngIf="filteredPickups.length > 0" class="p-4 bg-[#F8FAF7] border-t border-[#EAEFE8] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <div *ngIf="filteredPickups.length > 0" class="p-4 bg-[#F8FAF7] border-t border-[#F8FAF7] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
           <span class="text-slate-500 font-medium">
             Mostrando <strong class="text-slate-800">{{ (currentPage - 1) * pageSize + 1 }}</strong> a
             <strong class="text-slate-800">{{ Math.min(currentPage * pageSize, filteredPickups.length) }}</strong> de
@@ -317,7 +368,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
                     (click)="setPage(page)"
                     type="button"
                     class="w-8 h-8 rounded-lg font-bold transition-all text-xs flex items-center justify-center cursor-pointer"
-                    [ngClass]="currentPage === page ? 'bg-[#1F6685] text-white shadow-xs' : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'">
+                    [ngClass]="currentPage === page ? 'bg-[#123F5B] text-white shadow-xs' : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'">
               {{ page }}
             </button>
 
@@ -333,34 +384,34 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
       </section>
 
       <!-- ==================== 4. TELEMETRÍA MULTICAMIÓN PARA DESPACHO ==================== -->
-      <section class="bg-white rounded-3xl border border-[#E2E9E4] p-6 sm:p-8 shadow-xs">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-[#EAEFE8]">
+      <section *ngIf="activeCoordTab === 'mapa'" class="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-2xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-[#E2E8F0]">
           <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-[#1F6685]">Monitoreo de Cuadrillas en Terreno</span>
-            <h3 class="font-heading font-extrabold text-xl sm:text-2xl text-brand-navy mt-0.5">
-              Rastreo Satelital y Estimación de Tiempos (ETA)
+            <h3 class="font-heading font-extrabold text-xl text-[#123F5B]">
+              Monitoreo en Terreno
             </h3>
+            <p class="text-xs text-gray-500 mt-0.5">Seguimiento satelital y tiempos estimados de llegada (ETA) por cuadrante</p>
           </div>
 
           <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-xs font-bold text-slate-500">Seleccionar Camión:</span>
+            <span class="text-xs font-semibold text-slate-500">Unidad:</span>
             <div class="inline-flex rounded-xl p-1 bg-slate-100 border border-slate-200">
               <button *ngFor="let c of camiones"
                       (click)="selectTruck(c.patente)"
                       type="button"
                       class="px-3 py-1 rounded-lg text-xs font-bold font-mono transition-all cursor-pointer"
-                      [ngClass]="selectedTruckPatente === c.patente ? 'bg-[#1F6685] text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'">
+                      [ngClass]="selectedTruckPatente === c.patente ? 'bg-[#123F5B] text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'">
                 {{ c.patente }}
               </button>
             </div>
           </div>
         </div>
 
-        <div class="rounded-2xl bg-[#F0F6F9] border-2 border-[#D4E6EF] p-4 sm:p-5 relative overflow-hidden">
+        <div class="rounded-2xl bg-[#F8FAF7] border-2 border-[#E2E8F0] p-4 sm:p-5 relative overflow-hidden">
           <div class="flex items-center justify-between gap-2 mb-3">
             <div class="flex items-center gap-2">
-              <i class="fa-solid fa-compass text-[#1F6685] text-lg"></i>
-              <span class="font-bold text-sm text-brand-navy">
+              <i class="fa-solid fa-compass text-[#123F5B] text-lg"></i>
+              <span class="font-bold text-sm text-[#123F5B]">
                 Camión {{ selectedCamion.patente }} — {{ currentWaypoint.name }}
               </span>
             </div>
@@ -370,7 +421,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
           </div>
 
           <div class="h-48 sm:h-56 w-full bg-white rounded-xl relative p-2 overflow-hidden border border-[#E1EDF2] select-none">
-            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-3xl flex flex-col items-center justify-center text-[10px] font-extrabold text-[#1F6685] border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
+            <div class="absolute -top-4 -right-4 w-44 sm:w-52 h-24 bg-gradient-to-br from-[#E3F2F8] to-[#D5EBF5] rounded-2xl flex flex-col items-center justify-center text-[10px] font-extrabold text-[#123F5B] border border-[#C5E1EE]/70 shadow-xs pointer-events-none">
               <div class="flex items-center gap-1.5 opacity-90">
                 <i class="fa-solid fa-water text-xs text-sky-500"></i>
                 <span>Lago Llanquihue</span>
@@ -391,7 +442,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
 
             <svg class="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 100 100">
               <path d="M 8 72 L 28 72 L 28 28 L 52 28 L 52 72 L 82 72" fill="none" stroke="#CBD5E1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 3"></path>
-              <path d="M 8 72 L 28 72 L 28 28 L 52 28 L 52 72 L 82 72" fill="none" stroke="#4F8A3D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"></path>
+              <path d="M 8 72 L 28 72 L 28 28 L 52 28 L 52 72 L 82 72" fill="none" stroke="#22a652" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"></path>
             </svg>
 
             <div class="absolute z-30 pointer-events-none -translate-x-1/2 -translate-y-1/2"
@@ -399,7 +450,7 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
                  [style.top.%]="currentWaypoint.y"
                  style="transition: left 1.2s cubic-bezier(0.4, 0, 0.2, 1), top 1.2s cubic-bezier(0.4, 0, 0.2, 1);">
               <div class="relative flex items-center justify-center">
-                <div class="relative w-9 h-9 rounded-full bg-gradient-to-tr from-[#1F6685] to-[#38BDF8] text-white flex items-center justify-center text-xs shadow-lg ring-2 ring-white">
+                <div class="relative w-9 h-9 rounded-full bg-gradient-to-tr from-[#123F5B] to-[#38BDF8] text-white flex items-center justify-center text-xs shadow-lg ring-2 ring-white">
                   <i class="fa-solid fa-truck-moving text-xs text-white"></i>
                 </div>
                 <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-[#041D2D] text-white text-[9px] font-mono font-bold px-1.5 py-0.5 rounded shadow whitespace-nowrap border border-slate-700">
@@ -412,23 +463,18 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
           <div class="mt-3 bg-white/95 rounded-xl p-3 border border-[#D0E2EC] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-50 text-[#1F6685] border border-sky-200">
-                  <i class="fa-solid fa-location-dot text-[10px]"></i>
-                  <span>Cuadrante en Atención</span>
-                </span>
-                <span class="text-xs font-bold text-[#123F5B] truncate">{{ currentWaypoint.name }}</span>
+                <span class="text-xs font-bold text-[#123F5B]">{{ currentWaypoint.name }}</span>
+                <span class="text-xs text-slate-400 font-medium">({{ currentWaypoint.detail }})</span>
               </div>
               <p class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-2 flex-wrap">
-                <span>{{ currentWaypoint.detail }}</span>
+                <span class="font-bold text-[#22a652]"><i class="fa-regular fa-clock mr-1"></i>ETA: {{ currentWaypoint.eta }}</span>
                 <span class="text-slate-300">•</span>
-                <span class="font-bold text-[#4F8A3D]">Llegada aprox: {{ currentWaypoint.eta }}</span>
-                <span class="text-slate-300">•</span>
-                <span class="font-semibold text-slate-600">{{ currentWaypoint.distancia }}</span>
+                <span class="font-semibold text-slate-600"><i class="fa-solid fa-route mr-1 text-slate-400"></i>{{ currentWaypoint.distancia }}</span>
               </p>
             </div>
 
             <div class="flex items-center gap-1.5 flex-shrink-0 self-end sm:self-center">
-              <button (click)="toggleTruckSimulation.emit()" type="button" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#EEF5EB] hover:bg-[#E0EDE0] text-[#3D742F] border border-[#C8DFCA] transition-colors flex items-center gap-1.5 cursor-pointer">
+              <button (click)="toggleTruckSimulation.emit()" type="button" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#F8FAF7] hover:bg-[#E0EDE0] text-[#1b8e45] border border-[#C8DFCA] transition-colors flex items-center gap-1.5 cursor-pointer">
                 <i class="fa-solid" [class.fa-pause]="truckSimulationRunning" [class.fa-play]="!truckSimulationRunning"></i>
                 <span>{{ truckSimulationRunning ? 'Pausar' : 'Reanudar' }}</span>
               </button>
@@ -446,56 +492,127 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
       <!-- ==================== MODAL TELEFÓNICO ==================== -->
       <div *ngIf="showNuevoRetiroModal"
            (click)="closeNuevoRetiroModal()"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="coord-mesa-title"
            class="fixed inset-0 z-[9999] overflow-y-auto bg-[#041D2D]/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 min-h-screen anim-modal-backdrop">
         <div (click)="$event.stopPropagation()"
-             class="relative w-full max-w-lg bg-white rounded-[2rem] shadow-2xl border border-[#E2E9E4] overflow-hidden anim-modal-panel text-slate-800 my-auto p-6 sm:p-8">
+             class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-[#E2E8F0] overflow-hidden anim-modal-panel text-slate-800 my-auto p-6 sm:p-8">
           
-          <div class="h-1.5 -mx-8 -mt-8 mb-6 bg-gradient-to-r from-[#1F6685] via-[#38BDF8] to-[#4F8A3D]"></div>
+          <div class="h-1.5 -mx-8 -mt-8 mb-6 bg-gradient-to-r from-[#123F5B] via-[#38BDF8] to-[#22a652]"></div>
 
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-2.5">
-              <div class="w-9 h-9 rounded-xl bg-sky-50 text-[#1F6685] flex items-center justify-center text-sm font-bold border border-sky-200">
-                <i class="fa-solid fa-headset"></i>
+              <div class="w-9 h-9 rounded-xl bg-sky-50 text-[#123F5B] flex items-center justify-center text-sm font-bold border border-sky-200">
+                <i class="fa-solid fa-file-circle-plus"></i>
               </div>
               <div>
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Despacho Logístico</span>
-                <h3 class="font-heading font-extrabold text-lg text-brand-navy">Mesa de Entrada de Solicitud Telefónica</h3>
+                <h3 id="coord-mesa-title" class="font-heading font-extrabold text-lg text-[#123F5B]">Ingresar Solicitud de Retiro</h3>
+                <p class="text-xs text-slate-400">Registro de solicitud vecinal para recolección</p>
               </div>
             </div>
-            <button (click)="closeNuevoRetiroModal()" type="button" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-colors cursor-pointer">
+            <button (click)="closeNuevoRetiroModal()" type="button" aria-label="Cerrar modal" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-colors cursor-pointer">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
 
-          <form (ngSubmit)="submitRetiroVecinal()" class="space-y-4 text-left">
+          <div *ngIf="mesaError" role="alert" aria-live="polite" class="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+            <i class="fa-solid fa-circle-exclamation text-rose-600"></i>
+            <span>{{ mesaError }}</span>
+          </div>
+
+          <form (ngSubmit)="submitRetiroVecinal()" class="space-y-3.5 text-left">
             <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Nombre o Teléfono del Vecino</label>
-              <input type="text" [(ngModel)]="nuevoVecinoNombre" name="nuevoVecinoNombre" required class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: Juan Pérez (+56 9 8765 4321)">
+              <label for="coordVecinoNombre" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Nombre Completo del Vecino</label>
+              <input id="coordVecinoNombre" type="text" [(ngModel)]="nuevoVecinoNombre" name="nuevoVecinoNombre" required class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: Juan Pérez González">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="coordVecinoRut" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">RUT Vecino (Opcional)</label>
+                <input id="coordVecinoRut" type="text" [value]="nuevoVecinoRut" (input)="onMesaRutInput($event)" name="nuevoVecinoRut" class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: 12.345.678-K">
+                <span *ngIf="mesaRutError" class="text-[10px] text-rose-600 font-bold mt-0.5 block">{{ mesaRutError }}</span>
+              </div>
+              <div>
+                <label for="coordVecinoTelefono" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Teléfono Móvil (Opcional)</label>
+                <input id="coordVecinoTelefono" type="text" [value]="nuevoVecinoTelefono" (input)="onMesaPhoneInput($event)" name="nuevoVecinoTelefono" class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: +56 9 8765 4321">
+                <span *ngIf="mesaPhoneError" class="text-[10px] text-rose-600 font-bold mt-0.5 block">{{ mesaPhoneError }}</span>
+              </div>
             </div>
 
             <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Dirección Exacta</label>
-              <input type="text" [(ngModel)]="nuevaDireccion" name="nuevaDireccion" required class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: San Francisco 320, Puerto Varas">
+              <label for="coordNuevaDireccion" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Dirección Exacta</label>
+              <input id="coordNuevaDireccion" type="text" [(ngModel)]="nuevaDireccion" name="nuevaDireccion" required class="input-stitch w-full py-2 px-3 text-sm font-medium" placeholder="Ej: San Francisco 320, Puerto Varas">
+            </div>
+
+            <!-- Fila: Material y Peso Estimado -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <!-- Selector de Material Personalizado -->
+              <div class="relative material-dropdown-container">
+                <label id="coordResiduoLabel" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Tipo de Residuo / Material</label>
+                <button
+                  type="button"
+                  (click)="toggleMaterialDropdown($event)"
+                  aria-labelledby="coordResiduoLabel"
+                  aria-haspopup="listbox"
+                  [attr.aria-expanded]="isMaterialDropdownOpen"
+                  class="w-full flex items-center justify-between py-2 px-3 rounded-xl border border-[#E2E8F0] bg-white hover:border-[#22a652] text-left shadow-2xs transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#22a652]/30 min-h-[42px]">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-7 h-7 rounded-lg bg-[#F8FAF7] text-[#22a652] flex items-center justify-center text-xs flex-shrink-0">
+                      <i [class]="getMaterialIcon(selectedResiduoNombre)"></i>
+                    </div>
+                    <span class="text-xs font-bold text-[#123F5B] truncate">{{ selectedResiduoNombre }}</span>
+                  </div>
+                  <i class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-200"
+                     [class.rotate-180]="isMaterialDropdownOpen"></i>
+                </button>
+
+                <!-- Menú Desplegable Flotante Moderno -->
+                <div *ngIf="isMaterialDropdownOpen"
+                     class="absolute left-0 right-0 top-full mt-1.5 bg-white rounded-2xl shadow-2xl border border-[#E2E8F0] p-2 z-[100] anim-modal-backdrop space-y-1">
+                  <button
+                    *ngFor="let r of residuos"
+                    type="button"
+                    [attr.aria-selected]="nuevoResiduoId === r.id"
+                    (click)="selectResiduo(r.id)"
+                    class="w-full text-left p-2 rounded-xl transition-all flex items-center justify-between group cursor-pointer"
+                    [ngClass]="nuevoResiduoId === r.id ? 'bg-[#F8FAF7] border border-[#E2E8F0]' : 'hover:bg-slate-50 border border-transparent'">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <div class="w-7 h-7 rounded-lg flex items-center justify-center text-xs flex-shrink-0 transition-colors"
+                           [ngClass]="nuevoResiduoId === r.id ? 'bg-[#22a652] text-white' : 'bg-slate-100 text-slate-600 group-hover:bg-[#F8FAF7] group-hover:text-[#22a652]'">
+                        <i [class]="getMaterialIcon(r.nombre)"></i>
+                      </div>
+                      <div class="min-w-0">
+                        <span class="text-xs font-bold text-[#123F5B] block truncate">{{ r.nombre }}</span>
+                        <span class="text-[10px] text-slate-400 block truncate">{{ r.descripcion || 'Reciclaje clasificado' }}</span>
+                      </div>
+                    </div>
+                    <i *ngIf="nuevoResiduoId === r.id" class="fa-solid fa-circle-check text-[#22a652] text-sm flex-shrink-0 ml-2"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Peso Estimado -->
+              <div>
+                <label for="coordNuevoPeso" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Peso Estimado (kg)</label>
+                <div class="relative">
+                  <input id="coordNuevoPeso" type="number" step="0.5" min="0.5" max="500" [(ngModel)]="nuevoPesoEstimadoKg" name="nuevoPesoEstimadoKg" class="input-stitch w-full py-2 px-3 text-sm font-medium text-center min-h-[42px]" placeholder="5.0">
+                  <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">kg</span>
+                </div>
+              </div>
             </div>
 
             <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Tipo de Residuo / Material</label>
-              <select [(ngModel)]="nuevoResiduoId" name="nuevoResiduoId" class="select-stitch w-full py-2 px-3 text-sm font-medium">
-                <option *ngFor="let r of residuos" [value]="r.id">{{ r.nombre }}</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-[#1F6685] mb-1">Observaciones para el Chofer</label>
-              <textarea [(ngModel)]="nuevosComentarios" name="nuevosComentarios" rows="2" class="input-stitch w-full py-2 px-3 text-sm" placeholder="Ej: Dejar cajas amarradas en el portón"></textarea>
+              <label for="coordNuevosComentarios" class="block text-xs font-bold uppercase tracking-wider text-[#123F5B] mb-1">Observaciones para el Chofer</label>
+              <textarea id="coordNuevosComentarios" [(ngModel)]="nuevosComentarios" name="nuevosComentarios" rows="2" class="input-stitch w-full py-2 px-3 text-sm" placeholder="Ej: Dejar cajas amarradas en el portón"></textarea>
             </div>
 
             <div class="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
               <button (click)="closeNuevoRetiroModal()" type="button" class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer">
                 Cancelar
               </button>
-              <button type="submit" [disabled]="isSubmittingRetiro" class="px-5 py-2.5 rounded-xl bg-[#1F6685] hover:bg-[#164E66] text-white text-xs font-bold cursor-pointer">
-                <span *ngIf="!isSubmittingRetiro">Agendar para Despacho</span>
+              <button type="submit" [disabled]="isSubmittingRetiro" class="px-5 py-2.5 rounded-xl bg-[#123F5B] hover:bg-[#164E66] text-white text-xs font-bold cursor-pointer">
+                <span *ngIf="!isSubmittingRetiro">Guardar Solicitud</span>
                 <span *ngIf="isSubmittingRetiro"><i class="fa-solid fa-spinner fa-spin"></i> Guardando...</span>
               </button>
             </div>
@@ -505,15 +622,17 @@ import { Sector, Camion, Residuo, Pickup, Waypoint } from '../data/sectors.data'
     </div>
   `
 })
-export class CoordinadorDashboardComponent implements OnInit, OnChanges {
+export class CoordinadorDashboardComponent implements OnChanges, OnDestroy {
   @Input() sector: Sector | null = null;
   @Input() sectores: Sector[] = [];
   @Input() pickups: Pickup[] = [];
   @Input() camiones: Camion[] = [];
+  @Input() catalogoDisponible: boolean | null = true;
   @Input() residuos: Residuo[] = [];
   @Input() activeWaypoint: Waypoint = { name: 'Costanera Sur', detail: 'Recorrido en curso', eta: '10 min', distancia: '1.2 km', x: 28, y: 72, estado: 'En recorrido' };
   @Input() truckSimulationRunning: boolean = true;
   @Input() truckSpeed: number = 1;
+  @Input() rotacionSemanal: RotacionSemanal | null = null;
 
   @Output() actionRequested = new EventEmitter<{ pickup: Pickup; action: 'programar' | 'en-ruta' | 'retirado' | 'pesado' | 'cancelar' }>();
   @Output() pickupCreated = new EventEmitter<any>();
@@ -523,6 +642,15 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges {
 
   Math = Math;
   selectedTruckPatente: string = 'PV-RC-2026';
+  activeCoordTab: 'planilla' | 'mapa' = 'planilla';
+
+  get sectoresReprogramados(): Sector[] {
+    return (this.sectores || []).filter(s => s.diaModificado);
+  }
+
+  get pickupsCoordinador(): Pickup[] {
+    return this.pickups.filter(p => p.estado !== 'CANCELADO');
+  }
 
   filterStatus: string = 'ALL';
   filterSector: string = 'ALL';
@@ -532,10 +660,42 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges {
 
   showNuevoRetiroModal = false;
   isSubmittingRetiro = false;
+  isMaterialDropdownOpen = false;
   nuevoVecinoNombre = '';
+  nuevoVecinoRut = '';
+  nuevoVecinoTelefono = '';
   nuevaDireccion = '';
   nuevoResiduoId = 1;
+  nuevoPesoEstimadoKg: number = 5.0;
   nuevosComentarios = '';
+  mesaRutError = '';
+  mesaPhoneError = '';
+  mesaError = '';
+
+  toggleMaterialDropdown(event?: Event): void {
+    event?.stopPropagation();
+    this.isMaterialDropdownOpen = !this.isMaterialDropdownOpen;
+  }
+
+  selectResiduo(id: number): void {
+    this.nuevoResiduoId = id;
+    this.isMaterialDropdownOpen = false;
+  }
+
+  get selectedResiduoNombre(): string {
+    const found = this.residuos.find(r => r.id === Number(this.nuevoResiduoId));
+    return found ? found.nombre : (this.residuos[0]?.nombre || 'Vidrio');
+  }
+
+  getMaterialIcon(name?: string): string {
+    if (!name) return 'fa-solid fa-recycle';
+    const n = name.toLowerCase();
+    if (n.includes('vidrio')) return 'fa-solid fa-wine-bottle';
+    if (n.includes('cartón') || n.includes('carton') || n.includes('papel')) return 'fa-solid fa-box-archive';
+    if (n.includes('plástico') || n.includes('plastico') || n.includes('pet')) return 'fa-solid fa-bottle-water';
+    if (n.includes('lata') || n.includes('metal')) return 'fa-solid fa-boxes-stacked';
+    return 'fa-solid fa-recycle';
+  }
 
   truckWaypointsMap: Record<string, Waypoint> = {
     'PV-RC-2026': { name: 'Costanera Sur / San Francisco', detail: 'Recorriendo cuadrante urbano', eta: '6 min', distancia: '850 m', x: 28, y: 72, estado: 'En recorrido' },
@@ -543,10 +703,8 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges {
     'PV-RC-2028': { name: 'Camino a Ensenada Km 2', detail: 'Traslado a planta de valorización', eta: '18 min', distancia: '3.1 km', x: 75, y: 60, estado: 'En traslado' }
   };
 
-  ngOnInit(): void {}
-
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['residuos'] && this.residuos && this.residuos.length > 0) {
+    if (changes['residuos'] && this.residuos?.length) {
       this.nuevoResiduoId = this.residuos[0].id;
     }
   }
@@ -631,23 +789,104 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges {
     this.actionRequested.emit({ pickup, action });
   }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.material-dropdown-container')) {
+      this.isMaterialDropdownOpen = false;
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapePress(): void {
+    if (this.isMaterialDropdownOpen) {
+      this.isMaterialDropdownOpen = false;
+      return;
+    }
+    if (this.showNuevoRetiroModal) {
+      this.closeNuevoRetiroModal();
+    }
+  }
+
+  ngOnDestroy(): void {
+    document.body.style.overflow = '';
+  }
+
+  onMesaRutInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const formatted = formatRut(input.value);
+    this.nuevoVecinoRut = formatted;
+    input.value = formatted;
+    if (this.nuevoVecinoRut && !validateRut(this.nuevoVecinoRut)) {
+      this.mesaRutError = 'RUT inválido (ej: 12.345.678-5)';
+    } else {
+      this.mesaRutError = '';
+    }
+  }
+
+  onMesaPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const formatted = formatChileanPhone(input.value);
+    this.nuevoVecinoTelefono = formatted;
+    input.value = formatted;
+    if (this.nuevoVecinoTelefono && !validateChileanPhone(this.nuevoVecinoTelefono)) {
+      this.mesaPhoneError = 'Formato celular: +56 9 XXXX XXXX';
+    } else {
+      this.mesaPhoneError = '';
+    }
+  }
+
   openNuevoRetiroModal(): void {
+    this.mesaError = '';
+    this.mesaRutError = '';
+    this.mesaPhoneError = '';
+    this.isMaterialDropdownOpen = false;
     this.showNuevoRetiroModal = true;
     document.body.style.overflow = 'hidden';
   }
 
   closeNuevoRetiroModal(): void {
     this.showNuevoRetiroModal = false;
+    this.isMaterialDropdownOpen = false;
     document.body.style.overflow = '';
   }
 
   submitRetiroVecinal(): void {
-    if (!this.nuevaDireccion) return;
+    this.mesaError = '';
+    if (!this.nuevaDireccion || !this.nuevaDireccion.trim()) {
+      this.mesaError = 'Debe indicar una dirección válida para la coordinación.';
+      return;
+    }
+    if (this.nuevoVecinoRut && !validateRut(this.nuevoVecinoRut)) {
+      this.mesaError = 'El RUT ingresado no es válido.';
+      return;
+    }
+    if (this.nuevoVecinoTelefono && !validateChileanPhone(this.nuevoVecinoTelefono)) {
+      this.mesaError = 'El número de teléfono móvil no es válido.';
+      return;
+    }
+
+    const pesoNum = Number(this.nuevoPesoEstimadoKg) > 0 ? Number(this.nuevoPesoEstimadoKg) : 5.0;
+
     this.isSubmittingRetiro = true;
+    const resObj = this.residuos.find(r => r.id === Number(this.nuevoResiduoId));
+    const contactoInfo = [
+      this.nuevoVecinoRut ? `RUT: ${this.nuevoVecinoRut}` : '',
+      this.nuevoVecinoTelefono ? `Tel: ${this.nuevoVecinoTelefono}` : ''
+    ].filter(Boolean).join(' • ');
+
+    const comentariosCompletos = `[Ingreso Mesa Despacho - ${this.nuevoVecinoNombre || 'Atención Telefónica'}${contactoInfo ? ' - ' + contactoInfo : ''}] ${this.nuevosComentarios || ''}`.trim();
+
     const item = {
-      direccion: this.nuevaDireccion,
-      residuoId: Number(this.nuevoResiduoId),
-      comentarios: `[Ingreso Mesa Despacho - ${this.nuevoVecinoNombre}] ${this.nuevosComentarios}`
+      vecinoNombre: this.nuevoVecinoNombre || 'Vecino Telefónico',
+      vecinoEmail: 'vecino.contacto@puertovaras.cl',
+      direccion: this.nuevaDireccion.trim(),
+      comuna: 'Puerto Varas',
+      residuoId: Number(this.nuevoResiduoId || 1),
+      residuoNombre: resObj?.nombre ?? 'Vidrio',
+      pesoEstimadoKg: pesoNum,
+      comentarios: comentariosCompletos,
+      observaciones: comentariosCompletos
     };
     this.pickupCreated.emit(item);
     setTimeout(() => {
@@ -655,7 +894,10 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges {
       this.closeNuevoRetiroModal();
       this.nuevaDireccion = '';
       this.nuevoVecinoNombre = '';
+      this.nuevoVecinoRut = '';
+      this.nuevoVecinoTelefono = '';
       this.nuevosComentarios = '';
+      this.nuevoPesoEstimadoKg = 5.0;
     }, 500);
   }
 
@@ -670,7 +912,7 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges {
       case 'RETIRADO':
         return 'bg-emerald-50 text-emerald-900 border-emerald-200/80';
       case 'PESADO':
-        return 'bg-[#EBF5E7] text-emerald-900 border-[#CDE8C7]';
+        return 'bg-[#ecf7e6] text-emerald-900 border-[#E2E8F0]';
       default:
         return 'bg-slate-100 text-slate-700 border-slate-200';
     }
@@ -693,3 +935,4 @@ export class CoordinadorDashboardComponent implements OnInit, OnChanges {
     }
   }
 }
+

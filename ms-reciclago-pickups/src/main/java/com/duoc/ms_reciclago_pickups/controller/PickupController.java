@@ -4,7 +4,6 @@ import com.duoc.ms_reciclago_pickups.dto.PickupHistoryResponse;
 import com.duoc.ms_reciclago_pickups.model.Pickup;
 import com.duoc.ms_reciclago_pickups.service.PickupService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -85,15 +83,25 @@ public class PickupController {
 
     /**
      * Transición SOLICITADO/PROGRAMADO → PROGRAMADO.
-     * Requiere camionId, camionPatente y fechaProgramada del coordinador.
+     * Requiere camionId y camionPatente del coordinador. fechaProgramada es opcional;
+     * si se omite, el servicio asigna automáticamente el día siguiente.
      */
     @RequestMapping(value = "/{id}/programar", method = {RequestMethod.PATCH, RequestMethod.POST})
     public ResponseEntity<?> programarRetiro(@PathVariable Long id,
-                                              @RequestParam Long camionId,
-                                              @RequestParam String camionPatente,
-                                              @RequestParam String fechaProgramada) {
-        LocalDateTime fecha = parseFechaProgramada(fechaProgramada);
-        Pickup actualizado = pickupService.programarRetiro(id, camionId, camionPatente, fecha);
+                                              @RequestParam(required = false) Long camionId,
+                                              @RequestParam(required = false) String camionPatente,
+                                              @RequestParam(required = false) String fechaProgramada,
+                                              @RequestBody(required = false) Map<String, Object> body) {
+        Long effCamionId = resolverLong(camionId, body, "camionId");
+        String effPatente = resolverString(camionPatente, body, "camionPatente");
+        String effFecha = resolverString(fechaProgramada, body, "fechaProgramada");
+
+        if (effCamionId == null || effPatente == null || effPatente.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Los campos camionId y camionPatente son obligatorios para programar un retiro"));
+        }
+
+        LocalDateTime fecha = (effFecha != null && !effFecha.isBlank()) ? parseFechaProgramada(effFecha) : null;
+        Pickup actualizado = pickupService.programarRetiro(id, effCamionId, effPatente, fecha);
         return ResponseEntity.ok(actualizado);
     }
 
@@ -113,29 +121,99 @@ public class PickupController {
 
     /** Transición RETIRADO → PESADO con registro del peso real en kg. */
     @RequestMapping(value = "/{id}/pesado", method = {RequestMethod.PATCH, RequestMethod.POST})
-    public ResponseEntity<?> registrarPesaje(@PathVariable Long id, @RequestParam Double pesoRealKg) {
-        Pickup actualizado = pickupService.registrarPesaje(id, pesoRealKg);
+    public ResponseEntity<?> registrarPesaje(@PathVariable Long id,
+                                              @RequestParam(required = false) Double pesoRealKg,
+                                              @RequestBody(required = false) Map<String, Object> body) {
+        Double effPeso = resolverDouble(pesoRealKg, body, "pesoRealKg");
+        if (effPeso == null || effPeso <= 0) {
+            return ResponseEntity.badRequest().body(Map.of("error", "El campo pesoRealKg es obligatorio y debe ser mayor a 0"));
+        }
+        Pickup actualizado = pickupService.registrarPesaje(id, effPeso);
         return ResponseEntity.ok(actualizado);
     }
 
     /** Cancela un retiro (solo si no está en PESADO o ya CANCELADO). */
     @RequestMapping(value = "/{id}/cancelar", method = {RequestMethod.PATCH, RequestMethod.POST})
-    public ResponseEntity<?> cancelarRetiro(@PathVariable Long id, @RequestParam(required = false) String motivo) {
-        Pickup actualizado = pickupService.cancelarRetiro(id, motivo);
+    public ResponseEntity<?> cancelarRetiro(@PathVariable Long id,
+                                            @RequestParam(required = false) String motivo,
+                                            @RequestBody(required = false) Map<String, Object> body) {
+        String effMotivo = resolverString(motivo, body, "motivo");
+        Pickup actualizado = pickupService.cancelarRetiro(id, effMotivo);
         return ResponseEntity.ok(actualizado);
     }
 
-    // ── Utilidad interna ──────────────────────────────────────────────
+    /**
+     * Endpoint unificado de actualización de estado compatible con la especificación PUT /api/pickups/{id}/status.
+     * Enruta dinámicamente al flujo de negocio correspondiente según el estado solicitado.
+     */
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> actualizarEstadoUnificado(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        String nuevoEstado = resolverString(null, body, "nuevoEstado");
+        if (nuevoEstado == null || nuevoEstado.isBlank()) {
+            nuevoEstado = resolverString(null, body, "estado");
+        }
+        if (nuevoEstado == null || nuevoEstado.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "El campo nuevoEstado (o estado) es obligatorio"));
+        }
+
+        return switch (nuevoEstado.toUpperCase().trim()) {
+            case "PROGRAMADO" -> programarRetiro(id, null, null, null, body);
+            case "EN_RUTA" -> cambiarEstadoEnRuta(id);
+            case "RETIRADO" -> marcarRetirado(id);
+            case "PESADO" -> registrarPesaje(id, null, body);
+            case "CANCELADO" -> cancelarRetiro(id, null, body);
+            default -> ResponseEntity.badRequest().body(Map.of("error", "Estado no reconocido: " + nuevoEstado
+                    + ". Estados válidos: PROGRAMADO, EN_RUTA, RETIRADO, PESADO, CANCELADO"));
+        };
+    }
+
+    // ── Utilidades internas ───────────────────────────────────────────
+
+    private Long resolverLong(Long valor, Map<String, Object> body, String clave) {
+        if (valor != null) {
+            return valor;
+        }
+        if (body != null && body.get(clave) != null) {
+            return Long.valueOf(body.get(clave).toString());
+        }
+        return null;
+    }
+
+    private String resolverString(String valor, Map<String, Object> body, String clave) {
+        if (valor != null) {
+            return valor;
+        }
+        if (body != null && body.get(clave) != null) {
+            return body.get(clave).toString();
+        }
+        return null;
+    }
+
+    private Double resolverDouble(Double valor, Map<String, Object> body, String clave) {
+        if (valor != null) {
+            return valor;
+        }
+        if (body != null && body.get(clave) != null) {
+            return Double.valueOf(body.get(clave).toString());
+        }
+        return null;
+    }
 
     /**
      * Parsea la fecha programada desde el formato ISO 8601.
-     * Soporta tanto "2026-09-17T10:30" (16 chars) como "2026-09-17T10:30:00".
+     * Soporta tanto "2026-09-17T10:30" (16 chars) como "2026-09-17T10:30:00",
+     * tolerando además valores decodificados con URL encoding (%3A, %20, etc.).
      */
     private LocalDateTime parseFechaProgramada(String fechaProgramada) {
         if (fechaProgramada == null || fechaProgramada.isBlank()) {
             throw new IllegalArgumentException("La fecha programada es obligatoria");
         }
         String normalized = fechaProgramada.trim();
+        try {
+            normalized = java.net.URLDecoder.decode(normalized, java.nio.charset.StandardCharsets.UTF_8);
+        } catch (Exception ignored) {
+            // Se ignora el fallo de decodificación de URL y se conserva el valor de fecha normalizado original
+        }
         if (normalized.length() == 16) {
             normalized += ":00";
         }

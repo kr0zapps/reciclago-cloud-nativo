@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "contactos_ciudadanos")
@@ -39,22 +40,25 @@ public class ContactoCiudadano {
     private String status = "RECIBIDO"; // RECIBIDO, EN_TRAMITE, RESUELTO
 
     @Column(nullable = false)
-    private LocalDateTime fechaIngreso = LocalDateTime.now();
+    private LocalDateTime fechaIngreso = LocalDateTime.now(ZoneId.systemDefault());
 
     public ContactoCiudadano() {
     }
 
-    public ContactoCiudadano(Long id, String ticketId, String nombre, String email, String telefono,
-                             String asunto, String mensaje, String status, LocalDateTime fechaIngreso) {
-        this.id = id;
-        this.ticketId = ticketId;
-        this.nombre = nombre;
-        this.email = email;
-        this.telefono = telefono;
-        this.asunto = asunto;
-        this.mensaje = mensaje;
-        this.status = status != null ? status : "RECIBIDO";
-        this.fechaIngreso = fechaIngreso != null ? fechaIngreso : LocalDateTime.now();
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private ContactoCiudadano(Builder builder) {
+        this.id = builder.id;
+        this.ticketId = builder.ticketId;
+        this.nombre = builder.nombre;
+        this.email = builder.email;
+        this.telefono = builder.telefono;
+        this.asunto = builder.asunto;
+        this.mensaje = builder.mensaje;
+        this.status = builder.status != null ? builder.status : "RECIBIDO";
+        this.fechaIngreso = builder.fechaIngreso != null ? builder.fechaIngreso : LocalDateTime.now(ZoneId.systemDefault());
     }
 
     public Long getId() {
@@ -127,5 +131,66 @@ public class ContactoCiudadano {
 
     public void setFechaIngreso(LocalDateTime fechaIngreso) {
         this.fechaIngreso = fechaIngreso;
+    }
+
+    public static class Builder {
+        private Long id;
+        private String ticketId;
+        private String nombre;
+        private String email;
+        private String telefono;
+        private String asunto;
+        private String mensaje;
+        private String status = "RECIBIDO";
+        private LocalDateTime fechaIngreso;
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder ticketId(String ticketId) {
+            this.ticketId = ticketId;
+            return this;
+        }
+
+        public Builder nombre(String nombre) {
+            this.nombre = nombre;
+            return this;
+        }
+
+        public Builder email(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public Builder telefono(String telefono) {
+            this.telefono = telefono;
+            return this;
+        }
+
+        public Builder asunto(String asunto) {
+            this.asunto = asunto;
+            return this;
+        }
+
+        public Builder mensaje(String mensaje) {
+            this.mensaje = mensaje;
+            return this;
+        }
+
+        public Builder status(String status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder fechaIngreso(LocalDateTime fechaIngreso) {
+            this.fechaIngreso = fechaIngreso;
+            return this;
+        }
+
+        public ContactoCiudadano build() {
+            return new ContactoCiudadano(this);
+        }
     }
 }

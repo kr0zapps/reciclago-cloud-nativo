@@ -43,7 +43,9 @@ public class Tarifa {
         this.comuna = comuna;
         this.costoBase = costoBase;
         this.costoAdicionalPorKg = costoAdicionalPorKg;
-        this.activo = activo != null ? activo : true;
+        if (activo != null) {
+            this.activo = activo;
+        }
     }
 
     public Long getId() {

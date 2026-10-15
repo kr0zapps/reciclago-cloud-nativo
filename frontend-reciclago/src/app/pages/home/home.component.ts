@@ -1,14 +1,14 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { QuadrantCardInfo, SectorInfo, ALL_HOME_SECTORS } from './data/home-sectors.data';
+import { QuadrantCardInfo } from './data/home-sectors.data';
 import { HomeHeroComponent } from './components/home-hero.component';
 import { HomeCycleComponent } from './components/home-cycle.component';
 import { HomeQuadrantsComponent } from './components/home-quadrants.component';
 import { HomeImpactComponent } from './components/home-impact.component';
 import { HomeModalsComponent } from './components/home-modals.component';
 
-export { SectorInfo, QuadrantCardInfo };
+export { SectorInfo, QuadrantCardInfo } from './data/home-sectors.data';
 
 @Component({
   selector: 'app-home',

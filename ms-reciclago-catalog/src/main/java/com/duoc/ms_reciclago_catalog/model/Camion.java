@@ -30,19 +30,35 @@ public class Camion {
     @Column(nullable = false)
     private Double capacidadDisponibleKg;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String estado = "DISPONIBLE"; // DISPONIBLE, EN_RUTA, MANTENIMIENTO
+    private EstadoCamion estado = EstadoCamion.DISPONIBLE;
 
     public Camion() {
     }
 
-    public Camion(Long id, String patente, String modelo, Double capacidadTotalKg, Double capacidadDisponibleKg, String estado) {
+    public Camion(Long id, String patente, String modelo, Double capacidadTotalKg, Double capacidadDisponibleKg, EstadoCamion estado) {
         this.id = id;
         this.patente = patente;
         this.modelo = modelo;
         this.capacidadTotalKg = capacidadTotalKg;
         this.capacidadDisponibleKg = capacidadDisponibleKg;
-        this.estado = estado != null ? estado : "DISPONIBLE";
+        this.estado = estado != null ? estado : EstadoCamion.DISPONIBLE;
+    }
+
+    public Camion(Long id, String patente, String modelo, Double capacidadTotalKg, Double capacidadDisponibleKg, String estado) {
+        this(id, patente, modelo, capacidadTotalKg, capacidadDisponibleKg, parseEstado(estado));
+    }
+
+    public static EstadoCamion parseEstado(String estadoStr) {
+        if (estadoStr == null || estadoStr.isBlank()) {
+            return EstadoCamion.DISPONIBLE;
+        }
+        try {
+            return EstadoCamion.valueOf(estadoStr.toUpperCase().trim());
+        } catch (IllegalArgumentException e) {
+            return EstadoCamion.DISPONIBLE;
+        }
     }
 
     public Long getId() {
@@ -85,11 +101,15 @@ public class Camion {
         this.capacidadDisponibleKg = capacidadDisponibleKg;
     }
 
-    public String getEstado() {
+    public EstadoCamion getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
-        this.estado = estado;
+    public void setEstado(EstadoCamion estado) {
+        this.estado = estado != null ? estado : EstadoCamion.DISPONIBLE;
+    }
+
+    public void setEstado(String estadoStr) {
+        this.estado = parseEstado(estadoStr);
     }
 }

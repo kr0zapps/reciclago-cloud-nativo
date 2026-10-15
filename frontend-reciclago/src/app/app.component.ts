@@ -25,7 +25,7 @@ import { GlobalModalsComponent } from './shared/components/global-modals/global-
   template: `
     <app-page-loader [isLoading]="isPageLoading"></app-page-loader>
 
-    <div class="min-h-screen flex flex-col bg-[#F8FAF7]">
+    <div class="min-h-screen max-w-full flex flex-col overflow-x-hidden" [ngClass]="(isHomePage && !isScrolled) ? 'bg-[#123F5B]' : 'bg-[#F8FAF7]'">
       <app-navbar
         [isHomePage]="isHomePage"
         [isScrolled]="isScrolled"
@@ -38,7 +38,7 @@ import { GlobalModalsComponent } from './shared/components/global-modals/global-
         (logoutClicked)="logout()">
       </app-navbar>
 
-      <main class="flex-1 flex flex-col relative bg-[#F8FAF7]">
+      <main class="flex-1 flex flex-col relative max-w-full overflow-x-hidden bg-[#F8FAF7]">
         <router-outlet></router-outlet>
       </main>
 
@@ -69,7 +69,9 @@ export class AppComponent implements OnInit, OnDestroy {
   showContact = false;
 
   isScrolled = false;
-  isHomePage = false;
+  isHomePage = typeof window !== 'undefined'
+    ? (window.location.pathname === '/' || window.location.pathname === '/index.html' || !window.location.hash || window.location.hash === '#/' || window.location.hash === '#')
+    : true;
 
   private readonly _destroying$ = new Subject<void>();
 
@@ -86,13 +88,19 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   constructor(
-    @Inject(MSAL_GUARD_CONFIG) private msalGuardConfig: MsalGuardConfiguration,
-    private authService: MsalService,
-    private msalBroadcastService: MsalBroadcastService,
-    private router: Router
+    @Inject(MSAL_GUARD_CONFIG) private readonly msalGuardConfig: MsalGuardConfiguration,
+    private readonly authService: MsalService,
+    private readonly msalBroadcastService: MsalBroadcastService,
+    private readonly router: Router
   ) { }
 
   ngOnInit(): void {
+    if (typeof window !== 'undefined') {
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+      window.scrollTo(0, 0);
+    }
     this.checkCurrentRoute();
     this.onWindowScroll();
 
