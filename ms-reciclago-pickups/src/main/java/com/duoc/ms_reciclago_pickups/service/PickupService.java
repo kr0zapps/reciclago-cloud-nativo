@@ -450,6 +450,14 @@ public class PickupService {
                     mensaje,
                     pickup.getEstado(),
                     LocalDateTime.now(ZoneId.systemDefault()));
+            emailDto.setDireccion(pickup.getDireccion());
+            emailDto.setComuna(pickup.getComuna());
+            emailDto.setResiduoNombre(pickup.getResiduoNombre());
+            emailDto.setPesoEstimadoKg(pickup.getPesoEstimadoKg());
+            emailDto.setCamionPatente(pickup.getCamionPatente());
+            if (pickup.getFechaProgramada() != null) {
+                emailDto.setFechaProgramada(pickup.getFechaProgramada().toString());
+            }
             rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_EMAIL, emailDto);
             log.info("Mensaje de Email publicado en RabbitMQ (cola {}): {}", RabbitMQConfig.QUEUE_EMAIL,
                     pickup.getCodigoRetiro());

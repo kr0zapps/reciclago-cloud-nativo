@@ -81,4 +81,58 @@ public class EmailEventDto implements Serializable {
     public void setFechaEvento(LocalDateTime fechaEvento) {
         this.fechaEvento = fechaEvento;
     }
+    private String direccion;
+    private String comuna;
+    private String residuoNombre;
+    private Double pesoEstimadoKg;
+    private String camionPatente;
+    private String fechaProgramada;
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    public String getComuna() {
+        return comuna;
+    }
+
+    public void setComuna(String comuna) {
+        this.comuna = comuna;
+    }
+
+    public String getResiduoNombre() {
+        return residuoNombre;
+    }
+
+    public void setResiduoNombre(String residuoNombre) {
+        this.residuoNombre = residuoNombre;
+    }
+
+    public Double getPesoEstimadoKg() {
+        return pesoEstimadoKg;
+    }
+
+    public void setPesoEstimadoKg(Double pesoEstimadoKg) {
+        this.pesoEstimadoKg = pesoEstimadoKg;
+    }
+
+    public String getCamionPatente() {
+        return camionPatente;
+    }
+
+    public void setCamionPatente(String camionPatente) {
+        this.camionPatente = camionPatente;
+    }
+
+    public String getFechaProgramada() {
+        return fechaProgramada;
+    }
+
+    public void setFechaProgramada(String fechaProgramada) {
+        this.fechaProgramada = fechaProgramada;
+    }
 }

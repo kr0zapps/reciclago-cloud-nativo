@@ -155,11 +155,13 @@ jobs:
           RABBITMQ_USER: ${{ secrets.RABBITMQ_USER || 'guest' }}
           RABBITMQ_PASS: ${{ secrets.RABBITMQ_PASS || 'guest' }}
           RABBITMQ_ERLANG_COOKIE: ${{ secrets.RABBITMQ_ERLANG_COOKIE || 'reciclago_cookie_secreta' }}
+          SPRING_MAIL_USERNAME: ${{ secrets.SPRING_MAIL_USERNAME || 'malvaro991@gmail.com' }}
+          SPRING_MAIL_PASSWORD: ${{ secrets.SPRING_MAIL_PASSWORD || 'dlsqeexwnjykplfs' }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER || 'ubuntu' }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: REGISTRY,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_SESSION_TOKEN,AWS_REGION,RABBITMQ_USER,RABBITMQ_PASS,RABBITMQ_ERLANG_COOKIE
+          envs: REGISTRY,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_SESSION_TOKEN,AWS_REGION,RABBITMQ_USER,RABBITMQ_PASS,RABBITMQ_ERLANG_COOKIE,SPRING_MAIL_USERNAME,SPRING_MAIL_PASSWORD
           script: |
             set -e
             echo "Conectado exitosamente a la instancia EC2..."
@@ -229,6 +231,8 @@ jobs:
             RABBITMQ_USER=${RABBITMQ_USER:-guest}
             RABBITMQ_PASS=${RABBITMQ_PASS:-guest}
             RABBITMQ_ERLANG_COOKIE=${RABBITMQ_ERLANG_COOKIE:-reciclago_cookie_secreta}
+            SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME:-malvaro991@gmail.com}
+            SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD:-dlsqeexwnjykplfs}
             ECR_REGISTRY=$REGISTRY
             IMAGE_TAG=latest
             EOF
