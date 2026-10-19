@@ -155,6 +155,8 @@ services:
       SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER:-guest}
       SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASS:-guest}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-malvaro991@gmail.com}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD:-dlsqeexwnjykplfs}
       # URL interna de ms-reciclago-catalog para sincronizacion de estados de camiones (best-effort)
       CATALOG_URL: http://ms-catalog:8081
     depends_on:
